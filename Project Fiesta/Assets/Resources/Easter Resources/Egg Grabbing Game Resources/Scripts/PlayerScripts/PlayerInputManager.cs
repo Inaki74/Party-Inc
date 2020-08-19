@@ -28,8 +28,6 @@ public class PlayerInputManager : MonoBehaviour
         if (ctx.started)
         {
             Debug.Log("Start");
-
-            
         }
 
         if (ctx.performed)
