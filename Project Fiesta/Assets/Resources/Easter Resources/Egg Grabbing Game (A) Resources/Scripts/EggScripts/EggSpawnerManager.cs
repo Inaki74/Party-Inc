@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+namespace EGGA_EggSpawner { 
 /// <summary>
 /// Manages the spawning of the eggs and its random factors like speed of spawning, which to spawn, where and in which direction.
 /// Randomness is done with 1D Perlin Noise.
@@ -84,7 +85,7 @@ public class EggSpawnerManager : MonoBehaviour
     private float GeneratePosition()
     {
         //Vector3 aux = new Vector3(cameraWidth * Mathf.PerlinNoise(Time.time * xScale, 0.0f), 0f, mainCamera.transform.position.z);
-        Vector3 aux = new Vector3(cameraWidth * Random.Range(0.05f,0.95f), 0f, mainCamera.transform.position.z);
+        Vector3 aux = new Vector3(cameraWidth * Random.Range(0.1f,0.9f), 0f, mainCamera.transform.position.z);
         float posX = mainCamera.ScreenToWorldPoint(aux).x;
         return posX;
     }
@@ -129,4 +130,5 @@ public class EggSpawnerManager : MonoBehaviour
             return 1;
         }
     }
+}
 }
