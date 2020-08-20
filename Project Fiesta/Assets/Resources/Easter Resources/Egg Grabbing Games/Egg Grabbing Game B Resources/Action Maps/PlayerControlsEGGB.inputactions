@@ -1,0 +1,56 @@
+{
+    "name": "PlayerControlsEGGB",
+    "maps": [
+        {
+            "name": "Movement",
+            "id": "3e914999-8a39-41f9-9e44-e22c3a3ee000",
+            "actions": [
+                {
+                    "name": "Move",
+                    "type": "Button",
+                    "id": "902759d1-5af5-46bf-a4dc-8d919be58bb6",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": ""
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "d20352d5-8f9e-4e62-a789-04aa716205cf",
+                    "path": "",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Move",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "c8ff88ca-be2f-45d4-8467-e79cde3485e5",
+                    "path": "<Touchscreen>/press",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Touch",
+                    "action": "Move",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        }
+    ],
+    "controlSchemes": [
+        {
+            "name": "Touch",
+            "bindingGroup": "Touch",
+            "devices": [
+                {
+                    "devicePath": "<Touchscreen>",
+                    "isOptional": false,
+                    "isOR": false
+                }
+            ]
+        }
+    ]
+}

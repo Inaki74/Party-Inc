@@ -4,7 +4,6 @@ using UnityEngine;
 
 /// <summary>
 /// Manages the spawning of the eggs and its random factors like speed of spawning, which to spawn, where and in which direction.
-/// Randomness is done with 1D Perlin Noise.
 /// </summary>
 public class EggSpawnerManager : MonoBehaviour
 {
@@ -27,7 +26,6 @@ public class EggSpawnerManager : MonoBehaviour
     private Camera mainCamera;
     private float cameraWidth;
     private Vector3 spawningHeight = new Vector3(1f, 17f, 0f);
-    private float xScale;
 
     void Start()
     {
@@ -35,7 +33,6 @@ public class EggSpawnerManager : MonoBehaviour
         cameraWidth = mainCamera.scaledPixelWidth;
         pool = GetComponent<EggPoolManager>();
         lastSpawnedTime = Time.time;
-        xScale = Random.Range(0.00f, 10.00f);
     }
 
     void Update()
