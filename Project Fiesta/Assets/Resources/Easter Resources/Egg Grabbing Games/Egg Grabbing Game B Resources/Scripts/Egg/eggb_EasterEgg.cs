@@ -2,8 +2,17 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// The falling egg, in charge of itself.
+/// </summary>
 public class eggb_EasterEgg : MonoBehaviour
 {
+    public delegate void ActionObtain(int score);
+    public static event ActionObtain onObtainEgg;
+
+    public delegate void ActionSpawn(int score);
+    public static event ActionSpawn onSpawnEgg;
+
     public EggType eggType;
 
     public enum EggType
@@ -30,6 +39,7 @@ public class eggb_EasterEgg : MonoBehaviour
 
     private bool isMoving;
     private bool hitGround;
+    private bool hitPlayer;
 
     private void Start()
     {
@@ -45,8 +55,12 @@ public class eggb_EasterEgg : MonoBehaviour
     private void Update()
     {
         hitGround = CheckIfHitGround();
+        hitPlayer = CheckIfHitPlayer();
 
-        Debug.Log(hitGround);
+        if (hitPlayer)
+        {
+            OnObtain();
+        }
 
         if (hitGround)
         {
@@ -101,13 +115,18 @@ public class eggb_EasterEgg : MonoBehaviour
 
     private void OnObtain()
     {
+        if (scoreModifier != -1)
+            onSpawnEgg?.Invoke(scoreModifier);
         //Add a score of scoreModifier
+        onObtainEgg?.Invoke(scoreModifier);
         //Play OnObtain animation (specific to each egg though)
         gameObject.SetActive(false);
     }
 
     private void OnBreak()
     {
+        if (scoreModifier != -1)
+            onSpawnEgg?.Invoke(scoreModifier);
         //Play OnBreak animation (specific to each egg though)
         gameObject.SetActive(false);
     }
@@ -120,5 +139,20 @@ public class eggb_EasterEgg : MonoBehaviour
     private bool CheckIfHitGround()
     {
         return transform.position.y < collisionDistance;
+    }
+
+    private bool CheckIfHitPlayer()
+    {
+        RaycastHit hitDown;
+
+        if(Physics.Raycast(transform.position, Vector3.down, out hitDown, collisionDistance))
+        {
+            if (hitDown.collider.gameObject.tag == "Player")
+            {
+                return true;
+            }
+        }
+        
+        return false;
     }
 }

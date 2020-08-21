@@ -8,8 +8,6 @@ public class eggb_Player : MonoBehaviour
     [SerializeField]
     public Camera MainCamera { get; private set; }
     private eggb_PlayerInputManager InputManager;
-    private Rigidbody Rb;
-    private BoxCollider Bc;
     #endregion
 
     #region Instance Variables
@@ -27,6 +25,7 @@ public class eggb_Player : MonoBehaviour
 
     public float movementSpeed;
     public float maxRangeOfMovement;
+    public float inputWaitTime;
 
     private bool isMoving;
     private bool runOnce;
@@ -36,8 +35,6 @@ public class eggb_Player : MonoBehaviour
     private void Start()
     {
         InputManager = GetComponent<eggb_PlayerInputManager>();
-        Rb = GetComponent<Rigidbody>();
-        Bc = GetComponent<BoxCollider>();
         MainCamera = FindObjectOfType<Camera>();
 
         railLeft = Constants.LEFT_LANE;
@@ -59,20 +56,18 @@ public class eggb_Player : MonoBehaviour
     {
         if (isMoving && runOnce)
         {
-            Debug.Log("Should start co routine");
             runOnce = false;
             StartCoroutine(MoveToCo(movementSpeed, InputManager.MovementDirection));
-        }    
+        }
     }
     #endregion
 
-    #region CoRoutines Functions
+    #region CoRoutine Functions
     /// <summary>
     /// Moves the player to the desired position
     /// </summary>
     private IEnumerator MoveToCo(float velocity, int direction)
     {
-        Debug.Log("Started Co Routine");
         Vector3 moveToVector;
 
         if(direction > 0f)
@@ -105,7 +100,7 @@ public class eggb_Player : MonoBehaviour
         }
 
         StartCoroutine(SmoothMovementCo(moveToVector, velocity));
-        yield return new WaitForSeconds(0.2f);
+        yield return new WaitForSeconds(inputWaitTime);
         runOnce = true;
     }
 
@@ -127,15 +122,5 @@ public class eggb_Player : MonoBehaviour
     private bool CheckIfReachedPosition(Vector3 v)
     {
         return transform.position == v;
-    }
-
-    private void SetLimits(float width)
-    {
-        maxRangeOfMovement = MainCamera.ScreenToWorldPoint(new Vector3(width, 0f, MainCamera.transform.position.z)).x * -1;
-    }
-
-    private void SetSpeed(float width)
-    {
-        movementSpeed = MainCamera.ScreenToWorldPoint(new Vector3(width, 0f, MainCamera.transform.position.z)).x * -1;
     }
 }

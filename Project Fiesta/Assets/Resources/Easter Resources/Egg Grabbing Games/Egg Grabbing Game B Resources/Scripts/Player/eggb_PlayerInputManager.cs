@@ -21,18 +21,27 @@ public class eggb_PlayerInputManager : MonoBehaviour
     {
         if (ctx.started)
         {
-            Debug.Log("Start");
+
         }
 
         if (ctx.performed)
         {
-            Debug.Log("Sustain");
+            // TOUCH
+            //if (Touchscreen.current.delta.x.ReadValue() > 5f)
+            //{
+            //    MovementDirection = 1;
+            //}
+            //else if (Touchscreen.current.delta.x.ReadValue() < -5f)
+            //{
+            //    MovementDirection = -1;
+            //}
 
-            if (Touchscreen.current.delta.x.ReadValue() > 5f)
+            // PC OSX
+            if (ctx.ReadValue<float>() == 1f)
             {
                 MovementDirection = 1;
             }
-            else if (Touchscreen.current.delta.x.ReadValue() < -5f)
+            else if (ctx.ReadValue<float>() == -1f)
             {
                 MovementDirection = -1;
             }
@@ -41,8 +50,6 @@ public class eggb_PlayerInputManager : MonoBehaviour
 
         if (ctx.canceled)
         {
-            Debug.Log("End");
-
             MovementDirection = 0;
         }
     }
