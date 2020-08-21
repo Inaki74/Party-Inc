@@ -19,19 +19,14 @@ public class eggb_PlayerInputManager : MonoBehaviour
 
     public void DoMove(InputAction.CallbackContext ctx)
     {
-        if (ctx.started)
-        {
-
-        }
-
         if (ctx.performed)
         {
             // TOUCH
-            //if (Touchscreen.current.delta.x.ReadValue() > 5f)
+            //if (CheckSideOfTOuch(Touchscreen.current.position.ReadValue()))
             //{
             //    MovementDirection = 1;
             //}
-            //else if (Touchscreen.current.delta.x.ReadValue() < -5f)
+            //else
             //{
             //    MovementDirection = -1;
             //}

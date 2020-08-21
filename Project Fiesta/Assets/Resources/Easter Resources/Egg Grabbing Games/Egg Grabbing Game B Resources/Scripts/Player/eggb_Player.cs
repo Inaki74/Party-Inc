@@ -8,6 +8,7 @@ public class eggb_Player : MonoBehaviour
     [SerializeField]
     public Camera MainCamera { get; private set; }
     private eggb_PlayerInputManager InputManager;
+    private BoxCollider Bc;
     #endregion
 
     #region Instance Variables
@@ -36,6 +37,7 @@ public class eggb_Player : MonoBehaviour
     {
         InputManager = GetComponent<eggb_PlayerInputManager>();
         MainCamera = FindObjectOfType<Camera>();
+        Bc = GetComponent<BoxCollider>();
 
         railLeft = Constants.LEFT_LANE;
         railMiddle = Constants.MID_LANE;
@@ -54,7 +56,7 @@ public class eggb_Player : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (isMoving && runOnce)
+        if (runOnce)
         {
             runOnce = false;
             StartCoroutine(MoveToCo(movementSpeed, InputManager.MovementDirection));
@@ -70,37 +72,24 @@ public class eggb_Player : MonoBehaviour
     {
         Vector3 moveToVector;
 
-        if(direction > 0f)
+        if (direction > 0f)
         {
-            if (currentRail == Rail.left)
-            {
-                moveToVector = railMiddle;
-                currentRail = Rail.middle;
-            }
-            else if (currentRail == Rail.middle)
-            {
-                moveToVector = railRight;
-                currentRail = Rail.right;
-            }
-            else moveToVector = transform.position;
+            moveToVector = railRight;
         }
-        else
+        else if (direction < 0f)
         {
-            if (currentRail == Rail.right)
-            {
-                moveToVector = railMiddle;
-                currentRail = Rail.middle;
-            }
-            else if (currentRail == Rail.middle)
-            {
-                moveToVector = railLeft;
-                currentRail = Rail.left;
-            }
-            else moveToVector = transform.position;
+            moveToVector = railLeft;
         }
+        else moveToVector = railMiddle;
 
-        StartCoroutine(SmoothMovementCo(moveToVector, velocity));
-        yield return new WaitForSeconds(inputWaitTime);
+        Bc.enabled = false;
+        while (!CheckIfReachedPosition(moveToVector))
+        {
+            transform.position = Vector3.MoveTowards(transform.position, moveToVector, velocity * Time.deltaTime);
+            yield return new WaitForEndOfFrame();
+        }
+        Bc.enabled = true;
+        yield return new WaitForEndOfFrame();
         runOnce = true;
     }
 
@@ -110,17 +99,14 @@ public class eggb_Player : MonoBehaviour
     /// <param name="v"></param>
     /// <param name="velocity"></param>
     /// <returns></returns>
-    private IEnumerator SmoothMovementCo(Vector3 v, float velocity)
-    {
-        while (!CheckIfReachedPosition(v)) {
-            transform.position = Vector3.MoveTowards(transform.position, v, velocity * Time.deltaTime);
-            yield return new WaitForEndOfFrame();
-        }
-    }
+    //private IEnumerator SmoothMovementCo(Vector3 v, float velocity)
+    //{
+        
+    //}
     #endregion
 
     private bool CheckIfReachedPosition(Vector3 v)
     {
-        return transform.position == v;
+        return transform.position.x == v.x;
     }
 }
