@@ -6,16 +6,10 @@ using UnityEngine.InputSystem;
 public class eggb_PlayerInputManager : MonoBehaviour
 {
     public float MovementDirection { get; private set; }
-
-    private bool lastInput;
-
-    //private Player player;
-
     private float widthMiddlePoint;
-    // Start is called before the first frame update
+
     void Start()
     {
-        //player = GetComponent<Player>();
         widthMiddlePoint = Screen.width / 2;
     }
 
@@ -23,15 +17,8 @@ public class eggb_PlayerInputManager : MonoBehaviour
     {
         if (ctx.started)
         {
-            // PC OSX\
-            MovementDirection = ctx.ReadValue<float>();
-        }
-
-
-        if (ctx.performed)
-        {
             // TOUCH
-            //if (CheckSideOfTOuch(Touchscreen.current.position.ReadValue()))
+            //if (CheckSideOfTouch(Touchscreen.current.position.ReadValue()))
             //{
             //    MovementDirection = 1;
             //}
@@ -40,8 +27,8 @@ public class eggb_PlayerInputManager : MonoBehaviour
             //    MovementDirection = -1;
             //}
 
-            
-            //CheckSideOfTouch(Touchscreen.current.position.ReadValue()) || 
+            // PC OSX
+            MovementDirection = ctx.ReadValue<float>();
         }
 
         if (ctx.canceled)

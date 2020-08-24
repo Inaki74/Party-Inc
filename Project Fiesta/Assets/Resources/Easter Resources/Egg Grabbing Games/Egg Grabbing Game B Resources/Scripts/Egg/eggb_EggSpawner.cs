@@ -13,6 +13,7 @@ public class eggb_EggSpawner : MonoBehaviour
     private eggb_EggPoolManager pool;
     private float waveInterval;
 
+    #region Unity Callbacks
     void Start()
     {
         pool = FindObjectOfType<eggb_EggPoolManager>();
@@ -34,6 +35,7 @@ public class eggb_EggSpawner : MonoBehaviour
             }
         }
     }
+    #endregion
 
     /// <summary>
     /// Co routine that waits for the manager OK.
@@ -77,11 +79,19 @@ public class eggb_EggSpawner : MonoBehaviour
         egg.transform.position = spawningPosition;
     }
 
+    /// <summary>
+    /// Sets the intervals between each egg spawn.
+    /// </summary>
+    /// <param name="interval"></param>
     public void SetIntervals(float interval)
     {
         waveInterval = interval;
     }
 
+    /// <summary>
+    /// Sets the egg spawning routine.
+    /// </summary>
+    /// <param name="routine"></param>
     public void SetRoutine(List<int> routine)
     {
         OK = true;

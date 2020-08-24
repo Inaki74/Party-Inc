@@ -3,18 +3,25 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+/// <summary>
+/// The manager in charge of the UI.
+/// </summary>
 public class eggb_UIManager : MonoBehaviour
-{ 
+{
     public int playerScore;
     public int totalScore = 0;
+
+    #region UI Elements
     public Text playerScoreText;
     public Text totalScoreText;
     public Text countdownText;
-    // Start is called before the first frame update
+    #endregion
+
+    #region Unity Callbacks
     void Start()
     {
         playerScore = 0;
-        StartCoroutine("WaitForTotalScoreCo");
+        GetTotalScore();
         playerScoreText.text = "SCORE: " + playerScore;
     }
 
@@ -34,17 +41,29 @@ public class eggb_UIManager : MonoBehaviour
         eggb_GameManager.onGameStart -= GameStartCountdown;
         eggb_GameManager.onGameFinish -= GameFinishDisplay;
     }
+    #endregion
 
+    /// <summary>
+    /// Countdown coroutine starter.
+    /// </summary>
     private void GameStartCountdown()
     {
         StartCoroutine("CountdownCo");
     }
 
+    /// <summary>
+    /// Game finish coroutine starter.
+    /// </summary>
+    /// <param name="looped"></param>
     private void GameFinishDisplay(bool looped)
     {
         StartCoroutine(GameFinishCo(looped));
     }
 
+    /// <summary>
+    /// The countdown coroutine.
+    /// </summary>
+    /// <returns></returns>
     private IEnumerator CountdownCo()
     {
         //3
@@ -65,6 +84,11 @@ public class eggb_UIManager : MonoBehaviour
         countdownText.text = "";
     }
 
+    /// <summary>
+    /// The game finish coroutine.
+    /// </summary>
+    /// <param name="looped"></param>
+    /// <returns></returns>
     private IEnumerator GameFinishCo(bool looped)
     {
         countdownText.text = "FINISH!";
@@ -79,19 +103,30 @@ public class eggb_UIManager : MonoBehaviour
         countdownText.text = "";
     }
 
-    private IEnumerator WaitForTotalScoreCo()
+    /// <summary>
+    /// A Coroutine that waits for the 
+    /// </summary>
+    /// <returns></returns>
+    private void GetTotalScore()
     {
-        yield return new WaitUntil(() => totalScore != 0);
         totalScore = eggb_GameManager.Current.GetEggCount();
         totalScoreText.text = "LEFT: " + totalScore;
     }
 
+    /// <summary>
+    /// What happens when the player obtains an egg.
+    /// </summary>
+    /// <param name="score"></param>
     private void OnEggObtain(int score)
     {
         playerScore += score;
         playerScoreText.text = "SCORE: " + playerScore;
     }
 
+    /// <summary>
+    /// What happens when an egg is spawned.
+    /// </summary>
+    /// <param name="score"></param>
     private void OnEggSpawn(int score)
     {
         totalScore -= score;

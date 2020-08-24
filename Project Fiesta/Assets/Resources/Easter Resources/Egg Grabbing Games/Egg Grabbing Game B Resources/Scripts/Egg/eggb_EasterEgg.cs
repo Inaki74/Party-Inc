@@ -7,40 +7,50 @@ using UnityEngine;
 /// </summary>
 public class eggb_EasterEgg : MonoBehaviour
 {
+    #region Events
     public delegate void ActionObtain(int score);
     public static event ActionObtain onObtainEgg;
 
     public delegate void ActionSpawn(int score);
     public static event ActionSpawn onSpawnEgg;
+    #endregion
 
+    #region Egg Specifics
+    private int scoreModifier;
     public EggType eggType;
-
     public enum EggType
     {
         normal,
         rotten,
         golden
     }
+    #endregion
 
+    #region Inspector Assignables
     public LayerMask whatIsGround;
 
     [SerializeField] private Material normalMaterial;
     [SerializeField] private Material rottenMaterial;
     [SerializeField] private Material goldenMaterial;
+    #endregion
 
+    #region Components
     private MeshRenderer Mr;
+    #endregion
 
-    private int scoreModifier;
-
+    #region Physics Variables
     private Vector3 directionVector;
-
     private float fallingSpeed;
     private float collisionDistance;
+    #endregion
 
+    #region Boolean Variables
     private bool isMoving;
     private bool hitGround;
     private bool hitPlayer;
+    #endregion
 
+    #region Unity Callbacks
     private void Start()
     {
         Mr = GetComponent<MeshRenderer>();
@@ -85,15 +95,12 @@ public class eggb_EasterEgg : MonoBehaviour
     {
         isMoving = false;
     }
+    #endregion
 
-    private void OnCollisionEnter(Collision collision)
-    {
-        if (collision.gameObject.tag == "Player")
-        {
-            OnObtain();
-        }
-    }
-
+    /// <summary>
+    /// Sets the eggs settings depending of which type of egg it is.
+    /// </summary>
+    /// <param name="t"></param>
     private void SetEgg(EggType t)
     {
         switch (t)
@@ -113,6 +120,9 @@ public class eggb_EasterEgg : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// What happens when an egg is obtained.
+    /// </summary>
     private void OnObtain()
     {
         if (scoreModifier != -1)
@@ -123,6 +133,9 @@ public class eggb_EasterEgg : MonoBehaviour
         gameObject.SetActive(false);
     }
 
+    /// <summary>
+    /// What happens when an egg is broken (reaches the ground without the player touching it).
+    /// </summary>
     private void OnBreak()
     {
         if (scoreModifier != -1)
@@ -131,16 +144,29 @@ public class eggb_EasterEgg : MonoBehaviour
         gameObject.SetActive(false);
     }
 
+    /// <summary>
+    /// Sets the vector in which the egg moves.
+    /// </summary>
+    /// <param name="v"></param>
     public void SetDirectionVector(Vector3 v)
     {
         directionVector = v;
     }
 
+    /// <summary>
+    /// Checks if the egg hit the ground.
+    /// </summary>
+    /// <returns></returns>
     private bool CheckIfHitGround()
     {
-        return transform.position.y < collisionDistance;
+        return Physics.Raycast(transform.position, Vector3.down, collisionDistance, whatIsGround);
+        //return transform.position.y < collisionDistance;
     }
 
+    /// <summary>
+    /// Checks if the egg hit the player.
+    /// </summary>
+    /// <returns></returns>
     private bool CheckIfHitPlayer()
     {
         RaycastHit hitDown;

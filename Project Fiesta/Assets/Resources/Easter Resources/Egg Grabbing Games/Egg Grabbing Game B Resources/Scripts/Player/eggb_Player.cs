@@ -28,7 +28,6 @@ public class eggb_Player : MonoBehaviour
 
     public Vector3 moveToVector;
 
-    private bool isMoving;
     private bool runOnce;
     #endregion
 
@@ -47,11 +46,6 @@ public class eggb_Player : MonoBehaviour
 
         currentRail = Rail.middle;
         transform.position = railMiddle;
-    }
-
-    private void Update()
-    {
-        isMoving = Mathf.Abs(InputManager.MovementDirection) > 0f;
     }
 
     private void FixedUpdate()
@@ -90,19 +84,13 @@ public class eggb_Player : MonoBehaviour
         yield return new WaitForEndOfFrame();
         runOnce = true;
     }
-
-    /// <summary>
-    /// Provides soft movement to position v at a certain velocity.
-    /// </summary>
-    /// <param name="v"></param>
-    /// <param name="velocity"></param>
-    /// <returns></returns>
-    //private IEnumerator SmoothMovementCo(Vector3 v, float velocity)
-    //{
-        
-    //}
     #endregion
 
+    /// <summary>
+    /// Check if the player has reached a certain vector3 position.
+    /// </summary>
+    /// <param name="v"></param>
+    /// <returns></returns>
     private bool CheckIfReachedPosition(Vector3 v)
     {
         return transform.position.x == v.x;

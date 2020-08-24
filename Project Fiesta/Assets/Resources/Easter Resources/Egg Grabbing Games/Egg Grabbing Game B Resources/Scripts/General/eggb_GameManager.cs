@@ -6,10 +6,11 @@ using Array2DEditor;
 using System.Linq;
 
 /// <summary>
-/// The game manager, responsible of starting the game and keeping game settings
+/// The game manager, responsible of starting the game and managing its functionality.
 /// </summary>
 public class eggb_GameManager : MonoBehaviour
 {
+    #region Singleton Specifics
     private static eggb_GameManager _current;
     public static eggb_GameManager Current
     {
@@ -23,21 +24,27 @@ public class eggb_GameManager : MonoBehaviour
             return _current;
         }
     }
+    #endregion
 
+    #region Events
     public delegate void ActionGameStart();
     public static event ActionGameStart onGameStart;
 
     public delegate void ActionGameFinish(bool looped);
     public static event ActionGameFinish onGameFinish;
+    #endregion
 
+    // Path to the Egg Maps directory, relative to the resources folder //TODO: Check if this is consistent with other devices.
     private static string path = "Easter Resources/Egg Grabbing Games/Egg Grabbing Game B Resources/EggMaps/";
 
+    #region General Game Settings
     [Header("General Game Settings")]
     public GameObject managersPrefab;
     public float countdown;
-    private int amountOfEasyMaps = 4;
-    private int amountOfMediumMaps = 4;
-    private int amountOfHardMaps = 2;
+    public int amountOfEasyMaps = 4;
+    public int amountOfMediumMaps = 4;
+    public int amountOfHardMaps = 2;
+    #endregion
 
     [Header("Difficulty isnt working right now")]
     public EGGBDifficulty difficulty;
@@ -48,11 +55,13 @@ public class eggb_GameManager : MonoBehaviour
         hard
     }
 
+    #region Spawner Settings
     [Header("Spawner Game Settings")]
     public float waveIntervals;
     public float timeLimitOffset;
+    #endregion
 
-    [SerializeField] public Array2DInt[] eggMaps = new Array2DInt[10];
+    [SerializeField] public Array2DInt[] eggMaps;
     private float currentTime;
     private float startingTime;
     private bool gameStarted;
@@ -60,10 +69,13 @@ public class eggb_GameManager : MonoBehaviour
     public bool isGameFinished;
     public int playerScore;
 
+    #region Unity Callbacks
     private void Awake()
     {
         _current = this;
         eggb_EasterEgg.onObtainEgg += OnEggObtain;
+        eggMaps = new Array2DInt[amountOfEasyMaps + amountOfMediumMaps + amountOfHardMaps];
+        eggMaps = InitializeEggMaps();
     }
 
     private void OnDestroy()
@@ -71,11 +83,8 @@ public class eggb_GameManager : MonoBehaviour
         eggb_EasterEgg.onObtainEgg -= OnEggObtain;
     }
 
-    // Start is called before the first frame update
     void Start()
     {
-        Debug.Log("EGG initialized");
-        eggMaps = InitializeEggMaps();
         isGameFinished = false;
 
         gameStarted = false;
@@ -84,7 +93,6 @@ public class eggb_GameManager : MonoBehaviour
         onGameStart?.Invoke();
     }
 
-    // Update is called once per frame
     void Update()
     {
         currentTime = Time.time;
@@ -103,7 +111,12 @@ public class eggb_GameManager : MonoBehaviour
             isGameFinished = false;
         }
     }
+    #endregion
 
+    /// <summary>
+    /// The Game Finish coroutine which restarts the entire game.
+    /// </summary>
+    /// <returns></returns>
     private IEnumerator GameFinishCo()
     {
         yield return new WaitForSeconds(2.5f);

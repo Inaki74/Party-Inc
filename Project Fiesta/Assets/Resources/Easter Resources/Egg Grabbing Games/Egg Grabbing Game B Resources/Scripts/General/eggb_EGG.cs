@@ -4,8 +4,7 @@ using UnityEngine;
 using Array2DEditor;
 
 /// <summary>
-/// The present game session where we store the spawning routines and info of the game.
-/// EGG, Egg Grabbing Game
+/// The present game session where we store the info of the game.
 /// </summary>
 [System.Serializable]
 public class eggb_EGG

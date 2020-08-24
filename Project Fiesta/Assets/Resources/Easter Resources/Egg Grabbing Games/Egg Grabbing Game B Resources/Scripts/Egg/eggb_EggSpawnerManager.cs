@@ -9,6 +9,10 @@ using Array2DEditor;
 /// </summary>
 public class eggb_EggSpawnerManager : MonoBehaviour
 {
+    // The spawners specific ID.
+    public static int spawnerId;
+
+    #region Configurations & Info
     // The intervals between waves.
     [SerializeField] private float waveIntervals;
     // The wave routines that each spawner must respect.
@@ -19,7 +23,9 @@ public class eggb_EggSpawnerManager : MonoBehaviour
     private int currentWave;
     // The total time of spawning of the eggMap.
     private float timeLimit;
+    #endregion
 
+    #region Spawners
     // Spawners GO
     private GameObject leftSpawnerGO;
     private GameObject middleSpawnerGO;
@@ -29,16 +35,18 @@ public class eggb_EggSpawnerManager : MonoBehaviour
     private eggb_EggSpawner leftSpawner;
     private eggb_EggSpawner middleSpawner;
     private eggb_EggSpawner rightSpawner;
+    #endregion
 
+    #region Private Auxiliary Variables
     // Current time we are living.
     private float currentTime;
     // The start time of spawning the map.
     private float startTime;
     private bool editorMode = false;
     private bool runOnce = true;
+    #endregion
 
-    public static int spawnerId;
-
+    #region Unity Callbacks
     private void Start()
     {
         if (leftSpawnerGO != null) { leftSpawnerGO.transform.position = Constants.LEFT_LANE; }
@@ -119,6 +127,7 @@ public class eggb_EggSpawnerManager : MonoBehaviour
             }
         }
     }
+    #endregion
 
     /// <summary>
     /// Instantiates the spawners in their appropiate places.
@@ -148,6 +157,12 @@ public class eggb_EggSpawnerManager : MonoBehaviour
         spawner.SetRoutine(newRoutine);
     }
 
+    /// <summary>
+    /// Gets the entire list of the matrix column.
+    /// </summary>
+    /// <param name="column"></param>
+    /// <param name="matrix"></param>
+    /// <returns></returns>
     private List<int> GetColumnOfMatrix(int column, int[,] matrix)
     {
         if (column > 2 || column < 0)
@@ -167,6 +182,11 @@ public class eggb_EggSpawnerManager : MonoBehaviour
         return aux;
     }
 
+    /// <summary>
+    /// Sets some personalized settings such as the interval in which eggs spawn and the offset between waves.
+    /// </summary>
+    /// <param name="intervals"></param>
+    /// <param name="offset"></param>
     public void SetSettings(float intervals, float offset)
     {
         waveIntervals = intervals;
