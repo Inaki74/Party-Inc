@@ -5,7 +5,9 @@ using UnityEngine.InputSystem;
 
 public class eggb_PlayerInputManager : MonoBehaviour
 {
-    public int MovementDirection { get; private set; }
+    public float MovementDirection { get; private set; }
+
+    private bool lastInput;
 
     //private Player player;
 
@@ -19,6 +21,13 @@ public class eggb_PlayerInputManager : MonoBehaviour
 
     public void DoMove(InputAction.CallbackContext ctx)
     {
+        if (ctx.started)
+        {
+            // PC OSX\
+            MovementDirection = ctx.ReadValue<float>();
+        }
+
+
         if (ctx.performed)
         {
             // TOUCH
@@ -31,15 +40,7 @@ public class eggb_PlayerInputManager : MonoBehaviour
             //    MovementDirection = -1;
             //}
 
-            // PC OSX
-            if (ctx.ReadValue<float>() == 1f)
-            {
-                MovementDirection = 1;
-            }
-            else if (ctx.ReadValue<float>() == -1f)
-            {
-                MovementDirection = -1;
-            }
+            
             //CheckSideOfTouch(Touchscreen.current.position.ReadValue()) || 
         }
 

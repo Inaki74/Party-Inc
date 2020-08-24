@@ -35,6 +35,7 @@ public class eggb_EggSpawnerManager : MonoBehaviour
     // The start time of spawning the map.
     private float startTime;
     private bool editorMode = false;
+    private bool runOnce = true;
 
     public static int spawnerId;
 
@@ -59,7 +60,11 @@ public class eggb_EggSpawnerManager : MonoBehaviour
         if (FindObjectOfType<eggb_GameManager>() == null)
         {
             editorMode = true;
-        }else eggMap = eggb_EGG.Current.GetEggMap(0);
+        }else eggMap = eggb_GameManager.Current.GetEggMap(0);
+
+        Debug.Log(waveIntervals);
+        Debug.Log(eggMap.GetCells().GetLength(0));
+        Debug.Log(timeLimitOffset);
 
         timeLimit = waveIntervals * eggMap.GetCells().GetLength(0) + timeLimitOffset;
 
@@ -82,11 +87,15 @@ public class eggb_EggSpawnerManager : MonoBehaviour
                 if (currentWave >= 10)
                 {
                     Debug.Log("Game has ended.");
-                    currentWave = -1;
+                    if (runOnce)
+                    {
+                        eggb_GameManager.Current.SetGameFinished(true);
+                        runOnce = false;
+                    }
                     return;
                 }
 
-                eggMap = eggb_EGG.Current.GetEggMap(currentWave);
+                eggMap = eggb_GameManager.Current.GetEggMap(currentWave);
                 timeLimit = waveIntervals * eggMap.GetCells().GetLength(0) + timeLimitOffset;
 
                 UpdateRoutines(leftSpawner, GetColumnOfMatrix(0, eggMap.GetCells()));

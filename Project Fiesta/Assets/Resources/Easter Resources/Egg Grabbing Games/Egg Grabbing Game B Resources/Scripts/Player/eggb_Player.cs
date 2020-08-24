@@ -25,8 +25,8 @@ public class eggb_Player : MonoBehaviour
     private Vector3 railRight;
 
     public float movementSpeed;
-    public float maxRangeOfMovement;
-    public float inputWaitTime;
+
+    public Vector3 moveToVector;
 
     private bool isMoving;
     private bool runOnce;
@@ -68,10 +68,8 @@ public class eggb_Player : MonoBehaviour
     /// <summary>
     /// Moves the player to the desired position
     /// </summary>
-    private IEnumerator MoveToCo(float velocity, int direction)
+    private IEnumerator MoveToCo(float velocity, float direction)
     {
-        Vector3 moveToVector;
-
         if (direction > 0f)
         {
             moveToVector = railRight;

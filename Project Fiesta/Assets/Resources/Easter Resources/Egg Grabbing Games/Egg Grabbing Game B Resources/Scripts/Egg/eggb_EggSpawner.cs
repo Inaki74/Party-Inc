@@ -27,7 +27,7 @@ public class eggb_EggSpawner : MonoBehaviour
         if(eggMapCol.Count == 0)
         {
             // Ask if the game is not finished
-            if (!eggb_EGG.Current.isGameFinished)
+            if (!eggb_GameManager.Current.isGameFinished)
             {
                 // Wait for the OK of the manager
                 StartCoroutine("WaitForOKCo");

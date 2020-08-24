@@ -10,10 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 349d81111bfb3e440af05ecd5f8e0ef9, type: 3}
-  m_Name: eggmp_Easy6
+  m_Name: eggmp_Medium3
   m_EditorClassIdentifier: 
   gridSize: {x: 3, y: 3}
   cells:
-  - row: 00000000ffffffffffffffff
-  - row: ffffffff00000000ffffffff
-  - row: ffffffffffffffff00000000
+  - row: 000000000000000000000000
+  - row: 000000000000000000000000
+  - row: 000000000000000000000000
