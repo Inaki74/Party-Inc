@@ -39,9 +39,11 @@ public class eggb_EasterEgg : MonoBehaviour
     #endregion
 
     #region Physics Variables
+    private float fallingAcceleration;
     private Vector3 directionVector;
     private float fallingSpeed;
-    private float collisionDistance;
+    private float playerCollisionDistance;
+    private float groundCollisionDistance;
     #endregion
 
     #region Boolean Variables
@@ -57,8 +59,10 @@ public class eggb_EasterEgg : MonoBehaviour
 
         SetEgg(eggType);
 
-        fallingSpeed = 9.8f;
-        collisionDistance = 0.1f;
+        fallingAcceleration = 9.8f;
+        fallingSpeed = 0f;
+        playerCollisionDistance = 0.3f;
+        groundCollisionDistance = 0.3f;
         directionVector = Vector3.down;
     }
 
@@ -66,6 +70,7 @@ public class eggb_EasterEgg : MonoBehaviour
     {
         hitGround = CheckIfHitGround();
         hitPlayer = CheckIfHitPlayer();
+        fallingSpeed += fallingAcceleration * Time.deltaTime;
 
         if (hitPlayer)
         {
@@ -94,6 +99,7 @@ public class eggb_EasterEgg : MonoBehaviour
     private void OnDisable()
     {
         isMoving = false;
+        fallingSpeed = 0f;
     }
     #endregion
 
@@ -159,7 +165,7 @@ public class eggb_EasterEgg : MonoBehaviour
     /// <returns></returns>
     private bool CheckIfHitGround()
     {
-        return Physics.Raycast(transform.position, Vector3.down, collisionDistance, whatIsGround);
+        return Physics.Raycast(transform.position, Vector3.down, groundCollisionDistance, whatIsGround);
         //return transform.position.y < collisionDistance;
     }
 
@@ -171,9 +177,9 @@ public class eggb_EasterEgg : MonoBehaviour
     {
         RaycastHit hitDown;
 
-        if(Physics.Raycast(transform.position, Vector3.down, out hitDown, collisionDistance))
+        if(Physics.Raycast(transform.position, Vector3.down, out hitDown, playerCollisionDistance))
         {
-            if (hitDown.collider.gameObject.tag == "Player")
+            if (hitDown.collider.gameObject.tag == "Player" && !hitDown.collider.gameObject.GetComponent<eggb_Player>().GetIfStunned())
             {
                 return true;
             }
