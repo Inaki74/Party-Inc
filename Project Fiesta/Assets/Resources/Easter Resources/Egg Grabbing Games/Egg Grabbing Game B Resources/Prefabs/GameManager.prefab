@@ -45,7 +45,23 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   managersPrefab: {fileID: 2276027874578927911, guid: 281520ca779fa46e7818de75cf326072,
     type: 3}
-  countdown: 5
+  countdown: 4
+  amountOfEasyMaps: 4
+  amountOfMediumMaps: 4
+  amountOfHardMaps: 2
   difficulty: 0
   waveIntervals: 0.2
   timeLimitOffset: 2
+  eggMaps:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  isGameFinished: 0
+  playerScore: 0
