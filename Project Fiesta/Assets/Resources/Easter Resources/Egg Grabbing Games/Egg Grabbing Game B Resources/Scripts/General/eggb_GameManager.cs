@@ -129,7 +129,7 @@ public class eggb_GameManager : MonoBehaviour
     /// </summary>
     public Array2DInt[] InitializeEggMaps()
     {
-        Array2DInt[] aux = new Array2DInt[10];
+        Array2DInt[] aux = new Array2DInt[amountOfEasyMaps + amountOfMediumMaps + amountOfHardMaps];
 
         int[] randomNumberE = RandomlyDecideMap(TotalAmountOfMaps("Easy"), amountOfEasyMaps); //TODO: TotalAmountOfMaps is very inefficient, find a better way of getting the amount of files.
         int[] randomNumberM = RandomlyDecideMap(TotalAmountOfMaps("Medium"), amountOfMediumMaps);
