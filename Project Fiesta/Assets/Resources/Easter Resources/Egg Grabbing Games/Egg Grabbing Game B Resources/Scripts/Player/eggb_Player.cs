@@ -143,6 +143,7 @@ public class eggb_Player : MonoBehaviour
     {
         if(scoreModifier == -1)
         {
+
             StartCoroutine("StunnedCo");
             StartCoroutine(StunnedAnimationCo());
         }
