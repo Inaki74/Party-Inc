@@ -145,7 +145,7 @@ public class eggb_Player : MonoBehaviour
         {
 
             StartCoroutine("StunnedCo");
-            StartCoroutine(StunnedAnimationCo());
+            //StartCoroutine(StunnedAnimationCo());
         }
     }
 

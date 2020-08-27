@@ -15,15 +15,6 @@ public class CharacterAnim : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKey(KeyCode.RightArrow))
-        {
-            anim.SetBool("isRight", true);
-        }
-           
-        else
-        { 
-            anim.SetBool("isRight", false);
-        }
 
 
         if (Input.GetKey(KeyCode.LeftArrow))

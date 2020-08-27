@@ -5,7 +5,7 @@ using UnityEngine.InputSystem;
 
 public class eggb_PlayerInputManager : MonoBehaviour
 {
-    public float MovementDirection { get; private set; }
+    public int MovementDirection { get; private set; }
     private float widthMiddlePoint;
 
     void Start()
@@ -28,7 +28,7 @@ public class eggb_PlayerInputManager : MonoBehaviour
             //}
 
             // PC OSX
-            MovementDirection = ctx.ReadValue<float>();
+            MovementDirection = (int)ctx.ReadValue<float>();
         }
 
         if (ctx.canceled)
