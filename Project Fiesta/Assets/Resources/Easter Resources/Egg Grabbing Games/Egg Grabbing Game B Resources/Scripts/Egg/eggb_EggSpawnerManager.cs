@@ -70,10 +70,6 @@ public class eggb_EggSpawnerManager : MonoBehaviour
             editorMode = true;
         }else eggMap = eggb_GameManager.Current.GetEggMap(0);
 
-        Debug.Log(waveIntervals);
-        Debug.Log(eggMap.GetCells().GetLength(0));
-        Debug.Log(timeLimitOffset);
-
         timeLimit = waveIntervals * eggMap.GetCells().GetLength(0) + timeLimitOffset;
 
         UpdateRoutines(leftSpawner, GetColumnOfMatrix(0, eggMap.GetCells()));

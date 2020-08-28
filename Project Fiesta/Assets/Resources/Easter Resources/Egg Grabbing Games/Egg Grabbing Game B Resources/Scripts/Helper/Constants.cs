@@ -9,4 +9,5 @@ public static class Constants
     public static Vector3 RIGHT_LANE = new Vector3(2f, 0.5f, 0f);
     public static string INT_MOVDIR_ANIM = "MoveDirection";
     public static string BOOL_STUNNED_ANIM = "isStunned";
+    public static string BOOL_BROKENEGG_ANIM = "Broken";
 }

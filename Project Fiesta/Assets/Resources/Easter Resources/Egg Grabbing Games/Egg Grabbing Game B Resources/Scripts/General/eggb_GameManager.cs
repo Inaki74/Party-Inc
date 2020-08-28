@@ -121,6 +121,8 @@ public class eggb_GameManager : MonoBehaviour
     {
         yield return new WaitForSeconds(2.5f);
 
+        Resources.UnloadUnusedAssets();
+
         SceneManager.LoadScene("EggGrabbingGameB");
     }
 

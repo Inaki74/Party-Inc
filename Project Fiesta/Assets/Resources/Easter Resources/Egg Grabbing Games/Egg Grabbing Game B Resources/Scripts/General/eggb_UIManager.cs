@@ -27,7 +27,6 @@ public class eggb_UIManager : MonoBehaviour
 
     private void Awake()
     {
-        Debug.Log("UI awakened");
         eggb_EasterEgg.onObtainEgg += OnEggObtain;
         eggb_EasterEgg.onSpawnEgg += OnEggSpawn;
         eggb_GameManager.onGameStart += GameStartCountdown;

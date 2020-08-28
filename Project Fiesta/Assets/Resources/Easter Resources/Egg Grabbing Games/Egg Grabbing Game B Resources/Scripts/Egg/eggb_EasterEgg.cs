@@ -35,18 +35,17 @@ public class eggb_EasterEgg : MonoBehaviour
     #endregion
 
     #region Components
-    private MeshRenderer Mr;
+    //private MeshRenderer Mr;
+    private Animator anim;
+    private Rigidbody Rb;
+    public SphereCollider Sc;
     #endregion
 
     #region Physics Variables
-    private float fallingAcceleration;
-    private Vector3 directionVector;
-    private float fallingSpeed;
-    private float playerCollisionDistance;
-    private float groundCollisionDistance;
     #endregion
 
     #region Boolean Variables
+    private bool onlyHitOnce;
     private bool isMoving;
     private bool hitGround;
     private bool hitPlayer;
@@ -55,51 +54,48 @@ public class eggb_EasterEgg : MonoBehaviour
     #region Unity Callbacks
     private void Start()
     {
-        Mr = GetComponent<MeshRenderer>();
+        
+    }
+
+    private void Awake()
+    {
+        Sc = GetComponent<SphereCollider>();
+        anim = GetComponent<Animator>();
+        Rb = GetComponent<Rigidbody>();
+
 
         SetEgg(eggType);
-
-        fallingAcceleration = 9.8f;
-        fallingSpeed = 0f;
-        playerCollisionDistance = 0.3f;
-        groundCollisionDistance = 0.3f;
-        directionVector = Vector3.down;
-    }
-
-    private void Update()
-    {
-        hitGround = CheckIfHitGround();
-        hitPlayer = CheckIfHitPlayer();
-        fallingSpeed += fallingAcceleration * Time.deltaTime;
-
-        if (hitPlayer)
-        {
-            OnObtain();
-        }
-
-        if (hitGround)
-        {
-            OnBreak();
-        }
-    }
-
-    private void FixedUpdate()
-    {
-        if (isMoving)
-        {
-            transform.Translate(directionVector * fallingSpeed * Time.deltaTime);
-        }
     }
 
     private void OnEnable()
     {
-        isMoving = true;
+        Sc.enabled = true;
+        Rb.useGravity = true;
     }
 
     private void OnDisable()
     {
-        isMoving = false;
-        fallingSpeed = 0f;
+        
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if(collision.gameObject.tag == "Player" && !collision.gameObject.GetComponent<eggb_Player>().GetIfStunned()) {
+            Debug.Log("Collided player");
+            Sc.enabled = false;
+            Rb.useGravity = false;
+            Rb.velocity = Vector3.zero;
+            OnObtain();
+        }
+
+        if (collision.gameObject.tag == "Ground" || (collision.gameObject.tag == "Egg" && collision.rigidbody.position.y < 2f))
+        {
+            Debug.Log("Collided ground");
+            Sc.enabled = false;
+            Rb.useGravity = false;
+            Rb.velocity = Vector3.zero;
+            OnBreak();
+        }
     }
     #endregion
 
@@ -112,15 +108,15 @@ public class eggb_EasterEgg : MonoBehaviour
         switch (t)
         {
             case EggType.normal:
-                Mr.material = normalMaterial;
+                //Mr.material = normalMaterial;
                 scoreModifier = 1;
                 break;
             case EggType.rotten:
-                Mr.material = rottenMaterial;
+                //Mr.material = rottenMaterial;
                 scoreModifier = -1;
                 break;
             case EggType.golden:
-                Mr.material = goldenMaterial;
+                //Mr.material = goldenMaterial;
                 scoreModifier = 3;
                 break;
         }
@@ -144,47 +140,80 @@ public class eggb_EasterEgg : MonoBehaviour
     /// </summary>
     private void OnBreak()
     {
+        Debug.Log("Break");
         if (scoreModifier != -1)
             onSpawnEgg?.Invoke(scoreModifier);
         //Play OnBreak animation (specific to each egg though)
+        anim.SetBool(Constants.BOOL_BROKENEGG_ANIM, true);
+    }
+
+    public void FinishBreakAnimation()
+    {
+        anim.SetBool(Constants.BOOL_BROKENEGG_ANIM, false);
         gameObject.SetActive(false);
     }
 
-    /// <summary>
-    /// Sets the vector in which the egg moves.
-    /// </summary>
-    /// <param name="v"></param>
-    public void SetDirectionVector(Vector3 v)
-    {
-        directionVector = v;
-    }
+    ///// <summary>
+    ///// Sets the vector in which the egg moves.
+    ///// </summary>
+    ///// <param name="v"></param>
+    //public void SetDirectionVector(Vector3 v)
+    //{
+    //    directionVector = v;
+    //}
 
-    /// <summary>
-    /// Checks if the egg hit the ground.
-    /// </summary>
-    /// <returns></returns>
-    private bool CheckIfHitGround()
-    {
-        return Physics.Raycast(transform.position, Vector3.down, groundCollisionDistance, whatIsGround);
-        //return transform.position.y < collisionDistance;
-    }
+    ///// <summary>
+    ///// Checks if the egg hit the ground.
+    ///// </summary>
+    ///// <returns></returns>
+    //private bool CheckIfHitGround()
+    //{
+    //    return Physics.Raycast(transform.position, Vector3.down, groundCollisionDistance, whatIsGround);
+    //}
 
-    /// <summary>
-    /// Checks if the egg hit the player.
-    /// </summary>
-    /// <returns></returns>
-    private bool CheckIfHitPlayer()
-    {
-        RaycastHit hitDown;
+    ///// <summary>
+    ///// Checks if the egg hit the player.
+    ///// </summary>
+    ///// <returns></returns>
+    //private bool CheckIfHitPlayer()
+    //{
+    //    RaycastHit hitDown;
 
-        if(Physics.Raycast(transform.position, Vector3.down, out hitDown, playerCollisionDistance))
-        {
-            if (hitDown.collider.gameObject.tag == "Player" && !hitDown.collider.gameObject.GetComponent<eggb_Player>().GetIfStunned())
-            {
-                return true;
-            }
-        }
+    //    if(Physics.Raycast(transform.position, Vector3.down, out hitDown, playerCollisionDistance))
+    //    {
+    //        if (hitDown.collider.gameObject.tag == "Player" && !hitDown.collider.gameObject.GetComponent<eggb_Player>().GetIfStunned())
+    //        {
+    //            return true;
+    //        }
+    //    }
         
-        return false;
-    }
+    //    return false;
+    //}
 }
+
+
+////have we moved more than our minimum extent? 
+//Vector3 movementThisStep = transform.position - previousPosition;
+//float movementSqrMagnitude = movementThisStep.sqrMagnitude;
+ 
+//	   if (movementSqrMagnitude > sqrMinimumExtent) 
+//		{ 
+//	      float movementMagnitude = Mathf.Sqrt(movementSqrMagnitude);
+//        RaycastHit hitInfo; 
+ 
+//	      //check for obstructions we might have missed 
+//	      if (Physics.Raycast(previousPosition, movementThisStep, out hitInfo, movementMagnitude, layerMask.value))
+//              {
+//                 if (!hitInfo.collider)
+//                     return;
+ 
+//                 if (hitInfo.collider.isTrigger)
+//                     hitInfo.collider.SendMessage("OnTriggerEnter", myCollider);
+ 
+//                 if (!hitInfo.collider.isTrigger)
+//                     transform.position = hitInfo.point - (movementThisStep / movementMagnitude) * partialExtent; 
+ 
+//              }
+//	   } 
+ 
+//	   previousPosition = transform.position; 

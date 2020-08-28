@@ -18,17 +18,17 @@ public class eggb_PlayerInputManager : MonoBehaviour
         if (ctx.started)
         {
             // TOUCH
-            //if (CheckSideOfTouch(Touchscreen.current.position.ReadValue()))
-            //{
-            //    MovementDirection = 1;
-            //}
-            //else
-            //{
-            //    MovementDirection = -1;
-            //}
+            if (CheckSideOfTouch(Touchscreen.current.position.ReadValue()))
+            {
+                MovementDirection = 1;
+            }
+            else
+            {
+                MovementDirection = -1;
+            }
 
             // PC OSX
-            MovementDirection = (int)ctx.ReadValue<float>();
+            //MovementDirection = (int)ctx.ReadValue<float>();
         }
 
         if (ctx.canceled)

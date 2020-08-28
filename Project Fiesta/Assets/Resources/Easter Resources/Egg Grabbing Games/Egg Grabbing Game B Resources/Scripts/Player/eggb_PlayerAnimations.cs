@@ -20,7 +20,6 @@ public class eggb_PlayerAnimations : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        Debug.Log(inputManager.MovementDirection);
         if(player.GetIfStunned()){
             //Stunned
             anim.SetBool(Constants.BOOL_STUNNED_ANIM, true);

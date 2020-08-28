@@ -90,7 +90,10 @@ public class eggb_Player : MonoBehaviour
             transform.position = Vector3.MoveTowards(transform.position, moveToVector, velocity * Time.deltaTime);
             yield return new WaitForEndOfFrame();
         }
-        Bc.enabled = true;
+
+        if(!isStunned)
+            Bc.enabled = true;
+
         yield return new WaitForEndOfFrame();
         runOnce = true;
     }
@@ -103,29 +106,11 @@ public class eggb_Player : MonoBehaviour
     {
         isStunned = true;
         Bc.enabled = false;
+        Debug.Log("Disabled");
         yield return new WaitForSeconds(stunTime);
+        Debug.Log("Enabled");
         Bc.enabled = true;
         isStunned = false;
-    }
-
-    /// <summary>
-    /// A Coroutine responsible for animating stunned.
-    /// </summary>
-    /// <returns></returns>
-    private IEnumerator StunnedAnimationCo()
-    {
-        var tempColor = Mr.material.color;
-        for (int i = 0; i < 8; i++)
-        {
-            //alpha 0
-            tempColor.a = 0f;
-            Mr.material.color = tempColor;
-            yield return new WaitForSeconds(stunTime/16);
-            //alpha1
-            tempColor.a = 1f;
-            Mr.material.color = tempColor;
-            yield return new WaitForSeconds(stunTime/16);
-        }
     }
     #endregion
 
@@ -143,9 +128,7 @@ public class eggb_Player : MonoBehaviour
     {
         if(scoreModifier == -1)
         {
-
             StartCoroutine("StunnedCo");
-            //StartCoroutine(StunnedAnimationCo());
         }
     }
 
