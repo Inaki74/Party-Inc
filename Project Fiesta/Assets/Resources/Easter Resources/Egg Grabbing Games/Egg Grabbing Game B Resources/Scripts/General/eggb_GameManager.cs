@@ -5,6 +5,9 @@ using UnityEngine.SceneManagement;
 using Array2DEditor;
 using System.Linq;
 
+using Photon.Pun;
+using Photon.Realtime;
+
 /// <summary>
 /// The game manager, responsible of starting the game and managing its functionality.
 /// </summary>
@@ -76,6 +79,8 @@ public class eggb_GameManager : MonoBehaviour
         eggb_EasterEgg.onObtainEgg += OnEggObtain;
         eggMaps = new Array2DInt[amountOfEasyMaps + amountOfMediumMaps + amountOfHardMaps];
         eggMaps = InitializeEggMaps();
+
+        InitializeNetworkSettings();
     }
 
     private void OnDestroy()
@@ -263,12 +268,16 @@ public class eggb_GameManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Actions to do when an onObtainEgg event is triggered. Sets the player score in here
-    /// and updates the highest score if possible.
+    /// Actions to do when an onObtainEgg event is triggered. Sets the player score.
     /// </summary>
     /// <param name="score"></param>
     public void OnEggObtain(int score)
     {
         playerScore += score;
+    }
+
+    public void InitializeNetworkSettings()
+    {
+
     }
 }

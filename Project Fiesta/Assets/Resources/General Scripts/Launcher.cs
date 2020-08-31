@@ -47,16 +47,13 @@ namespace FiestaTime
         public override void OnEnable()
         {
             base.OnEnable();
+            PhotonNetwork.AddCallbackTarget(this);
         }
 
         public override void OnDisable()
         {
             base.OnDisable();
-        }
-
-        private void Awake()
-        {
-            PhotonNetwork.AutomaticallySyncScene = true;
+            PhotonNetwork.RemoveCallbackTarget(this);
         }
 
         #endregion
