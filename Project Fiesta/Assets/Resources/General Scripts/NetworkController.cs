@@ -2,17 +2,25 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class NetworkController : MonoBehaviour
-{
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+using Photon.Pun;
+using Photon.Realtime;
 
-    // Update is called once per frame
-    void Update()
+namespace FiestaTime
+{
+    public class NetworkController : MonoBehaviourPunCallbacks
     {
-        
+        // Start is called before the first frame update
+        void Start()
+        {
+
+        }
+
+        // Update is called once per frame
+        void Update()
+        {
+
+        }
     }
 }
+
+
