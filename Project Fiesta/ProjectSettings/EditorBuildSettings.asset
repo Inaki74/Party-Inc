@@ -4,5 +4,23 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 0
+    path: 
+    guid: 00000000000000000000000000000000
+  - enabled: 0
+    path: 
+    guid: 00000000000000000000000000000000
+  - enabled: 1
+    path: Assets/Scenes/LauncherScene.unity
+    guid: 5130e088a7a0a4f6bb7fa9e44681d584
+  - enabled: 1
+    path: Assets/Scenes/ChooseGameScene.unity
+    guid: eb977b07e0b594397bd9f124f483a362
+  - enabled: 1
+    path: Assets/Scenes/DisconnectedScene.unity
+    guid: befd8d85c31a1431eb1c08baef49200d
+  - enabled: 1
+    path: Assets/Scenes/EggGrabbingGameB.unity
+    guid: 5a6ea711aae66443b8ea80d003f95edd
   m_configObjects: {}
