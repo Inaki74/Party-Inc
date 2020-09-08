@@ -7,6 +7,9 @@ using UnityEngine.SceneManagement;
 using Photon.Pun;
 using Photon.Realtime;
 
+/// <summary>
+/// The controller of the waiting room.
+/// </summary>
 public class eggb_NetworkRoomController : MonoBehaviourPunCallbacks
 {
     private PhotonView Pv;

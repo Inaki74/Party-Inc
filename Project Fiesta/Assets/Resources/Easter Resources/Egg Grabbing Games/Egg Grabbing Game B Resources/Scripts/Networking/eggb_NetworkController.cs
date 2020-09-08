@@ -5,6 +5,9 @@ using UnityEngine;
 using Photon.Pun;
 using Photon.Realtime;
 
+/// <summary>
+/// Its the game object that instantiates the manager in the network and manages disconnection issues (and players leaving).
+/// </summary>
 public class eggb_NetworkController : MonoBehaviourPunCallbacks
 {
     [SerializeField] private GameObject gameManager;

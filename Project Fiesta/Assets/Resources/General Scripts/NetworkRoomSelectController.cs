@@ -8,6 +8,9 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
+/// <summary>
+/// Its the class in charge of the game selection.
+/// </summary>
 public class NetworkRoomSelectController : MonoBehaviourPunCallbacks
 {
     private const int maxEggPlayers = 2;
@@ -15,7 +18,7 @@ public class NetworkRoomSelectController : MonoBehaviourPunCallbacks
     private List<RoomInfo> currentRoomList;
 
     [SerializeField] private Text nameText;
-    private string gameJoining;
+    private string gameToJoin = "";
     private bool isConnecting;
 
     // Start is called before the first frame update
@@ -52,12 +55,28 @@ public class NetworkRoomSelectController : MonoBehaviourPunCallbacks
         PhotonNetwork.RemoveCallbackTarget(this);
     }
 
+    #region Join Functions
+
     public void JoinEGG()
     {
-        foreach(RoomInfo room in currentRoomList)
+        if(gameToJoin == "")
+            JoinARoom("EGG_");
+    }
+
+    public void JoinDD()
+    {
+        if (gameToJoin == "")
+            JoinARoom("DD_");
+    }
+
+    public void JoinARoom(string gameJoining)
+    {
+        gameToJoin = gameJoining;
+
+        foreach (RoomInfo room in currentRoomList)
         {
             Debug.Log("Room: " + room.Name + ", Quantity: " + room.PlayerCount + ", Maximum allowed: " + room.MaxPlayers + ", is available ? " + room.IsOpen);
-            if(room.PlayerCount < room.MaxPlayers && room.IsOpen)
+            if (room.PlayerCount < room.MaxPlayers && room.IsOpen && IsGameImLookingFor(room.Name, gameJoining))
             {
                 PhotonNetwork.JoinRoom(room.Name);
                 isConnecting = true;
@@ -65,9 +84,16 @@ public class NetworkRoomSelectController : MonoBehaviourPunCallbacks
             }
         }
 
-        gameJoining = "EGG_";
+        
         PhotonNetwork.CreateRoom(gameJoining + Random.Range(0, 10000), new RoomOptions { MaxPlayers = maxEggPlayers });
     }
+
+    private bool IsGameImLookingFor(string roomName, string gamePrefix)
+    {
+        return roomName.Contains(gamePrefix);
+    }
+
+    #endregion
 
     #region PUN Callbacks
 
@@ -93,14 +119,14 @@ public class NetworkRoomSelectController : MonoBehaviourPunCallbacks
     {
         Debug.Log("Fiesta Time/ RoomController: Room creation failed, reason: " + message + " error code: " + returnCode + ". Trying again...");
 
-        PhotonNetwork.CreateRoom(gameJoining + Random.Range(0, 10000), new RoomOptions { MaxPlayers = maxEggPlayers });
+        PhotonNetwork.CreateRoom(gameToJoin + Random.Range(0, 10000), new RoomOptions { MaxPlayers = maxEggPlayers });
     }
 
     public override void OnJoinedRoom()
     {
         Debug.Log("Fiesta Time/ RoomController: Successfully joined room. Entering game...");
 
-        PhotonNetwork.LoadLevel("EggGrabbingGameLobby");
+        PhotonNetwork.LoadLevel(gameToJoin + "GameLobby");
         isConnecting = false;
     }
 

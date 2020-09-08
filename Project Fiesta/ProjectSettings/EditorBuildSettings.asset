@@ -24,6 +24,6 @@ EditorBuildSettings:
     path: Assets/Scenes/EggGrabbingGameB.unity
     guid: 5a6ea711aae66443b8ea80d003f95edd
   - enabled: 1
-    path: Assets/Scenes/EggGrabbingGameLobby.unity
+    path: Assets/Scenes/EGG_GameLobby.unity
     guid: 307a71cc20749490a931c8f14d971de9
   m_configObjects: {}
