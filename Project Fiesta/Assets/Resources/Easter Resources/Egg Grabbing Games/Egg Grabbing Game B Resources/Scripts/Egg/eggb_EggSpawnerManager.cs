@@ -3,11 +3,14 @@ using System.Collections.Generic;
 using UnityEngine;
 using Array2DEditor;
 
+using Photon.Pun;
+using Photon.Realtime;
+
 /// <summary>
 /// Manages the spawning of the eggs relative to a total of (for now) 3 spawners tied to each lane.
 /// It gives each spawner its necessary spawning routines (maps).
 /// </summary>
-public class eggb_EggSpawnerManager : MonoBehaviour
+public class eggb_EggSpawnerManager : MonoBehaviourPun
 {
     // The spawners specific ID.
     public static int spawnerId;
@@ -16,13 +19,17 @@ public class eggb_EggSpawnerManager : MonoBehaviour
     // The intervals between waves.
     [SerializeField] private float waveIntervals;
     // The wave routines that each spawner must respect.
-    [SerializeField] private Array2DInt eggMap;
+    [SerializeField] private int [,] eggMap;
     // The waiting time between waves.
     [SerializeField] private float timeLimitOffset;
     // Counter of the current wave we are on.
     private int currentWave;
     // The total time of spawning of the eggMap.
     private float timeLimit;
+
+    private Vector3 middleSpawnerPosition;
+
+    [SerializeField] private GameObject spawnerPrefab;
     #endregion
 
     #region Spawners
@@ -49,14 +56,14 @@ public class eggb_EggSpawnerManager : MonoBehaviour
     #region Unity Callbacks
     private void Start()
     {
-        if (leftSpawnerGO != null) { leftSpawnerGO.transform.position = Constants.LEFT_LANE; }
-        else leftSpawnerGO = InstantiateSpawner(Constants.LEFT_LANE);
+        if (leftSpawnerGO != null) { leftSpawnerGO.transform.position = middleSpawnerPosition + Vector3.left * 2; }
+        else leftSpawnerGO = InstantiateSpawner(middleSpawnerPosition + Vector3.left * 2);
 
-        if (middleSpawnerGO != null) { middleSpawnerGO.transform.position = Constants.MID_LANE; }
-        else middleSpawnerGO = InstantiateSpawner(Constants.MID_LANE);
+        if (middleSpawnerGO != null) { middleSpawnerGO.transform.position = middleSpawnerPosition; }
+        else middleSpawnerGO = InstantiateSpawner(middleSpawnerPosition);
 
-        if (rightSpawnerGO != null) { rightSpawnerGO.transform.position = Constants.RIGHT_LANE; }
-        else rightSpawnerGO = InstantiateSpawner(Constants.RIGHT_LANE);
+        if (rightSpawnerGO != null) { rightSpawnerGO.transform.position = middleSpawnerPosition + Vector3.right * 2; }
+        else rightSpawnerGO = InstantiateSpawner(middleSpawnerPosition + Vector3.right * 2);
 
         leftSpawner = leftSpawnerGO.GetComponent<eggb_EggSpawner>();
         middleSpawner = middleSpawnerGO.GetComponent<eggb_EggSpawner>();
@@ -68,13 +75,13 @@ public class eggb_EggSpawnerManager : MonoBehaviour
         if (FindObjectOfType<eggb_GameManager>() == null)
         {
             editorMode = true;
-        }else eggMap = eggb_GameManager.Current.GetEggMap(0);
+        }
+        else
+        {
+            SwapEggMap(0);
+        }
 
-        timeLimit = waveIntervals * eggMap.GetCells().GetLength(0) + timeLimitOffset;
-
-        UpdateRoutines(leftSpawner, GetColumnOfMatrix(0, eggMap.GetCells()));
-        UpdateRoutines(middleSpawner, GetColumnOfMatrix(1, eggMap.GetCells()));
-        UpdateRoutines(rightSpawner, GetColumnOfMatrix(2, eggMap.GetCells()));
+        UpdateAllSpawners(eggMap);
     }
 
     private void Update()
@@ -93,18 +100,15 @@ public class eggb_EggSpawnerManager : MonoBehaviour
                     Debug.Log("Game has ended.");
                     if (runOnce)
                     {
-                        eggb_GameManager.Current.SetGameFinished(true);
+                        if(PhotonNetwork.IsMasterClient) eggb_GameManager.Current.SetGameFinished(true);
                         runOnce = false;
                     }
                     return;
                 }
 
-                eggMap = eggb_GameManager.Current.GetEggMap(currentWave);
-                timeLimit = waveIntervals * eggMap.GetCells().GetLength(0) + timeLimitOffset;
+                SwapEggMap(currentWave);
 
-                UpdateRoutines(leftSpawner, GetColumnOfMatrix(0, eggMap.GetCells()));
-                UpdateRoutines(middleSpawner, GetColumnOfMatrix(1, eggMap.GetCells()));
-                UpdateRoutines(rightSpawner, GetColumnOfMatrix(2, eggMap.GetCells()));
+                UpdateAllSpawners(eggMap);
 
                 startTime = Time.time;
             }
@@ -115,9 +119,7 @@ public class eggb_EggSpawnerManager : MonoBehaviour
             // The egg map is finished, bring in the next map.
             if (currentTime - startTime > timeLimit)
             {
-                UpdateRoutines(leftSpawner, GetColumnOfMatrix(0, eggMap.GetCells()));
-                UpdateRoutines(middleSpawner, GetColumnOfMatrix(1, eggMap.GetCells()));
-                UpdateRoutines(rightSpawner, GetColumnOfMatrix(2, eggMap.GetCells()));
+                UpdateAllSpawners(eggMap);
 
                 startTime = Time.time;
             }
@@ -132,16 +134,15 @@ public class eggb_EggSpawnerManager : MonoBehaviour
     /// <returns>The spawner.</returns>
     private GameObject InstantiateSpawner(Vector3 set)
     {
-        GameObject aux = new GameObject();
-
-        aux.name = "EggSpawner" + spawnerId;
-        spawnerId++;
-
-        aux.AddComponent<eggb_EggSpawner>();
-        aux.GetComponent<eggb_EggSpawner>().SetIntervals(waveIntervals);
-
         set.Set(set.x, 12f, set.z);
+
+        Debug.Log("Spawner in play");
+
+        GameObject aux = Instantiate(spawnerPrefab);
+
+        aux.GetComponent<eggb_EggSpawner>().SetIntervals(waveIntervals);
         aux.transform.position = set;
+
         return aux;
     }
 
@@ -151,6 +152,21 @@ public class eggb_EggSpawnerManager : MonoBehaviour
     private void UpdateRoutines(eggb_EggSpawner spawner, List<int> newRoutine)
     {
         spawner.SetRoutine(newRoutine);
+    }
+
+    private void UpdateAllSpawners(int [,] map)
+    {
+        // Need to serialize map
+
+        UpdateRoutines(leftSpawner, GetColumnOfMatrix(0, map));
+        UpdateRoutines(middleSpawner, GetColumnOfMatrix(1, map));
+        UpdateRoutines(rightSpawner, GetColumnOfMatrix(2, map));
+    }
+
+    private void SwapEggMap(int round)
+    {
+        eggMap = eggb_GameManager.Current.GetEggMap(round);
+        timeLimit = waveIntervals * eggMap.GetLength(0) + timeLimitOffset;
     }
 
     /// <summary>
@@ -183,10 +199,10 @@ public class eggb_EggSpawnerManager : MonoBehaviour
     /// </summary>
     /// <param name="intervals"></param>
     /// <param name="offset"></param>
-    public void SetSettings(float intervals, float offset)
+    public void SetSettings(float intervals, float offset, Vector3 spawnerPosition)
     {
         waveIntervals = intervals;
         timeLimitOffset = offset;
+        middleSpawnerPosition = spawnerPosition;
     }
-
 }

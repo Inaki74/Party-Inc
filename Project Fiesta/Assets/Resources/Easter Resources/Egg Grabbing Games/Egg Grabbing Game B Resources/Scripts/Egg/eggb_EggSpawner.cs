@@ -2,11 +2,15 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+using Photon.Pun;
+
 /// <summary>
 /// The actual spawner, in charge of spawning the eggs.
 /// </summary>
-public class eggb_EggSpawner : MonoBehaviour
+public class eggb_EggSpawner : MonoBehaviourPun
 {
+    //We might need to synchronize spawners with photon with IPunObservable
+
     private bool OK;
     private List<int> eggMapCol = new List<int>();
     private Vector3 spawningPosition;
@@ -25,7 +29,7 @@ public class eggb_EggSpawner : MonoBehaviour
     private void Update()
     {
         // If there are no more eggs available
-        if(eggMapCol.Count == 0)
+        if (eggMapCol.Count == 0)
         {
             // Ask if the game is not finished
             if (!eggb_GameManager.Current.isGameFinished)
@@ -74,6 +78,11 @@ public class eggb_EggSpawner : MonoBehaviour
     private void SpawnEgg(int t)
     {
         if (t == -1) return;
+
+        if(pool == null)
+        {
+            pool = FindObjectOfType<eggb_EggPoolManager>();
+        }
 
         GameObject egg = pool.RequestEgg(t);
         egg.transform.position = spawningPosition;

@@ -47,16 +47,13 @@ namespace FiestaTime
         public override void OnEnable()
         {
             base.OnEnable();
+            PhotonNetwork.AddCallbackTarget(this);
         }
 
         public override void OnDisable()
         {
             base.OnDisable();
-        }
-
-        private void Awake()
-        {
-            PhotonNetwork.AutomaticallySyncScene = true;
+            PhotonNetwork.RemoveCallbackTarget(this);
         }
 
         #endregion
@@ -101,8 +98,6 @@ namespace FiestaTime
         /// </summary>
         public void Connect()
         {
-            Debug.Log("Connecting");
-
             if (PhotonNetwork.IsConnected)
             {
                 if (PlayerPrefs.HasKey(Constants.NAME_KEY_NETWRK) && PlayerPrefs.GetString(Constants.NAME_KEY_NETWRK) != "" && nameInput.text != "")

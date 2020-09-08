@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+using Photon.Pun;
+
 /// <summary>
 /// The falling egg, in charge of itself.
 /// </summary>
-public class eggb_EasterEgg : MonoBehaviour
+public class eggb_EasterEgg : MonoBehaviourPun, IPunObservable
 {
     #region Events
     public delegate void ActionObtain(int score);
@@ -45,24 +47,14 @@ public class eggb_EasterEgg : MonoBehaviour
     #endregion
 
     #region Boolean Variables
-    private bool onlyHitOnce;
-    private bool isMoving;
-    private bool hitGround;
-    private bool hitPlayer;
     #endregion
 
     #region Unity Callbacks
-    private void Start()
-    {
-        
-    }
-
     private void Awake()
     {
         Sc = GetComponent<SphereCollider>();
         anim = GetComponent<Animator>();
         Rb = GetComponent<Rigidbody>();
-
 
         SetEgg(eggType);
     }
@@ -73,28 +65,21 @@ public class eggb_EasterEgg : MonoBehaviour
         Rb.useGravity = true;
     }
 
-    private void OnDisable()
-    {
-        
-    }
-
     private void OnCollisionEnter(Collision collision)
     {
-        if(collision.gameObject.tag == "Player" && !collision.gameObject.GetComponent<eggb_Player>().GetIfStunned()) {
-            Debug.Log("Collided player");
+        if (collision.gameObject.tag == "Player" && !collision.gameObject.GetComponent<eggb_Player>().GetIfStunned()) {
             Sc.enabled = false;
             Rb.useGravity = false;
             Rb.velocity = Vector3.zero;
-            OnObtain();
+            if (photonView.IsMine) OnObtain();
         }
 
         if (collision.gameObject.tag == "Ground" || (collision.gameObject.tag == "Egg" && collision.rigidbody.position.y < 2f))
         {
-            Debug.Log("Collided ground");
             Sc.enabled = false;
             Rb.useGravity = false;
             Rb.velocity = Vector3.zero;
-            OnBreak();
+            if (photonView.IsMine) OnBreak();
         }
     }
     #endregion
@@ -140,7 +125,6 @@ public class eggb_EasterEgg : MonoBehaviour
     /// </summary>
     private void OnBreak()
     {
-        Debug.Log("Break");
         if (scoreModifier != -1)
             onSpawnEgg?.Invoke(scoreModifier);
         //Play OnBreak animation (specific to each egg though)
@@ -153,67 +137,23 @@ public class eggb_EasterEgg : MonoBehaviour
         gameObject.SetActive(false);
     }
 
-    ///// <summary>
-    ///// Sets the vector in which the egg moves.
-    ///// </summary>
-    ///// <param name="v"></param>
-    //public void SetDirectionVector(Vector3 v)
-    //{
-    //    directionVector = v;
-    //}
-
-    ///// <summary>
-    ///// Checks if the egg hit the ground.
-    ///// </summary>
-    ///// <returns></returns>
-    //private bool CheckIfHitGround()
-    //{
-    //    return Physics.Raycast(transform.position, Vector3.down, groundCollisionDistance, whatIsGround);
-    //}
-
-    ///// <summary>
-    ///// Checks if the egg hit the player.
-    ///// </summary>
-    ///// <returns></returns>
-    //private bool CheckIfHitPlayer()
-    //{
-    //    RaycastHit hitDown;
-
-    //    if(Physics.Raycast(transform.position, Vector3.down, out hitDown, playerCollisionDistance))
-    //    {
-    //        if (hitDown.collider.gameObject.tag == "Player" && !hitDown.collider.gameObject.GetComponent<eggb_Player>().GetIfStunned())
-    //        {
-    //            return true;
-    //        }
-    //    }
-        
-    //    return false;
-    //}
+    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+    {
+        if (stream.IsWriting)
+        {
+            //Ours
+            stream.SendNext(transform.position);
+            stream.SendNext(gameObject.activeInHierarchy);
+            stream.SendNext(anim.GetBool(Constants.BOOL_BROKENEGG_ANIM));
+            stream.SendNext(Rb.velocity);
+        }
+        else
+        {
+            //Others
+            transform.position = (Vector3)stream.ReceiveNext();
+            gameObject.SetActive((bool)stream.ReceiveNext());
+            anim.SetBool(Constants.BOOL_BROKENEGG_ANIM, (bool)stream.ReceiveNext());
+            Rb.velocity = (Vector3)stream.ReceiveNext();
+        }
+    }
 }
-
-
-////have we moved more than our minimum extent? 
-//Vector3 movementThisStep = transform.position - previousPosition;
-//float movementSqrMagnitude = movementThisStep.sqrMagnitude;
- 
-//	   if (movementSqrMagnitude > sqrMinimumExtent) 
-//		{ 
-//	      float movementMagnitude = Mathf.Sqrt(movementSqrMagnitude);
-//        RaycastHit hitInfo; 
- 
-//	      //check for obstructions we might have missed 
-//	      if (Physics.Raycast(previousPosition, movementThisStep, out hitInfo, movementMagnitude, layerMask.value))
-//              {
-//                 if (!hitInfo.collider)
-//                     return;
- 
-//                 if (hitInfo.collider.isTrigger)
-//                     hitInfo.collider.SendMessage("OnTriggerEnter", myCollider);
- 
-//                 if (!hitInfo.collider.isTrigger)
-//                     transform.position = hitInfo.point - (movementThisStep / movementMagnitude) * partialExtent; 
- 
-//              }
-//	   } 
- 
-//	   previousPosition = transform.position; 
