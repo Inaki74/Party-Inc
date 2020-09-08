@@ -11,7 +11,7 @@ using Photon.Realtime;
 /// <summary>
 /// The game manager, responsible of starting the game and managing its functionality.
 /// </summary>
-public class eggb_GameManager : MonoBehaviour
+public class eggb_GameManager : MonoBehaviourPun
 {
     #region Singleton Specifics
     private static eggb_GameManager _current;
@@ -35,6 +35,9 @@ public class eggb_GameManager : MonoBehaviour
 
     public delegate void ActionGameFinish(bool looped);
     public static event ActionGameFinish onGameFinish;
+
+    public delegate void ActionEnemyScore(int score);
+    public static event ActionEnemyScore onEnemyScore;
     #endregion
 
     // Path to the Egg Maps directory, relative to the resources folder //TODO: Check if this is consistent with other devices.
@@ -42,7 +45,6 @@ public class eggb_GameManager : MonoBehaviour
 
     #region General Game Settings
     [Header("General Game Settings")]
-    public GameObject managersPrefab;
     public float countdown;
     public int amountOfEasyMaps = 4;
     public int amountOfMediumMaps = 4;
@@ -64,23 +66,32 @@ public class eggb_GameManager : MonoBehaviour
     public float timeLimitOffset;
     #endregion
 
-    [SerializeField] public Array2DInt[] eggMaps;
+    [SerializeField] public int[][,] eggMaps;
     private float currentTime;
-    private float startingTime;
     private bool gameStarted;
     private int startingEggCount = 0;
     public bool isGameFinished;
     public int playerScore;
+    public int enemyScore;
+
+    [SerializeField] private GameObject playerAssetsPrefab;
+    [SerializeField] private GameObject playerPrefab;
+    [SerializeField] private GameObject spawnerManagerPrefab;
+    [SerializeField] private GameObject eggPoolManagerPrefab;
+    [SerializeField] private GameObject uiPrefab;
+
+    #region Network Decided Settings
+    private Vector3 playerOneMiddleLane;
+    private Vector3 playerTwoMiddleLane;
+    #endregion
 
     #region Unity Callbacks
     private void Awake()
     {
         _current = this;
         eggb_EasterEgg.onObtainEgg += OnEggObtain;
-        eggMaps = new Array2DInt[amountOfEasyMaps + amountOfMediumMaps + amountOfHardMaps];
-        eggMaps = InitializeEggMaps();
-
-        InitializeNetworkSettings();
+        eggMaps = new int [amountOfEasyMaps + amountOfMediumMaps + amountOfHardMaps][,];
+        if (PhotonNetwork.IsMasterClient) { eggMaps = InitializeEggMaps(); NotifyPlayersMaps(); }
     }
 
     private void OnDestroy()
@@ -90,34 +101,52 @@ public class eggb_GameManager : MonoBehaviour
 
     void Start()
     {
+        if(PhotonNetwork.IsMasterClient) PhotonNetwork.InstantiateRoomObject(eggPoolManagerPrefab.name, new Vector3(0, 12f, 0), Quaternion.identity);
+
         isGameFinished = false;
 
         gameStarted = false;
-        startingTime = Time.time;
+        currentTime = 0;
+
+        InitializeGameSettings();
+
+        InitializePlayer();
+
+        InitializeUI();
 
         onGameStart?.Invoke();
     }
 
     void Update()
     {
-        currentTime = Time.time;
+        currentTime += Time.deltaTime;
         // START GAME (run once per game)
-        if (currentTime - startingTime > countdown + 1 && !gameStarted)
+        if (currentTime > countdown + 1 && !gameStarted)
         {
-            var GO = Instantiate(managersPrefab);
-            GO.GetComponent<eggb_EggSpawnerManager>().SetSettings(waveIntervals, timeLimitOffset);
+            var GO = Instantiate(spawnerManagerPrefab);
+            
+            Debug.Log("GameManager: Instantiating Egg Spawner, " + PhotonNetwork.NickName);
+
+            if (PhotonNetwork.IsMasterClient)
+                GO.GetComponent<eggb_EggSpawnerManager>().SetSettings(waveIntervals, timeLimitOffset, playerOneMiddleLane);
+            else GO.GetComponent<eggb_EggSpawnerManager>().SetSettings(waveIntervals, timeLimitOffset, playerTwoMiddleLane);
+
             gameStarted = true;
         }
 
         if (isGameFinished)
         {
+            if (PhotonNetwork.IsMasterClient) photonView.RPC("RPC_SendFinishedGame", RpcTarget.Others, isGameFinished);
             onGameFinish?.Invoke(true);
             StartCoroutine("GameFinishCo");
             isGameFinished = false;
         }
+
+        photonView.RPC("RPC_SendCountdown", RpcTarget.Others, currentTime);
     }
     #endregion
 
+    #region Private Methods
     /// <summary>
     /// The Game Finish coroutine which restarts the entire game.
     /// </summary>
@@ -128,13 +157,13 @@ public class eggb_GameManager : MonoBehaviour
 
         Resources.UnloadUnusedAssets();
 
-        SceneManager.LoadScene("EggGrabbingGameB");
+        PhotonNetwork.LoadLevel("EggGrabbingGameB");
     }
 
     /// <summary>
     /// Loads a randomized set of Egg Maps and places them in the eggMaps array.
     /// </summary>
-    public Array2DInt[] InitializeEggMaps()
+    private int [][,] InitializeEggMaps()
     {
         Array2DInt[] aux = new Array2DInt[amountOfEasyMaps + amountOfMediumMaps + amountOfHardMaps];
 
@@ -167,7 +196,14 @@ public class eggb_GameManager : MonoBehaviour
 
         startingEggCount = CountEggs(aux);
 
-        return aux;
+        int[][,] ret = new int[randomNumberE.Length + randomNumberM.Length + randomNumberH.Length][,];
+
+        for(int i = 0; i < randomNumberE.Length + randomNumberM.Length + randomNumberH.Length; i++)
+        {
+            ret[i] = aux[i].GetCells();
+        }
+
+        return ret;
     }
 
     private int TotalAmountOfMaps(string difficulty)
@@ -240,11 +276,86 @@ public class eggb_GameManager : MonoBehaviour
     }
 
     /// <summary>
+    /// Initializes the unmodifiable settings of the game which are dependant on the amount of players playing.
+    /// </summary>
+    private void InitializeGameSettings()
+    {
+        playerTwoMiddleLane = Constants.TWOPLAYER_MID_LANE_PLYRTWO;
+
+        if(PhotonNetwork.CurrentRoom.PlayerCount == 2)
+        {
+            Debug.Log("GameManager: Setting up for two players...");
+            playerOneMiddleLane = Constants.TWOPLAYER_MID_LANE_PLYRONE;
+        }
+        else
+        {
+            playerOneMiddleLane = Constants.ONEPLAYER_MID_LANE;
+        }
+    }
+
+    /// <summary>
+    /// Initializes the player/s.
+    /// </summary>
+    private void InitializePlayer()
+    {
+        Vector3 decidedVector;
+
+        if (PhotonNetwork.IsMasterClient) decidedVector = playerOneMiddleLane;
+        else decidedVector = playerTwoMiddleLane;
+
+        var holder = PhotonNetwork.Instantiate(playerAssetsPrefab.name, decidedVector, Quaternion.identity);
+        var plyr = PhotonNetwork.Instantiate(playerPrefab.name, decidedVector + new Vector3(0f, 0.7f, 0f), Quaternion.identity);
+
+    }
+
+    private void InitializeUI()
+    {
+        eggb_UIManager UI = Instantiate(uiPrefab).GetComponent<eggb_UIManager>();
+
+        if(PhotonNetwork.CurrentRoom.PlayerCount == 2)
+        {
+            if (PhotonNetwork.IsMasterClient)
+            {
+                UI.playerScoreText.rectTransform.anchoredPosition = new Vector3(Constants.XPOS_PLYRONESCORE_UI, -250, 0);
+                UI.enemyScoreText.rectTransform.anchoredPosition = new Vector3(Constants.XPOS_PLYRTWOSCORE_UI, -250, 0);
+            }
+            else
+            {
+                UI.enemyScoreText.rectTransform.anchoredPosition = new Vector3(Constants.XPOS_PLYRONESCORE_UI, -250, 0);
+                UI.playerScoreText.rectTransform.anchoredPosition = new Vector3(Constants.XPOS_PLYRTWOSCORE_UI, -250, 0);
+            }
+        }
+        else
+        {
+            //-1242, +992
+            UI.playerScoreText.rectTransform.anchoredPosition = new Vector3(Constants.XPOS_PLYRONESCORE_UI, -250, 0);
+            UI.enemyScoreText.rectTransform.anchoredPosition = new Vector3(Constants.XPOS_PLYRONESCORE_UI, 500, 0);
+        }
+
+        
+    }
+
+    private void NotifyPlayersMaps()
+    {
+        int[][][] ret = new int[amountOfEasyMaps + amountOfMediumMaps + amountOfHardMaps][][];
+
+        for (int i = 0; i < amountOfEasyMaps + amountOfMediumMaps + amountOfHardMaps; i++)
+        {
+            ret[i] = SerializationHelperClass.SerializeTDArray(eggMaps[i]);
+        }
+
+        photonView.RPC("RPC_SendEggMaps", RpcTarget.Others, new object[] { ret, startingEggCount });
+    }
+
+    #endregion
+
+    #region Public Methods
+    /// <summary>
     /// Returns the egg map, wave number n.
     /// </summary>
     /// <param name="n">The wave number of the egg map</param>
     /// <returns>Wave n egg map.</returns>
-    public Array2DInt GetEggMap(int n)
+    public int[,] GetEggMap(int n)
     {
         return eggMaps[n];
     }
@@ -274,10 +385,40 @@ public class eggb_GameManager : MonoBehaviour
     public void OnEggObtain(int score)
     {
         playerScore += score;
+        photonView.RPC("RPC_SendScore", RpcTarget.Others, playerScore);
     }
+    #endregion
 
-    public void InitializeNetworkSettings()
+    #region PUN RPC
+    [PunRPC]
+    public void RPC_SendCountdown(float time)
     {
-
+        currentTime = time;
     }
+
+    [PunRPC]
+    public void RPC_SendFinishedGame(bool finished)
+    {
+        isGameFinished = finished;
+    }
+
+    [PunRPC]
+    public void RPC_SendEggMaps(object[] args)
+    {
+        for (int i = 0; i < amountOfEasyMaps + amountOfMediumMaps + amountOfHardMaps; i++)
+        {
+            int[][][] received = (int[][][])args[0];
+            eggMaps[i] = SerializationHelperClass.DeserializeTDArray(received[i]);
+        }
+        startingEggCount = (int)args[1];
+    }
+
+    [PunRPC]
+    public void RPC_SendScore(int score)
+    {
+        enemyScore = score;
+        onEnemyScore?.Invoke(score);
+    }
+    #endregion
+
 }

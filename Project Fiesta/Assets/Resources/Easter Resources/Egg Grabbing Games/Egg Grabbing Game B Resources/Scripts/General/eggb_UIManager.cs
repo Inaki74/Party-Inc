@@ -13,6 +13,7 @@ public class eggb_UIManager : MonoBehaviour
 
     #region UI Elements
     public Text playerScoreText;
+    public Text enemyScoreText;
     public Text totalScoreText;
     public Text countdownText;
     #endregion
@@ -22,7 +23,6 @@ public class eggb_UIManager : MonoBehaviour
     {
         playerScore = 0;
         GetTotalScore();
-        playerScoreText.text = "SCORE: " + playerScore;
     }
 
     private void Awake()
@@ -31,6 +31,7 @@ public class eggb_UIManager : MonoBehaviour
         eggb_EasterEgg.onSpawnEgg += OnEggSpawn;
         eggb_GameManager.onGameStart += GameStartCountdown;
         eggb_GameManager.onGameFinish += GameFinishDisplay;
+        eggb_GameManager.onEnemyScore += OnEnemyScoreChange;
     }
 
     private void OnDestroy()
@@ -39,6 +40,7 @@ public class eggb_UIManager : MonoBehaviour
         eggb_EasterEgg.onSpawnEgg -= OnEggSpawn;
         eggb_GameManager.onGameStart -= GameStartCountdown;
         eggb_GameManager.onGameFinish -= GameFinishDisplay;
+        eggb_GameManager.onEnemyScore -= OnEnemyScoreChange;
     }
     #endregion
 
@@ -109,7 +111,9 @@ public class eggb_UIManager : MonoBehaviour
     private void GetTotalScore()
     {
         totalScore = eggb_GameManager.Current.GetEggCount();
-        totalScoreText.text = "LEFT: " + totalScore;
+        string str = "LEFT@" + totalScore;
+        str = str.Replace("@", System.Environment.NewLine);
+        totalScoreText.text = str;
     }
 
     /// <summary>
@@ -119,7 +123,16 @@ public class eggb_UIManager : MonoBehaviour
     private void OnEggObtain(int score)
     {
         playerScore += score;
-        playerScoreText.text = "SCORE: " + playerScore;
+        string str = "SCORE@" + playerScore;
+        str = str.Replace("@", System.Environment.NewLine);
+        playerScoreText.text = str;
+    }
+
+    private void OnEnemyScoreChange(int score)
+    {
+        string str = "SCORE@" + score;
+        str = str.Replace("@", System.Environment.NewLine);
+        enemyScoreText.text = str;
     }
 
     /// <summary>
@@ -129,6 +142,9 @@ public class eggb_UIManager : MonoBehaviour
     private void OnEggSpawn(int score)
     {
         totalScore -= score;
-        totalScoreText.text = "LEFT: " + totalScore;
+        string str = "LEFT@" + totalScore;
+        str = str.Replace("@", System.Environment.NewLine);
+        totalScoreText.text = str;
     }
+
 }

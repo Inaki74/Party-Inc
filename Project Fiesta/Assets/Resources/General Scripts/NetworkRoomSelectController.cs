@@ -25,15 +25,19 @@ public class NetworkRoomSelectController : MonoBehaviourPunCallbacks
 
         if (PhotonNetwork.IsConnected)
         {
-            Debug.Log("Still connected");
-            PhotonNetwork.JoinLobby();
+            StartCoroutine("JoinLobbyCo");
         }
     }
 
-    // Update is called once per frame
-    void Update()
+    private IEnumerator JoinLobbyCo()
     {
-        
+        if (!PhotonNetwork.InLobby)
+            yield return new WaitUntil(() => PhotonNetwork.IsConnectedAndReady && PhotonNetwork.JoinLobby());
+        else
+        {
+            yield return new WaitUntil(() => PhotonNetwork.IsConnectedAndReady && PhotonNetwork.LeaveLobby());
+            PhotonNetwork.JoinLobby();
+        }
     }
 
     public override void OnEnable()
@@ -50,7 +54,6 @@ public class NetworkRoomSelectController : MonoBehaviourPunCallbacks
 
     public void JoinEGG()
     {
-        int count = 0;
         foreach(RoomInfo room in currentRoomList)
         {
             Debug.Log("Room: " + room.Name + ", Quantity: " + room.PlayerCount + ", Maximum allowed: " + room.MaxPlayers + ", is available ? " + room.IsOpen);
@@ -60,15 +63,10 @@ public class NetworkRoomSelectController : MonoBehaviourPunCallbacks
                 isConnecting = true;
                 return;
             }
-            count++;
         }
 
-        if(count == 0)
-        {
-            //No rooms available, create new room
-            gameJoining = "EGG_";
-            PhotonNetwork.CreateRoom(gameJoining + Random.Range(0, 10000), new RoomOptions { MaxPlayers = maxEggPlayers });
-        }
+        gameJoining = "EGG_";
+        PhotonNetwork.CreateRoom(gameJoining + Random.Range(0, 10000), new RoomOptions { MaxPlayers = maxEggPlayers });
     }
 
     #region PUN Callbacks
@@ -102,6 +100,7 @@ public class NetworkRoomSelectController : MonoBehaviourPunCallbacks
     {
         Debug.Log("Fiesta Time/ RoomController: Successfully joined room. Entering game...");
 
+        PhotonNetwork.LoadLevel("EggGrabbingGameLobby");
         isConnecting = false;
     }
 

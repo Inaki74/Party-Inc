@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+using Photon.Pun;
+using Photon.Realtime;
+
 /// <summary>
 /// Manages the Object Pooling of all of the eggs with a list of each kind respectively.
 /// </summary>
@@ -22,7 +25,7 @@ public class eggb_EggPoolManager : MonoBehaviour
     void Start()
     {
         eggHolder = GetComponentInChildren<Transform>();
-        InitializeEggs(amountOfEggs);
+        //InitializeEggs(amountOfEggs);
     }
 
     /// <summary>
@@ -33,20 +36,11 @@ public class eggb_EggPoolManager : MonoBehaviour
     {
         for (int i = 0; i < n; i++)
         {
-            GameObject newEasterEgg = Instantiate(easterEggPrefab);
-            newEasterEgg.transform.parent = eggHolder.transform;
-            newEasterEgg.SetActive(false);
-            easterEggs.Add(newEasterEgg);
+            GenerateEgg(0);
 
-            GameObject newRottenEgg = Instantiate(rottenEggPrefab);
-            newRottenEgg.transform.parent = eggHolder.transform;
-            newRottenEgg.SetActive(false);
-            rottenEggs.Add(newRottenEgg);
+            GenerateEgg(1);
 
-            GameObject newGoldenEgg = Instantiate(goldenEggPrefab);
-            newGoldenEgg.transform.parent = eggHolder.transform;
-            newGoldenEgg.SetActive(false);
-            goldenEggs.Add(newGoldenEgg);
+            GenerateEgg(2);
         }
     }
 
@@ -59,19 +53,19 @@ public class eggb_EggPoolManager : MonoBehaviour
         switch (type)
         {
             case 0:
-                GameObject newEasterEgg = Instantiate(easterEggPrefab);
+                GameObject newEasterEgg = PhotonNetwork.Instantiate(easterEggPrefab.name, new Vector3(0, 13f, 0), Quaternion.identity);
                 newEasterEgg.transform.parent = eggHolder.transform;
                 newEasterEgg.SetActive(false);
                 easterEggs.Add(newEasterEgg);
                 break;
             case 1:
-                GameObject newRottenEgg = Instantiate(rottenEggPrefab);
+                GameObject newRottenEgg = PhotonNetwork.Instantiate(rottenEggPrefab.name, new Vector3(0, 13f, 0), Quaternion.identity);
                 newRottenEgg.transform.parent = eggHolder.transform;
                 newRottenEgg.SetActive(false);
                 rottenEggs.Add(newRottenEgg);
                 break;
             case 2:
-                GameObject newGoldenEgg = Instantiate(goldenEggPrefab);
+                GameObject newGoldenEgg = PhotonNetwork.Instantiate(goldenEggPrefab.name, new Vector3(0, 13f, 0), Quaternion.identity);
                 newGoldenEgg.transform.parent = eggHolder.transform;
                 newGoldenEgg.SetActive(false);
                 goldenEggs.Add(newGoldenEgg);

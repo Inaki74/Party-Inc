@@ -98,8 +98,6 @@ namespace FiestaTime
         /// </summary>
         public void Connect()
         {
-            Debug.Log("Connecting");
-
             if (PhotonNetwork.IsConnected)
             {
                 if (PlayerPrefs.HasKey(Constants.NAME_KEY_NETWRK) && PlayerPrefs.GetString(Constants.NAME_KEY_NETWRK) != "" && nameInput.text != "")

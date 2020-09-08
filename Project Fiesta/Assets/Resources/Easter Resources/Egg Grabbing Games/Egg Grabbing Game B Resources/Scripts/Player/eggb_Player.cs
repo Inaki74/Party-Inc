@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class eggb_Player : MonoBehaviour
+using Photon.Pun;
+
+public class eggb_Player : MonoBehaviourPun
 {
     #region Components
     [SerializeField]
@@ -35,9 +37,11 @@ public class eggb_Player : MonoBehaviour
         Bc = GetComponent<BoxCollider>();
         Mr = GetComponent<MeshRenderer>();
 
-        railLeft = Constants.LEFT_LANE;
-        railMiddle = Constants.MID_LANE;
-        railRight = Constants.RIGHT_LANE;
+        if (!photonView.IsMine) return;
+
+        railMiddle = transform.position;
+        railRight = railMiddle + Vector3.right * 2;
+        railLeft = railMiddle + Vector3.left * 2;
 
         runOnce = true;
         isStunned = false;
@@ -47,6 +51,11 @@ public class eggb_Player : MonoBehaviour
 
     private void FixedUpdate()
     {
+        if (!photonView.IsMine)
+        {
+            return;
+        }
+
         if (runOnce && !isStunned)
         {
             runOnce = false;
@@ -106,9 +115,7 @@ public class eggb_Player : MonoBehaviour
     {
         isStunned = true;
         Bc.enabled = false;
-        Debug.Log("Disabled");
         yield return new WaitForSeconds(stunTime);
-        Debug.Log("Enabled");
         Bc.enabled = true;
         isStunned = false;
     }
@@ -126,7 +133,9 @@ public class eggb_Player : MonoBehaviour
 
     private void OnRottenObtain(int scoreModifier)
     {
-        if(scoreModifier == -1)
+        if (!photonView.IsMine) return;
+
+        if (scoreModifier == -1)
         {
             StartCoroutine("StunnedCo");
         }

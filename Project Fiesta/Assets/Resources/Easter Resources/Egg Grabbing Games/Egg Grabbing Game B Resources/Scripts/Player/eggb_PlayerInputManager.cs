@@ -2,23 +2,35 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.UI;
 
-public class eggb_PlayerInputManager : MonoBehaviour
+using Photon.Pun;
+
+public class eggb_PlayerInputManager : MonoBehaviourPun
 {
     public int MovementDirection { get; private set; }
     private float widthMiddlePoint;
 
+    public Text a;
+
+    private int lastFrameCount;
+
     void Start()
     {
         widthMiddlePoint = Screen.width / 2;
+        lastFrameCount = 0;
     }
 
     public void DoMove(InputAction.CallbackContext ctx)
     {
         if (ctx.started)
         {
+            int amountOfTouches = CountTouches();
+
+            a.text = "" + Touchscreen.current.primaryTouch.phase.ReadValue().ToString();
+            
             // TOUCH
-            if (CheckSideOfTouch(Touchscreen.current.position.ReadValue()))
+            if (CheckSideOfTouch(Touchscreen.current.touches[amountOfTouches -1].position.ReadValue()))
             {
                 MovementDirection = 1;
             }
@@ -27,8 +39,14 @@ public class eggb_PlayerInputManager : MonoBehaviour
                 MovementDirection = -1;
             }
 
+
             // PC OSX
             //MovementDirection = (int)ctx.ReadValue<float>();
+
+            if (amountOfTouches != lastFrameCount)
+            {
+                lastFrameCount = amountOfTouches;
+            }
         }
 
         if (ctx.canceled)
@@ -45,5 +63,20 @@ public class eggb_PlayerInputManager : MonoBehaviour
     private bool CheckSideOfTouch(Vector3 touchPosition)
     {
         return touchPosition.x > widthMiddlePoint;
+    }
+
+    private int CountTouches()
+    {
+        int ret = 0;
+
+        foreach(var touch in Touchscreen.current.touches)
+        {
+            if(touch.phase.ReadValue() == UnityEngine.InputSystem.TouchPhase.Began)
+            {
+                ret++;
+            }
+        }
+
+        return ret;
     }
 }
