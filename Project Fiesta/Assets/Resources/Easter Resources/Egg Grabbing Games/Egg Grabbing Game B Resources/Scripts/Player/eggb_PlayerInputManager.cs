@@ -9,50 +9,47 @@ using Photon.Pun;
 public class eggb_PlayerInputManager : MonoBehaviourPun
 {
     public int MovementDirection { get; private set; }
+    public int lastCount;
+    public int lastFingerID;
     private float widthMiddlePoint;
-
-    public Text a;
-
-    private int lastFrameCount;
+    private Vector3 lastTouchPosition = Vector3.zero;
 
     void Start()
     {
         widthMiddlePoint = Screen.width / 2;
-        lastFrameCount = 0;
     }
 
-    public void DoMove(InputAction.CallbackContext ctx)
+    private void Update()
     {
-        if (ctx.started)
-        {
-            int amountOfTouches = CountTouches();
+        DetermineLastTouchPosition();
 
-            a.text = "" + Touchscreen.current.primaryTouch.phase.ReadValue().ToString();
-            
-            // TOUCH
-            if (CheckSideOfTouch(Touchscreen.current.touches[amountOfTouches -1].position.ReadValue()))
-            {
-                MovementDirection = 1;
-            }
-            else
-            {
-                MovementDirection = -1;
-            }
-
-
-            // PC OSX
-            //MovementDirection = (int)ctx.ReadValue<float>();
-
-            if (amountOfTouches != lastFrameCount)
-            {
-                lastFrameCount = amountOfTouches;
-            }
-        }
-
-        if (ctx.canceled)
+        // TOUCH
+        if(lastTouchPosition == Vector3.zero)
         {
             MovementDirection = 0;
         }
+        else if (CheckSideOfTouch(lastTouchPosition))
+        {
+            MovementDirection = 1;
+        }
+        else
+        {
+            MovementDirection = -1;
+        }
+
+
+        // PC OSX
+        //if (Input.GetKey(KeyCode.LeftArrow))
+        //{
+        //    MovementDirection = -1;
+        //}else if (Input.GetKey(KeyCode.RightArrow))
+        //{
+        //    MovementDirection = 1;
+        //}
+        //else
+        //{
+        //    MovementDirection = 0;
+        //}
     }
 
     /// <summary>
@@ -65,18 +62,24 @@ public class eggb_PlayerInputManager : MonoBehaviourPun
         return touchPosition.x > widthMiddlePoint;
     }
 
-    private int CountTouches()
+    /// <summary>
+    /// Gets the last touches position in the screen.
+    /// </summary>
+    private void DetermineLastTouchPosition()
     {
-        int ret = 0;
-
-        foreach(var touch in Touchscreen.current.touches)
+        if (Input.touchCount > 0)
         {
-            if(touch.phase.ReadValue() == UnityEngine.InputSystem.TouchPhase.Began)
+
+            if (Input.touches[Input.touchCount - 1].phase == UnityEngine.TouchPhase.Began ||
+                Input.touches[Input.touchCount - 1].phase == UnityEngine.TouchPhase.Stationary ||
+                Input.touches[Input.touchCount - 1].phase == UnityEngine.TouchPhase.Moved)
             {
-                ret++;
+                lastTouchPosition = Input.touches[Input.touchCount - 1].position;
+            }
+            else
+            {
+                lastTouchPosition = Vector3.zero;
             }
         }
-
-        return ret;
     }
 }
