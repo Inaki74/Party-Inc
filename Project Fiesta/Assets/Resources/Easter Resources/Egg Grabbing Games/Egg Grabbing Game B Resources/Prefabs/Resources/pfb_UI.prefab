@@ -34,7 +34,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: -420, y: -250}
   m_SizeDelta: {x: 400, y: 400}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &1152163342405026600
@@ -114,7 +114,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 420, y: -250}
   m_SizeDelta: {x: 400, y: 400}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &7167819016468716188
@@ -326,7 +326,7 @@ GameObject:
   - component: {fileID: 7167819017252082313}
   - component: {fileID: 7167819017252082310}
   - component: {fileID: 7167819017252082311}
-  - component: {fileID: 7167819017252082308}
+  - component: {fileID: 4708778732019611542}
   m_Layer: 5
   m_Name: pfb_UI
   m_TagString: Untagged
@@ -417,7 +417,7 @@ MonoBehaviour:
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 4294967295
---- !u!114 &7167819017252082308
+--- !u!114 &4708778732019611542
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -426,7 +426,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 7167819017252082309}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2d0cef841cf11474da2c3bf605caaf59, type: 3}
+  m_Script: {fileID: 11500000, guid: 1940b5e029ab84c298bad077231c9d8f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   playerScore: 0

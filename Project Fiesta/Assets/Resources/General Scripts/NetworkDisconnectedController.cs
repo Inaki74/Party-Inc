@@ -8,51 +8,57 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
-public class NetworkDisconnectedController : MonoBehaviourPunCallbacks
+namespace FiestaTime
 {
-    [SerializeField] private GameObject goBackButton;
-
-    private float timeElapsed;
-
-    // Start is called before the first frame update
-    void Start()
+    /// <summary>
+    /// Script in charge of the disconnected scene.
+    /// </summary>
+    public class NetworkDisconnectedController : MonoBehaviourPunCallbacks
     {
-        PhotonNetwork.ConnectUsingSettings();
+        [SerializeField] private GameObject goBackButton;
 
-        timeElapsed = 0f;
+        private float timeElapsed;
 
-        goBackButton.SetActive(false);
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        timeElapsed += Time.deltaTime;
-
-        if (!PhotonNetwork.IsConnected)
+        // Start is called before the first frame update
+        void Start()
         {
             PhotonNetwork.ConnectUsingSettings();
+
+            timeElapsed = 0f;
+
+            goBackButton.SetActive(false);
         }
 
-        if(timeElapsed > 3f)
+        // Update is called once per frame
+        void Update()
         {
-            goBackButton.SetActive(true);
+            timeElapsed += Time.deltaTime;
+
+            if (!PhotonNetwork.IsConnected)
+            {
+                PhotonNetwork.ConnectUsingSettings();
+            }
+
+            if(timeElapsed > 3f)
+            {
+                goBackButton.SetActive(true);
+            }
         }
-    }
 
-    #region PUN Callbacks
+        #region PUN Callbacks
 
-    public override void OnConnectedToMaster()
-    {
-        Debug.Log("Fiesta Time/ DisconnectedController: Successfully reconnected!");
-        // Reloads lobby
-        SceneManager.LoadScene(1);
-    }
+        public override void OnConnectedToMaster()
+        {
+            Debug.Log("Fiesta Time/ DisconnectedController: Successfully reconnected!");
+            // Reloads lobby
+            SceneManager.LoadScene(1);
+        }
 
-    #endregion
+        #endregion
 
-    public void ReturnToLobby()
-    {
-        SceneManager.LoadScene(0);
+        public void ReturnToLobby()
+        {
+            SceneManager.LoadScene(0);
+        }
     }
 }
