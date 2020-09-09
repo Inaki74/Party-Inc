@@ -269,7 +269,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 1581109745}
         m_MethodName: BtnLeaveRoom
         m_Mode: 1
         m_Arguments:
@@ -544,7 +544,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Name 2
+  m_Text: Searching...
 --- !u!222 &571954025
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -622,7 +622,9 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Name 3
+  m_Text: 'Searching...
+
+'
 --- !u!222 &674032837
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -830,7 +832,9 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Name 4
+  m_Text: 'Searching...
+
+'
 --- !u!222 &818616358
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -1180,6 +1184,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1581109746}
   - component: {fileID: 1581109747}
+  - component: {fileID: 1581109745}
   m_Layer: 0
   m_Name: NetworkController
   m_TagString: Untagged
@@ -1187,6 +1192,26 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!114 &1581109745
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1581109744}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9697c940512e44d768a3b9564727a10f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxCountdownTime: 20
+  gameName: DragonDance
+  playerTexts:
+  - {fileID: 424935319}
+  - {fileID: 571954024}
+  - {fileID: 674032836}
+  - {fileID: 818616357}
+  countdownText: {fileID: 1599188138}
 --- !u!4 &1581109746
 Transform:
   m_ObjectHideFlags: 0

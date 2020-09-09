@@ -9,42 +9,42 @@ using Photon.Realtime;
 
 namespace FiestaTime
 {
+    /// <summary>
+    /// Its the class that controls all game lobbies.
+    /// </summary>
     public class NetworkGameLobbyController : MonoBehaviourPunCallbacks
     {
+        public float maxCountdownTime = 8f;
+        public string gameName;
+
         private PhotonView Pv;
 
-        [SerializeField] private Text playerOneText;
-        [SerializeField] private Text playerTwoText;
+        [Header ("Player Name Texts, place them in order")]
+        [SerializeField] private Text[] playerTexts;
         [SerializeField] private Text countdownText;
+
+        private int[] playersInRoom = new int[4];
 
         private bool runOnce = true;
 
-        private float maxCountdownTime = 8f;
-
         private float currentCountdownTime;
+
+        #region Unity Callbacks
 
         // Start is called before the first frame update
         void Start()
         {
             Pv = GetComponent<PhotonView>();
 
+            PlayerPrefs.SetString(Constants.CHRCTR_KEY_NETWRK, Constants.BUNNY_NAME_CHRCTR);
+
             currentCountdownTime = maxCountdownTime;
 
-            PhotonNetwork.AutomaticallySyncScene = true;
-
-            PlayerPrefs.SetString(Constants.CHRCTR_KEY_NETWRK, Constants.BUNNY_NAME_CHRCTR);
             if (PhotonNetwork.IsMasterClient)
             {
-                playerOneText.text = PhotonNetwork.NickName;
-            }
-
-            if (PhotonNetwork.CurrentRoom.PlayerCount == 1)
-            {
-                playerTwoText.text = "Searching";
-            }
-            else
-            {
-                playerTwoText.text = PhotonNetwork.NickName;
+                playerTexts[0].text = PhotonNetwork.NickName;
+                PhotonNetwork.AutomaticallySyncScene = true;
+                playersInRoom[0] = PhotonNetwork.LocalPlayer.ActorNumber;
             }
         }
 
@@ -55,7 +55,7 @@ namespace FiestaTime
             {
                 PhotonNetwork.CurrentRoom.IsOpen = false;
                 runOnce = false;
-                PhotonNetwork.LoadLevel("EggGrabbingGameB");
+                PhotonNetwork.LoadLevel(gameName);
             }
             else
             {
@@ -63,6 +63,8 @@ namespace FiestaTime
                 countdownText.text = string.Format("{0:00}", currentCountdownTime);
             }
         }
+
+        #endregion
 
         #region Button Functions
 
@@ -88,25 +90,98 @@ namespace FiestaTime
 
         #endregion
 
+        #region Private Functions
+
+        private void UpdateNames()
+        {
+            for (int i = 0; i < playersInRoom.Length; i++)
+            {
+                if (playersInRoom[i] != 0 && PhotonNetwork.CurrentRoom.Players.ContainsKey(playersInRoom[i]))
+                {
+                    playerTexts[i].text = PhotonNetwork.CurrentRoom.GetPlayer(playersInRoom[i]).NickName;
+                }
+                else
+                {
+                    playerTexts[i].text = "Connecting...";
+                }
+            }
+        }
+
+        private void UpdatePlayerListMasterLeft(Photon.Realtime.Player newMasterClient)
+        {
+            int[] aux = new int[playersInRoom.Length];
+
+            aux[0] = newMasterClient.ActorNumber;
+            for (int i = 0; i < playersInRoom.Length; i++)
+            {
+                for (int j = 1; j < playersInRoom.Length; j++)
+                {
+                    if (playersInRoom[i] != 0 && playersInRoom[i] != newMasterClient.ActorNumber && playersInRoom[i] != PhotonNetwork.CurrentRoom.masterClientId && !aux.Contains(playersInRoom[i]))
+                    {
+                        aux[j] = playersInRoom[i];
+                    }
+                }
+            }
+
+            playersInRoom = aux;
+        }
+
+        private void UpdatePlayerListPlayerLeft(Photon.Realtime.Player otherPlayer)
+        {
+            int[] aux = new int[playersInRoom.Length];
+            int k = 0;
+
+            for (int i = 0; i < playersInRoom.Length; i++)
+            {
+                if (playersInRoom[i] != otherPlayer.ActorNumber)
+                {
+                    aux[k] = playersInRoom[i];
+                    k++;
+                }
+            }
+
+            playersInRoom = aux;
+        }
+
+        #endregion
+
+        #region PUN Callbacks
+
         public override void OnPlayerEnteredRoom(Photon.Realtime.Player newPlayer)
         {
-            Debug.Log("Fiesta Time/ EGG/ NetworkRoomController: A player joined the room! Welcome " + newPlayer.NickName);
-            playerTwoText.text = newPlayer.NickName;
-
+            Debug.Log("Fiesta Time/" + PhotonNetwork.CurrentRoom.Name + "/ NetworkGameLobbyController: A player joined the room! Welcome " + newPlayer.NickName);
+            
             if (PhotonNetwork.IsMasterClient)
             {
+                playersInRoom[PhotonNetwork.CurrentRoom.PlayerCount - 1] = newPlayer.ActorNumber;
                 Pv.RPC("RPC_SendTimer", RpcTarget.Others, currentCountdownTime);
-                Pv.RPC("RPC_SendName", RpcTarget.Others, PhotonNetwork.NickName);
+                Pv.RPC("RPC_SendCurrentPlayers", RpcTarget.All, playersInRoom);
             }
 
         }
 
         public override void OnPlayerLeftRoom(Photon.Realtime.Player otherPlayer)
         {
-            Debug.Log("Fiesta Time/ EGG/ NetworkRoomController: Bye bye! " + otherPlayer.NickName);
-            playerTwoText.text = "Searching...";
+            Debug.Log("Fiesta Time/" + PhotonNetwork.CurrentRoom.Name + "/ NetworkGameLobbyController: Bye bye! " + otherPlayer.NickName);
+
+            if (PhotonNetwork.IsMasterClient && !otherPlayer.IsMasterClient)
+            {
+                UpdatePlayerListPlayerLeft(otherPlayer);
+                Pv.RPC("RPC_SendCurrentPlayers", RpcTarget.All, playersInRoom);
+            }
         }
 
+        public override void OnMasterClientSwitched(Photon.Realtime.Player newMasterClient)
+        {
+            Debug.Log("Fiesta Time/" + PhotonNetwork.CurrentRoom.Name + "/ NetworkGameLobbyController: The old Master Client is dead, long live the Master Client: " + newMasterClient.NickName + "!");
+
+            UpdatePlayerListMasterLeft(newMasterClient);
+            UpdateNames();
+        }
+
+        #endregion
+
+        #region PUNRPCs
         [PunRPC]
         public void RPC_SendTimer(float time)
         {
@@ -114,10 +189,13 @@ namespace FiestaTime
         }
 
         [PunRPC]
-        public void RPC_SendName(string name)
+        public void RPC_SendCurrentPlayers(int[] players)
         {
-            playerOneText.text = name;
+            playersInRoom = players;
+
+            UpdateNames();
         }
+        #endregion
     }
 }
 

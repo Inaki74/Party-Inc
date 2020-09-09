@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 9004327087624844486}
-  - component: {fileID: 9004327087624844487}
+  - component: {fileID: 682032443992295696}
   m_Layer: 0
   m_Name: pfb_GameRoomController
   m_TagString: Untagged
@@ -31,7 +31,7 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &9004327087624844487
+--- !u!114 &682032443992295696
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -40,8 +40,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 9004327087624844480}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d5dd51fe01b6f4e82b7fa8e72253f383, type: 3}
+  m_Script: {fileID: 11500000, guid: f497f481a417f4843a3bc1b82675f750, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gameManager: {fileID: 3353127175612487685, guid: fa66edd38f3b14d4ca8d651fc42aa2f8,
-    type: 3}
+  gameManager: {fileID: 0}

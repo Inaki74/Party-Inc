@@ -22,8 +22,8 @@ namespace FiestaTime
 
         [SerializeField] private Text nameText;
         private string gameToJoin = "";
-        private bool isConnecting;
 
+        #region Unity Callbacks
         // Start is called before the first frame update
         void Start()
         {
@@ -58,6 +58,8 @@ namespace FiestaTime
             PhotonNetwork.RemoveCallbackTarget(this);
         }
 
+        #endregion
+
         #region Join Functions
 
         public void JoinEGG()
@@ -82,7 +84,6 @@ namespace FiestaTime
                 if (room.PlayerCount < room.MaxPlayers && room.IsOpen && IsGameImLookingFor(room.Name, gameJoining))
                 {
                     PhotonNetwork.JoinRoom(room.Name);
-                    isConnecting = true;
                     return;
                 }
             }
@@ -130,7 +131,6 @@ namespace FiestaTime
             Debug.Log("Fiesta Time/ RoomController: Successfully joined room. Entering game...");
 
             PhotonNetwork.LoadLevel(gameToJoin + "GameLobby");
-            isConnecting = false;
         }
 
         public override void OnJoinRoomFailed(short returnCode, string message)

@@ -455,18 +455,6 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 4f3891efaf8e34fb1a70848c76597a94, type: 3}
---- !u!114 &1581109745 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 1583794355869324635, guid: 33572cf95c58a4290a857dd00702e824,
-    type: 3}
-  m_PrefabInstance: {fileID: 1583794354963727530}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c564c206a54f14996aaf5d078c5ddbb0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &1599188138 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 4665392479902808625, guid: 0b4b47bd60a234aee8b191236a3c1952,
@@ -486,6 +474,31 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: -7808296303126965196, guid: 33572cf95c58a4290a857dd00702e824,
+        type: 3}
+      propertyPath: playerTexts.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: -7808296303126965196, guid: 33572cf95c58a4290a857dd00702e824,
+        type: 3}
+      propertyPath: playerTexts.Array.data[0]
+      value: 
+      objectReference: {fileID: 424935319}
+    - target: {fileID: -7808296303126965196, guid: 33572cf95c58a4290a857dd00702e824,
+        type: 3}
+      propertyPath: playerTexts.Array.data[1]
+      value: 
+      objectReference: {fileID: 571954024}
+    - target: {fileID: -7808296303126965196, guid: 33572cf95c58a4290a857dd00702e824,
+        type: 3}
+      propertyPath: countdownText
+      value: 
+      objectReference: {fileID: 1599188138}
+    - target: {fileID: -7808296303126965196, guid: 33572cf95c58a4290a857dd00702e824,
+        type: 3}
+      propertyPath: gameName
+      value: EggGrabbingGameB
+      objectReference: {fileID: 0}
     - target: {fileID: 1583794355869324632, guid: 33572cf95c58a4290a857dd00702e824,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -579,17 +592,17 @@ PrefabInstance:
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 1581109745}
+      objectReference: {fileID: 0}
     - target: {fileID: 4665392478388569759, guid: 0b4b47bd60a234aee8b191236a3c1952,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 1581109745}
+      objectReference: {fileID: 0}
     - target: {fileID: 4665392479118031253, guid: 0b4b47bd60a234aee8b191236a3c1952,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 1581109745}
+      objectReference: {fileID: 0}
     - target: {fileID: 4665392479262906928, guid: 0b4b47bd60a234aee8b191236a3c1952,
         type: 3}
       propertyPath: m_LocalPosition.x

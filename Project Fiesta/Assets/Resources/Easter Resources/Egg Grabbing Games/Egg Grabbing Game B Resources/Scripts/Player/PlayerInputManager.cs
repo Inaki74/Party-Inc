@@ -42,7 +42,7 @@ namespace FiestaTime
                 }
 
 
-                // PC OSX
+                //// PC OSX
                 //if (Input.GetKey(KeyCode.LeftArrow))
                 //{
                 //    MovementDirection = -1;
