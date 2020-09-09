@@ -10,9 +10,9 @@ GameObject:
   m_Component:
   - component: {fileID: 5822086951608490114}
   - component: {fileID: 4218219320886643948}
-  - component: {fileID: 3325699949143889513}
   - component: {fileID: 2122989732861102366}
   - component: {fileID: 7370895179752485199}
+  - component: {fileID: 8039329017478249810}
   - component: {fileID: -3961405843445437851}
   - component: {fileID: 5815692144956720862}
   m_Layer: 0
@@ -49,26 +49,6 @@ SphereCollider:
   serializedVersion: 2
   m_Radius: 0.5
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &3325699949143889513
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2870790742212354326}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8d17238cd085a4c2b9471c45a00839ad, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  eggType: 0
-  whatIsGround:
-    serializedVersion: 2
-    m_Bits: 256
-  normalMaterial: {fileID: 2100000, guid: 671d10104d71e436aa71eaf4eaaec9fa, type: 2}
-  rottenMaterial: {fileID: 2100000, guid: 3fde595e669454f998bc6e5414ec9336, type: 2}
-  goldenMaterial: {fileID: 2100000, guid: edbdc49eff89f4b7a8dfaaf1e01a6f94, type: 2}
-  Sc: {fileID: 0}
 --- !u!212 &2122989732861102366
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -138,6 +118,26 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
+--- !u!114 &8039329017478249810
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2870790742212354326}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e8d9d6ce588e84bc2bc7c48f15a01d4b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  eggType: 0
+  whatIsGround:
+    serializedVersion: 2
+    m_Bits: 256
+  normalMaterial: {fileID: 0}
+  rottenMaterial: {fileID: 0}
+  goldenMaterial: {fileID: 0}
+  Sc: {fileID: 4218219320886643948}
 --- !u!54 &-3961405843445437851
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -173,7 +173,7 @@ MonoBehaviour:
   Synchronization: 2
   OwnershipTransfer: 0
   ObservedComponents:
-  - {fileID: 3325699949143889513}
+  - {fileID: 8039329017478249810}
   viewIdField: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0
