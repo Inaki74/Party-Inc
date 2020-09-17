@@ -43,6 +43,8 @@ MonoBehaviour:
   - RPC_SendFinishedGame
   - RPC_SendEggMaps
   - RPC_SendScore
+  - RPC_SendCurrentPlayers
+  - RPC_SendPlayerReady
   DisableAutoOpenWizard: 1
   ShowSettings: 0
   DevRegionSetOnce: 1

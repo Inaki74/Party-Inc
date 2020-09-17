@@ -8,111 +8,141 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
-public class NetworkRoomSelectController : MonoBehaviourPunCallbacks
+namespace FiestaTime
 {
-    private const int maxEggPlayers = 2;
-
-    private List<RoomInfo> currentRoomList;
-
-    [SerializeField] private Text nameText;
-    private string gameJoining;
-    private bool isConnecting;
-
-    // Start is called before the first frame update
-    void Start()
+    /// <summary>
+    /// Its the class in charge of the game selection.
+    /// </summary>
+    public class NetworkRoomSelectController : MonoBehaviourPunCallbacks
     {
-        nameText.text = "Welcome " + PlayerPrefs.GetString(Constants.NAME_KEY_NETWRK) + "!";
+        private const int maxEggPlayers = 2;
+        private const int maxDdPlayers = 4;
 
-        if (PhotonNetwork.IsConnected)
+        private List<RoomInfo> currentRoomList;
+
+        [SerializeField] private Text nameText;
+        private string gameToJoin = "";
+
+        #region Unity Callbacks
+        // Start is called before the first frame update
+        void Start()
         {
-            StartCoroutine("JoinLobbyCo");
-        }
-    }
+            nameText.text = "Welcome " + PlayerPrefs.GetString(Constants.NAME_KEY_NETWRK) + "!";
 
-    private IEnumerator JoinLobbyCo()
-    {
-        if (!PhotonNetwork.InLobby)
-            yield return new WaitUntil(() => PhotonNetwork.IsConnectedAndReady && PhotonNetwork.JoinLobby());
-        else
-        {
-            yield return new WaitUntil(() => PhotonNetwork.IsConnectedAndReady && PhotonNetwork.LeaveLobby());
-            PhotonNetwork.JoinLobby();
-        }
-    }
-
-    public override void OnEnable()
-    {
-        base.OnEnable();
-        PhotonNetwork.AddCallbackTarget(this);
-    }
-
-    public override void OnDisable()
-    {
-        base.OnDisable();
-        PhotonNetwork.RemoveCallbackTarget(this);
-    }
-
-    public void JoinEGG()
-    {
-        foreach(RoomInfo room in currentRoomList)
-        {
-            Debug.Log("Room: " + room.Name + ", Quantity: " + room.PlayerCount + ", Maximum allowed: " + room.MaxPlayers + ", is available ? " + room.IsOpen);
-            if(room.PlayerCount < room.MaxPlayers && room.IsOpen)
+            if (PhotonNetwork.IsConnected)
             {
-                PhotonNetwork.JoinRoom(room.Name);
-                isConnecting = true;
-                return;
+                StartCoroutine("JoinLobbyCo");
             }
         }
 
-        gameJoining = "EGG_";
-        PhotonNetwork.CreateRoom(gameJoining + Random.Range(0, 10000), new RoomOptions { MaxPlayers = maxEggPlayers });
-    }
+        private IEnumerator JoinLobbyCo()
+        {
+            if (!PhotonNetwork.InLobby)
+                yield return new WaitUntil(() => PhotonNetwork.IsConnectedAndReady && PhotonNetwork.JoinLobby());
+            else
+            {
+                yield return new WaitUntil(() => PhotonNetwork.IsConnectedAndReady && PhotonNetwork.LeaveLobby());
+                PhotonNetwork.JoinLobby();
+            }
+        }
 
-    #region PUN Callbacks
+        public override void OnEnable()
+        {
+            base.OnEnable();
+            PhotonNetwork.AddCallbackTarget(this);
+        }
 
-    public override void OnDisconnected(DisconnectCause cause)
-    {
-        Debug.Log("Fiesta Time/ RoomController: You have disconnected from the server. Cause: " + cause + ". Retrying...");
-        // Loads disconnected scene
-        SceneManager.LoadScene(2);
-    }
+        public override void OnDisable()
+        {
+            base.OnDisable();
+            PhotonNetwork.RemoveCallbackTarget(this);
+        }
 
-    public override void OnRoomListUpdate(List<RoomInfo> roomList)
-    {
-        Debug.Log("Fiesta Time/ RoomController: Room list updated.");
-        currentRoomList = roomList;
-    }
+        #endregion
 
-    public override void OnCreatedRoom()
-    {
-        Debug.Log("Fiesta Time/ RoomController: Room created!");
-    }
+        #region Join Functions
 
-    public override void OnCreateRoomFailed(short returnCode, string message)
-    {
-        Debug.Log("Fiesta Time/ RoomController: Room creation failed, reason: " + message + " error code: " + returnCode + ". Trying again...");
+        public void JoinEGG()
+        {
+            if (gameToJoin == "")
+                JoinARoom("EGG_", maxEggPlayers);
+        }
 
-        PhotonNetwork.CreateRoom(gameJoining + Random.Range(0, 10000), new RoomOptions { MaxPlayers = maxEggPlayers });
-    }
+        public void JoinDD()
+        {
+            if (gameToJoin == "")
+                JoinARoom("DD_", maxDdPlayers);
+        }
 
-    public override void OnJoinedRoom()
-    {
-        Debug.Log("Fiesta Time/ RoomController: Successfully joined room. Entering game...");
+        public void JoinARoom(string gameJoining, int maxPlayersAllowed)
+        {
+            gameToJoin = gameJoining;
 
-        PhotonNetwork.LoadLevel("EggGrabbingGameLobby");
-        isConnecting = false;
-    }
+            foreach (RoomInfo room in currentRoomList)
+            {
+                Debug.Log("Room: " + room.Name + ", Quantity: " + room.PlayerCount + ", Maximum allowed: " + room.MaxPlayers + ", is available ? " + room.IsOpen);
+                if (room.PlayerCount < room.MaxPlayers && room.IsOpen && IsGameImLookingFor(room.Name, gameJoining))
+                {
+                    PhotonNetwork.JoinRoom(room.Name);
+                    return;
+                }
+            }
 
-    public override void OnJoinRoomFailed(short returnCode, string message)
-    {
-        Debug.Log("Fiesta Time/ RoomController: Room creation failed, reason: " + message + " error code: " + returnCode + ". Try again later.");
-    }
 
-    #endregion
+            PhotonNetwork.CreateRoom(gameJoining + Random.Range(0, 10000), new RoomOptions { MaxPlayers = (byte)maxPlayersAllowed });
+        }
 
-    public void ReturnToLobby()
-    {
-        SceneManager.LoadScene(0);
+        private bool IsGameImLookingFor(string roomName, string gamePrefix)
+        {
+            return roomName.Contains(gamePrefix);
+        }
+
+        #endregion
+
+        #region PUN Callbacks
+
+        public override void OnDisconnected(DisconnectCause cause)
+        {
+            Debug.Log("Fiesta Time/ RoomController: You have disconnected from the server. Cause: " + cause + ". Retrying...");
+            // Loads disconnected scene
+            SceneManager.LoadScene(2);
+        }
+
+        public override void OnRoomListUpdate(List<RoomInfo> roomList)
+        {
+            Debug.Log("Fiesta Time/ RoomController: Room list updated.");
+            currentRoomList = roomList;
+        }
+
+        public override void OnCreatedRoom()
+        {
+            Debug.Log("Fiesta Time/ RoomController: Room created!");
+        }
+
+        public override void OnCreateRoomFailed(short returnCode, string message)
+        {
+            Debug.Log("Fiesta Time/ RoomController: Room creation failed, reason: " + message + " error code: " + returnCode + ". Trying again...");
+
+            PhotonNetwork.CreateRoom(gameToJoin + Random.Range(0, 10000), new RoomOptions { MaxPlayers = maxEggPlayers });
+        }
+
+        public override void OnJoinedRoom()
+        {
+            Debug.Log("Fiesta Time/ RoomController: Successfully joined room. Entering game...");
+
+            PhotonNetwork.LoadLevel(gameToJoin + "GameLobby");
+        }
+
+        public override void OnJoinRoomFailed(short returnCode, string message)
+        {
+            Debug.Log("Fiesta Time/ RoomController: Room creation failed, reason: " + message + " error code: " + returnCode + ". Try again later.");
+        }
+
+        #endregion
+
+        public void ReturnToLobby()
+        {
+            SceneManager.LoadScene(0);
+        }
     }
 }

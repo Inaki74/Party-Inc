@@ -1,0 +1,88 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &3353127175612487685
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3353127175612487687}
+  - component: {fileID: 303744968433338716}
+  - component: {fileID: 4315692202825456980}
+  m_Layer: 0
+  m_Name: pfb_eggb_GameManager
+  m_TagString: GameController
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3353127175612487687
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3353127175612487685}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 10, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &303744968433338716
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3353127175612487685}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ObservedComponentsFoldoutOpen: 1
+  Group: 0
+  prefixField: -1
+  observableSearch: 2
+  Synchronization: 0
+  OwnershipTransfer: 0
+  ObservedComponents: []
+  viewIdField: 0
+  InstantiationId: 0
+  isRuntimeInstantiated: 0
+--- !u!114 &4315692202825456980
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3353127175612487685}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8fdb30c49d71c40e3b995c179def8ebe, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  countdown: 4
+  amountOfEasyMaps: 4
+  amountOfMediumMaps: 4
+  amountOfHardMaps: 2
+  difficulty: 0
+  waveIntervals: 0.2
+  timeLimitOffset: 2
+  isGameFinished: 0
+  playerScore: 0
+  enemyScore: 0
+  playerAssetsPrefab: {fileID: 2772520239534581506, guid: 9655959150dde46d38d000330d8b67c9,
+    type: 3}
+  playerPrefab: {fileID: 4862033087429230649, guid: 3c99575628fc04a85be6221f4430b75c,
+    type: 3}
+  spawnerManagerPrefab: {fileID: 2276027874578927911, guid: 281520ca779fa46e7818de75cf326072,
+    type: 3}
+  eggPoolManagerPrefab: {fileID: 4042388351733942291, guid: c156a4478255d4753a5d625c047b3fe9,
+    type: 3}
+  uiPrefab: {fileID: 7167819017252082309, guid: 75e8b0e9704d94d949c39edeee363d66,
+    type: 3}

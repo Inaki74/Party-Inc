@@ -9,6 +9,9 @@ using Photon.Realtime;
 
 namespace FiestaTime
 {
+    /// <summary>
+    /// Script in charge of the title screen as well as connecting to the server.
+    /// </summary>
     public class Launcher : MonoBehaviourPunCallbacks
     {
         private string gameVersion = "1.0";

@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6296148551296734783}
-  - component: {fileID: 6296148551296734776}
+  - component: {fileID: 1894629500714319970}
   m_Layer: 0
   m_Name: pfb_EggSpawner
   m_TagString: Untagged
@@ -31,7 +31,7 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &6296148551296734776
+--- !u!114 &1894629500714319970
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -40,6 +40,6 @@ MonoBehaviour:
   m_GameObject: {fileID: 6296148551296734779}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 57521e552218c4c9fb34c6fb7702e5c8, type: 3}
+  m_Script: {fileID: 11500000, guid: 8d645951ee15a4e1fb1209deffd7e248, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
