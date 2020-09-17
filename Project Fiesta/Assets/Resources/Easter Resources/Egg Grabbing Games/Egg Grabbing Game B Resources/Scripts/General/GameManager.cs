@@ -15,24 +15,8 @@ namespace FiestaTime
         /// <summary>
         /// The game manager, responsible of starting the game and managing its functionality.
         /// </summary>
-        public class GameManager : MonoBehaviourPun
+        public class GameManager : MonoSingleton<GameManager>
         {
-            #region Singleton Specifics
-            private static GameManager _current;
-            public static GameManager Current
-            {
-                get
-                {
-                    if (_current == null)
-                    {
-                        Debug.Log("No Game manager Instantiated");
-                    }
-
-                    return _current;
-                }
-            }
-            #endregion
-
             #region Events
             public delegate void ActionGameStart();
             public static event ActionGameStart onGameStart;
@@ -90,9 +74,10 @@ namespace FiestaTime
             #endregion
 
             #region Unity Callbacks
-            private void Awake()
+            public override void Init()
             {
-                _current = this;
+                base.Init();
+
                 EasterEgg.onObtainEgg += OnEggObtain;
                 eggMaps = new int[amountOfEasyMaps + amountOfMediumMaps + amountOfHardMaps][,];
                 if (PhotonNetwork.IsMasterClient) { eggMaps = InitializeEggMaps(); NotifyPlayersMaps(); }

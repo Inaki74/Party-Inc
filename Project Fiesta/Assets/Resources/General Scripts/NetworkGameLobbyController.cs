@@ -7,6 +7,7 @@ using UnityEngine.SceneManagement;
 using Photon.Pun;
 using Photon.Realtime;
 
+
 namespace FiestaTime
 {
     /// <summary>
@@ -18,6 +19,8 @@ namespace FiestaTime
         public string gameName;
 
         private PhotonView Pv;
+
+        private ExitGames.Client.Photon.Hashtable roomProps = new ExitGames.Client.Photon.Hashtable();
 
         [Header ("Player Name Texts, place them in order")]
         [SerializeField] private Text[] playerTexts;
@@ -55,6 +58,7 @@ namespace FiestaTime
             {
                 PhotonNetwork.CurrentRoom.IsOpen = false;
                 runOnce = false;
+                SetCustomProperties();
                 PhotonNetwork.LoadLevel(gameName);
             }
             else
@@ -92,6 +96,23 @@ namespace FiestaTime
 
         #region Private Functions
 
+        private void SetCustomProperties()
+        {
+            int[] aux = new int[PhotonNetwork.CurrentRoom.PlayerCount];
+
+            for (int i = 0; i < PhotonNetwork.CurrentRoom.PlayerCount; i++)
+            {
+                aux[i] = playersInRoom[i];
+            }
+
+            roomProps.Add("PlayerIDsList", aux);
+            bool a = PhotonNetwork.CurrentRoom.SetCustomProperties(roomProps);
+            if (a)
+            {
+                Debug.Log("Properties set appropiately.");
+            }
+        }
+
         private void UpdateNames()
         {
             for (int i = 0; i < playersInRoom.Length; i++)
@@ -116,7 +137,10 @@ namespace FiestaTime
             {
                 for (int j = 1; j < playersInRoom.Length; j++)
                 {
-                    if (playersInRoom[i] != 0 && playersInRoom[i] != newMasterClient.ActorNumber && playersInRoom[i] != PhotonNetwork.CurrentRoom.masterClientId && !aux.Contains(playersInRoom[i]))
+                    if (playersInRoom[i] != 0 &&
+                        playersInRoom[i] != newMasterClient.ActorNumber &&
+                        playersInRoom[i] != PhotonNetwork.CurrentRoom.masterClientId &&
+                        !aux.Contains(playersInRoom[i]))
                     {
                         aux[j] = playersInRoom[i];
                     }
@@ -173,7 +197,8 @@ namespace FiestaTime
 
         public override void OnMasterClientSwitched(Photon.Realtime.Player newMasterClient)
         {
-            Debug.Log("Fiesta Time/" + PhotonNetwork.CurrentRoom.Name + "/ NetworkGameLobbyController: The old Master Client is dead, long live the Master Client: " + newMasterClient.NickName + "!");
+            Debug.Log("Fiesta Time/" + PhotonNetwork.CurrentRoom.Name + "/ NetworkGameLobbyController: The old Master Client is dead," +
+                      " long live the Master Client: " + newMasterClient.NickName + "!");
 
             UpdatePlayerListMasterLeft(newMasterClient);
             UpdateNames();

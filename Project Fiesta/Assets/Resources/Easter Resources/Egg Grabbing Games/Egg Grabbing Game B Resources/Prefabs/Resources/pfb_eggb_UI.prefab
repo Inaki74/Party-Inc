@@ -328,7 +328,7 @@ GameObject:
   - component: {fileID: 7167819017252082311}
   - component: {fileID: 4708778732019611542}
   m_Layer: 5
-  m_Name: pfb_UI
+  m_Name: pfb_eggb_UI
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

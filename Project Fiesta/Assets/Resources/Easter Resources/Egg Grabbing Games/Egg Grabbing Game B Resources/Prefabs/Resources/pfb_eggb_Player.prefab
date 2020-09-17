@@ -18,7 +18,7 @@ GameObject:
   - component: {fileID: 878258600350263691}
   - component: {fileID: 7838622818746730}
   m_Layer: 0
-  m_Name: pfb_Player
+  m_Name: pfb_eggb_Player
   m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -128,7 +128,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   monosToDisable:
   - {fileID: 7838622818746730}
-  mine: 
 --- !u!114 &-9113631721321474703
 MonoBehaviour:
   m_ObjectHideFlags: 0

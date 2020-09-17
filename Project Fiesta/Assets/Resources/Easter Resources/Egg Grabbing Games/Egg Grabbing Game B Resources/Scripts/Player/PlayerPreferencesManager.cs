@@ -29,8 +29,8 @@ namespace FiestaTime
             {
                 if (photonView.IsMine)
                 {
-                    decidedCharacter = PlayerPrefs.GetString(Constants.CHRCTR_KEY_NETWRK);
-                    playerName = PlayerPrefs.GetString(Constants.NAME_KEY_NETWRK);
+                    decidedCharacter = PlayerPrefs.GetString(FiestaTime.Constants.CHRCTR_KEY_NETWRK);
+                    playerName = PlayerPrefs.GetString(FiestaTime.Constants.NAME_KEY_NETWRK);
                 }
                 else
                 {
@@ -43,10 +43,10 @@ namespace FiestaTime
 
                 switch (decidedCharacter)
                 {
-                    case Constants.BUNNY_NAME_CHRCTR:
+                    case FiestaTime.Constants.BUNNY_NAME_CHRCTR:
                         //Put on Easter Bunny animations and sprites
                         break;
-                    case Constants.SANTA_NAME_CHRCTR:
+                    case FiestaTime.Constants.SANTA_NAME_CHRCTR:
                         //Put on Santa Claus animations and sprites
                         break;
                 }

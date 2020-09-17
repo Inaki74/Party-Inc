@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 303744968433338716}
   - component: {fileID: 4315692202825456980}
   m_Layer: 0
-  m_Name: GameManager
+  m_Name: pfb_eggb_GameManager
   m_TagString: GameController
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
