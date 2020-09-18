@@ -11,6 +11,8 @@ namespace FiestaTime
     {
         public class ShowSequenceUI : MonoBehaviour
         {
+            private Quaternion firstQuat;
+
             [SerializeField] private RectTransform arrowImage;
             [SerializeField] private GameObject arrow;
 
@@ -31,12 +33,21 @@ namespace FiestaTime
 
             private void SetArrow(int sequence)
             {
-                int rotation = 270;
+                Debug.Log(sequence);
+
+                float rotation = 270;
                 if (sequence == 2) rotation = 0;
                 if (sequence == 3) rotation = 90;
                 if (sequence == 4) rotation = 180;
 
+                Debug.Log(rotation);
+
                 arrowImage.Rotate(new Vector3(0, 0, rotation));
+            }
+
+            private void ResetArrow()
+            {
+                arrowImage.rotation = new Quaternion(0, 0, 0, 1);
             }
 
             private IEnumerator ShowSequence(int elements)
@@ -52,6 +63,8 @@ namespace FiestaTime
                     StartCoroutine(AnimateArrowCo());
 
                     yield return new WaitForSeconds(1f);
+
+                    ResetArrow();
                 }
                 arrow.SetActive(false);
 

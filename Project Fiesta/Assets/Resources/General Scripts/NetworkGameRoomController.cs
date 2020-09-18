@@ -14,8 +14,8 @@ namespace FiestaTime
         // Start is called before the first frame update
         void Start()
         {
-            if (PhotonNetwork.IsMasterClient)
-                PhotonNetwork.InstantiateRoomObject(gameManager.name, Vector3.zero, Quaternion.identity);
+            //if (PhotonNetwork.IsMasterClient)
+                //PhotonNetwork.Instantiate(gameManager.name, Vector3.zero, Quaternion.identity);
         }
 
         public override void OnEnable()

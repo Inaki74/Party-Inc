@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+using Photon.Pun;
+
 namespace FiestaTime
 {
     namespace DD
     {
-        public class ResultsUI : MonoBehaviour
+        public class ResultsUI : MonoBehaviourPun, IPunObservable
         {
             [SerializeField] private GameObject healthHolder;
 
@@ -55,6 +57,22 @@ namespace FiestaTime
                     healthRect.localScale = Vector3.zero;
                 }
 
+            }
+
+            public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+            {
+                if (stream.IsWriting)
+                {
+                    stream.SendNext(healthRect.localScale);
+                    stream.SendNext(healthRect.anchoredPosition);
+                    stream.SendNext(healthHolder.activeInHierarchy);
+                }
+                else
+                {
+                    healthRect.localScale = (Vector3)stream.ReceiveNext();
+                    healthRect.anchoredPosition = (Vector3)stream.ReceiveNext();
+                    healthHolder.SetActive((bool)stream.ReceiveNext());
+                }
             }
         }
     }

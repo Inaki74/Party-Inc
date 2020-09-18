@@ -28,7 +28,7 @@ namespace FiestaTime
             {
                 countdown -= Time.deltaTime;
 
-                countdownText.text = "" + countdown;
+                countdownText.text = string.Format("{0:00}", countdown);
             }
 
             private void OnEnable()

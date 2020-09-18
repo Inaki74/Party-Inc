@@ -12,7 +12,7 @@ namespace FiestaTime
         /// <summary>
         /// In charge of all things player, its animations, its input management and its synchronization over the network.
         /// </summary>
-        public class Player : MonoBehaviour
+        public class Player : MonoBehaviourPun, IPunObservable
         {
             public int health = 3;
 
@@ -39,7 +39,11 @@ namespace FiestaTime
                 if (anim == null) anim = GetComponent<Animator>();
                 if (Mr == null) Mr = GetComponent<MeshRenderer>();
 
-                playerName.text = PhotonNetwork.NickName;
+                if (photonView.IsMine)
+                {
+                    playerName.text = PhotonNetwork.NickName;
+                    photonView.RPC("RPC_SendName", RpcTarget.Others, PhotonNetwork.NickName);
+                } 
             }
 
             private void Awake()
@@ -54,6 +58,8 @@ namespace FiestaTime
 
             private void OnPhaseTransit(int nextPhase)
             {
+                if (!photonView.IsMine && PhotonNetwork.IsConnected) return;
+
                 if (hasLost) {
                     GameManager.Current.NotifyOfPlayerReady(PhotonNetwork.LocalPlayer.ActorNumber);
                     return;
@@ -82,17 +88,16 @@ namespace FiestaTime
                         hasLost = true;
                         inputManager.enabled = false;
 
-                        // Check if theres atleast two players standing
-                        // If true
-                        // The game goes on, you as a spectator TODO: Prompt the player to stay or leave.
-                        // else
-                        // The game ends abruptly, the last one standing wins.
+                        GameManager.Current.NotifyOfPlayerLost(PhotonNetwork.LocalPlayer.ActorNumber);
                     }
 
                     GameManager.Current.NotifyOfPlayerReady(PhotonNetwork.LocalPlayer.ActorNumber);
                 }
 
-                // If necessary, we can deactivate mesh renderer / animations when leaving their view. 
+                if(nextPhase == 4)
+                {
+                    // Game finished
+                }
             }
 
             private IEnumerator DemonstrationCo()
@@ -135,6 +140,25 @@ namespace FiestaTime
                 Mr.material.color = new Color(1, 1, 1);
 
                 GameManager.Current.NotifyOfPlayerReady(PhotonNetwork.LocalPlayer.ActorNumber);
+            }
+
+            [PunRPC]
+            public void RPC_SendName(string name)
+            {
+                playerName.text = name;
+            }
+
+            public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+            {
+                if (stream.IsWriting)
+                {
+                    stream.SendNext(new Vector3(Mr.material.color.r, Mr.material.color.g, Mr.material.color.b));
+                }
+                else
+                {
+                    Vector3 temp = (Vector3)stream.ReceiveNext();
+                    Mr.material.color = new Color(temp.x, temp.y, temp.z);
+                }
             }
         }
     }

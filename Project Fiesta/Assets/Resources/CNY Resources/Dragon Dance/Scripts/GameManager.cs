@@ -9,12 +9,18 @@ namespace FiestaTime
     {
         public class GameManager : MonoSingleton<GameManager>
         {
+            private Vector3[] playerPositions = { new Vector3(-2.5f, 0.5f, -16f),
+                                                  new Vector3(-0.75f, 0.5f, -16f),
+                                                  new Vector3(0.75f, 0.5f, -16f),
+                                                  new Vector3(2.5f, 0.5f, -16f)};
+
             //The sequence map of moves to be generated.
             public int[] sequenceMap = new int[12];
 
             private int amountOfPlayers;
             private int[] playerList;
             private Hashtable playersReady = new Hashtable();
+            private Hashtable playersLost = new Hashtable();
 
             public delegate void ActionGameStart();
             public static event ActionGameStart onGameStart;
@@ -32,18 +38,6 @@ namespace FiestaTime
             // Start is called before the first frame update
             void Start()
             {
-                // Generate the sequence map to be followed.
-                GenerateSequenceMap();
-
-                // Initialize game for x amount of players.
-                InitializeGame();
-
-                // Initialize player UI
-                InitializeUI();
-
-                // Initialize players
-                InitializePlayers();
-
                 // Start game
                 StartCoroutine(GameLoopCo());
             }
@@ -60,25 +54,18 @@ namespace FiestaTime
                     yield return new WaitForEndOfFrame();
                 }
 
-                for (int i = 0; i < PhotonNetwork.CurrentRoom.PlayerCount; i++)
-                {
-                    Debug.Log(playerList[i]);
-                }
+                //for (int i = 0; i < PhotonNetwork.CurrentRoom.PlayerCount; i++)
+                //{
+                //    Debug.Log(playerList[i]);
+                //}
 
+                SetPlayersLost();
                 ResetPlayersReady();
 
-                for (int i = 0; i < playerList.Length; i++)
-                {
-                    Debug.Log(playersReady[playerList[i]]);
-                }
-            }
-
-            private void PrintArray(int[] a)
-            {
-                foreach(var i in a)
-                {
-                    Debug.Log(i);
-                }
+                //for (int i = 0; i < playerList.Length; i++)
+                //{
+                //    Debug.Log(playersReady[playerList[i]]);
+                //}
             }
 
             private bool HasFetched(int[] list)
@@ -105,6 +92,15 @@ namespace FiestaTime
                 }
             }
 
+            private void SetPlayersLost()
+            {
+                foreach (int id in playerList)
+                {
+                    playersLost.Remove(id);
+                    playersLost.Add(id, false);
+                }
+            }
+
             private void InitializeUI()
             {
                 Instantiate(UIPrefab);
@@ -112,7 +108,17 @@ namespace FiestaTime
 
             private void InitializePlayers()
             {
-                PhotonNetwork.Instantiate(playerPrefab.name, new Vector3(0, 0.5f, -12), Quaternion.identity);
+                Vector3 decidedVec = Vector3.zero;
+
+                for(int i = 0; i < playerList.Length; i++)
+                {
+                    if(PhotonNetwork.LocalPlayer.ActorNumber == playerList[i])
+                    {
+                        decidedVec = playerPositions[i];
+                    }
+                }
+
+                PhotonNetwork.Instantiate(playerPrefab.name, decidedVec, Quaternion.identity);
             }
 
             /// <summary>
@@ -121,12 +127,30 @@ namespace FiestaTime
             /// <returns></returns>
             private IEnumerator GameLoopCo()
             {
+                // Generate the sequence map to be followed.
+                if (PhotonNetwork.IsMasterClient)
+                {
+                    GenerateSequenceMap();
+                    SendSequenceMap();
+                }
+
+                // Initialize game for x amount of players.
+                InitializeGame();
+
                 yield return StartCoroutine(SetPlayerIDs());
+
+                // Initialize players
+                InitializePlayers();
+
+                // Initialize player UI
+                InitializeUI();
+
+                yield return new WaitUntil(() => PlayersReady());
+                ResetPlayersReady();
 
                 while (isGameRunning)
                 {
                     // Trigger "Sequence Showing" Sequence
-                    Debug.Log("Commencing Sequence Showing");
                     onNextPhase?.Invoke(0);
                     yield return new WaitUntil(() => PlayersReady());
                     ResetPlayersReady();
@@ -147,11 +171,52 @@ namespace FiestaTime
                     ResetPlayersReady();
 
                     amountOfMovesThisRound += 2;
-                    // IsGameOver();
 
+                    isGameRunning = !CheckGameOver();
                 }
 
                 // Outro
+                // TODO: Decide winner, put on a FINISH screen.
+                onNextPhase?.Invoke(4);
+            }
+
+            /// <summary>
+            /// Checks if the game is over. True if the game is over.
+            /// </summary>
+            /// <returns></returns>
+            private bool CheckGameOver()
+            {
+                // Game is over if either of these are true:
+                //      There is one player standing.
+                //      There are no players standing.
+                //      All rounds have been played.
+
+                return amountOfMovesThisRound > sequenceMap.Length || CheckPlayersStanding();
+            }
+
+            /// <summary>
+            /// Returns true if theres one or less players standing (game is over).
+            /// </summary>
+            /// <returns></returns>
+            private bool CheckPlayersStanding()
+            {
+                int playersStanding = 0;
+
+                for(int i = 0; i < playerList.Length; i++)
+                {
+                    bool lost = (bool) playersLost[playerList[i]];
+
+                    if (!lost) playersStanding++;
+                }
+
+                if(PhotonNetwork.CurrentRoom.PlayerCount > 1)
+                {
+                    return playersStanding <= 1;
+                }
+                else
+                {
+                    return playersStanding <= 0;
+                }
             }
 
             private bool PlayersReady()
@@ -162,7 +227,6 @@ namespace FiestaTime
                 {
                     allReady = allReady && (bool)playersReady[id];
                 }
-                Debug.Log("Players ready? " + allReady);
 
                 return allReady;
             }
@@ -175,6 +239,11 @@ namespace FiestaTime
                 }
             }
 
+            private void SendSequenceMap()
+            {
+                photonView.RPC("RPC_SendSequenceMap", RpcTarget.Others, sequenceMap);
+            }
+
             public void NotifyOfPlayerReady(int playerId)
             {
                 playersReady.Remove(playerId);
@@ -183,49 +252,12 @@ namespace FiestaTime
                 photonView.RPC("RPC_SendPlayerReady", RpcTarget.Others, playerId);
             }
 
-            private void OnPhaseTransit(int nextPhase)
+            public void NotifyOfPlayerLost(int playerId)
             {
-                // 0 -> entered showSeq, 1 -> entered playerInput, 2 -> entered demoSeq, 3 -> entered results
-                
+                playersLost.Remove(playerId);
+                playersLost[playerId] = true;
 
-                switch (nextPhase)
-                {
-                    case 0:
-                        // Deactivate all pieces of Results phase
-
-
-                        // Activate all pieces of Showing Sequence phase
-
-
-                        break;
-                    case 1:
-                        // Deactivate all pieces of Showing Sequence phase
-
-
-                        // Activate all pieces of Input Phase phase
-
-
-                        break;
-                    case 2:
-                        // Deactivate all pieces of Input phase
-
-
-                        // Activate all pieces of demonstration phase
-
-
-                        break;
-                    case 3:
-                        // Deactivate all pieces of demonstration phase
-
-
-                        // Activate all pieces of Results phase
-
-
-                        break;
-                    default:
-                        Debug.Log("ITS NOT POSSIBLEEEEE!");
-                        break;
-                }
+                photonView.RPC("RPC_SendPlayerLost", RpcTarget.Others, playerId);
             }
 
             #region PUNRPC
@@ -235,6 +267,19 @@ namespace FiestaTime
             {
                 playersReady.Remove(id);
                 playersReady[id] = true;
+            }
+
+            [PunRPC]
+            public void RPC_SendPlayerLost(int id)
+            {
+                playersLost.Remove(id);
+                playersLost[id] = true;
+            }
+
+            [PunRPC]
+            public void RPC_SendSequenceMap(int[] sequence)
+            {
+                sequenceMap = sequence;
             }
 
             #endregion

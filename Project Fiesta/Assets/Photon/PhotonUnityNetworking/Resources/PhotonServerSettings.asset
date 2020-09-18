@@ -45,6 +45,11 @@ MonoBehaviour:
   - RPC_SendScore
   - RPC_SendCurrentPlayers
   - RPC_SendPlayerReady
+  - RPC_SendSequenceMap
+  - RPC_SendPlayerLost
+  - RPC_SendDisable
+  - RPC_SendEnable
+  - RPC_SendIfRight
   DisableAutoOpenWizard: 1
   ShowSettings: 0
   DevRegionSetOnce: 1

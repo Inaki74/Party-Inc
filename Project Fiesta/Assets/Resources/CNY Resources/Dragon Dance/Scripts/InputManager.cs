@@ -7,7 +7,7 @@ namespace FiestaTime
 {
     namespace DD
     {
-        public class InputManager : MonoBehaviour
+        public class InputManager : MonoBehaviourPun
         {
             public delegate void ActionTakeMove(int numberMove);
             public static event ActionTakeMove onMoveMade;
@@ -37,6 +37,8 @@ namespace FiestaTime
             // Update is called once per frame
             void Update()
             {
+                if (!photonView.IsMine && PhotonNetwork.IsConnected) return;
+
                 timeout -= Time.deltaTime;
                 if (currentMoves != GameManager.Current.amountOfMovesThisRound && timeout > 0)
                 {

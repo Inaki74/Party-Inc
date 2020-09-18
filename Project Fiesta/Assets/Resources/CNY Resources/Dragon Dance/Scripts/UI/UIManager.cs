@@ -16,9 +16,6 @@ namespace FiestaTime
             [SerializeField] private GameObject playerInputUIHolder;
             private PlayerInputUI playerInputUI;
 
-            private DemonstrationSequenceUI demonstrationSequenceUI;
-            private ResultsUI resultsUI;
-
             [SerializeField] private GameObject resultsUIHolder;
             //private ResultsUI resultsUI;
 
@@ -29,20 +26,19 @@ namespace FiestaTime
             {
                 playerInputUI = playerInputUIHolder.GetComponent<PlayerInputUI>();
                 FindMyPlayer();
+                GameManager.Current.NotifyOfPlayerReady(PhotonNetwork.LocalPlayer.ActorNumber);
             }
 
             private void Awake()
             {
                 GameManager.onNextPhase += OnPhaseTransit;
                 InputManager.onMoveMade += OnInputTaken;
-                Player.onShowMove += OnMoveShown;
             }
 
             private void OnDestroy()
             {
                 GameManager.onNextPhase -= OnPhaseTransit;
                 InputManager.onMoveMade -= OnInputTaken;
-                Player.onShowMove -= OnMoveShown;
             }
 
             private void FindMyPlayer()
@@ -52,22 +48,8 @@ namespace FiestaTime
                     if (g.GetComponent<PhotonView>().OwnerActorNr == PhotonNetwork.LocalPlayer.ActorNumber)
                     {
                         myPlayer = g.GetComponent<Player>();
-
-                        demonstrationSequenceUI = g.GetComponentInChildren<DemonstrationSequenceUI>();
-                        demonstrationSequenceUI.enabled = false;
-
-                        resultsUI = g.GetComponentInChildren<ResultsUI>();
-                        resultsUI.enabled = false;
                     }
                 }
-            }
-
-            private void OnMoveShown(bool isRight, int moveNumber)
-            {
-                //demoSeqUI should be attached to each player individually, furthermore whether they made the right or wrong choice
-                //should be visible to everyone and so its independent to everyone, therefore it must be synchronized over the network.
-
-                demonstrationSequenceUI.TriggerFeedbackIndicator(isRight, moveNumber);
             }
 
             private void OnInputTaken(int number)
@@ -78,7 +60,7 @@ namespace FiestaTime
             private void OnPhaseTransit(int nextPhase)
             {
                 // 0 -> entered showSeq, 1 -> entered playerInput, 2 -> entered demoSeq, 3 -> entered results
-                if (myPlayer.hasLost) return;
+                if (myPlayer.hasLost && nextPhase != 3) return;
 
                 switch (nextPhase)
                 {
@@ -102,19 +84,22 @@ namespace FiestaTime
                         // Deactivate all pieces of Input phase
                         playerInputUIHolder.SetActive(false);
 
-                        // Activate all pieces of demonstration phase
-                        demonstrationSequenceUI.enabled = true;
-                        resultsUI.enabled = true;
+                        // Activate all pieces of demonstration phase (moved to playerUI)
+                        //demonstrationSequenceUI.enabled = true;
+                        //resultsUI.enabled = true;
 
                         break;
                     case 3:
-                        // Deactivate all pieces of demonstration phase
-                        demonstrationSequenceUI.enabled = false;
-                        resultsUI.enabled = false;
+                        // Deactivate all pieces of demonstration phase (moved to playerUI)
+                        //demonstrationSequenceUI.enabled = false;
+                        //resultsUI.enabled = false;
 
                         // Activate all pieces of Results phase (in player.cs)
                         //resultsUIHolder.SetActive(true);
 
+                        break;
+                    case 4:
+                        // Game finished
                         break;
                     default:
                         Debug.Log("ITS NOT POSSIBLEEEEE!");

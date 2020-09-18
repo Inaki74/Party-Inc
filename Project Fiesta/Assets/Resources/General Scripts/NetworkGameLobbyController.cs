@@ -54,11 +54,15 @@ namespace FiestaTime
         // Update is called once per frame
         void Update()
         {
-            if (currentCountdownTime < 0f && PhotonNetwork.IsMasterClient && runOnce)
+            if (currentCountdownTime < 0f && runOnce)
             {
-                PhotonNetwork.CurrentRoom.IsOpen = false;
-                runOnce = false;
-                SetCustomProperties();
+                if (PhotonNetwork.IsMasterClient)
+                {
+                    PhotonNetwork.CurrentRoom.IsOpen = false;
+                    runOnce = false;
+                    SetCustomProperties();
+                }
+                
                 PhotonNetwork.LoadLevel(gameName);
             }
             else
