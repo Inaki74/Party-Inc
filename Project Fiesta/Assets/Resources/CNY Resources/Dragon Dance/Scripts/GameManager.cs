@@ -124,9 +124,6 @@ namespace FiestaTime
             /// <returns></returns>
             private IEnumerator GameLoopCo()
             {
-                yield return new WaitUntil(() => PlayersReady("Fiesta Time/ DD/ GameManager: Awaiting player confirmation on UI instantiation."));
-                ResetPlayersReady();
-
                 while (isGameRunning)
                 {
                     // Trigger "Sequence Showing" Sequence

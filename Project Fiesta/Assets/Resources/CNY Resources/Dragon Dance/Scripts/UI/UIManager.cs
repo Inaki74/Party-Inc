@@ -10,6 +10,8 @@ namespace FiestaTime
     {
         public class UIManager : MonoBehaviour
         {
+            private bool startup = true;
+
             [SerializeField] private GameObject showSequenceUIHolder;
 
             //private InputManager
@@ -26,7 +28,6 @@ namespace FiestaTime
             {
                 playerInputUI = playerInputUIHolder.GetComponent<PlayerInputUI>();
                 FindMyPlayer();
-                GameManager.Current.NotifyOfPlayerReady(PhotonNetwork.LocalPlayer.ActorNumber);
             }
 
             private void Awake()
@@ -60,7 +61,12 @@ namespace FiestaTime
             private void OnPhaseTransit(int nextPhase)
             {
                 // 0 -> entered showSeq, 1 -> entered playerInput, 2 -> entered demoSeq, 3 -> entered results
-                if (myPlayer.hasLost && nextPhase != 3) return;
+                if (!startup)
+                {
+                    if (myPlayer.hasLost && nextPhase != 3) return;
+                }
+
+                startup = false;
 
                 switch (nextPhase)
                 {
