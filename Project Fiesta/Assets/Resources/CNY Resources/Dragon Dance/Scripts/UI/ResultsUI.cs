@@ -14,8 +14,6 @@ namespace FiestaTime
 
             [SerializeField] private RectTransform healthRect;
 
-            private bool startup = true;
-
             private void Awake()
             {
                 Player.onWrongMove += WrongMove;
@@ -28,9 +26,7 @@ namespace FiestaTime
 
             private void OnEnable()
             {
-                if(!startup) healthHolder.SetActive(true);
-
-                startup = false;
+                healthHolder.SetActive(true);
             }
 
             private void OnDisable()
@@ -63,14 +59,26 @@ namespace FiestaTime
             {
                 if (stream.IsWriting)
                 {
+                    //Debug.Log("Fiesta Time/ DD/ Results UI: Sending over.");
+
                     stream.SendNext(healthRect.localScale);
+
                     stream.SendNext(healthRect.anchoredPosition);
+                    
                     stream.SendNext(healthHolder.activeInHierarchy);
                 }
                 else
                 {
+                    //Debug.Log("Fiesta Time/ DD/ Results UI: Received: ");
+                    //Debug.Log("Dato 1:" + stream.ReceiveNext());
+                    //Debug.Log("Dato 2:" + stream.ReceiveNext());
+                    //Debug.Log("Dato 3:" + stream.ReceiveNext());
+
+                    //stream.Count > 
+
                     healthRect.localScale = (Vector3)stream.ReceiveNext();
-                    healthRect.anchoredPosition = (Vector3)stream.ReceiveNext();
+                    healthRect.anchoredPosition = (Vector2)stream.ReceiveNext();
+
                     healthHolder.SetActive((bool)stream.ReceiveNext());
                 }
             }

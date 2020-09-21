@@ -43,10 +43,12 @@ namespace FiestaTime
 
             currentCountdownTime = maxCountdownTime;
 
+            PhotonNetwork.AutomaticallySyncScene = true;
+
             if (PhotonNetwork.IsMasterClient)
             {
                 playerTexts[0].text = PhotonNetwork.NickName;
-                PhotonNetwork.AutomaticallySyncScene = true;
+                
                 playersInRoom[0] = PhotonNetwork.LocalPlayer.ActorNumber;
             }
         }
@@ -61,9 +63,10 @@ namespace FiestaTime
                     PhotonNetwork.CurrentRoom.IsOpen = false;
                     runOnce = false;
                     SetCustomProperties();
+                    PhotonNetwork.LoadLevel(gameName);
                 }
                 
-                PhotonNetwork.LoadLevel(gameName);
+                
             }
             else
             {
@@ -125,7 +128,7 @@ namespace FiestaTime
                 {
                     playerTexts[i].text = PhotonNetwork.CurrentRoom.GetPlayer(playersInRoom[i]).NickName;
                 }
-                else
+                else if(i < playerTexts.Length)
                 {
                     playerTexts[i].text = "Connecting...";
                 }

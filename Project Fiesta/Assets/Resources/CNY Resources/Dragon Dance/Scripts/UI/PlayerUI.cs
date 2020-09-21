@@ -10,20 +10,21 @@ namespace FiestaTime
     {
         public class PlayerUI : MonoBehaviourPun, IPunObservable
         {
-            private Player myPlayer;
-            private DemonstrationSequenceUI demonstrationSequenceUI;
-            private ResultsUI resultsUI;
+            [SerializeField] private Player myPlayer;
+            [SerializeField] private DemonstrationSequenceUI demonstrationSequenceUI;
+            [SerializeField] private ResultsUI resultsUI;
 
             // Start is called before the first frame update
             void Start()
             {
-                myPlayer = GetComponentInParent<Player>();
+                if(myPlayer == null)
+                    myPlayer = GetComponentInParent<Player>();
 
-                demonstrationSequenceUI = GetComponentInChildren<DemonstrationSequenceUI>();
-                demonstrationSequenceUI.enabled = false;
+                if(demonstrationSequenceUI == null)
+                    demonstrationSequenceUI = GetComponentInChildren<DemonstrationSequenceUI>();
 
-                resultsUI = GetComponentInChildren<ResultsUI>();
-                resultsUI.enabled = false;
+                if(resultsUI == null)
+                    resultsUI = GetComponentInChildren<ResultsUI>();
             }
 
             private void Awake()
@@ -80,12 +81,18 @@ namespace FiestaTime
             {
                 if (stream.IsWriting)
                 {
+                    //Debug.Log("Fiesta Time/ DD/ Player UI: Sending over.");
+
                     stream.SendNext(demonstrationSequenceUI.enabled);
+
                     stream.SendNext(resultsUI.enabled);
                 }
                 else
                 {
+                    //Debug.Log("Fiesta Time/ DD/ Player UI: Received.");
+
                     demonstrationSequenceUI.enabled = (bool)stream.ReceiveNext();
+
                     resultsUI.enabled = (bool)stream.ReceiveNext();
                 }
             }

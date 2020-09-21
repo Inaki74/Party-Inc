@@ -18,7 +18,6 @@ namespace FiestaTime
             public int[] sequenceMap = new int[12];
 
             private int amountOfPlayers;
-            private int[] playerList;
             private Hashtable playersReady = new Hashtable();
             private Hashtable playersLost = new Hashtable();
 
@@ -38,44 +37,42 @@ namespace FiestaTime
             // Start is called before the first frame update
             void Start()
             {
+                // Generate the sequence map to be followed.
+                if (PhotonNetwork.IsMasterClient)
+                {
+                    GenerateSequenceMap();
+                    SendSequenceMap();
+                }
+
+                // Initialize game for x amount of players.
+                InitializeGame();
+
+                SetPlayerIDs();
+
+                // Initialize players
+                InitializePlayers();
+
+                // Initialize player UI
+                InitializeUI();
+
                 // Start game
                 StartCoroutine(GameLoopCo());
             }
 
-            private IEnumerator SetPlayerIDs()
+            private void SetPlayerIDs()
             {
-                playerList = new int[PhotonNetwork.CurrentRoom.PlayerCount];
-
-                while (!HasFetched(playerList))
+                for (int i = 0; i < PhotonNetwork.CurrentRoom.PlayerCount; i++)
                 {
-                    if (PhotonNetwork.CurrentRoom.CustomProperties.ContainsKey("PlayerIDsList"))
-                        playerList = (int[])PhotonNetwork.CurrentRoom.CustomProperties["PlayerIDsList"];
-
-                    yield return new WaitForEndOfFrame();
+                    Debug.Log(PhotonNetwork.PlayerList[i].ActorNumber);
                 }
-
-                //for (int i = 0; i < PhotonNetwork.CurrentRoom.PlayerCount; i++)
-                //{
-                //    Debug.Log(playerList[i]);
-                //}
 
                 SetPlayersLost();
                 ResetPlayersReady();
 
-                //for (int i = 0; i < playerList.Length; i++)
-                //{
-                //    Debug.Log(playersReady[playerList[i]]);
-                //}
-            }
-
-            private bool HasFetched(int[] list)
-            {
-                foreach(int i in list)
+                for (int i = 0; i < PhotonNetwork.PlayerList.Length; i++)
                 {
-                    if (i == 0) return false;
+                    Debug.Log(playersReady[PhotonNetwork.PlayerList[i].ActorNumber]);
                 }
-
-                return true;
             }
 
             private void InitializeGame()
@@ -85,19 +82,19 @@ namespace FiestaTime
 
             private void ResetPlayersReady()
             {
-                foreach (int id in playerList)
+                foreach (Photon.Realtime.Player p in PhotonNetwork.PlayerList)
                 {
-                    playersReady.Remove(id);
-                    playersReady.Add(id, false);
+                    playersReady.Remove(p.ActorNumber);
+                    playersReady.Add(p.ActorNumber, false);
                 }
             }
 
             private void SetPlayersLost()
             {
-                foreach (int id in playerList)
+                foreach(Photon.Realtime.Player p in PhotonNetwork.PlayerList)
                 {
-                    playersLost.Remove(id);
-                    playersLost.Add(id, false);
+                    playersLost.Remove(p.ActorNumber);
+                    playersLost.Add(p.ActorNumber, false);
                 }
             }
 
@@ -110,9 +107,9 @@ namespace FiestaTime
             {
                 Vector3 decidedVec = Vector3.zero;
 
-                for(int i = 0; i < playerList.Length; i++)
+                for(int i = 0; i < PhotonNetwork.PlayerList.Length; i++)
                 {
-                    if(PhotonNetwork.LocalPlayer.ActorNumber == playerList[i])
+                    if(PhotonNetwork.LocalPlayer.ActorNumber == PhotonNetwork.PlayerList[i].ActorNumber)
                     {
                         decidedVec = playerPositions[i];
                     }
@@ -127,47 +124,29 @@ namespace FiestaTime
             /// <returns></returns>
             private IEnumerator GameLoopCo()
             {
-                // Generate the sequence map to be followed.
-                if (PhotonNetwork.IsMasterClient)
-                {
-                    GenerateSequenceMap();
-                    SendSequenceMap();
-                }
-
-                // Initialize game for x amount of players.
-                InitializeGame();
-
-                yield return StartCoroutine(SetPlayerIDs());
-
-                // Initialize players
-                InitializePlayers();
-
-                // Initialize player UI
-                InitializeUI();
-
-                yield return new WaitUntil(() => PlayersReady());
+                yield return new WaitUntil(() => PlayersReady("Fiesta Time/ DD/ GameManager: Awaiting player confirmation on UI instantiation."));
                 ResetPlayersReady();
 
                 while (isGameRunning)
                 {
                     // Trigger "Sequence Showing" Sequence
                     onNextPhase?.Invoke(0);
-                    yield return new WaitUntil(() => PlayersReady());
+                    yield return new WaitUntil(() => PlayersReady("Fiesta Time/ DD/ GameManager: Awaiting player confirmation on Sequence Showing."));
                     ResetPlayersReady();
 
                     // Activate "Player Input" Sequence
                     onNextPhase?.Invoke(1);
-                    yield return new WaitUntil(() => PlayersReady());
+                    yield return new WaitUntil(() => PlayersReady("Fiesta Time/ DD/ GameManager: Awaiting player confirmation on Player Input."));
                     ResetPlayersReady();
 
                     // Activate "Player Demonstration" Sequence
                     onNextPhase?.Invoke(2);
-                    yield return new WaitUntil(() => PlayersReady());
+                    yield return new WaitUntil(() => PlayersReady("Fiesta Time/ DD/ GameManager: Awaiting player confirmation on Demonstration."));
                     ResetPlayersReady();
 
                     // Trigger "Results Showing" Sequence
                     onNextPhase?.Invoke(3);
-                    yield return new WaitUntil(() => PlayersReady());
+                    yield return new WaitUntil(() => PlayersReady("Fiesta Time/ DD/ GameManager: Awaiting player confirmation on Results Showing."));
                     ResetPlayersReady();
 
                     amountOfMovesThisRound += 2;
@@ -202,9 +181,9 @@ namespace FiestaTime
             {
                 int playersStanding = 0;
 
-                for(int i = 0; i < playerList.Length; i++)
+                for(int i = 0; i < PhotonNetwork.PlayerList.Length; i++)
                 {
-                    bool lost = (bool) playersLost[playerList[i]];
+                    bool lost = (bool) playersLost[PhotonNetwork.PlayerList[i].ActorNumber];
 
                     if (!lost) playersStanding++;
                 }
@@ -219,13 +198,15 @@ namespace FiestaTime
                 }
             }
 
-            private bool PlayersReady()
+            private bool PlayersReady(string message)
             {
                 bool allReady = true;
 
-                foreach(int id in playerList)
+                Debug.Log(message);
+
+                foreach(Photon.Realtime.Player p in PhotonNetwork.PlayerList)
                 {
-                    allReady = allReady && (bool)playersReady[id];
+                    allReady = allReady && (bool)playersReady[p.ActorNumber];
                 }
 
                 return allReady;

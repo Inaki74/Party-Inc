@@ -87,7 +87,7 @@ namespace FiestaTime
             {
                 if (Input.touches[0].phase == TouchPhase.Began)
                 {
-                    Debug.Log("Began taking input");
+                    //Debug.Log("Began taking input");
                     fingerMovement = Vector2.zero;
                 }
 
@@ -107,7 +107,7 @@ namespace FiestaTime
 
                 if (Input.touches[0].phase == TouchPhase.Ended || timeStationary > 0.2f)
                 {
-                    Debug.Log("Stopped taking input, reason: " + Input.touches[0].phase);
+                    //Debug.Log("Stopped taking input, reason: " + Input.touches[0].phase);
                     if (Mathf.Abs(fingerMovement.x) > 200f || Mathf.Abs(fingerMovement.y) > 200f)
                     {
                         inputAllowed = false;
@@ -123,12 +123,12 @@ namespace FiestaTime
                 {
                     if (fingerMovement.x > 0)
                     {
-                        Debug.Log("You swiped right");
+                        //Debug.Log("You swiped right");
                         return 1;
                     }
                     else
                     {
-                        Debug.Log("You swiped left");
+                        //Debug.Log("You swiped left");
                         return 3;
                     }
                 }
@@ -136,12 +136,12 @@ namespace FiestaTime
                 {
                     if (fingerMovement.y > 0)
                     {
-                        Debug.Log("You swiped up");
+                        //Debug.Log("You swiped up");
                         return 2;
                     }
                     else
                     {
-                        Debug.Log("You swiped down");
+                        //Debug.Log("You swiped down");
                         return 4;
                     }
                 }

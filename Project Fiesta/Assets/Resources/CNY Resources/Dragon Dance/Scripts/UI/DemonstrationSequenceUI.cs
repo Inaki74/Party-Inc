@@ -22,14 +22,11 @@ namespace FiestaTime
 
             private void OnEnable()
             {
-                if (!startup)
-                {
-                    holder.SetActive(true);
-                    IndicatorFunctions.DisableAllIndicators(feedbackIndicators);
-                    IndicatorFunctions.EnableIndicators(feedbackIndicators, GameManager.Current.amountOfMovesThisRound);
-                    photonView.RPC("RPC_SendEnable", RpcTarget.Others, GameManager.Current.amountOfMovesThisRound);
-                }
-                startup = false;
+                holder.SetActive(true);
+                IndicatorFunctions.DisableAllIndicators(feedbackIndicators);
+                IndicatorFunctions.EnableIndicators(feedbackIndicators, GameManager.Current.amountOfMovesThisRound);
+                photonView.RPC("RPC_SendEnable", RpcTarget.Others, GameManager.Current.amountOfMovesThisRound);
+            
             }
 
             private void OnDisable()
@@ -51,8 +48,6 @@ namespace FiestaTime
                 }
                 photonView.RPC("RPC_SendIfRight", RpcTarget.Others, new object[] { isRight, moveNumber });
             }
-
-            //TODO: PunRPCs dont work on children.
 
             [PunRPC]
             public void RPC_SendIfRight(object[] args)

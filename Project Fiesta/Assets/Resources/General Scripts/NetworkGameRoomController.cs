@@ -11,11 +11,14 @@ namespace FiestaTime
     {
         [SerializeField] private GameObject gameManager;
 
+        Hashtable playersReady = new Hashtable();
+
         // Start is called before the first frame update
         void Start()
         {
-            if (PhotonNetwork.IsMasterClient)
-                PhotonNetwork.Instantiate(gameManager.name, Vector3.zero, Quaternion.identity);
+            SetPlayerReady(PhotonNetwork.LocalPlayer.ActorNumber);
+
+            if (PhotonNetwork.IsMasterClient) StartCoroutine(StartGameCo());
         }
 
         public override void OnEnable()
@@ -28,6 +31,59 @@ namespace FiestaTime
         {
             base.OnDisable();
             PhotonNetwork.RemoveCallbackTarget(this);
+        }
+
+        private void SetPlayerReady(int id)
+        {
+            if (!playersReady.ContainsKey(id))
+            {
+                playersReady.Add(id, true);
+            }
+            else
+            {
+                playersReady.Remove(id);
+                playersReady.Add(id, true);
+            }
+
+            photonView.RPC("RPC_SendPlayerReady", RpcTarget.MasterClient, id);
+        }
+
+        private IEnumerator StartGameCo()
+        {
+            yield return new WaitUntil(() => PlayersLoadedGame());
+
+            PhotonNetwork.InstantiateRoomObject(gameManager.name, Vector3.zero, Quaternion.identity);
+        }
+
+        private bool PlayersLoadedGame()
+        {
+            foreach(Photon.Realtime.Player p in PhotonNetwork.PlayerList)
+            {
+                if (playersReady.ContainsKey(p.ActorNumber))
+                {
+                    if (!(bool)playersReady[p.ActorNumber])
+                    {
+                        return false;
+                    }
+                }
+                else return false;
+            }
+
+            return true;
+        }
+
+        [PunRPC]
+        public void RPC_SendPlayerReady(int id)
+        {
+            if (!playersReady.ContainsKey(id))
+            {
+                playersReady.Add(id, true);
+            }
+            else
+            {
+                playersReady.Remove(id);
+                playersReady.Add(id, true);
+            }
         }
 
         #region PUN Callbacks
