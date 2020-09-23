@@ -17,6 +17,8 @@ namespace FiestaTime
 
             public GameObject[] inputIndicators;
 
+            #region Unity Callbacks
+
             // Start is called before the first frame update
             void Start()
             {
@@ -28,7 +30,7 @@ namespace FiestaTime
             {
                 countdown -= Time.deltaTime;
 
-                countdownText.text = "" + countdown;
+                countdownText.text = string.Format("{0:00}", countdown);
             }
 
             private void OnEnable()
@@ -43,6 +45,12 @@ namespace FiestaTime
                 countdown = 15f;
             }
 
+            #endregion
+
+            /// <summary>
+            /// Event function that triggers when input is taken. Changes an indicators color.
+            /// </summary>
+            /// <param name="number"></param>
             public void TriggerInputIndicator(int number)
             {
                 IndicatorFunctions.TriggerInputIndicator(inputIndicatorsImages[number], new Color(1f, 1f, 0f));

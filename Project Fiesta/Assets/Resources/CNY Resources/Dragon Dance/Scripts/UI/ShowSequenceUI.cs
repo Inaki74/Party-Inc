@@ -9,58 +9,84 @@ namespace FiestaTime
 {
     namespace DD
     {
+        /// <summary>
+        /// Component in charge of the UI in the show sequence stage of the game.
+        /// </summary>
         public class ShowSequenceUI : MonoBehaviour
         {
-            [SerializeField] private RectTransform[] arrowImages;
-            [SerializeField] private GameObject[] arrows;
+            [SerializeField] private RectTransform arrowImage;
+            [SerializeField] private GameObject arrow;
 
             //[SerializeField] private Image rightArrowImage;
             //[SerializeField] private Image upArrowImage;
             //[SerializeField] private Image leftArrowImage;
             //[SerializeField] private Image downArrowImage;
 
-            // Start is called before the first frame update
-            void Start()
-            {
-                SetArrows();
-            }
-
             private void OnEnable()
             {
-                IndicatorFunctions.DisableAllIndicators(arrows);
                 StartCoroutine(ShowSequence(GameManager.Current.amountOfMovesThisRound));
             }
 
-            private void OnDisable()
+            /// <summary>
+            /// Changes the arrows rotation to match that of the generated sequence.
+            /// </summary>
+            /// <param name="sequence"></param>
+            private void SetArrow(int sequence)
             {
-                IndicatorFunctions.DisableAllIndicators(arrows);
+                float rotation = 270;
+                if (sequence == 2) rotation = 0;
+                if (sequence == 3) rotation = 90;
+                if (sequence == 4) rotation = 180;
+
+                arrowImage.Rotate(new Vector3(0, 0, rotation));
             }
 
-            private void SetArrows()
+            /// <summary>
+            /// Resets the arrows position back to its original.
+            /// </summary>
+            private void ResetArrow()
             {
-                for (int i = 0; i < GameManager.Current.sequenceMap.Length; i++)
-                {
-                    int rotation = 270;
-                    if (GameManager.Current.sequenceMap[i] == 2) rotation = 0;
-                    if (GameManager.Current.sequenceMap[i] == 3) rotation = 90;
-                    if (GameManager.Current.sequenceMap[i] == 4) rotation = 180;
-
-                    arrowImages[i].Rotate(new Vector3(0, 0, rotation));
-                }
+                arrowImage.rotation = new Quaternion(0, 0, 0, 1);
             }
 
+            /// <summary>
+            /// The coroutine that shows the players the sequence generated.
+            /// </summary>
+            /// <param name="elements"></param>
+            /// <returns></returns>
             private IEnumerator ShowSequence(int elements)
             {
-                yield return new WaitForSeconds(1f);
-
                 for(int i = 0; i < elements; i++)
                 {
-                    arrows[i].SetActive(true);
+                    arrowImage.localScale = new Vector3(0.5f, 0.5f, 0.5f);
 
-                    yield return new WaitForSeconds(0.5f);
+                    SetArrow(GameManager.Current.sequenceMap[i]);
+
+                    arrow.SetActive(true);
+
+                    StartCoroutine(AnimateArrowCo());
+
+                    yield return new WaitForSeconds(1f);
+
+                    ResetArrow();
                 }
+                arrow.SetActive(false);
 
                 GameManager.Current.NotifyOfPlayerReady(PhotonNetwork.LocalPlayer.ActorNumber);
+            }
+
+            /// <summary>
+            /// Animates the arrow.
+            /// </summary>
+            /// <returns></returns>
+            private IEnumerator AnimateArrowCo()
+            {
+                for(int i = 0; i < 70; i++)
+                {
+                    arrowImage.localScale += new Vector3(0.00714285714f, 0.00714285714f, 0.00714285714f);
+
+                    yield return new WaitForSeconds(0.01f);
+                }
             }
         }
     }

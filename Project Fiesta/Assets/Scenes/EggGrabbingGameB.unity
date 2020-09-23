@@ -771,12 +771,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 682032443992295696, guid: 5ce5a6e4f2fb54a28ae8f8c475030357,
+    - target: {fileID: 2561221818320291242, guid: 5ce5a6e4f2fb54a28ae8f8c475030357,
         type: 3}
-      propertyPath: gameManager
-      value: 
-      objectReference: {fileID: 3353127175612487685, guid: fa66edd38f3b14d4ca8d651fc42aa2f8,
-        type: 3}
+      propertyPath: viewIdField
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 9004327087624844480, guid: 5ce5a6e4f2fb54a28ae8f8c475030357,
         type: 3}
       propertyPath: m_Name

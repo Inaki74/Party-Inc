@@ -2,17 +2,22 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+using Photon.Pun;
+
 namespace FiestaTime
 {
     namespace DD
     {
-        public class ResultsUI : MonoBehaviour
+        /// <summary>
+        /// The UI controller of the UI in charge of the Results Sequence.
+        /// </summary>
+        public class ResultsUI : MonoBehaviourPun, IPunObservable
         {
             [SerializeField] private GameObject healthHolder;
 
             [SerializeField] private RectTransform healthRect;
 
-            private bool startup = true;
+            #region Unity Callbacks
 
             private void Awake()
             {
@@ -26,15 +31,15 @@ namespace FiestaTime
 
             private void OnEnable()
             {
-                if(!startup) healthHolder.SetActive(true);
-
-                startup = false;
+                healthHolder.SetActive(true);
             }
 
             private void OnDisable()
             {
                 healthHolder.SetActive(false);
             }
+
+            #endregion
 
             public void WrongMove(int health)
             {
@@ -54,7 +59,22 @@ namespace FiestaTime
                 {
                     healthRect.localScale = Vector3.zero;
                 }
+            }
 
+            public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+            {
+                if (stream.IsWriting)
+                {
+                    stream.SendNext(healthRect.localScale);
+                    stream.SendNext(healthRect.anchoredPosition);
+                    stream.SendNext(healthHolder.activeInHierarchy);
+                }
+                else
+                {
+                    healthRect.localScale = (Vector3)stream.ReceiveNext();
+                    healthRect.anchoredPosition = (Vector2)stream.ReceiveNext();
+                    healthHolder.SetActive((bool)stream.ReceiveNext());
+                }
             }
         }
     }

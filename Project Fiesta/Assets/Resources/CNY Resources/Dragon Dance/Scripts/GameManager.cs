@@ -9,18 +9,24 @@ namespace FiestaTime
     {
         public class GameManager : MonoSingleton<GameManager>
         {
+            private Vector3[] playerPositions;
+
             //The sequence map of moves to be generated.
             public int[] sequenceMap = new int[12];
 
-            private int amountOfPlayers;
-            private int[] playerList;
+            private float amountOfPlayers;
             private Hashtable playersReady = new Hashtable();
+            private Hashtable playersLost = new Hashtable();
+
+            #region Events
 
             public delegate void ActionGameStart();
             public static event ActionGameStart onGameStart;
 
             public delegate void ActionSectionAdvance(int nextPhase);
             public static event ActionSectionAdvance onNextPhase;
+
+            #endregion
 
             private bool isGameRunning = true;
 
@@ -29,144 +35,216 @@ namespace FiestaTime
 
             public int amountOfMovesThisRound = 4;
 
-            // Start is called before the first frame update
+            #region Game Loop
+
             void Start()
             {
                 // Generate the sequence map to be followed.
-                GenerateSequenceMap();
+                if (PhotonNetwork.IsMasterClient)
+                {
+                    GenerateSequenceMap();
+                    SendSequenceMap();
+                }
 
-                // Initialize game for x amount of players.
-                InitializeGame();
+                // Set that no one lost yet.
+                SetPlayersLost();
 
-                // Initialize player UI
-                InitializeUI();
+                // Set that no one is ready yet.
+                ResetPlayersReady();
 
                 // Initialize players
                 InitializePlayers();
+
+                // Initialize player UI
+                Instantiate(UIPrefab);
 
                 // Start game
                 StartCoroutine(GameLoopCo());
             }
 
-            private IEnumerator SetPlayerIDs()
-            {
-                playerList = new int[PhotonNetwork.CurrentRoom.PlayerCount];
-
-                while (!HasFetched(playerList))
-                {
-                    if (PhotonNetwork.CurrentRoom.CustomProperties.ContainsKey("PlayerIDsList"))
-                        playerList = (int[])PhotonNetwork.CurrentRoom.CustomProperties["PlayerIDsList"];
-
-                    yield return new WaitForEndOfFrame();
-                }
-
-                for (int i = 0; i < PhotonNetwork.CurrentRoom.PlayerCount; i++)
-                {
-                    Debug.Log(playerList[i]);
-                }
-
-                ResetPlayersReady();
-
-                for (int i = 0; i < playerList.Length; i++)
-                {
-                    Debug.Log(playersReady[playerList[i]]);
-                }
-            }
-
-            private void PrintArray(int[] a)
-            {
-                foreach(var i in a)
-                {
-                    Debug.Log(i);
-                }
-            }
-
-            private bool HasFetched(int[] list)
-            {
-                foreach(int i in list)
-                {
-                    if (i == 0) return false;
-                }
-
-                return true;
-            }
-
-            private void InitializeGame()
-            {
-                amountOfPlayers = PhotonNetwork.CurrentRoom.PlayerCount;
-            }
-
-            private void ResetPlayersReady()
-            {
-                foreach (int id in playerList)
-                {
-                    playersReady.Remove(id);
-                    playersReady.Add(id, false);
-                }
-            }
-
-            private void InitializeUI()
-            {
-                Instantiate(UIPrefab);
-            }
-
-            private void InitializePlayers()
-            {
-                PhotonNetwork.Instantiate(playerPrefab.name, new Vector3(0, 0.5f, -12), Quaternion.identity);
-            }
-
             /// <summary>
-            /// The game loop coroutine. Im using this because the WaitFor classes help a lot with the loop flow.
+            /// The game loop coroutine. Im using this rather than update because the WaitFor classes help a lot with the loop flow.
             /// </summary>
             /// <returns></returns>
             private IEnumerator GameLoopCo()
             {
-                yield return StartCoroutine(SetPlayerIDs());
+                //A buffer just to make sure master isnt ahead.
+                //StartCoroutine(BufferCo());
+
+                //yield return new WaitUntil(() => PlayersReady("Fiesta Time/ DD/ GameManager: Awaiting player confirmation on Loop Start."));
+                //ResetPlayersReady();
 
                 while (isGameRunning)
                 {
                     // Trigger "Sequence Showing" Sequence
-                    Debug.Log("Commencing Sequence Showing");
                     onNextPhase?.Invoke(0);
-                    yield return new WaitUntil(() => PlayersReady());
+                    yield return new WaitUntil(() => PlayersReady("Fiesta Time/ DD/ GameManager: Awaiting player confirmation on Sequence Showing."));
                     ResetPlayersReady();
 
                     // Activate "Player Input" Sequence
                     onNextPhase?.Invoke(1);
-                    yield return new WaitUntil(() => PlayersReady());
+                    yield return new WaitUntil(() => PlayersReady("Fiesta Time/ DD/ GameManager: Awaiting player confirmation on Player Input."));
                     ResetPlayersReady();
 
                     // Activate "Player Demonstration" Sequence
                     onNextPhase?.Invoke(2);
-                    yield return new WaitUntil(() => PlayersReady());
+                    yield return new WaitUntil(() => PlayersReady("Fiesta Time/ DD/ GameManager: Awaiting player confirmation on Demonstration."));
                     ResetPlayersReady();
 
                     // Trigger "Results Showing" Sequence
                     onNextPhase?.Invoke(3);
-                    yield return new WaitUntil(() => PlayersReady());
+                    yield return new WaitUntil(() => PlayersReady("Fiesta Time/ DD/ GameManager: Awaiting player confirmation on Results Showing."));
                     ResetPlayersReady();
 
                     amountOfMovesThisRound += 2;
-                    // IsGameOver();
 
+                    isGameRunning = !CheckGameOver();
                 }
 
                 // Outro
+                // TODO: Decide winner, put on a FINISH screen.
+                onNextPhase?.Invoke(4);
             }
 
-            private bool PlayersReady()
+            #endregion
+
+            #region Private Functions
+
+            /// <summary>
+            /// Initializes players in their positions.
+            /// </summary>
+            private void InitializePlayers()
+            {
+                SetPlayerPositions();
+
+                Vector3 decidedVec = Vector3.zero;
+
+                for (int i = 0; i < PhotonNetwork.PlayerList.Length; i++)
+                {
+                    if (PhotonNetwork.LocalPlayer.ActorNumber == PhotonNetwork.PlayerList[i].ActorNumber)
+                    {
+                        decidedVec = playerPositions[i];
+                    }
+                }
+
+                PhotonNetwork.Instantiate(playerPrefab.name, decidedVec, Quaternion.identity);
+            }
+
+            /// <summary>
+            /// Sets the player position vectors.
+            /// </summary>
+            private void SetPlayerPositions()
+            {
+                switch (PhotonNetwork.CurrentRoom.PlayerCount)
+                {
+                    case 1:
+                        playerPositions[0] = new Vector3(0f, 0.5f, -16f);
+                        break;
+                    case 2:
+                        playerPositions[0] = new Vector3(-1.25f, 0.5f, -16f);
+                        playerPositions[1] = new Vector3(1.25f, 0.5f, -16f);
+                        break;
+                    case 3:
+                        playerPositions[0] = new Vector3(-2.5f, 0.5f, -16f);
+                        playerPositions[1] = new Vector3(0f, 0.5f, -16f);
+                        playerPositions[2] = new Vector3(2.5f, 0.5f, -16f);
+                        break;
+                    case 4:
+                        playerPositions[0] = new Vector3(-2.5f, 0.5f, -16f);
+                        playerPositions[1] = new Vector3(-0.75f, 0.5f, -16f);
+                        playerPositions[2] = new Vector3(0.75f, 0.5f, -16f);
+                        playerPositions[3] = new Vector3(2.5f, 0.5f, -16f);
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            /// <summary>
+            /// Resets the state of the PlayersReady array (all false).
+            /// </summary>
+            private void ResetPlayersReady()
+            {
+                foreach (Photon.Realtime.Player p in PhotonNetwork.PlayerList)
+                {
+                    playersReady.Remove(p.ActorNumber);
+                    playersReady.Add(p.ActorNumber, false);
+                }
+            }
+
+            /// <summary>
+            /// Resets the state of the PlayersLost array (all false).
+            /// </summary>
+            private void SetPlayersLost()
+            {
+                foreach(Photon.Realtime.Player p in PhotonNetwork.PlayerList)
+                {
+                    playersLost.Remove(p.ActorNumber);
+                    playersLost.Add(p.ActorNumber, false);
+                }
+            }
+
+            /// <summary>
+            /// Checks if the game is over. True if the game is over.
+            /// </summary>
+            /// <returns></returns>
+            private bool CheckGameOver()
+            {
+                // Game is over if either of these are true:
+                //      There is one player standing.
+                //      There are no players standing.
+                //      All rounds have been played.
+
+                return amountOfMovesThisRound > sequenceMap.Length || CheckPlayersStanding();
+            }
+
+            /// <summary>
+            /// Returns true if theres one or less players standing (game is over).
+            /// </summary>
+            /// <returns></returns>
+            private bool CheckPlayersStanding()
+            {
+                int playersStanding = 0;
+
+                for(int i = 0; i < PhotonNetwork.PlayerList.Length; i++)
+                {
+                    bool lost = (bool) playersLost[PhotonNetwork.PlayerList[i].ActorNumber];
+
+                    if (!lost) playersStanding++;
+                }
+
+                if(PhotonNetwork.CurrentRoom.PlayerCount > 1)
+                {
+                    return playersStanding <= 1;
+                }
+                else
+                {
+                    return playersStanding <= 0;
+                }
+            }
+
+            /// <summary>
+            /// Checks and returns true if all players are ready to move on.
+            /// </summary>
+            /// <param name="message"></param>
+            /// <returns></returns>
+            private bool PlayersReady(string message)
             {
                 bool allReady = true;
 
-                foreach(int id in playerList)
+                Debug.Log(message);
+
+                foreach(Photon.Realtime.Player p in PhotonNetwork.PlayerList)
                 {
-                    allReady = allReady && (bool)playersReady[id];
+                    allReady = allReady && (bool)playersReady[p.ActorNumber];
                 }
-                Debug.Log("Players ready? " + allReady);
 
                 return allReady;
             }
 
+            /// <summary>
+            /// Generates a random map of sequences.
+            /// </summary>
             private void GenerateSequenceMap()
             {
                 for(int i = 0; i < sequenceMap.Length; i++)
@@ -175,6 +253,22 @@ namespace FiestaTime
                 }
             }
 
+            /// <summary>
+            /// Sends the sequence map generated across the network.
+            /// </summary>
+            private void SendSequenceMap()
+            {
+                photonView.RPC("RPC_SendSequenceMap", RpcTarget.Others, sequenceMap);
+            }
+
+            #endregion
+
+            #region Public Functions
+
+            /// <summary>
+            /// Notifies other clients that this player is ready.
+            /// </summary>
+            /// <param name="playerId"></param>
             public void NotifyOfPlayerReady(int playerId)
             {
                 playersReady.Remove(playerId);
@@ -183,50 +277,19 @@ namespace FiestaTime
                 photonView.RPC("RPC_SendPlayerReady", RpcTarget.Others, playerId);
             }
 
-            private void OnPhaseTransit(int nextPhase)
+            /// <summary>
+            /// Notifies other clients that this player has lost.
+            /// </summary>
+            /// <param name="playerId"></param>
+            public void NotifyOfPlayerLost(int playerId)
             {
-                // 0 -> entered showSeq, 1 -> entered playerInput, 2 -> entered demoSeq, 3 -> entered results
-                
+                playersLost.Remove(playerId);
+                playersLost[playerId] = true;
 
-                switch (nextPhase)
-                {
-                    case 0:
-                        // Deactivate all pieces of Results phase
-
-
-                        // Activate all pieces of Showing Sequence phase
-
-
-                        break;
-                    case 1:
-                        // Deactivate all pieces of Showing Sequence phase
-
-
-                        // Activate all pieces of Input Phase phase
-
-
-                        break;
-                    case 2:
-                        // Deactivate all pieces of Input phase
-
-
-                        // Activate all pieces of demonstration phase
-
-
-                        break;
-                    case 3:
-                        // Deactivate all pieces of demonstration phase
-
-
-                        // Activate all pieces of Results phase
-
-
-                        break;
-                    default:
-                        Debug.Log("ITS NOT POSSIBLEEEEE!");
-                        break;
-                }
+                photonView.RPC("RPC_SendPlayerLost", RpcTarget.Others, playerId);
             }
+
+            #endregion
 
             #region PUNRPC
 
@@ -235,6 +298,19 @@ namespace FiestaTime
             {
                 playersReady.Remove(id);
                 playersReady[id] = true;
+            }
+
+            [PunRPC]
+            public void RPC_SendPlayerLost(int id)
+            {
+                playersLost.Remove(id);
+                playersLost[id] = true;
+            }
+
+            [PunRPC]
+            public void RPC_SendSequenceMap(int[] sequence)
+            {
+                sequenceMap = sequence;
             }
 
             #endregion

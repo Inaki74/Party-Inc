@@ -11,11 +11,15 @@ namespace FiestaTime
     {
         [SerializeField] private GameObject gameManager;
 
-        // Start is called before the first frame update
+        Hashtable playersReady = new Hashtable();
+
+        #region Unity Callbacks
+
         void Start()
         {
-            if (PhotonNetwork.IsMasterClient)
-                PhotonNetwork.InstantiateRoomObject(gameManager.name, Vector3.zero, Quaternion.identity);
+            SetPlayerReady(PhotonNetwork.LocalPlayer.ActorNumber);
+
+            if (PhotonNetwork.IsMasterClient) StartCoroutine(StartGameCo());
         }
 
         public override void OnEnable()
@@ -28,6 +32,73 @@ namespace FiestaTime
         {
             base.OnDisable();
             PhotonNetwork.RemoveCallbackTarget(this);
+        }
+
+        #endregion
+
+        #region Private Functions
+
+        private void SetPlayerReady(int id)
+        {
+            if (!playersReady.ContainsKey(id))
+            {
+                playersReady.Add(id, true);
+            }
+            else
+            {
+                playersReady.Remove(id);
+                playersReady.Add(id, true);
+            }
+
+            photonView.RPC("RPC_SendPlayerReady", RpcTarget.MasterClient, id);
+        }
+
+        /// <summary>
+        /// The coroutine in charge of starting the game.
+        /// </summary>
+        /// <returns></returns>
+        private IEnumerator StartGameCo()
+        {
+            yield return new WaitUntil(() => PlayersLoadedGame());
+
+            PhotonNetwork.InstantiateRoomObject(gameManager.name, Vector3.zero, Quaternion.identity);
+        }
+
+        /// <summary>
+        /// Returns true if all players have loaded the game.
+        /// </summary>
+        /// <returns></returns>
+        private bool PlayersLoadedGame()
+        {
+            foreach(Photon.Realtime.Player p in PhotonNetwork.PlayerList)
+            {
+                if (playersReady.ContainsKey(p.ActorNumber))
+                {
+                    if (!(bool)playersReady[p.ActorNumber])
+                    {
+                        return false;
+                    }
+                }
+                else return false;
+            }
+
+            return true;
+        }
+
+        #endregion
+
+        [PunRPC]
+        public void RPC_SendPlayerReady(int id)
+        {
+            if (!playersReady.ContainsKey(id))
+            {
+                playersReady.Add(id, true);
+            }
+            else
+            {
+                playersReady.Remove(id);
+                playersReady.Add(id, true);
+            }
         }
 
         #region PUN Callbacks

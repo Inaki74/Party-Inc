@@ -10,20 +10,20 @@ namespace FiestaTime
     {
         public class UIManager : MonoBehaviour
         {
-            [SerializeField] private GameObject showSequenceUIHolder;
+            private bool startup = true;
 
-            //private InputManager
+            #region UI GameObjects
+
+            [SerializeField] private GameObject showSequenceUIHolder;
             [SerializeField] private GameObject playerInputUIHolder;
+            [SerializeField] private GameObject resultsUIHolder;
             private PlayerInputUI playerInputUI;
 
-            private DemonstrationSequenceUI demonstrationSequenceUI;
-            private ResultsUI resultsUI;
-
-            [SerializeField] private GameObject resultsUIHolder;
-            //private ResultsUI resultsUI;
+            #endregion
 
             private Player myPlayer;
 
+            #region Unity Callbacks
             // Start is called before the first frame update
             void Start()
             {
@@ -35,16 +35,18 @@ namespace FiestaTime
             {
                 GameManager.onNextPhase += OnPhaseTransit;
                 InputManager.onMoveMade += OnInputTaken;
-                Player.onShowMove += OnMoveShown;
             }
 
             private void OnDestroy()
             {
                 GameManager.onNextPhase -= OnPhaseTransit;
                 InputManager.onMoveMade -= OnInputTaken;
-                Player.onShowMove -= OnMoveShown;
             }
+            #endregion
 
+            /// <summary>
+            /// Finds the player object bound to the local player.
+            /// </summary>
             private void FindMyPlayer()
             {
                 foreach (GameObject g in GameObject.FindGameObjectsWithTag("Player"))
@@ -52,40 +54,38 @@ namespace FiestaTime
                     if (g.GetComponent<PhotonView>().OwnerActorNr == PhotonNetwork.LocalPlayer.ActorNumber)
                     {
                         myPlayer = g.GetComponent<Player>();
-
-                        demonstrationSequenceUI = g.GetComponentInChildren<DemonstrationSequenceUI>();
-                        demonstrationSequenceUI.enabled = false;
-
-                        resultsUI = g.GetComponentInChildren<ResultsUI>();
-                        resultsUI.enabled = false;
                     }
                 }
             }
 
-            private void OnMoveShown(bool isRight, int moveNumber)
-            {
-                //demoSeqUI should be attached to each player individually, furthermore whether they made the right or wrong choice
-                //should be visible to everyone and so its independent to everyone, therefore it must be synchronized over the network.
+            #region Event Functions
 
-                demonstrationSequenceUI.TriggerFeedbackIndicator(isRight, moveNumber);
-            }
-
+            /// <summary>
+            /// Function run when the player gives input to the game.
+            /// </summary>
+            /// <param name="number">The int representing the move.</param>
             private void OnInputTaken(int number)
             {
                 playerInputUI.TriggerInputIndicator(number);
             }
 
+            /// <summary>
+            /// Function run when the "next phase" event is triggered.
+            /// </summary>
+            /// <param name="nextPhase">The int representing the next phase</param>
             private void OnPhaseTransit(int nextPhase)
             {
                 // 0 -> entered showSeq, 1 -> entered playerInput, 2 -> entered demoSeq, 3 -> entered results
-                if (myPlayer.hasLost) return;
+                if (!startup)
+                {
+                    if (myPlayer.hasLost && nextPhase != 3) return;
+                }
+
+                startup = false;
 
                 switch (nextPhase)
                 {
                     case 0:
-                        // Deactivate all pieces of Results phase (in player.cs)
-                        //resultsUIHolder.SetActive(false);
-
                         // Activate all pieces of Showing Sequence phase
                         showSequenceUIHolder.SetActive(true);
 
@@ -102,25 +102,18 @@ namespace FiestaTime
                         // Deactivate all pieces of Input phase
                         playerInputUIHolder.SetActive(false);
 
-                        // Activate all pieces of demonstration phase
-                        demonstrationSequenceUI.enabled = true;
-                        resultsUI.enabled = true;
-
                         break;
-                    case 3:
-                        // Deactivate all pieces of demonstration phase
-                        demonstrationSequenceUI.enabled = false;
-                        resultsUI.enabled = false;
-
-                        // Activate all pieces of Results phase (in player.cs)
-                        //resultsUIHolder.SetActive(true);
-
+                    case 4:
+                        // Case 3 irrelevant to UIManager, relevant to PlayerUI
+                        // Game finished
                         break;
                     default:
                         Debug.Log("ITS NOT POSSIBLEEEEE!");
                         break;
                 }
             }
+
+            #endregion
         }
     }
 }
