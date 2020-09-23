@@ -9,7 +9,7 @@ namespace FiestaTime
     {
         public class GameManager : MonoSingleton<GameManager>
         {
-            private Vector3[] playerPositions;
+            private Vector3[] playerPositions = new Vector3[4];
 
             //The sequence map of moves to be generated.
             public int[] sequenceMap = new int[12];
