@@ -8,11 +8,16 @@ namespace FiestaTime
 {
     namespace DD
     {
+        /// <summary>
+        /// The UI controller of the UI in charge of the Results Sequence.
+        /// </summary>
         public class ResultsUI : MonoBehaviourPun, IPunObservable
         {
             [SerializeField] private GameObject healthHolder;
 
             [SerializeField] private RectTransform healthRect;
+
+            #region Unity Callbacks
 
             private void Awake()
             {
@@ -34,6 +39,8 @@ namespace FiestaTime
                 healthHolder.SetActive(false);
             }
 
+            #endregion
+
             public void WrongMove(int health)
             {
                 if (health == 2)
@@ -52,33 +59,20 @@ namespace FiestaTime
                 {
                     healthRect.localScale = Vector3.zero;
                 }
-
             }
 
             public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
             {
                 if (stream.IsWriting)
                 {
-                    //Debug.Log("Fiesta Time/ DD/ Results UI: Sending over.");
-
                     stream.SendNext(healthRect.localScale);
-
                     stream.SendNext(healthRect.anchoredPosition);
-                    
                     stream.SendNext(healthHolder.activeInHierarchy);
                 }
                 else
                 {
-                    //Debug.Log("Fiesta Time/ DD/ Results UI: Received: ");
-                    //Debug.Log("Dato 1:" + stream.ReceiveNext());
-                    //Debug.Log("Dato 2:" + stream.ReceiveNext());
-                    //Debug.Log("Dato 3:" + stream.ReceiveNext());
-
-                    //stream.Count > 
-
                     healthRect.localScale = (Vector3)stream.ReceiveNext();
                     healthRect.anchoredPosition = (Vector2)stream.ReceiveNext();
-
                     healthHolder.SetActive((bool)stream.ReceiveNext());
                 }
             }

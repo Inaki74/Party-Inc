@@ -13,7 +13,8 @@ namespace FiestaTime
 
         Hashtable playersReady = new Hashtable();
 
-        // Start is called before the first frame update
+        #region Unity Callbacks
+
         void Start()
         {
             SetPlayerReady(PhotonNetwork.LocalPlayer.ActorNumber);
@@ -33,6 +34,10 @@ namespace FiestaTime
             PhotonNetwork.RemoveCallbackTarget(this);
         }
 
+        #endregion
+
+        #region Private Functions
+
         private void SetPlayerReady(int id)
         {
             if (!playersReady.ContainsKey(id))
@@ -48,6 +53,10 @@ namespace FiestaTime
             photonView.RPC("RPC_SendPlayerReady", RpcTarget.MasterClient, id);
         }
 
+        /// <summary>
+        /// The coroutine in charge of starting the game.
+        /// </summary>
+        /// <returns></returns>
         private IEnumerator StartGameCo()
         {
             yield return new WaitUntil(() => PlayersLoadedGame());
@@ -55,6 +64,10 @@ namespace FiestaTime
             PhotonNetwork.InstantiateRoomObject(gameManager.name, Vector3.zero, Quaternion.identity);
         }
 
+        /// <summary>
+        /// Returns true if all players have loaded the game.
+        /// </summary>
+        /// <returns></returns>
         private bool PlayersLoadedGame()
         {
             foreach(Photon.Realtime.Player p in PhotonNetwork.PlayerList)
@@ -71,6 +84,8 @@ namespace FiestaTime
 
             return true;
         }
+
+        #endregion
 
         [PunRPC]
         public void RPC_SendPlayerReady(int id)

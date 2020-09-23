@@ -12,17 +12,18 @@ namespace FiestaTime
         {
             private bool startup = true;
 
-            [SerializeField] private GameObject showSequenceUIHolder;
+            #region UI GameObjects
 
-            //private InputManager
+            [SerializeField] private GameObject showSequenceUIHolder;
             [SerializeField] private GameObject playerInputUIHolder;
+            [SerializeField] private GameObject resultsUIHolder;
             private PlayerInputUI playerInputUI;
 
-            [SerializeField] private GameObject resultsUIHolder;
-            //private ResultsUI resultsUI;
+            #endregion
 
             private Player myPlayer;
 
+            #region Unity Callbacks
             // Start is called before the first frame update
             void Start()
             {
@@ -41,7 +42,11 @@ namespace FiestaTime
                 GameManager.onNextPhase -= OnPhaseTransit;
                 InputManager.onMoveMade -= OnInputTaken;
             }
+            #endregion
 
+            /// <summary>
+            /// Finds the player object bound to the local player.
+            /// </summary>
             private void FindMyPlayer()
             {
                 foreach (GameObject g in GameObject.FindGameObjectsWithTag("Player"))
@@ -53,11 +58,21 @@ namespace FiestaTime
                 }
             }
 
+            #region Event Functions
+
+            /// <summary>
+            /// Function run when the player gives input to the game.
+            /// </summary>
+            /// <param name="number">The int representing the move.</param>
             private void OnInputTaken(int number)
             {
                 playerInputUI.TriggerInputIndicator(number);
             }
 
+            /// <summary>
+            /// Function run when the "next phase" event is triggered.
+            /// </summary>
+            /// <param name="nextPhase">The int representing the next phase</param>
             private void OnPhaseTransit(int nextPhase)
             {
                 // 0 -> entered showSeq, 1 -> entered playerInput, 2 -> entered demoSeq, 3 -> entered results
@@ -71,9 +86,6 @@ namespace FiestaTime
                 switch (nextPhase)
                 {
                     case 0:
-                        // Deactivate all pieces of Results phase (in player.cs)
-                        //resultsUIHolder.SetActive(false);
-
                         // Activate all pieces of Showing Sequence phase
                         showSequenceUIHolder.SetActive(true);
 
@@ -90,21 +102,9 @@ namespace FiestaTime
                         // Deactivate all pieces of Input phase
                         playerInputUIHolder.SetActive(false);
 
-                        // Activate all pieces of demonstration phase (moved to playerUI)
-                        //demonstrationSequenceUI.enabled = true;
-                        //resultsUI.enabled = true;
-
-                        break;
-                    case 3:
-                        // Deactivate all pieces of demonstration phase (moved to playerUI)
-                        //demonstrationSequenceUI.enabled = false;
-                        //resultsUI.enabled = false;
-
-                        // Activate all pieces of Results phase (in player.cs)
-                        //resultsUIHolder.SetActive(true);
-
                         break;
                     case 4:
+                        // Case 3 irrelevant to UIManager, relevant to PlayerUI
                         // Game finished
                         break;
                     default:
@@ -112,6 +112,8 @@ namespace FiestaTime
                         break;
                 }
             }
+
+            #endregion
         }
     }
 }

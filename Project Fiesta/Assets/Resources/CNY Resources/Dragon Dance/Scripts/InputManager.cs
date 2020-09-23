@@ -26,7 +26,8 @@ namespace FiestaTime
             private bool inputAllowed;
             private bool runOnce;
 
-            // Start is called before the first frame update
+            #region Unity Callbacks
+
             void Start()
             {
                 timeout = startingTimeout;
@@ -34,7 +35,6 @@ namespace FiestaTime
                 runOnce = true;
             }
 
-            // Update is called once per frame
             void Update()
             {
                 if (!photonView.IsMine && PhotonNetwork.IsConnected) return;
@@ -63,11 +63,22 @@ namespace FiestaTime
                 fingerMovement = Vector2.zero;
             }
 
+            #endregion
+
+            /// <summary>
+            /// Returns the current sequence that was determined on this round.
+            /// </summary>
+            /// <returns></returns>
             public int[] GetCurrentSequence()
             {
                 return sequenceGenerated;
             }
 
+            #region Private Functions
+
+            /// <summary>
+            /// Saves the move made and activates the onMoveMade event.
+            /// </summary>
             private void TakeMove()
             {
                 sequenceGenerated[currentMoves] = presentMove;
@@ -77,12 +88,9 @@ namespace FiestaTime
                 StartCoroutine(SwipeCooldownCo());
             }
 
-            private IEnumerator SwipeCooldownCo()
-            {
-                yield return new WaitForSeconds(0.2f);
-                inputAllowed = true;
-            }
-
+            /// <summary>
+            /// Function that takes in the touch input.
+            /// </summary>
             private void TakeInput()
             {
                 if (Input.touches[0].phase == TouchPhase.Began)
@@ -117,6 +125,10 @@ namespace FiestaTime
                 }
             }
 
+            /// <summary>
+            /// Interprets the swipe and returns the result. (1 is right, 2 is up, 3 is left and 4 is down)
+            /// </summary>
+            /// <returns></returns>
             private int ManageInput()
             {
                 if (Mathf.Abs(fingerMovement.x) > Mathf.Abs(fingerMovement.y))
@@ -146,6 +158,41 @@ namespace FiestaTime
                     }
                 }
             }
+
+            /// <summary>
+            /// The input cooldown coroutine.
+            /// </summary>
+            /// <returns></returns>
+            private IEnumerator SwipeCooldownCo()
+            {
+                yield return new WaitForSeconds(0.2f);
+                inputAllowed = true;
+            }
+
+            #endregion
+
+            //private int TakeInputPC()
+            //{
+            //    if (Input.GetKeyDown(KeyCode.RightArrow))
+            //    {
+            //        return 1;
+            //    }
+            //    else
+            //    if (Input.GetKeyDown(KeyCode.UpArrow))
+            //    {
+            //        return 2;
+            //    }
+            //    else
+            //    if (Input.GetKeyDown(KeyCode.LeftArrow))
+            //    {
+            //        return 3;
+            //    }
+            //    else
+            //    if (Input.GetKeyDown(KeyCode.DownArrow))
+            //    {
+            //        return 4;
+            //    }
+            //}
         }
     }
 }

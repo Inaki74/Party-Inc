@@ -440,7 +440,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9697c940512e44d768a3b9564727a10f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxCountdownTime: 5
+  maxCountdownTime: 10
   gameName: DragonDance
   playerTexts:
   - {fileID: 424935319}

@@ -19,14 +19,12 @@ namespace FiestaTime
         public string gameName;
 
         private PhotonView Pv;
-
         private ExitGames.Client.Photon.Hashtable roomProps = new ExitGames.Client.Photon.Hashtable();
+        private int[] playersInRoom = new int[4];
 
         [Header ("Player Name Texts, place them in order")]
         [SerializeField] private Text[] playerTexts;
         [SerializeField] private Text countdownText;
-
-        private int[] playersInRoom = new int[4];
 
         private bool runOnce = true;
 
@@ -62,11 +60,8 @@ namespace FiestaTime
                 {
                     PhotonNetwork.CurrentRoom.IsOpen = false;
                     runOnce = false;
-                    SetCustomProperties();
                     PhotonNetwork.LoadLevel(gameName);
                 }
-                
-                
             }
             else
             {
@@ -89,37 +84,31 @@ namespace FiestaTime
             SceneManager.LoadScene(1);
         }
 
-        public void BtnChooseBunny()
-        {
-            PlayerPrefs.SetString(Constants.CHRCTR_KEY_NETWRK, Constants.BUNNY_NAME_CHRCTR); ;
-        }
-
-        public void BtnChooseSanta()
-        {
-            PlayerPrefs.SetString(Constants.CHRCTR_KEY_NETWRK, Constants.SANTA_NAME_CHRCTR);
-        }
-
         #endregion
 
         #region Private Functions
 
-        private void SetCustomProperties()
-        {
-            int[] aux = new int[PhotonNetwork.CurrentRoom.PlayerCount];
+        // Deprecated
+        //private void SetCustomProperties()
+        //{
+        //    int[] aux = new int[PhotonNetwork.CurrentRoom.PlayerCount];
 
-            for (int i = 0; i < PhotonNetwork.CurrentRoom.PlayerCount; i++)
-            {
-                aux[i] = playersInRoom[i];
-            }
+        //    for (int i = 0; i < PhotonNetwork.CurrentRoom.PlayerCount; i++)
+        //    {
+        //        aux[i] = playersInRoom[i];
+        //    }
 
-            roomProps.Add("PlayerIDsList", aux);
-            bool a = PhotonNetwork.CurrentRoom.SetCustomProperties(roomProps);
-            if (a)
-            {
-                Debug.Log("Properties set appropiately.");
-            }
-        }
+        //    roomProps.Add("PlayerIDsList", aux);
+        //    bool a = PhotonNetwork.CurrentRoom.SetCustomProperties(roomProps);
+        //    if (a)
+        //    {
+        //        Debug.Log("Properties set appropiately.");
+        //    }
+        //}
 
+        /// <summary>
+        /// Updates the name texts in the UI.
+        /// </summary>
         private void UpdateNames()
         {
             for (int i = 0; i < playersInRoom.Length; i++)
@@ -135,6 +124,10 @@ namespace FiestaTime
             }
         }
 
+        /// <summary>
+        /// Updates the list of players after the Master Left.
+        /// </summary>
+        /// <param name="newMasterClient"></param>
         private void UpdatePlayerListMasterLeft(Photon.Realtime.Player newMasterClient)
         {
             int[] aux = new int[playersInRoom.Length];
@@ -157,6 +150,10 @@ namespace FiestaTime
             playersInRoom = aux;
         }
 
+        /// <summary>
+        /// Updates the list of players after a player left.
+        /// </summary>
+        /// <param name="otherPlayer"></param>
         private void UpdatePlayerListPlayerLeft(Photon.Realtime.Player otherPlayer)
         {
             int[] aux = new int[playersInRoom.Length];
@@ -214,6 +211,7 @@ namespace FiestaTime
         #endregion
 
         #region PUNRPCs
+
         [PunRPC]
         public void RPC_SendTimer(float time)
         {
@@ -227,6 +225,7 @@ namespace FiestaTime
 
             UpdateNames();
         }
+
         #endregion
     }
 }

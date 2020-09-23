@@ -9,6 +9,9 @@ namespace FiestaTime
 {
     namespace DD
     {
+        /// <summary>
+        /// Component in charge of the UI in the show sequence stage of the game.
+        /// </summary>
         public class ShowSequenceUI : MonoBehaviour
         {
             [SerializeField] private RectTransform arrowImage;
@@ -24,6 +27,10 @@ namespace FiestaTime
                 StartCoroutine(ShowSequence(GameManager.Current.amountOfMovesThisRound));
             }
 
+            /// <summary>
+            /// Changes the arrows rotation to match that of the generated sequence.
+            /// </summary>
+            /// <param name="sequence"></param>
             private void SetArrow(int sequence)
             {
                 float rotation = 270;
@@ -34,11 +41,19 @@ namespace FiestaTime
                 arrowImage.Rotate(new Vector3(0, 0, rotation));
             }
 
+            /// <summary>
+            /// Resets the arrows position back to its original.
+            /// </summary>
             private void ResetArrow()
             {
                 arrowImage.rotation = new Quaternion(0, 0, 0, 1);
             }
 
+            /// <summary>
+            /// The coroutine that shows the players the sequence generated.
+            /// </summary>
+            /// <param name="elements"></param>
+            /// <returns></returns>
             private IEnumerator ShowSequence(int elements)
             {
                 for(int i = 0; i < elements; i++)
@@ -60,6 +75,10 @@ namespace FiestaTime
                 GameManager.Current.NotifyOfPlayerReady(PhotonNetwork.LocalPlayer.ActorNumber);
             }
 
+            /// <summary>
+            /// Animates the arrow.
+            /// </summary>
+            /// <returns></returns>
             private IEnumerator AnimateArrowCo()
             {
                 for(int i = 0; i < 70; i++)

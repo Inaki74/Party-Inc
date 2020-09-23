@@ -18,20 +18,31 @@ namespace FiestaTime
 
             private int[] currentSequence;
 
+            #region Events
+
             public delegate void ActionShowMove(bool rightMove, int moveNumber);
             public static event ActionShowMove onShowMove;
 
             public delegate void ActionWrongMove(int health);
             public static event ActionWrongMove onWrongMove;
 
-            [SerializeField] private Text playerName;
-            [SerializeField] private GameObject demonstrationUIHolder;
+            #endregion
+
+            #region Serialized Components
 
             [SerializeField] private InputManager inputManager;
             [SerializeField] private MeshRenderer Mr;
             [SerializeField] private Animator anim;
 
+            [SerializeField] private Text playerName;
+            [SerializeField] private GameObject demonstrationUIHolder;
+
+            #endregion
+
             public bool hasLost = false;
+
+            #region Unity Callbacks
+
             // Start is called before the first frame update
             void Start()
             {
@@ -56,6 +67,12 @@ namespace FiestaTime
                 GameManager.onNextPhase -= OnPhaseTransit;
             }
 
+            #endregion
+
+            /// <summary>
+            /// Function run when the "next phase" event is triggered.
+            /// </summary>
+            /// <param name="nextPhase">The int representing the next phase</param>
             private void OnPhaseTransit(int nextPhase)
             {
                 if (!photonView.IsMine && PhotonNetwork.IsConnected) return;
@@ -100,6 +117,10 @@ namespace FiestaTime
                 }
             }
 
+            /// <summary>
+            /// The Coroutine that takes care of the demonstration of the movements of each player.
+            /// </summary>
+            /// <returns></returns>
             private IEnumerator DemonstrationCo()
             {
                 for(int i = 0; i < GameManager.Current.amountOfMovesThisRound; i++)
@@ -142,6 +163,8 @@ namespace FiestaTime
                 GameManager.Current.NotifyOfPlayerReady(PhotonNetwork.LocalPlayer.ActorNumber);
             }
 
+            #region PUN
+
             [PunRPC]
             public void RPC_SendName(string name)
             {
@@ -160,6 +183,8 @@ namespace FiestaTime
                     Mr.material.color = new Color(temp.x, temp.y, temp.z);
                 }
             }
+
+            #endregion
         }
     }
 }

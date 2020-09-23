@@ -1313,11 +1313,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   health: 3
-  playerName: {fileID: 168257648}
-  demonstrationUIHolder: {fileID: 1222073136536948683}
   inputManager: {fileID: 7428520905753749262}
   Mr: {fileID: 7428520905753749261}
   anim: {fileID: 0}
+  playerName: {fileID: 168257648}
+  demonstrationUIHolder: {fileID: 1222073136536948683}
   hasLost: 0
 --- !u!95 &7428520905753749256
 Animator:

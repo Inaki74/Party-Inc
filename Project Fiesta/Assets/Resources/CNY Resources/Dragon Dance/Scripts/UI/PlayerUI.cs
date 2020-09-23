@@ -8,13 +8,17 @@ namespace FiestaTime
 {
     namespace DD
     {
+        /// <summary>
+        /// The UI controller in charge of the players UI pieces.
+        /// </summary>
         public class PlayerUI : MonoBehaviourPun, IPunObservable
         {
             [SerializeField] private Player myPlayer;
             [SerializeField] private DemonstrationSequenceUI demonstrationSequenceUI;
             [SerializeField] private ResultsUI resultsUI;
 
-            // Start is called before the first frame update
+            #region Unity Callbacks
+
             void Start()
             {
                 if(myPlayer == null)
@@ -39,6 +43,13 @@ namespace FiestaTime
                 Player.onShowMove -= OnMoveShown;
             }
 
+            #endregion
+
+            /// <summary>
+            /// Event function that triggers when a move must be shown.
+            /// </summary>
+            /// <param name="isRight"></param>
+            /// <param name="moveNumber"></param>
             private void OnMoveShown(bool isRight, int moveNumber)
             {
                 //demoSeqUI should be attached to each player individually, furthermore whether they made the right or wrong choice
@@ -48,6 +59,10 @@ namespace FiestaTime
                 demonstrationSequenceUI.TriggerFeedbackIndicator(isRight, moveNumber);
             }
 
+            /// <summary>
+            /// The function triggered by the phase changing. Acts on everything
+            /// </summary>
+            /// <param name="nextPhase"></param>
             private void OnPhaseTransit(int nextPhase)
             {
                 if (!photonView.IsMine && PhotonNetwork.IsConnected) return;

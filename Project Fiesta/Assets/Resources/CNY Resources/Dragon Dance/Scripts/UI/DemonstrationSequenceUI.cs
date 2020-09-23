@@ -10,6 +10,9 @@ namespace FiestaTime
 {
     namespace DD
     {
+        /// <summary>
+        /// The UI controller in charge of the UI of the Demonstration Sequence.
+        /// </summary>
         public class DemonstrationSequenceUI : MonoBehaviourPun
         {
             public Image[] feedbackIndicatorsImages;
@@ -18,7 +21,7 @@ namespace FiestaTime
 
             public GameObject holder;
 
-            private bool startup = true;
+            #region Unity Callbacks
 
             private void OnEnable()
             {
@@ -36,6 +39,13 @@ namespace FiestaTime
                 photonView.RPC("RPC_SendDisable", RpcTarget.Others);
             }
 
+            #endregion
+
+            /// <summary>
+            /// Event function that indicates the player whether the move it made was right or wrong.
+            /// </summary>
+            /// <param name="isRight"></param>
+            /// <param name="moveNumber"></param>
             public void TriggerFeedbackIndicator(bool isRight, int moveNumber)
             {
                 if (isRight)
@@ -48,6 +58,8 @@ namespace FiestaTime
                 }
                 photonView.RPC("RPC_SendIfRight", RpcTarget.Others, new object[] { isRight, moveNumber });
             }
+
+            #region PunRPCS
 
             [PunRPC]
             public void RPC_SendIfRight(object[] args)
@@ -76,6 +88,8 @@ namespace FiestaTime
                 IndicatorFunctions.DisableAllIndicators(feedbackIndicators);
                 IndicatorFunctions.EnableIndicators(feedbackIndicators, amount);
             }
+
+            #endregion
         }
     }
 }
