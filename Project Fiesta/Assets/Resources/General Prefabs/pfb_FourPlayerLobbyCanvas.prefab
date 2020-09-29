@@ -657,7 +657,7 @@ GameObject:
   - component: {fileID: 6811778604748000903}
   - component: {fileID: 6811778604748000902}
   m_Layer: 5
-  m_Name: pfb_DD_LobbyCanvas
+  m_Name: pfb_FourPlayerLobbyCanvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

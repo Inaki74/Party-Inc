@@ -64,7 +64,7 @@ namespace FiestaTime
 
                     arrow.SetActive(true);
 
-                    StartCoroutine(AnimateArrowCo());
+                    StartCoroutine(UIFunctions.GrowthAnimationCo(arrowImage, 1, 0.7f));
 
                     yield return new WaitForSeconds(1f);
 
@@ -73,20 +73,6 @@ namespace FiestaTime
                 arrow.SetActive(false);
 
                 GameManager.Current.NotifyOfPlayerReady(PhotonNetwork.LocalPlayer.ActorNumber);
-            }
-
-            /// <summary>
-            /// Animates the arrow.
-            /// </summary>
-            /// <returns></returns>
-            private IEnumerator AnimateArrowCo()
-            {
-                for(int i = 0; i < 70; i++)
-                {
-                    arrowImage.localScale += new Vector3(0.00714285714f, 0.00714285714f, 0.00714285714f);
-
-                    yield return new WaitForSeconds(0.01f);
-                }
             }
         }
     }

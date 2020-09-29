@@ -499,6 +499,11 @@ PrefabInstance:
       propertyPath: gameName
       value: EggGrabbingGameB
       objectReference: {fileID: 0}
+    - target: {fileID: -7808296303126965196, guid: 33572cf95c58a4290a857dd00702e824,
+        type: 3}
+      propertyPath: gameSceneName
+      value: EggGrabbingGameB
+      objectReference: {fileID: 0}
     - target: {fileID: 1583794355869324632, guid: 33572cf95c58a4290a857dd00702e824,
         type: 3}
       propertyPath: m_LocalPosition.x

@@ -6,7 +6,6 @@ namespace FiestaTime
 {
     public static class Constants
     {
-
         public const string NAME_KEY_NETWRK = "PlayerName";
         public const string CHRCTR_KEY_NETWRK = "ChosenCharacter";
 

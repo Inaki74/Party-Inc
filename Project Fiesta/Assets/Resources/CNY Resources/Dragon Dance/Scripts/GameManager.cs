@@ -13,6 +13,8 @@ namespace FiestaTime
 
             //The sequence map of moves to be generated.
             public int[] sequenceMap = new int[12];
+            public int amountOfMovesThisRound = 4;
+            public float countdownGameStart;
 
             private float amountOfPlayers;
             private Hashtable playersReady = new Hashtable();
@@ -29,16 +31,17 @@ namespace FiestaTime
             #endregion
 
             private bool isGameRunning = true;
+            private bool startedGame;
 
             [SerializeField] private GameObject playerPrefab;
             [SerializeField] private GameObject UIPrefab;
-
-            public int amountOfMovesThisRound = 4;
 
             #region Game Loop
 
             void Start()
             {
+                startedGame = false;
+
                 // Generate the sequence map to be followed.
                 if (PhotonNetwork.IsMasterClient)
                 {
@@ -57,9 +60,20 @@ namespace FiestaTime
 
                 // Initialize player UI
                 Instantiate(UIPrefab);
+            }
 
-                // Start game
-                StartCoroutine(GameLoopCo());
+            private void Update()
+            {
+                if(!startedGame && countdownGameStart <= -1f)
+                {
+                    startedGame = true;
+                    // Start game
+                    StartCoroutine(GameLoopCo());
+                }
+                else if(countdownGameStart > -1f)
+                {
+                    countdownGameStart -= Time.deltaTime;
+                }
             }
 
             /// <summary>
@@ -151,8 +165,8 @@ namespace FiestaTime
                         break;
                     case 4:
                         playerPositions[0] = new Vector3(-2.5f, 0.5f, -16f);
-                        playerPositions[1] = new Vector3(-0.75f, 0.5f, -16f);
-                        playerPositions[2] = new Vector3(0.75f, 0.5f, -16f);
+                        playerPositions[1] = new Vector3(-0.85f, 0.5f, -16f);
+                        playerPositions[2] = new Vector3(0.85f, 0.5f, -16f);
                         playerPositions[3] = new Vector3(2.5f, 0.5f, -16f);
                         break;
                     default:

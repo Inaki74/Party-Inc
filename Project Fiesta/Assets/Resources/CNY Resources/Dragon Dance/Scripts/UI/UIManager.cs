@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 using Photon.Pun;
 
@@ -21,6 +22,10 @@ namespace FiestaTime
 
             #endregion
 
+            [SerializeField] private Text countdownText;
+
+            [SerializeField] private float countdown;
+
             private Player myPlayer;
 
             #region Unity Callbacks
@@ -29,6 +34,9 @@ namespace FiestaTime
             {
                 playerInputUI = playerInputUIHolder.GetComponent<PlayerInputUI>();
                 FindMyPlayer();
+
+                countdownText.enabled = true;
+                StartCoroutine(UIFunctions.ShowCountdownCo(this, countdownText, GameManager.Current.countdownGameStart));
             }
 
             private void Awake()

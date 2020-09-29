@@ -53,7 +53,7 @@ namespace FiestaTime
             /// </summary>
             private void GameStartCountdown()
             {
-                StartCoroutine("CountdownCo");
+                StartCoroutine(UIFunctions.ShowCountdownCo(this, countdownText, 3f));
             }
 
             /// <summary>
