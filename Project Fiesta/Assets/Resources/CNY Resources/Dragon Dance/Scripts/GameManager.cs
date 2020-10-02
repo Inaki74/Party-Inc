@@ -92,23 +92,23 @@ namespace FiestaTime
                 {
                     // Trigger "Sequence Showing" Sequence
                     onNextPhase?.Invoke(0);
-                    yield return new WaitUntil(() => PlayersReady("Fiesta Time/ DD/ GameManager: Awaiting player confirmation on Sequence Showing."));
-                    ResetPlayersReady();
+                    //yield return new WaitUntil(() => PlayersReady("Fiesta Time/ DD/ GameManager: Awaiting player confirmation on Sequence Showing."));
+                    //ResetPlayersReady();
 
                     // Activate "Player Input" Sequence
                     onNextPhase?.Invoke(1);
-                    yield return new WaitUntil(() => PlayersReady("Fiesta Time/ DD/ GameManager: Awaiting player confirmation on Player Input."));
-                    ResetPlayersReady();
+                    //yield return new WaitUntil(() => PlayersReady("Fiesta Time/ DD/ GameManager: Awaiting player confirmation on Player Input."));
+                    //ResetPlayersReady();
 
                     // Activate "Player Demonstration" Sequence
                     onNextPhase?.Invoke(2);
-                    yield return new WaitUntil(() => PlayersReady("Fiesta Time/ DD/ GameManager: Awaiting player confirmation on Demonstration."));
-                    ResetPlayersReady();
+                    //yield return new WaitUntil(() => PlayersReady("Fiesta Time/ DD/ GameManager: Awaiting player confirmation on Demonstration."));
+                    //ResetPlayersReady();
 
                     // Trigger "Results Showing" Sequence
                     onNextPhase?.Invoke(3);
-                    yield return new WaitUntil(() => PlayersReady("Fiesta Time/ DD/ GameManager: Awaiting player confirmation on Results Showing."));
-                    ResetPlayersReady();
+                    //yield return new WaitUntil(() => PlayersReady("Fiesta Time/ DD/ GameManager: Awaiting player confirmation on Results Showing."));
+                    //ResetPlayersReady();
 
                     amountOfMovesThisRound += 2;
 

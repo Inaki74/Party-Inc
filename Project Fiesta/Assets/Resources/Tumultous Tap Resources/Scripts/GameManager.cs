@@ -12,7 +12,7 @@ namespace FiestaTime
         {
             public static Vector3 forwardVector = new Vector3(0f, Mathf.Cos(45f), Mathf.Cos(45f));
             public static float maxDistance = 13f;
-            public static float hazardMinimumVelocity = 13f;
+            public static float hazardMinimumVelocity = 12f;
 
             private Vector3[] playerPositions = new Vector3[4];
 
