@@ -76,6 +76,7 @@ MonoBehaviour:
   isGameFinished: 0
   playerScore: 0
   enemyScore: 0
+  winner: 0
   playerAssetsPrefab: {fileID: 2772520239534581506, guid: 9655959150dde46d38d000330d8b67c9,
     type: 3}
   playerPrefab: {fileID: 4862033087429230649, guid: 3c99575628fc04a85be6221f4430b75c,

@@ -106,9 +106,9 @@ RectTransform:
   m_Father: {fileID: 5307709950818576903}
   m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -854, y: 346}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 400, y: -300}
   m_SizeDelta: {x: 600, y: 400}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &4571977140439152622
@@ -140,7 +140,7 @@ MonoBehaviour:
       m_Calls: []
   m_FontData:
     m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
-    m_FontSize: 100
+    m_FontSize: 60
     m_FontStyle: 0
     m_BestFit: 0
     m_MinSize: 0
@@ -589,7 +589,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Rb: {fileID: 6170294561143131526}
   Mr: {fileID: 6170294561143131525}
-  punishmentDrag: 1.5
+  punishmentDrag: 1
   mine: {fileID: 2100000, guid: afc77ec9dfdaf43bb9144f4482047acf, type: 2}
   middleLine: {fileID: 4881968344573745262}
   toleranceLineOneMin: {fileID: 8144956381055764138}
@@ -597,7 +597,7 @@ MonoBehaviour:
   toleranceLineTwoMin: {fileID: 6159988298954491402}
   toleranceLineTwoMax: {fileID: 1437627192974388283}
   leftRight: {fileID: 3767325667421496682}
-  tapForce: 0.3
+  tapForce: 0.4
   minimumTimeIdle: 0.3
 --- !u!54 &6170294561143131526
 Rigidbody:

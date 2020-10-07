@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using Photon.Pun;
 
 namespace FiestaTime
 {
@@ -20,6 +21,9 @@ namespace FiestaTime
             public Text enemyScoreText;
             public Text totalScoreText;
             public Text countdownText;
+
+            public GameObject finishScreen;
+            public GameObject normalScreen;
             #endregion
 
             #region Unity Callbacks
@@ -27,6 +31,8 @@ namespace FiestaTime
             {
                 playerScore = 0;
                 GetTotalScore();
+
+                InitializeUI();
             }
 
             private void Awake()
@@ -48,6 +54,39 @@ namespace FiestaTime
             }
             #endregion
 
+            private void InitializeUI()
+            {
+                if (PhotonNetwork.CurrentRoom.PlayerCount == 2)
+                {
+                    if (PhotonNetwork.IsMasterClient)
+                    {
+                        playerScoreText.rectTransform.anchorMin = new Vector2(0, 1);
+                        playerScoreText.rectTransform.anchorMax = new Vector2(0, 1);
+                        playerScoreText.rectTransform.anchoredPosition = new Vector3(Constants.XPOS_PLYRONESCORE_UI, -50, 0);
+
+                        enemyScoreText.rectTransform.anchorMin = new Vector2(1, 1);
+                        enemyScoreText.rectTransform.anchorMax = new Vector2(1, 1);
+                        enemyScoreText.rectTransform.anchoredPosition = new Vector3(Constants.XPOS_PLYRTWOSCORE_UI, -50, 0);
+                    }
+                    else
+                    {
+                        enemyScoreText.rectTransform.anchorMin = new Vector2(0, 1);
+                        enemyScoreText.rectTransform.anchorMax = new Vector2(0, 1);
+                       enemyScoreText.rectTransform.anchoredPosition = new Vector3(Constants.XPOS_PLYRONESCORE_UI, -50, 0);
+
+                        playerScoreText.rectTransform.anchorMin = new Vector2(1, 1);
+                        playerScoreText.rectTransform.anchorMax = new Vector2(1, 1);
+                        playerScoreText.rectTransform.anchoredPosition = new Vector3(Constants.XPOS_PLYRTWOSCORE_UI, -50, 0);
+                    }
+                }
+                else
+                {
+                    //-1242, +992
+                    playerScoreText.rectTransform.anchoredPosition = new Vector3(Constants.XPOS_PLYRONESCORE_UI, -50, 0);
+                    enemyScoreText.rectTransform.anchoredPosition = new Vector3(Constants.XPOS_PLYRONESCORE_UI, 500, 0);
+                }
+            }
+
             /// <summary>
             /// Countdown coroutine starter.
             /// </summary>
@@ -59,53 +98,23 @@ namespace FiestaTime
             /// <summary>
             /// Game finish coroutine starter.
             /// </summary>
-            /// <param name="looped"></param>
-            private void GameFinishDisplay(bool looped)
+            private void GameFinishDisplay()
             {
-                StartCoroutine(GameFinishCo(looped));
-            }
-
-            /// <summary>
-            /// The countdown coroutine.
-            /// </summary>
-            /// <returns></returns>
-            private IEnumerator CountdownCo()
-            {
-                //3
-                yield return new WaitForSeconds(1.0f);
-
-                //2
-                countdownText.text = "" + 2;
-                yield return new WaitForSeconds(1.0f);
-
-                //1
-                countdownText.text = "" + 1;
-                yield return new WaitForSeconds(1.0f);
-
-                countdownText.text = "START!";
-
-                yield return new WaitForSeconds(1.0f);
-
-                countdownText.text = "";
+                StartCoroutine(GameFinishCo());
             }
 
             /// <summary>
             /// The game finish coroutine.
             /// </summary>
-            /// <param name="looped"></param>
             /// <returns></returns>
-            private IEnumerator GameFinishCo(bool looped)
+            private IEnumerator GameFinishCo()
             {
+                countdownText.enabled = true;
                 countdownText.text = "FINISH!";
                 yield return new WaitForSeconds(1.0f);
-                if (looped)
-                {
-                    countdownText.text = "Restarting...";
 
-                    yield return new WaitForSeconds(1.0f);
-                }
-
-                countdownText.text = "";
+                finishScreen.SetActive(true);
+                normalScreen.SetActive(false);
             }
 
             /// <summary>
@@ -114,7 +123,7 @@ namespace FiestaTime
             /// <returns></returns>
             private void GetTotalScore()
             {
-                totalScore = FiestaTime.EGG.GameManager.Current.GetEggCount();
+                totalScore = GameManager.Current.GetEggCount();
                 string str = "LEFT@" + totalScore;
                 str = str.Replace("@", System.Environment.NewLine);
                 totalScoreText.text = str;

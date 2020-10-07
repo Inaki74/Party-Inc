@@ -43,6 +43,16 @@ namespace FiestaTime
                     }
                 }
             }
+
+            private void Awake()
+            {
+                GameManager.onGameFinish += OnGameFinish;
+            }
+
+            private void OnDestroy()
+            {
+                GameManager.onGameFinish -= OnGameFinish;
+            }
             #endregion
 
             /// <summary>
@@ -109,6 +119,11 @@ namespace FiestaTime
             {
                 OK = true;
                 eggMapCol = routine;
+            }
+
+            public void OnGameFinish()
+            {
+                StopAllCoroutines();
             }
         }
     }

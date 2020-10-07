@@ -43,22 +43,18 @@ namespace FiestaTime
 
             public void WrongMove(int health)
             {
-                if (health == 2)
-                {
-                    healthRect.localScale = new Vector3(1f, 0.66f, 1f);
-                    healthRect.anchoredPosition = new Vector2(-46.4f, -9f);
-                }
+                if (!photonView.IsMine && PhotonNetwork.IsConnected) return;
 
-                if (health == 1)
-                {
-                    healthRect.localScale = new Vector3(1f, 0.33f, 1f);
-                    healthRect.anchoredPosition = new Vector2(-46.4f, -17f);
-                }
+                int maxHealth = GameManager.Current.playersHealth;
 
-                if (health == 0)
-                {
-                    healthRect.localScale = Vector3.zero;
-                }
+                float scaleRatioSubstraction = 1f / maxHealth;
+
+                int healthFromMax = maxHealth - health;
+
+                float yAnchoredPos = scaleRatioSubstraction * healthFromMax * 25;
+
+                healthRect.localScale = new Vector3(1f, 1f - scaleRatioSubstraction * healthFromMax, 1f);
+                healthRect.anchoredPosition = new Vector2(-46.4f, -yAnchoredPos);
             }
 
             public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)

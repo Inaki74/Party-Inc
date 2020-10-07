@@ -47,7 +47,7 @@ namespace FiestaTime
             private float toleranceRightMax = 1000000;
             private float toleranceLeftMin;
             private float toleranceLeftMax = -1000000;
-            private static float tolerance = Screen.width/7f;
+            private static float tolerance = Screen.width/4f;
             private int lastInput; //1 is right, -1 is left, 0 is base case
 
             [SerializeField] private float tapForce;

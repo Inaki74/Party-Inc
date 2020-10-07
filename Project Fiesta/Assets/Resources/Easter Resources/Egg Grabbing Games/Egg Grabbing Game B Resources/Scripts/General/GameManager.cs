@@ -21,7 +21,7 @@ namespace FiestaTime
             public delegate void ActionGameStart();
             public static event ActionGameStart onGameStart;
 
-            public delegate void ActionGameFinish(bool looped);
+            public delegate void ActionGameFinish();
             public static event ActionGameFinish onGameFinish;
 
             public delegate void ActionEnemyScore(int score);
@@ -57,10 +57,12 @@ namespace FiestaTime
             [SerializeField] public int[][,] eggMaps;
             private float currentTime;
             private bool gameStarted;
+            private bool runOnce = false;
             private int startingEggCount = 0;
             public bool isGameFinished;
             public int playerScore;
             public int enemyScore;
+            public int winner;
 
             [SerializeField] private GameObject playerAssetsPrefab;
             [SerializeField] private GameObject playerPrefab;
@@ -101,7 +103,7 @@ namespace FiestaTime
 
                 InitializePlayer();
 
-                InitializeUI();
+                Instantiate(uiPrefab);
 
                 onGameStart?.Invoke();
             }
@@ -123,12 +125,17 @@ namespace FiestaTime
                     gameStarted = true;
                 }
 
-                if (isGameFinished)
+                if (isGameFinished && !runOnce)
                 {
-                    if (PhotonNetwork.IsMasterClient) photonView.RPC("RPC_SendFinishedGame", RpcTarget.Others, isGameFinished);
-                    onGameFinish?.Invoke(true);
+                    if (PhotonNetwork.IsMasterClient)
+                    {
+                        winner = DecideWinner();
+                        photonView.RPC("RPC_SendFinishedGame", RpcTarget.Others, isGameFinished, winner);
+                    }
+
+                    onGameFinish?.Invoke();
                     StartCoroutine("GameFinishCo");
-                    isGameFinished = false;
+                    runOnce = true;
                 }
 
                 photonView.RPC("RPC_SendCountdown", RpcTarget.Others, currentTime);
@@ -136,6 +143,34 @@ namespace FiestaTime
             #endregion
 
             #region Private Methods
+
+            private int DecideWinner()
+            {
+                int ret = 0;
+
+                if(PhotonNetwork.PlayerList.Count() == 1)
+                {
+                    return -1;
+                }
+
+                if(playerScore > enemyScore)
+                {
+                    ret = PhotonNetwork.LocalPlayer.ActorNumber; //Master client wins
+                }
+                else if(playerScore < enemyScore)
+                {
+                    foreach(var player in PhotonNetwork.PlayerList)
+                    {
+                        if(PhotonNetwork.LocalPlayer.ActorNumber != player.ActorNumber)
+                        {
+                            ret = player.ActorNumber; // Other client wins
+                        }
+                    }
+                }
+
+                return ret;
+            }
+
             /// <summary>
             /// The Game Finish coroutine which restarts the entire game.
             /// </summary>
@@ -146,7 +181,7 @@ namespace FiestaTime
 
                 Resources.UnloadUnusedAssets();
 
-                PhotonNetwork.LoadLevel("EggGrabbingGameB");
+                StopAllCoroutines();
             }
 
             /// <summary>
@@ -297,43 +332,6 @@ namespace FiestaTime
 
             }
 
-            private void InitializeUI()
-            {
-                UIManager UI = Instantiate(uiPrefab).GetComponent<UIManager>();
-
-                if (PhotonNetwork.CurrentRoom.PlayerCount == 2)
-                {
-                    if (PhotonNetwork.IsMasterClient)
-                    {
-                        UI.playerScoreText.rectTransform.anchorMin = new Vector2(0, 1);
-                        UI.playerScoreText.rectTransform.anchorMax = new Vector2(0, 1);
-                        UI.playerScoreText.rectTransform.anchoredPosition = new Vector3(Constants.XPOS_PLYRONESCORE_UI, -250, 0);
-
-                        UI.enemyScoreText.rectTransform.anchorMin = new Vector2(1, 1);
-                        UI.enemyScoreText.rectTransform.anchorMax = new Vector2(1, 1);
-                        UI.enemyScoreText.rectTransform.anchoredPosition = new Vector3(Constants.XPOS_PLYRTWOSCORE_UI, -250, 0);
-                    }
-                    else
-                    {
-                        UI.enemyScoreText.rectTransform.anchorMin = new Vector2(0, 1);
-                        UI.enemyScoreText.rectTransform.anchorMax = new Vector2(0, 1);
-                        UI.enemyScoreText.rectTransform.anchoredPosition = new Vector3(Constants.XPOS_PLYRONESCORE_UI, -250, 0);
-
-                        UI.playerScoreText.rectTransform.anchorMin = new Vector2(1, 1);
-                        UI.playerScoreText.rectTransform.anchorMax = new Vector2(1, 1);
-                        UI.playerScoreText.rectTransform.anchoredPosition = new Vector3(Constants.XPOS_PLYRTWOSCORE_UI, -250, 0);
-                    }
-                }
-                else
-                {
-                    //-1242, +992
-                    UI.playerScoreText.rectTransform.anchoredPosition = new Vector3(Constants.XPOS_PLYRONESCORE_UI, -250, 0);
-                    UI.enemyScoreText.rectTransform.anchoredPosition = new Vector3(Constants.XPOS_PLYRONESCORE_UI, 500, 0);
-                }
-
-
-            }
-
             private void NotifyPlayersMaps()
             {
                 int[][][] ret = new int[amountOfEasyMaps + amountOfMediumMaps + amountOfHardMaps][][];
@@ -396,9 +394,10 @@ namespace FiestaTime
             }
 
             [PunRPC]
-            public void RPC_SendFinishedGame(bool finished)
+            public void RPC_SendFinishedGame(bool finished, int theWinner)
             {
                 isGameFinished = finished;
+                winner = theWinner;
             }
 
             [PunRPC]

@@ -64,15 +64,16 @@ namespace FiestaTime
 
                     arrow.SetActive(true);
 
-                    StartCoroutine(UIFunctions.GrowthAnimationCo(arrowImage, 1, 0.7f));
+                    StartCoroutine(UIFunctions.GrowthAnimationCo(arrowImage, 1, (70 * GameManager.Current.timeToSeeMove) / 100));
 
-                    yield return new WaitForSeconds(1f);
+                    yield return new WaitForSeconds(GameManager.Current.timeToSeeMove);
 
                     ResetArrow();
                 }
                 arrow.SetActive(false);
 
-                GameManager.Current.NotifyOfPlayerReady(PhotonNetwork.LocalPlayer.ActorNumber);
+                //GameManager.Current.NotifyOfRemotePlayerReady(PhotonNetwork.LocalPlayer.ActorNumber);
+                GameManager.Current.NotifyOfLocalPlayerReady();
             }
         }
     }

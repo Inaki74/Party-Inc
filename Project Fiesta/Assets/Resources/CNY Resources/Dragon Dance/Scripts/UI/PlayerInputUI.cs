@@ -22,7 +22,7 @@ namespace FiestaTime
             // Start is called before the first frame update
             void Start()
             {
-                countdown = 15.0f;
+                countdown = GameManager.Current.timeForInput;
             }
 
             // Update is called once per frame
@@ -35,6 +35,7 @@ namespace FiestaTime
 
             private void OnEnable()
             {
+                countdown = GameManager.Current.timeForInput;
                 IndicatorFunctions.DisableAllIndicators(inputIndicators);
                 IndicatorFunctions.EnableIndicators(inputIndicators ,GameManager.Current.amountOfMovesThisRound);
             }
@@ -42,7 +43,6 @@ namespace FiestaTime
             private void OnDisable()
             {
                 IndicatorFunctions.ResetColors(inputIndicatorsImages, new Color(1f,1f,1f));
-                countdown = 15f;
             }
 
             #endregion

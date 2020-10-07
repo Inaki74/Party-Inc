@@ -9,12 +9,19 @@ namespace FiestaTime
 {
     namespace DD
     {
+        public struct PlayerResults
+        {
+            public int playerId;
+            public int score;
+        } 
+
         /// <summary>
         /// In charge of all things player, its animations, its input management and its synchronization over the network.
         /// </summary>
         public class Player : MonoBehaviourPun, IPunObservable
         {
-            public int health = 3;
+            public int health;
+            public PlayerResults myResults;
 
             private int[] currentSequence;
 
@@ -52,6 +59,9 @@ namespace FiestaTime
 
                 if (photonView.IsMine)
                 {
+                    myResults.playerId = PhotonNetwork.LocalPlayer.ActorNumber;
+                    myResults.score = 0;
+                    health = GameManager.Current.playersHealth;
                     playerName.text = PhotonNetwork.NickName;
                     photonView.RPC("RPC_SendName", RpcTarget.Others, PhotonNetwork.NickName);
                 } 
@@ -78,7 +88,7 @@ namespace FiestaTime
                 if (!photonView.IsMine && PhotonNetwork.IsConnected) return;
 
                 if (hasLost) {
-                    GameManager.Current.NotifyOfPlayerReady(PhotonNetwork.LocalPlayer.ActorNumber);
+                    GameManager.Current.NotifyOfRemotePlayerReady(PhotonNetwork.LocalPlayer.ActorNumber);
                     return;
                 }
 
@@ -108,7 +118,7 @@ namespace FiestaTime
                         GameManager.Current.NotifyOfPlayerLost(PhotonNetwork.LocalPlayer.ActorNumber);
                     }
 
-                    GameManager.Current.NotifyOfPlayerReady(PhotonNetwork.LocalPlayer.ActorNumber);
+                    GameManager.Current.NotifyOfRemotePlayerReady(PhotonNetwork.LocalPlayer.ActorNumber);
                 }
 
                 if(nextPhase == 4)
@@ -147,11 +157,19 @@ namespace FiestaTime
                     // Check if move was right or wrong
                     bool isRight = currentSequence[i] == GameManager.Current.sequenceMap[i];
 
-                    if (!isRight) {
-                        health--;
-                        onWrongMove?.Invoke(health);
+                    if(health > 0)
+                    {
+                        if (!isRight)
+                        {
+                            health--;
+                            onWrongMove?.Invoke(health);
+                        }
+                        else
+                        {
+                            myResults.score++;
+                        }
                     }
-
+                    
                     // Send notification to UI
                     onShowMove?.Invoke(isRight, i);
 
@@ -160,7 +178,8 @@ namespace FiestaTime
 
                 Mr.material.color = new Color(1, 1, 1);
 
-                GameManager.Current.NotifyOfPlayerReady(PhotonNetwork.LocalPlayer.ActorNumber);
+                //GameManager.Current.NotifyOfRemotePlayerReady(PhotonNetwork.LocalPlayer.ActorNumber);
+                GameManager.Current.NotifyOfLocalPlayerReady();
             }
 
             #region PUN

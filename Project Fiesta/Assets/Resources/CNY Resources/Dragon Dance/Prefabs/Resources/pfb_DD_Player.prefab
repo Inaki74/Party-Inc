@@ -1298,7 +1298,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8546ccb41993e46d7a8d8e8f47d8e48d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  startingTimeout: 15
   fingerMovement: {x: 0, y: 0}
 --- !u!114 &7428520905753749257
 MonoBehaviour:
@@ -1313,6 +1312,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   health: 3
+  rightMoves: 0
   inputManager: {fileID: 7428520905753749262}
   Mr: {fileID: 7428520905753749261}
   anim: {fileID: 0}
