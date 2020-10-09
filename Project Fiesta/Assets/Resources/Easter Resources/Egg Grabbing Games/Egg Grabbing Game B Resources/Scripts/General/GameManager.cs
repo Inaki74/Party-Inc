@@ -60,6 +60,7 @@ namespace FiestaTime
             private bool runOnce = false;
             private int startingEggCount = 0;
             public bool isGameFinished;
+            public bool isHighScore;
             public int playerScore;
             public int enemyScore;
             public int winner;
@@ -182,6 +183,8 @@ namespace FiestaTime
                 Resources.UnloadUnusedAssets();
 
                 StopAllCoroutines();
+
+                if (photonView.IsMine) isHighScore = GeneralHelperFunctions.DetermineHighScoreInt(FiestaTime.Constants.EGG_KEY_HISCORE, playerScore);
             }
 
             /// <summary>

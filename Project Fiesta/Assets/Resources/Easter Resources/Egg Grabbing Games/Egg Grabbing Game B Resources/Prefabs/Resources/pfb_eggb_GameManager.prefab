@@ -74,6 +74,7 @@ MonoBehaviour:
   waveIntervals: 0.2
   timeLimitOffset: 2
   isGameFinished: 0
+  isHighScore: 0
   playerScore: 0
   enemyScore: 0
   winner: 0

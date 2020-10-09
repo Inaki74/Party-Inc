@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
+using System.Linq;
 
 namespace FiestaTime
 {
@@ -16,8 +17,11 @@ namespace FiestaTime
             public int amountOfMovesThisRound = 4;
             public float countdownGameStart;
 
+            public int playersInGame;
+
             public PlayerResults[] playerResults;
             public int winnerId;
+            public bool isHighScore;
 
             // Difficulty scaling factors
             public float timeForInput = 15f;
@@ -56,6 +60,8 @@ namespace FiestaTime
             void Start()
             {
                 startedGame = false;
+
+                playersInGame = PhotonNetwork.PlayerList.Length;
 
                 fieryRoundsTimeForInputDiscount = (timeForInput - minTimeForInput) / 10;
                 fieryRoundsTimeToSeeMoveDiscount = (timeToSeeMove - minTimeToSeeMove) / 10;
@@ -166,8 +172,17 @@ namespace FiestaTime
 
                 // Outro
                 // TODO: Decide winner, put on a FINISH screen.
-                DecideWinner();
+                if (playersInGame > 1) DecideWinner();
+                else
+                {
+                    winnerId = PhotonNetwork.LocalPlayer.ActorNumber;
+                    playerResults = GetPlayerResults();
+                } 
+
+                Debug.Log("Invoking Phase 4, winnerId: " + winnerId);
                 onNextPhase?.Invoke(4);
+
+                //Register results in the system, yada yada, profit
             }
 
             #endregion
@@ -187,16 +202,28 @@ namespace FiestaTime
                         winnerId = playerResults[i].playerId;
                     }
                 }
+
+                PlayerResults aux = new PlayerResults();
+                aux.score = max;
+                int hap = 0;
+                foreach(PlayerResults result in playerResults)
+                {
+                    if (result.Equals(aux)) hap++;
+                }
+
+                if(hap > 1)
+                {
+                    //Draw
+                    winnerId = -1;
+                }
             }
 
             private PlayerResults[] GetPlayerResults()
             {
-                int length = PhotonNetwork.PlayerList.Length;
-
-                PlayerResults[] ret = new PlayerResults[length];
+                PlayerResults[] ret = new PlayerResults[playersInGame];
                 Player[] players = FindObjectsOfType<Player>();
 
-                for(int i = 0; i < length; i++)
+                for(int i = 0; i < playersInGame; i++)
                 {
                     ret[i] = players[i].myResults;
                 }
@@ -213,7 +240,7 @@ namespace FiestaTime
 
                 Vector3 decidedVec = Vector3.zero;
 
-                for (int i = 0; i < PhotonNetwork.PlayerList.Length; i++)
+                for (int i = 0; i < playersInGame; i++)
                 {
                     if (PhotonNetwork.LocalPlayer.ActorNumber == PhotonNetwork.PlayerList[i].ActorNumber)
                     {
@@ -286,14 +313,14 @@ namespace FiestaTime
             {
                 int playersStanding = 0;
 
-                for(int i = 0; i < PhotonNetwork.PlayerList.Length; i++)
+                for(int i = 0; i < playersInGame; i++)
                 {
                     bool lost = (bool) playersLost[PhotonNetwork.PlayerList[i].ActorNumber];
 
                     if (!lost) playersStanding++;
                 }
 
-                if(PhotonNetwork.CurrentRoom.PlayerCount > 1)
+                if(playersInGame > 1)
                 {
                     return playersStanding <= 1;
                 }

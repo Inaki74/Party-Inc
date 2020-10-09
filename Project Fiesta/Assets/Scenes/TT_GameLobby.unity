@@ -216,11 +216,6 @@ PrefabInstance:
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
       objectReference: {fileID: 1842826397}
-    - target: {fileID: 6811778602800222762, guid: 495afc8eeb16e4827bed1151078a2063,
-        type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: BtnLeaveRoom
-      objectReference: {fileID: 0}
     - target: {fileID: 6811778604748000901, guid: 495afc8eeb16e4827bed1151078a2063,
         type: 3}
       propertyPath: m_LocalPosition.x

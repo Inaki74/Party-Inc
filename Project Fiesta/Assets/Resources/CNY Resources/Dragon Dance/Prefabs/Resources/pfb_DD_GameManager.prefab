@@ -47,6 +47,8 @@ MonoBehaviour:
   sequenceMap: 000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
   amountOfMovesThisRound: 4
   countdownGameStart: 3
+  winnerId: 0
+  isHighScore: 0
   timeForInput: 15
   timeToSeeMove: 1
   minTimeForInput: 7

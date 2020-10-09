@@ -1312,7 +1312,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   health: 3
-  rightMoves: 0
   inputManager: {fileID: 7428520905753749262}
   Mr: {fileID: 7428520905753749261}
   anim: {fileID: 0}

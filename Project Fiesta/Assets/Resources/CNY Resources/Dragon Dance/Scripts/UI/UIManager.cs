@@ -17,12 +17,13 @@ namespace FiestaTime
 
             [SerializeField] private GameObject showSequenceUIHolder;
             [SerializeField] private GameObject playerInputUIHolder;
-            [SerializeField] private GameObject resultsUIHolder;
+            [SerializeField] private GameObject finishUIHolder;
             private PlayerInputUI playerInputUI;
 
             #endregion
 
             [SerializeField] private Text countdownText;
+            [SerializeField] private Text finishText;
 
             [SerializeField] private float countdown;
 
@@ -66,6 +67,15 @@ namespace FiestaTime
                 }
             }
 
+            private IEnumerator FinishGameCo()
+            {
+                finishText.enabled = true;
+                yield return new WaitForSeconds(2f);
+                finishText.enabled = false;
+
+                finishUIHolder.SetActive(true);
+            }
+
             #region Event Functions
 
             /// <summary>
@@ -83,13 +93,16 @@ namespace FiestaTime
             /// <param name="nextPhase">The int representing the next phase</param>
             private void OnPhaseTransit(int nextPhase)
             {
+                Debug.Log("1 OnPhaseTransit, UIManager: phase " + nextPhase);
                 // 0 -> entered showSeq, 1 -> entered playerInput, 2 -> entered demoSeq, 3 -> entered results
-                if (!startup)
+                if (!startup && nextPhase != 4)
                 {
                     if (myPlayer.hasLost && nextPhase != 3) return;
                 }
 
                 startup = false;
+
+                Debug.Log("2 OnPhaseTransit, UIManager: phase " + nextPhase);
 
                 switch (nextPhase)
                 {
@@ -114,6 +127,8 @@ namespace FiestaTime
                     case 4:
                         // Case 3 irrelevant to UIManager, relevant to PlayerUI
                         // Game finished
+                        Debug.Log("Received invocation");
+                        StartCoroutine("FinishGameCo");
                         break;
                     default:
                         Debug.Log("ITS NOT POSSIBLEEEEE!");

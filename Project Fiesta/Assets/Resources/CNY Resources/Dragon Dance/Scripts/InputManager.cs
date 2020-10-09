@@ -77,6 +77,14 @@ namespace FiestaTime
                 return sequenceGenerated;
             }
 
+            public void ResetCurrentSequence()
+            {
+                for(int i = 0; i < sequenceGenerated.Length; i++)
+                {
+                    sequenceGenerated[i] = 0;
+                }
+            }
+
             #region Private Functions
 
             /// <summary>

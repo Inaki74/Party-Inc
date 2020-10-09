@@ -14,6 +14,14 @@ namespace FiestaTime
             [SerializeField] private Rigidbody Rb;
             [SerializeField] private MeshRenderer Mr;
 
+            public delegate void ActionCrossFinish(int playerId);
+            public static event ActionCrossFinish onCrossFinishLine;
+
+            public delegate void ActionPlayerLost(int playerId);
+            public static event ActionPlayerLost onPlayerDied;
+
+            private bool crossedLine = false;
+
             private float originalDrag;
             [SerializeField] private float punishmentDrag;
 
@@ -35,8 +43,6 @@ namespace FiestaTime
             [SerializeField] private RectTransform toleranceLineTwoMin;
             [SerializeField] private RectTransform toleranceLineTwoMax;
             [SerializeField] private Text leftRight;
-
-            private int notBeginCount = 0;
 
             // Input Variables
             private int tapCount = 0;
@@ -76,6 +82,9 @@ namespace FiestaTime
                     return;
                 }
 
+                // Make the players move a bit more forward and stop
+                if (crossedLine) return;
+
                 if (GameManager.Current.gameBegan)
                 {
                     CheckForInput(false);
@@ -101,6 +110,9 @@ namespace FiestaTime
                     return;
                 }
 
+                // Make the players move a bit more forward and stop
+                if (crossedLine) return;
+
                 if (GameManager.Current.gameBegan) { CheckForInput(true); CheckForInputPC(); }
             }
 
@@ -110,6 +122,9 @@ namespace FiestaTime
                 {
                     return;
                 }
+
+                // Make the players move a bit more forward and stop
+                if (crossedLine) return;
 
                 if (tap || bufferedTap)
                 {
@@ -144,7 +159,23 @@ namespace FiestaTime
                 if (collision.gameObject.tag == "DeathPlane")
                 {
                     gameObject.SetActive(false);
+                    onPlayerDied?.Invoke(PhotonNetwork.LocalPlayer.ActorNumber);
                     photonView.RPC("RPC_Disable", RpcTarget.All);
+                }
+            }
+
+            private void OnTriggerEnter(Collider other)
+            {
+                if (!photonView.IsMine && PhotonNetwork.IsConnected)
+                {
+                    return;
+                }
+
+                if(other.tag == "FinishPlane")
+                {
+                    // You win xd
+                    crossedLine = true;
+                    onCrossFinishLine?.Invoke(PhotonNetwork.LocalPlayer.ActorNumber);
                 }
             }
 
@@ -359,5 +390,3 @@ namespace FiestaTime
         }
     }
 }
-
-

@@ -13,6 +13,12 @@ namespace FiestaTime
         {
             public int playerId;
             public int score;
+
+            public override bool Equals(object obj)
+            {
+                PlayerResults a = (PlayerResults)obj;
+                return a.score == score;
+            }
         } 
 
         /// <summary>
@@ -87,7 +93,7 @@ namespace FiestaTime
             {
                 if (!photonView.IsMine && PhotonNetwork.IsConnected) return;
 
-                if (hasLost) {
+                if (hasLost && nextPhase != 4) {
                     GameManager.Current.NotifyOfRemotePlayerReady(PhotonNetwork.LocalPlayer.ActorNumber);
                     return;
                 }
@@ -124,6 +130,9 @@ namespace FiestaTime
                 if(nextPhase == 4)
                 {
                     // Game finished
+                    inputManager.enabled = false;
+                    Debug.Log(photonView.IsMine);
+                    if(photonView.IsMine) GameManager.Current.isHighScore = GeneralHelperFunctions.DetermineHighScoreInt(Constants.DD_KEY_HISCORE, myResults.score);
                 }
             }
 
@@ -176,6 +185,7 @@ namespace FiestaTime
                     yield return new WaitForSeconds(1f);
                 }
 
+                inputManager.ResetCurrentSequence();
                 Mr.material.color = new Color(1, 1, 1);
 
                 //GameManager.Current.NotifyOfRemotePlayerReady(PhotonNetwork.LocalPlayer.ActorNumber);
@@ -195,11 +205,20 @@ namespace FiestaTime
                 if (stream.IsWriting)
                 {
                     stream.SendNext(new Vector3(Mr.material.color.r, Mr.material.color.g, Mr.material.color.b));
+                    stream.SendNext(myResults.playerId);
+                    stream.SendNext(myResults.score);
                 }
                 else
                 {
                     Vector3 temp = (Vector3)stream.ReceiveNext();
                     Mr.material.color = new Color(temp.x, temp.y, temp.z);
+
+                    PlayerResults aux = new PlayerResults();
+
+                    aux.playerId = (int)stream.ReceiveNext();
+                    aux.score = (int)stream.ReceiveNext();
+
+                    myResults = aux;
                 }
             }
 

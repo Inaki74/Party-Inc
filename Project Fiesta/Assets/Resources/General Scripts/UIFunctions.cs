@@ -26,7 +26,7 @@ namespace FiestaTime
 
             while (length > 0)
             {
-                countdownText.text = length.ToString();
+                countdownText.text = string.Format("{0:0}", length);
                 obj.StartCoroutine(GrowthAnimationCo(countdownText.rectTransform, 2.5f, 0.95f));
 
                 yield return new WaitForSeconds(1.0f);

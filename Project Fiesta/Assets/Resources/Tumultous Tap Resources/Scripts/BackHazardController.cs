@@ -61,7 +61,6 @@ namespace FiestaTime
                     k = Vector3.Distance(gameObject.transform.position, firstPos);
 
                     UpdateVelocity();
-                    //Debug.Log("Difference of speeds: " + (Rb.velocity.magnitude - playersRB[0].velocity.magnitude));
                 }
 
                 Rb.velocity = currentVelocity;
@@ -70,11 +69,13 @@ namespace FiestaTime
             private void Awake()
             {
                 GameManager.onGameStart += OnGameStart;
+                GameManager.onGameFinished += OnGameFinished;
             }
 
             private void OnDestroy()
             {
                 GameManager.onGameStart -= OnGameStart;
+                GameManager.onGameFinished -= OnGameFinished;
             }
 
             private void GetPlayersInformation()
@@ -158,6 +159,12 @@ namespace FiestaTime
             {
                 gameStarted = true;
                 GetPlayersInformation();
+            }
+
+            private void OnGameFinished()
+            {
+                gameStarted = false;
+                Rb.velocity = Vector3.zero;
             }
         }
     }
