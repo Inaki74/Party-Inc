@@ -12,6 +12,7 @@ namespace FiestaTime
     {
         public class FinishScreenUI : MonoBehaviour
         {
+            // me duele la cabeza
             [Header("Players in the list, in order")]
             [SerializeField] private GameObject[] players;
             [SerializeField] private GameObject highScores;
