@@ -56,11 +56,14 @@ namespace FiestaTime
                 {
                     var aux = playersTransforms.OrderByDescending(t => t.position.z);
 
-                    firstPos = aux.First().position;
+                    if(playersTransforms.Length > 0)
+                    {
+                        firstPos = aux.First().position;
 
-                    k = Vector3.Distance(gameObject.transform.position, firstPos);
+                        k = Vector3.Distance(gameObject.transform.position, firstPos);
 
-                    UpdateVelocity();
+                        UpdateVelocity();
+                    }
                 }
 
                 Rb.velocity = currentVelocity;
@@ -164,7 +167,7 @@ namespace FiestaTime
             private void OnGameFinished()
             {
                 gameStarted = false;
-                Rb.velocity = Vector3.zero;
+                currentVelocity = Vector3.zero;
             }
         }
     }

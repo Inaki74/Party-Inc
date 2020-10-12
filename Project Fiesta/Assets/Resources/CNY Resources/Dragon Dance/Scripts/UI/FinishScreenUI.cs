@@ -39,7 +39,7 @@ namespace FiestaTime
 
                     playerNames[0].text = PhotonNetwork.LocalPlayer.NickName;
                     playerPlacings[0].enabled = false;
-                    playerScores[0].text = GameManager.Current.playerResults[0].score.ToString();
+                    playerScores[0].text = GameManager.Current.playerResults[0].scoring.ToString();
 
                     if (GameManager.Current.isHighScore)
                     {
@@ -79,17 +79,17 @@ namespace FiestaTime
 
             private void SetPositionsList()
             {
-                var aux = GameManager.Current.playerResults.OrderByDescending(r => r.score);
-                PlayerResults[] res = aux.ToArray();
+                var aux = GameManager.Current.playerResults.OrderByDescending(r => r.scoring);
+                PlayerResults<int>[] res = aux.ToArray();
                 int place = 0;
                 int lastScore = -1;
                 for (int i = 0; i < res.Length; i++)
                 {
-                    if (res[i].score != lastScore)
+                    if (res[i].scoring != lastScore)
                     {
                         place++;
                     }
-                    lastScore = res[i].score;
+                    lastScore = res[i].scoring;
 
                     switch (place)
                     {
@@ -110,7 +110,7 @@ namespace FiestaTime
                             break;
                     }
 
-                    playerScores[i].text = res[i].score.ToString();
+                    playerScores[i].text = res[i].scoring.ToString();
 
                     foreach (var player in PhotonNetwork.PlayerList)
                     {

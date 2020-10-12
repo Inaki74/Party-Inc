@@ -95,9 +95,9 @@ namespace FiestaTime
             {
                 Debug.Log("1 OnPhaseTransit, UIManager: phase " + nextPhase);
                 // 0 -> entered showSeq, 1 -> entered playerInput, 2 -> entered demoSeq, 3 -> entered results
-                if (!startup && nextPhase != 4)
+                if (!startup)
                 {
-                    if (myPlayer.hasLost && nextPhase != 3) return;
+                    if (myPlayer.hasLost && nextPhase != 0 && nextPhase != 4) return;
                 }
 
                 startup = false;

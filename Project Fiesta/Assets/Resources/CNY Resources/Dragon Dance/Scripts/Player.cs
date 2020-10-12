@@ -9,25 +9,13 @@ namespace FiestaTime
 {
     namespace DD
     {
-        public struct PlayerResults
-        {
-            public int playerId;
-            public int score;
-
-            public override bool Equals(object obj)
-            {
-                PlayerResults a = (PlayerResults)obj;
-                return a.score == score;
-            }
-        } 
-
         /// <summary>
         /// In charge of all things player, its animations, its input management and its synchronization over the network.
         /// </summary>
         public class Player : MonoBehaviourPun, IPunObservable
         {
             public int health;
-            public PlayerResults myResults;
+            public PlayerResults<int> myResults;
 
             private int[] currentSequence;
 
@@ -66,7 +54,7 @@ namespace FiestaTime
                 if (photonView.IsMine)
                 {
                     myResults.playerId = PhotonNetwork.LocalPlayer.ActorNumber;
-                    myResults.score = 0;
+                    myResults.scoring = 0;
                     health = GameManager.Current.playersHealth;
                     playerName.text = PhotonNetwork.NickName;
                     photonView.RPC("RPC_SendName", RpcTarget.Others, PhotonNetwork.NickName);
@@ -93,13 +81,11 @@ namespace FiestaTime
             {
                 if (!photonView.IsMine && PhotonNetwork.IsConnected) return;
 
-                if (hasLost && nextPhase != 4) {
-                    GameManager.Current.NotifyOfRemotePlayerReady(PhotonNetwork.LocalPlayer.ActorNumber);
-                    return;
-                }
+                if (nextPhase == 0) return;
 
                 if(nextPhase == 1)
                 {
+                    if (hasLost) { GameManager.Current.NotifyOfRemotePlayerReady(PhotonNetwork.LocalPlayer.ActorNumber); return; }
                     // Entered input section of loop
                     inputManager.enabled = true;
                 }
@@ -110,13 +96,14 @@ namespace FiestaTime
 
                 if(nextPhase == 2)
                 {
+                    if (hasLost) { Debug.Log("Player notify finish"); GameManager.Current.NotifyOfLocalPlayerReady(); return; }
                     //Demonstration phase
                     StartCoroutine(DemonstrationCo());
                 }
 
                 if(nextPhase == 3)
                 {
-                    if(health <= 0)
+                    if(health <= 0 && !hasLost)
                     {
                         hasLost = true;
                         inputManager.enabled = false;
@@ -131,8 +118,7 @@ namespace FiestaTime
                 {
                     // Game finished
                     inputManager.enabled = false;
-                    Debug.Log(photonView.IsMine);
-                    if(photonView.IsMine) GameManager.Current.isHighScore = GeneralHelperFunctions.DetermineHighScoreInt(Constants.DD_KEY_HISCORE, myResults.score);
+                    if(photonView.IsMine) GameManager.Current.isHighScore = GeneralHelperFunctions.DetermineHighScoreInt(Constants.DD_KEY_HISCORE, myResults.scoring, true);
                 }
             }
 
@@ -175,7 +161,7 @@ namespace FiestaTime
                         }
                         else
                         {
-                            myResults.score++;
+                            myResults.scoring++;
                         }
                     }
                     
@@ -206,17 +192,17 @@ namespace FiestaTime
                 {
                     stream.SendNext(new Vector3(Mr.material.color.r, Mr.material.color.g, Mr.material.color.b));
                     stream.SendNext(myResults.playerId);
-                    stream.SendNext(myResults.score);
+                    stream.SendNext(myResults.scoring);
                 }
                 else
                 {
                     Vector3 temp = (Vector3)stream.ReceiveNext();
                     Mr.material.color = new Color(temp.x, temp.y, temp.z);
 
-                    PlayerResults aux = new PlayerResults();
+                    PlayerResults<int> aux = new PlayerResults<int>();
 
                     aux.playerId = (int)stream.ReceiveNext();
-                    aux.score = (int)stream.ReceiveNext();
+                    aux.scoring = (int)stream.ReceiveNext();
 
                     myResults = aux;
                 }

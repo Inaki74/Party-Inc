@@ -216,6 +216,81 @@ PrefabInstance:
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
       objectReference: {fileID: 1842826397}
+    - target: {fileID: 6811778602800222762, guid: 495afc8eeb16e4827bed1151078a2063,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: BtnLeaveRoom
+      objectReference: {fileID: 0}
+    - target: {fileID: 6811778603139874232, guid: 495afc8eeb16e4827bed1151078a2063,
+        type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 300
+      objectReference: {fileID: 0}
+    - target: {fileID: 6811778603139874232, guid: 495afc8eeb16e4827bed1151078a2063,
+        type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 100
+      objectReference: {fileID: 0}
+    - target: {fileID: 6811778603320512841, guid: 495afc8eeb16e4827bed1151078a2063,
+        type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 300
+      objectReference: {fileID: 0}
+    - target: {fileID: 6811778603320512841, guid: 495afc8eeb16e4827bed1151078a2063,
+        type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 100
+      objectReference: {fileID: 0}
+    - target: {fileID: 6811778603424755437, guid: 495afc8eeb16e4827bed1151078a2063,
+        type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 300
+      objectReference: {fileID: 0}
+    - target: {fileID: 6811778603424755437, guid: 495afc8eeb16e4827bed1151078a2063,
+        type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 100
+      objectReference: {fileID: 0}
+    - target: {fileID: 6811778603552528906, guid: 495afc8eeb16e4827bed1151078a2063,
+        type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 300
+      objectReference: {fileID: 0}
+    - target: {fileID: 6811778603552528906, guid: 495afc8eeb16e4827bed1151078a2063,
+        type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 100
+      objectReference: {fileID: 0}
+    - target: {fileID: 6811778604314160770, guid: 495afc8eeb16e4827bed1151078a2063,
+        type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -550
+      objectReference: {fileID: 0}
+    - target: {fileID: 6811778604314160770, guid: 495afc8eeb16e4827bed1151078a2063,
+        type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 200
+      objectReference: {fileID: 0}
+    - target: {fileID: 6811778604314160770, guid: 495afc8eeb16e4827bed1151078a2063,
+        type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 75
+      objectReference: {fileID: 0}
+    - target: {fileID: 6811778604471875772, guid: 495afc8eeb16e4827bed1151078a2063,
+        type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 6811778604471875772, guid: 495afc8eeb16e4827bed1151078a2063,
+        type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 6811778604471875772, guid: 495afc8eeb16e4827bed1151078a2063,
+        type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 268
+      objectReference: {fileID: 0}
     - target: {fileID: 6811778604748000901, guid: 495afc8eeb16e4827bed1151078a2063,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -325,6 +400,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: pfb_FourPlayerLobbyCanvas
+      objectReference: {fileID: 0}
+    - target: {fileID: 6811778604791206549, guid: 495afc8eeb16e4827bed1151078a2063,
+        type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 300
+      objectReference: {fileID: 0}
+    - target: {fileID: 6811778604791206549, guid: 495afc8eeb16e4827bed1151078a2063,
+        type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 100
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 495afc8eeb16e4827bed1151078a2063, type: 3}

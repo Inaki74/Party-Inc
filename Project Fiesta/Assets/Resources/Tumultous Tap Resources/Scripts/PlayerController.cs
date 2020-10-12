@@ -64,12 +64,14 @@ namespace FiestaTime
             // Start is called before the first frame update
             void Start()
             {
-                if(Rb == null) Rb = GetComponent<Rigidbody>();
+                Debug.Log("PlayerController start");
+                if (Rb == null) Rb = GetComponent<Rigidbody>();
                 if (Mr == null) Mr = GetComponent<MeshRenderer>();
 
                 originalDrag = Rb.drag;
 
-                if(photonView.IsMine) Mr.material = mine;
+                if (photonView.IsMine) Mr.material = mine;
+                else leftRight.enabled = false;
             }
 
             // Update is called once per frame

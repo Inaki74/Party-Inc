@@ -19,7 +19,7 @@ namespace FiestaTime
 
             public int playersInGame;
 
-            public PlayerResults[] playerResults;
+            public PlayerResults<int>[] playerResults;
             public int winnerId;
             public bool isHighScore;
 
@@ -37,6 +37,8 @@ namespace FiestaTime
             private float amountOfPlayers;
             private Hashtable playersReady = new Hashtable();
             private Hashtable playersLost = new Hashtable();
+
+            public bool[] playersLostAr;
 
             #region Events
 
@@ -62,6 +64,7 @@ namespace FiestaTime
                 startedGame = false;
 
                 playersInGame = PhotonNetwork.PlayerList.Length;
+                playersLostAr = new bool[playersInGame];
 
                 fieryRoundsTimeForInputDiscount = (timeForInput - minTimeForInput) / 10;
                 fieryRoundsTimeToSeeMoveDiscount = (timeToSeeMove - minTimeToSeeMove) / 10;
@@ -185,6 +188,22 @@ namespace FiestaTime
                 //Register results in the system, yada yada, profit
             }
 
+            //private void PrintArray(PlayerResults[] args)
+            //{
+            //    foreach (var o in args)
+            //    {
+            //        foreach (var player in PhotonNetwork.PlayerList)
+            //        {
+            //            if (player.ActorNumber == o.playerId)
+            //            {
+            //                Debug.Log(player.NickName);
+            //            }
+            //        }
+
+            //        Debug.Log(o.ToString());
+            //    }
+            //}
+
             #endregion
 
             #region Private Functions
@@ -196,17 +215,17 @@ namespace FiestaTime
                 int max = -1;
                 for(int i = 0; i < playerResults.Length; i++)
                 {
-                    if(playerResults[i].score > max)
+                    if(playerResults[i].scoring > max)
                     {
-                        max = playerResults[i].score;
+                        max = playerResults[i].scoring;
                         winnerId = playerResults[i].playerId;
                     }
                 }
 
-                PlayerResults aux = new PlayerResults();
-                aux.score = max;
+                PlayerResults<int> aux = new PlayerResults<int>();
+                aux.scoring = max;
                 int hap = 0;
-                foreach(PlayerResults result in playerResults)
+                foreach(PlayerResults<int> result in playerResults)
                 {
                     if (result.Equals(aux)) hap++;
                 }
@@ -218,9 +237,9 @@ namespace FiestaTime
                 }
             }
 
-            private PlayerResults[] GetPlayerResults()
+            private PlayerResults<int>[] GetPlayerResults()
             {
-                PlayerResults[] ret = new PlayerResults[playersInGame];
+                PlayerResults<int>[] ret = new PlayerResults<int>[playersInGame];
                 Player[] players = FindObjectsOfType<Player>();
 
                 for(int i = 0; i < playersInGame; i++)
@@ -316,6 +335,7 @@ namespace FiestaTime
                 for(int i = 0; i < playersInGame; i++)
                 {
                     bool lost = (bool) playersLost[PhotonNetwork.PlayerList[i].ActorNumber];
+                    playersLostAr[i] = lost;
 
                     if (!lost) playersStanding++;
                 }
@@ -389,6 +409,7 @@ namespace FiestaTime
 
             public void NotifyOfLocalPlayerReady()
             {
+                Debug.Log("GM Notify finish");
                 localPlayerReady = true;
             }
 

@@ -15,6 +15,7 @@ namespace FiestaTime
             [Header("Players in the list, in order")]
             [SerializeField] private GameObject[] players;
             [SerializeField] private GameObject highScores;
+            [SerializeField] private GameObject timeAchieved;
 
             [SerializeField] private Text highScore;
             [SerializeField] private Text flavourTitle;
@@ -26,6 +27,7 @@ namespace FiestaTime
 
             private void OnEnable()
             {
+                Debug.Log(GameManager.Current.playersInGame);
                 // Set active for the amount of players playing.
                 for (int i = 0; i < GameManager.Current.playersInGame; i++)
                 {
@@ -34,21 +36,33 @@ namespace FiestaTime
 
                 if (GameManager.Current.playersInGame == 1)
                 {
-                    highScores.SetActive(true);
-                    highScore.text = PlayerPrefs.GetInt(Constants.DD_KEY_HISCORE).ToString();
-
-                    playerNames[0].text = PhotonNetwork.LocalPlayer.NickName;
-                    playerPlacings[0].enabled = false;
-                    playerScores[0].text = GameManager.Current.playerResults[0].time.ToString();
-
-                    if (GameManager.Current.isHighScore)
+                    if (GameManager.Current.playerResults[0].reachedEnd)
                     {
-                        flavourTitle.text = "CONGRATULATIONS! New high score!";
-                        highScore.color = Color.yellow;
+                        highScores.SetActive(true);
+                        highScore.text = GeneralHelperFunctions.ShowInMinutes(PlayerPrefs.GetFloat(Constants.TT_KEY_HISCORE));
+
+                        playerNames[0].text = PhotonNetwork.LocalPlayer.NickName;
+                        playerPlacings[0].enabled = false;
+                        playerScores[0].text = GeneralHelperFunctions.ShowInMinutes(GameManager.Current.playerResults[0].scoring);
+
+                        if (GameManager.Current.isHighScore)
+                        {
+                            flavourTitle.text = "CONGRATULATIONS! New high score!";
+                            highScore.color = Color.yellow;
+                        }
+                        else
+                        {
+                            flavourTitle.text = "You'll get that high score someday!";
+                        }
                     }
                     else
                     {
-                        flavourTitle.text = "You'll get that high score someday!";
+                        timeAchieved.SetActive(false);
+                        players[0].SetActive(false);
+                        flavourTitle.rectTransform.anchoredPosition = new Vector2(0, -150f);
+                        flavourTitle.text = "Here's Johhny!";
+                        flavourTitle.fontSize = 90;
+                        flavourTitle.color = Color.red;
                     }
                 }
                 else
@@ -76,19 +90,35 @@ namespace FiestaTime
                 }
             }
 
+            //private void PrintArray(PlayerResults[] args)
+            //{
+            //    foreach (var o in args)
+            //    {
+            //        foreach (var player in PhotonNetwork.PlayerList)
+            //        {
+            //            if (player.ActorNumber == o.playerId)
+            //            {
+            //                Debug.Log(player.NickName);
+            //            }
+            //        }
+
+            //        Debug.Log(o.ToString());
+            //    }
+            //}
+
             private void SetPositionsList()
             {
                 // Results are already ordered for us
-                PlayerResults[] res = GameManager.Current.playerResults;
+                PlayerResults<float>[] res = GameManager.Current.playerResults;
                 int place = 0;
                 float lastScore = -1;
                 for (int i = 0; i < res.Length; i++)
                 {
-                    if (res[i].time != lastScore)
+                    if (res[i].scoring != lastScore)
                     {
                         place++;
                     }
-                    lastScore = res[i].time;
+                    lastScore = res[i].scoring;
 
                     switch (place)
                     {
@@ -109,7 +139,7 @@ namespace FiestaTime
                             break;
                     }
 
-                    playerScores[i].text = res[i].time.ToString();
+                    playerScores[i].text = GeneralHelperFunctions.ShowInMinutes(res[i].scoring);
 
                     foreach (var player in PhotonNetwork.PlayerList)
                     {
@@ -124,6 +154,11 @@ namespace FiestaTime
                         playerNames[i].color = Color.yellow;
                         playerPlacings[i].color = Color.yellow;
                         playerScores[i].color = Color.yellow;
+                    }
+
+                    if (!res[i].reachedEnd)
+                    {
+                        playerScores[i].color = Color.red;
                     }
                 }
             }

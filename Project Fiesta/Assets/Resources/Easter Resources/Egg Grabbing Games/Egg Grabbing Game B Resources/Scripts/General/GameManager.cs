@@ -184,7 +184,7 @@ namespace FiestaTime
 
                 StopAllCoroutines();
 
-                if (photonView.IsMine) isHighScore = GeneralHelperFunctions.DetermineHighScoreInt(FiestaTime.Constants.EGG_KEY_HISCORE, playerScore);
+                if (photonView.IsMine) isHighScore = GeneralHelperFunctions.DetermineHighScoreInt(FiestaTime.Constants.EGG_KEY_HISCORE, playerScore, true);
             }
 
             /// <summary>

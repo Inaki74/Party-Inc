@@ -72,6 +72,7 @@ namespace FiestaTime
                 }
                 arrow.SetActive(false);
 
+                Debug.Log("ShowSequence finish");
                 //GameManager.Current.NotifyOfRemotePlayerReady(PhotonNetwork.LocalPlayer.ActorNumber);
                 GameManager.Current.NotifyOfLocalPlayerReady();
             }
