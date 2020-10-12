@@ -74,11 +74,13 @@ namespace FiestaTime
             private void Awake()
             {
                 EasterEgg.onObtainEgg += OnRottenObtain;
+                GameManager.onGameFinish += OnGameFinish;
             }
 
             private void OnDestroy()
             {
                 EasterEgg.onObtainEgg -= OnRottenObtain;
+                GameManager.onGameFinish -= OnGameFinish;
             }
             #endregion
 
@@ -149,6 +151,11 @@ namespace FiestaTime
             public bool GetIfStunned()
             {
                 return isStunned;
+            }
+
+            public void OnGameFinish()
+            {
+                StopAllCoroutines();
             }
         }
 

@@ -441,7 +441,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxCountdownTime: 10
-  gameName: DragonDance
+  gameSceneName: DragonDance
   playerTexts:
   - {fileID: 424935319}
   - {fileID: 571954024}
@@ -508,25 +508,40 @@ PrefabInstance:
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
       objectReference: {fileID: 1581109745}
+    - target: {fileID: 6811778602800222762, guid: 495afc8eeb16e4827bed1151078a2063,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: BtnLeaveRoom
+      objectReference: {fileID: 0}
     - target: {fileID: 6811778602800222765, guid: 495afc8eeb16e4827bed1151078a2063,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -400
+      value: -450
       objectReference: {fileID: 0}
     - target: {fileID: 6811778603552528906, guid: 495afc8eeb16e4827bed1151078a2063,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -325
+      value: -350
       objectReference: {fileID: 0}
     - target: {fileID: 6811778604314160770, guid: 495afc8eeb16e4827bed1151078a2063,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -500
+      value: -550
+      objectReference: {fileID: 0}
+    - target: {fileID: 6811778604314160770, guid: 495afc8eeb16e4827bed1151078a2063,
+        type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 200
+      objectReference: {fileID: 0}
+    - target: {fileID: 6811778604314160770, guid: 495afc8eeb16e4827bed1151078a2063,
+        type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 75
       objectReference: {fileID: 0}
     - target: {fileID: 6811778604471875772, guid: 495afc8eeb16e4827bed1151078a2063,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 200
+      value: 250
       objectReference: {fileID: 0}
     - target: {fileID: 6811778604748000901, guid: 495afc8eeb16e4827bed1151078a2063,
         type: 3}

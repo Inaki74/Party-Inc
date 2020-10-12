@@ -18,8 +18,8 @@ namespace FiestaTime
             public const string BOOL_STUNNED_ANIM = "isStunned";
             public const string BOOL_BROKENEGG_ANIM = "Broken";
 
-            public const int XPOS_PLYRONESCORE_UI = 250;
-            public const int XPOS_PLYRTWOSCORE_UI = -250;
+            public const int XPOS_PLYRONESCORE_UI = 100;
+            public const int XPOS_PLYRTWOSCORE_UI = -100;
         }
     }
 }

@@ -21,7 +21,6 @@ namespace FiestaTime
 
         public void BtnOpenMenu()
         {
-            Debug.Log("AAAAA");
             if (!menuOpen)
             {
                 // Open menu

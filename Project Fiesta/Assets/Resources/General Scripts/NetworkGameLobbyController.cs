@@ -16,7 +16,7 @@ namespace FiestaTime
     public class NetworkGameLobbyController : MonoBehaviourPunCallbacks
     {
         public float maxCountdownTime = 8f;
-        public string gameName;
+        public string gameSceneName;
 
         private PhotonView Pv;
         private ExitGames.Client.Photon.Hashtable roomProps = new ExitGames.Client.Photon.Hashtable();
@@ -60,7 +60,7 @@ namespace FiestaTime
                 {
                     PhotonNetwork.CurrentRoom.IsOpen = false;
                     runOnce = false;
-                    PhotonNetwork.LoadLevel(gameName);
+                    PhotonNetwork.LoadLevel(gameSceneName);
                 }
             }
             else

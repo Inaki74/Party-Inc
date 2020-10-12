@@ -6,6 +6,8 @@ TagManager:
   tags:
   - Ground
   - Egg
+  - DeathPlane
+  - FinishPlane
   layers:
   - Default
   - TransparentFX

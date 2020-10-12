@@ -45,11 +45,21 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   sequenceMap: 000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+  amountOfMovesThisRound: 4
+  countdownGameStart: 3
+  playersInGame: 0
+  winnerId: 0
+  isHighScore: 0
+  timeForInput: 15
+  timeToSeeMove: 1
+  minTimeForInput: 7
+  minTimeToSeeMove: 0.5
+  playersHealth: 5
+  playersLostAr: 
   playerPrefab: {fileID: 7428520905753749251, guid: 6cea402b001e0469889df4e3a76b4a4e,
     type: 3}
   UIPrefab: {fileID: 7039350831127629018, guid: dcdb1d92d3e8f4469861fd148e1ca5b1,
     type: 3}
-  amountOfMovesThisRound: 4
 --- !u!114 &1124036698949585936
 MonoBehaviour:
   m_ObjectHideFlags: 0

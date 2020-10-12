@@ -19,7 +19,6 @@ namespace FiestaTime
 
             private float timeStationary;
             private float timeout;
-            [SerializeField] private float startingTimeout = 15.0f;
 
             public Vector2 fingerMovement;
 
@@ -30,7 +29,7 @@ namespace FiestaTime
 
             void Start()
             {
-                timeout = startingTimeout;
+                timeout = GameManager.Current.timeForInput;
                 inputAllowed = true;
                 runOnce = true;
             }
@@ -48,8 +47,13 @@ namespace FiestaTime
                 {
                     // Took all possible moves or out of time, transition phase
                     runOnce = false;
-                    GameManager.Current.NotifyOfPlayerReady(PhotonNetwork.LocalPlayer.ActorNumber);
+                    GameManager.Current.NotifyOfRemotePlayerReady(PhotonNetwork.LocalPlayer.ActorNumber);
                 }
+            }
+
+            private void OnEnable()
+            {
+                timeout = GameManager.Current.timeForInput;
             }
 
             private void OnDisable()
@@ -59,7 +63,6 @@ namespace FiestaTime
                 currentMoves = 0;
                 presentMove = 0;
                 timeStationary = 0;
-                timeout = startingTimeout;
                 fingerMovement = Vector2.zero;
             }
 
@@ -72,6 +75,14 @@ namespace FiestaTime
             public int[] GetCurrentSequence()
             {
                 return sequenceGenerated;
+            }
+
+            public void ResetCurrentSequence()
+            {
+                for(int i = 0; i < sequenceGenerated.Length; i++)
+                {
+                    sequenceGenerated[i] = 0;
+                }
             }
 
             #region Private Functions
@@ -95,7 +106,6 @@ namespace FiestaTime
             {
                 if (Input.touches[0].phase == TouchPhase.Began)
                 {
-                    //Debug.Log("Began taking input");
                     fingerMovement = Vector2.zero;
                 }
 
@@ -115,7 +125,6 @@ namespace FiestaTime
 
                 if (Input.touches[0].phase == TouchPhase.Ended || timeStationary > 0.2f)
                 {
-                    //Debug.Log("Stopped taking input, reason: " + Input.touches[0].phase);
                     if (Mathf.Abs(fingerMovement.x) > 200f || Mathf.Abs(fingerMovement.y) > 200f)
                     {
                         inputAllowed = false;
@@ -196,5 +205,3 @@ namespace FiestaTime
         }
     }
 }
-
-

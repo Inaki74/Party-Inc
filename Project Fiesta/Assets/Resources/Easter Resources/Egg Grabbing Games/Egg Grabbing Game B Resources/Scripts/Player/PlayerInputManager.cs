@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
-
 using Photon.Pun;
 
 namespace FiestaTime
@@ -25,6 +24,11 @@ namespace FiestaTime
 
             private void Update()
             {
+                if (GameManager.Current.isGameFinished)
+                {
+                    return;
+                }
+
                 DetermineLastTouchPosition();
 
                 // TOUCH

@@ -32,4 +32,10 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/DragonDance.unity
     guid: de95697e910184a3092f61bd24ddd60e
+  - enabled: 1
+    path: Assets/Scenes/TT_GameLobby.unity
+    guid: cadc8a9ec91454d49aac9f9c6a0f7782
+  - enabled: 1
+    path: Assets/Scenes/TumultousTap.unity
+    guid: 12c358b85aa2f46a8ad6ab219b2ce452
   m_configObjects: {}

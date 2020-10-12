@@ -18,7 +18,7 @@ namespace FiestaTime
             {
                 if (_current == null)
                 {
-                    Debug.Log("No Game manager Instantiated");
+                    Debug.Log("No " + typeof(T) + " Instantiated");
                 }
 
                 return _current;
@@ -27,6 +27,7 @@ namespace FiestaTime
 
         private void Awake()
         {
+            Debug.Log(typeof(T) + " Instantiated");
             _current = (T)this;
             Init();
         }

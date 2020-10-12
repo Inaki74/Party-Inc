@@ -14,7 +14,8 @@ namespace FiestaTime
         /// </summary>
         public class Player : MonoBehaviourPun, IPunObservable
         {
-            public int health = 3;
+            public int health;
+            public PlayerResults<int> myResults;
 
             private int[] currentSequence;
 
@@ -52,6 +53,9 @@ namespace FiestaTime
 
                 if (photonView.IsMine)
                 {
+                    myResults.playerId = PhotonNetwork.LocalPlayer.ActorNumber;
+                    myResults.scoring = 0;
+                    health = GameManager.Current.playersHealth;
                     playerName.text = PhotonNetwork.NickName;
                     photonView.RPC("RPC_SendName", RpcTarget.Others, PhotonNetwork.NickName);
                 } 
@@ -77,13 +81,11 @@ namespace FiestaTime
             {
                 if (!photonView.IsMine && PhotonNetwork.IsConnected) return;
 
-                if (hasLost) {
-                    GameManager.Current.NotifyOfPlayerReady(PhotonNetwork.LocalPlayer.ActorNumber);
-                    return;
-                }
+                if (nextPhase == 0) return;
 
                 if(nextPhase == 1)
                 {
+                    if (hasLost) { GameManager.Current.NotifyOfRemotePlayerReady(PhotonNetwork.LocalPlayer.ActorNumber); return; }
                     // Entered input section of loop
                     inputManager.enabled = true;
                 }
@@ -94,13 +96,14 @@ namespace FiestaTime
 
                 if(nextPhase == 2)
                 {
+                    if (hasLost) { Debug.Log("Player notify finish"); GameManager.Current.NotifyOfLocalPlayerReady(); return; }
                     //Demonstration phase
                     StartCoroutine(DemonstrationCo());
                 }
 
                 if(nextPhase == 3)
                 {
-                    if(health <= 0)
+                    if(health <= 0 && !hasLost)
                     {
                         hasLost = true;
                         inputManager.enabled = false;
@@ -108,12 +111,14 @@ namespace FiestaTime
                         GameManager.Current.NotifyOfPlayerLost(PhotonNetwork.LocalPlayer.ActorNumber);
                     }
 
-                    GameManager.Current.NotifyOfPlayerReady(PhotonNetwork.LocalPlayer.ActorNumber);
+                    GameManager.Current.NotifyOfRemotePlayerReady(PhotonNetwork.LocalPlayer.ActorNumber);
                 }
 
                 if(nextPhase == 4)
                 {
                     // Game finished
+                    inputManager.enabled = false;
+                    if(photonView.IsMine) GameManager.Current.isHighScore = GeneralHelperFunctions.DetermineHighScoreInt(Constants.DD_KEY_HISCORE, myResults.scoring, true);
                 }
             }
 
@@ -147,20 +152,30 @@ namespace FiestaTime
                     // Check if move was right or wrong
                     bool isRight = currentSequence[i] == GameManager.Current.sequenceMap[i];
 
-                    if (!isRight) {
-                        health--;
-                        onWrongMove?.Invoke(health);
+                    if(health > 0)
+                    {
+                        if (!isRight)
+                        {
+                            health--;
+                            onWrongMove?.Invoke(health);
+                        }
+                        else
+                        {
+                            myResults.scoring++;
+                        }
                     }
-
+                    
                     // Send notification to UI
                     onShowMove?.Invoke(isRight, i);
 
                     yield return new WaitForSeconds(1f);
                 }
 
+                inputManager.ResetCurrentSequence();
                 Mr.material.color = new Color(1, 1, 1);
 
-                GameManager.Current.NotifyOfPlayerReady(PhotonNetwork.LocalPlayer.ActorNumber);
+                //GameManager.Current.NotifyOfRemotePlayerReady(PhotonNetwork.LocalPlayer.ActorNumber);
+                GameManager.Current.NotifyOfLocalPlayerReady();
             }
 
             #region PUN
@@ -176,11 +191,20 @@ namespace FiestaTime
                 if (stream.IsWriting)
                 {
                     stream.SendNext(new Vector3(Mr.material.color.r, Mr.material.color.g, Mr.material.color.b));
+                    stream.SendNext(myResults.playerId);
+                    stream.SendNext(myResults.scoring);
                 }
                 else
                 {
                     Vector3 temp = (Vector3)stream.ReceiveNext();
                     Mr.material.color = new Color(temp.x, temp.y, temp.z);
+
+                    PlayerResults<int> aux = new PlayerResults<int>();
+
+                    aux.playerId = (int)stream.ReceiveNext();
+                    aux.scoring = (int)stream.ReceiveNext();
+
+                    myResults = aux;
                 }
             }
 
