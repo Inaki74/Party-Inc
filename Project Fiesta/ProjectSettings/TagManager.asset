@@ -8,6 +8,7 @@ TagManager:
   - Egg
   - DeathPlane
   - FinishPlane
+  - Rope
   layers:
   - Default
   - TransparentFX

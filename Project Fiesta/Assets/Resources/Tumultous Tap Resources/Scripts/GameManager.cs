@@ -33,7 +33,7 @@ namespace FiestaTime
             private int playersPlaying;
             private bool runOnce = false;
 
-            public float gameStartCountdown = 3f;
+            public float gameStartCountdown = 3f; // Have to take into account the start text
 
             public float inGameTime = 0;
 
@@ -56,7 +56,7 @@ namespace FiestaTime
             // Update is called once per frame
             void Update()
             {
-                if (gameStartCountdown <= -1f)
+                if (gameStartCountdown <= -1f) // Taking into account the start text
                 {
                     if (inGameTime == 0)
                     {
@@ -107,6 +107,7 @@ namespace FiestaTime
 
             private int DecideWinner()
             {
+                // Game was too short
                 if (inGameTime < 7f)
                 {
                     return -1;
