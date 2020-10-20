@@ -7,30 +7,16 @@ namespace FiestaTime
 {
     namespace RR
     {
-        public class GameManager : MonoSingleton<GameManager>
+        public class GameManager : FiestaGameManager<GameManager, int>
         {
-            private NetworkGameRoomController networkController;
-
-            PlayerResults<int>[] playerResults;
-
-            public delegate void ActionGameStart();
-            public static event ActionGameStart onGameStart;
-
             public delegate void CheckpointReach(int checkpoint);
             public static event CheckpointReach onCheckpointReached;
 
             [SerializeField] private GameObject stagePrefab;
-            [SerializeField] private GameObject playerPrefab;
-            [SerializeField] private GameObject UIPrefab;
 
             public float startingSpeed;
             public float startingAngle;
 
-            private int playerCount;
-            private Vector3[] playerPositions = new Vector3[4];
-
-
-            public float gameStartCountdown = 3f; //Have to take into account the start text
             public int movesForSpeedIncrease;
             public int thresholdInverse;
             public int thresholdBurst;
@@ -41,16 +27,13 @@ namespace FiestaTime
 
             public int currentJump;
 
-            // Start is called before the first frame update
-            void Start()
+            protected override void InStart()
             {
-                networkController = FindObjectOfType<NetworkGameRoomController>();
-
-                playerCount = PhotonNetwork.PlayerList.Length;
-                playerResults = new PlayerResults<int>[playerCount];
                 firstRun = true;
+            }
 
-                StartCoroutine("");
+            protected override void InitializeGameManagerDependantObjects()
+            {
                 InitializePlayers();
                 InitializeStage();
                 InitializeUI();
@@ -63,7 +46,7 @@ namespace FiestaTime
                 {
                     gameStartCountdown = -1f;
                     firstRun = false;
-                    onGameStart?.Invoke();
+                    OnGameStartInvoke();
                 }
                 else
                 {

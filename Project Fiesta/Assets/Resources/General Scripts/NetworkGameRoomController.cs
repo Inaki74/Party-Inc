@@ -63,7 +63,8 @@ namespace FiestaTime
         {
             yield return new WaitUntil(() => PlayersLoadedGame());
 
-            PhotonNetwork.InstantiateRoomObject(gameManager.name, Vector3.zero, Quaternion.identity);
+            playersAreReady = true;
+            //PhotonNetwork.InstantiateRoomObject(gameManager.name, Vector3.zero, Quaternion.identity);
         }
 
         /// <summary>
