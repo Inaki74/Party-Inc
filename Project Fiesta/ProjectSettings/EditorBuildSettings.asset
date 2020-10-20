@@ -38,4 +38,10 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/TumultousTap.unity
     guid: 12c358b85aa2f46a8ad6ab219b2ce452
+  - enabled: 1
+    path: Assets/Scenes/RR_GameLobby.unity
+    guid: c793665a22dd1464aa9e3dfe96816b49
+  - enabled: 1
+    path: Assets/Scenes/RowdyRope.unity
+    guid: 2337a39dd43a5490f9512fb979620ea1
   m_configObjects: {}

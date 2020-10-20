@@ -13,8 +13,6 @@ namespace FiestaTime
             [SerializeField] private Text countdownText;
             [SerializeField] private Text timerText;
 
-            [SerializeField] private float countdown;
-
             [SerializeField] private GameObject finishScreen;
 
             private bool gameRunning = false;

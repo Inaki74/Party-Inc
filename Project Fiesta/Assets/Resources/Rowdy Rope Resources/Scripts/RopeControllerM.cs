@@ -8,7 +8,8 @@ namespace FiestaTime
     {
         public class RopeControllerM : MonoBehaviour
         {
-
+            public delegate void ActionLoopCompleted();
+            public static event ActionLoopCompleted onLoopComplete;
 
             [SerializeField] private GameObject linkPrefab;
             [SerializeField] private GameObject startPoint;
@@ -20,6 +21,7 @@ namespace FiestaTime
 
             private float distanceStartEnd;
             private float startingAngle;
+            private float speedIncreasePerRound = 0.2f; 
 
             private bool gameStarted;
             private bool firstRun;
@@ -36,11 +38,12 @@ namespace FiestaTime
             void Start()
             {
                 firstRun = true;
+                gameStarted = false;
 
-                angle = Mathf.PI / 2;
                 distanceStartEnd = Vector3.Distance(startPoint.transform.position, endPoint.transform.position);
 
                 startingAngle = GameManager.Current.startingAngle;
+                angle = startingAngle;
                 rotationSpeed = 0f;
                 InstantiateRope();
             }
@@ -57,12 +60,20 @@ namespace FiestaTime
                     }
 
                     Debug.DrawRay(transform.position, transform.TransformDirection(new Vector3(Mathf.Cos(angle), Mathf.Sin(angle), 0f) * 5f), Color.red);
-                    angle += Mathf.Abs(Time.deltaTime * rotationSpeed);
+                    angle += Time.deltaTime * rotationSpeed;
 
-                    if(angle > Mathf.PI * 2)
+                    if(angle > 5 * Mathf.PI /2 && rotationSpeed > 0f)
                     {
                         // Round completed
-                        GameManager.Current.RoundCompleted();
+                        onLoopComplete?.Invoke();
+                        angle = Mathf.PI/2;
+                    }
+
+                    if (angle < Mathf.PI/ 2 && rotationSpeed < 0f)
+                    {
+                        // Round completed
+                        onLoopComplete?.Invoke();
+                        angle = 5 * Mathf.PI / 2;
                     }
                 }
                 
@@ -95,7 +106,7 @@ namespace FiestaTime
 
                     float radius = Mathf.Pow(z, 2) / 40 - z / 2;
 
-                    ropeAux.Add(GO.GetComponent<RopeLinkM>().Init(this, radius, z, i, 0f));
+                    ropeAux.Add(GO.GetComponent<RopeLinkM>().Init(this, radius, z, i, startingAngle * Mathf.Deg2Rad));
 
                     z += separation;
                     i++;
@@ -118,7 +129,7 @@ namespace FiestaTime
                         if (!chkpnt_Peak)
                         {
                             // Increase speed
-                            // rotationalSpeed += 0.2; ?
+                            // rotationalSpeed += speedIncreasePerRound; ?
                         }
                         break;
                     case 1:

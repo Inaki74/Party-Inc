@@ -9,6 +9,8 @@ namespace FiestaTime
     {
         public class GameManager : MonoSingleton<GameManager>
         {
+            private NetworkGameRoomController networkController;
+
             PlayerResults<int>[] playerResults;
 
             public delegate void ActionGameStart();
@@ -37,14 +39,18 @@ namespace FiestaTime
 
             private bool firstRun;
 
-            private int currentJump;
+            public int currentJump;
 
             // Start is called before the first frame update
             void Start()
             {
+                networkController = FindObjectOfType<NetworkGameRoomController>();
+
                 playerCount = PhotonNetwork.PlayerList.Length;
                 playerResults = new PlayerResults<int>[playerCount];
+                firstRun = true;
 
+                StartCoroutine("");
                 InitializePlayers();
                 InitializeStage();
                 InitializeUI();
@@ -56,6 +62,7 @@ namespace FiestaTime
                 if(gameStartCountdown <= -1f && firstRun)
                 {
                     gameStartCountdown = -1f;
+                    firstRun = false;
                     onGameStart?.Invoke();
                 }
                 else
@@ -64,6 +71,17 @@ namespace FiestaTime
                 }
 
 
+                //
+            }
+
+            public override void Init()
+            {
+                RopeControllerM.onLoopComplete += OnRoundCompleted;
+            }
+
+            private void OnDestroy()
+            {
+                RopeControllerM.onLoopComplete -= OnRoundCompleted;
             }
 
             private void InitializePlayers()
@@ -85,7 +103,7 @@ namespace FiestaTime
 
             private void InitializeStage()
             {
-                Instantiate(stagePrefab);
+                //Instantiate(stagePrefab);
             }
 
             private void InitializeUI()
@@ -123,10 +141,34 @@ namespace FiestaTime
             private void CheckCheckpoints()
             {
                 // Check currentJump
-                // 
+                // Here invoke the checkpoints
+                if(currentJump % movesForSpeedIncrease == 0)
+                {
+                    onCheckpointReached?.Invoke(0);
+                }
+
+                if(currentJump == thresholdInverse)
+                {
+                    onCheckpointReached?.Invoke(1);
+                }
+
+                if(currentJump == thresholdBurst)
+                {
+                    onCheckpointReached?.Invoke(2);
+                }
+
+                if(currentJump == thresholdPeak)
+                {
+                    onCheckpointReached?.Invoke(3);
+                }
+
+                if(currentJump == thresholdDeath)
+                {
+                    onCheckpointReached?.Invoke(4);
+                }
             }
 
-            public void RoundCompleted()
+            private void OnRoundCompleted()
             {
                 currentJump += 1;
 

@@ -16,7 +16,7 @@ namespace FiestaTime
             [SerializeField] private float jumpingDrag;
 
             private float originalDrag;
-            private float fallingDrag = -2;
+            private float fallingDrag = -5;
 
             private bool jumpInput;
             private bool jumpPressed;

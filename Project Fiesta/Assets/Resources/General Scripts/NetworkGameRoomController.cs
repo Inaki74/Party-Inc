@@ -11,6 +11,8 @@ namespace FiestaTime
     {
         [SerializeField] private GameObject gameManager;
 
+        public bool playersAreReady;
+
         Hashtable playersReady = new Hashtable();
 
         #region Unity Callbacks
