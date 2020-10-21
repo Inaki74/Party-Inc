@@ -64,6 +64,7 @@ namespace FiestaTime
             yield return new WaitUntil(() => PlayersLoadedGame());
 
             playersAreReady = true;
+            if (PhotonNetwork.IsMasterClient) photonView.RPC("RPC_SendPlayersReady", RpcTarget.Others, playersAreReady);
             //PhotonNetwork.InstantiateRoomObject(gameManager.name, Vector3.zero, Quaternion.identity);
         }
 
@@ -102,6 +103,12 @@ namespace FiestaTime
                 playersReady.Remove(id);
                 playersReady.Add(id, true);
             }
+        }
+
+        [PunRPC]
+        public void RPC_SendPlayersReady(bool ready)
+        {
+            playersAreReady = ready;
         }
 
         #region PUN Callbacks

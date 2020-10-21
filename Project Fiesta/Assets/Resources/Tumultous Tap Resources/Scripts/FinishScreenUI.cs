@@ -28,14 +28,14 @@ namespace FiestaTime
 
             private void OnEnable()
             {
-                Debug.Log(GameManager.Current.playersInGame);
+                Debug.Log(GameManager.Current.playerCount);
                 // Set active for the amount of players playing.
-                for (int i = 0; i < GameManager.Current.playersInGame; i++)
+                for (int i = 0; i < GameManager.Current.playerCount; i++)
                 {
                     players[i].SetActive(true);
                 }
 
-                if (GameManager.Current.playersInGame == 1)
+                if (GameManager.Current.playerCount == 1)
                 {
                     if (GameManager.Current.playerResults[0].reachedEnd)
                     {

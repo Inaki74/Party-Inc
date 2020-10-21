@@ -9,46 +9,29 @@ namespace FiestaTime
 {
     namespace TT
     {
-        public class GameManager : MonoSingleton<GameManager>
+        public class GameManager : FiestaGameManager<GameManager, float>
         {
             public static Vector3 forwardVector = new Vector3(0f, Mathf.Cos(45f), Mathf.Cos(45f));
             public static float maxDistance = 13f;
             public static float hazardMinimumVelocity = 9f;
-            public int playersInGame = -1;
             public bool isHighScore;
             public int winnerId;
             private int nextToInsert = 0;
 
-            private Vector3[] playerPositions = new Vector3[4];
-
-            public delegate void ActionGameStart();
-            public static event ActionGameStart onGameStart;
-
-            public delegate void ActionGameFinished();
-            public static event ActionGameFinished onGameFinished;
-
-            [SerializeField] private GameObject playerPrefab;
-            [SerializeField] private GameObject uiPrefab;
-
             private int playersPlaying;
             private bool runOnce = false;
 
-            public float gameStartCountdown = 3f; // Have to take into account the start text
-
             public float inGameTime = 0;
-
-            public PlayerResults<float>[] playerResults;
 
             public bool gameBegan;
 
-            // Start is called before the first frame update
-            void Start()
+            protected override void InStart()
             {
-                Debug.Log("GM Start");
-                playersInGame = PhotonNetwork.PlayerList.Length;
-                playerResults = new PlayerResults<float>[playersInGame];
-                playersPlaying = playersInGame;
+                playersPlaying = playerCount;
+            }
 
+            protected override void InitializeGameManagerDependantObjects()
+            {
                 InitializePlayers();
                 InitializeUI();
             }
@@ -62,7 +45,7 @@ namespace FiestaTime
                     {
                         gameBegan = true;
                         gameStartCountdown = -1f;
-                        onGameStart?.Invoke();
+                        OnGameStartInvoke();
                     } 
 
                     if(gameBegan) inGameTime += Time.deltaTime;
@@ -102,7 +85,7 @@ namespace FiestaTime
                 winnerId = DecideWinner();
 
                 // then invoke on finish
-                onGameFinished?.Invoke();
+                OnGameFinishInvoke();
             }
 
             private int DecideWinner()
@@ -160,7 +143,7 @@ namespace FiestaTime
 
                 int k = 0;
                 int l = 0;
-                for (int j = 0; j < playersInGame; j++)
+                for (int j = 0; j < playerCount; j++)
                 {
                     if (playerResults[j].reachedEnd)
                     {
@@ -179,7 +162,7 @@ namespace FiestaTime
                 PlayerResults<float>[] ordDidCross = o1.ToArray();
                 var o2 = didntCross.OrderByDescending(r => r.scoring);
                 PlayerResults<float>[] ordDidntCross = o2.ToArray();
-                PlayerResults<float>[] aux = new PlayerResults<float>[playersInGame];
+                PlayerResults<float>[] aux = new PlayerResults<float>[playerCount];
 
                 int i = 0;
                 for (int t = 0; t < trueCounts; t++)
@@ -216,7 +199,7 @@ namespace FiestaTime
 
             private void InitializeUI()
             {
-                Instantiate(uiPrefab);
+                Instantiate(UIPrefab);
             }
 
             private void InitializePlayers()
@@ -225,14 +208,14 @@ namespace FiestaTime
 
                 Vector3 decidedPosition = Vector3.zero;
 
-                for(int i = 0; i < playersInGame; i++)
+                for(int i = 0; i < playerCount; i++)
                 {
                     if(PhotonNetwork.LocalPlayer.ActorNumber == PhotonNetwork.PlayerList[i].ActorNumber)
                     {
                         decidedPosition = playerPositions[i];
                     }
                 }
-
+                Debug.Log(playerPrefab.name);
                 PhotonNetwork.Instantiate(playerPrefab.name, decidedPosition, Quaternion.identity);
             }
 
@@ -276,7 +259,7 @@ namespace FiestaTime
             /// </summary>
             private void SetPlayerPositions()
             {
-                switch (playersInGame)
+                switch (playerCount)
                 {
                     case 1:
                         playerPositions[0] = new Vector3(0f, 0.4f, -0.4f);

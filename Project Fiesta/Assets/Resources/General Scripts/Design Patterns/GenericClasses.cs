@@ -39,7 +39,7 @@ namespace FiestaTime
         protected NetworkGameRoomController networkController;
 
         // The results of the game, every game has results and winners.
-        protected PlayerResults<T>[] playerResults = new PlayerResults<T>[4];
+        public PlayerResults<T>[] playerResults = new PlayerResults<T>[4];
 
         // Every game has a start.
         public delegate void ActionGameStart();
@@ -54,7 +54,7 @@ namespace FiestaTime
         [SerializeField] protected GameObject UIPrefab;
 
         // Every game has a count of players.
-        protected int playerCount;
+        public int playerCount;
 
         // Every game has a players that start somewhere.
         protected Vector3[] playerPositions = new Vector3[4];

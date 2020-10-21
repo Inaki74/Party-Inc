@@ -35,13 +35,13 @@ namespace FiestaTime
             private void Awake()
             {
                 GameManager.onGameStart += OnGameStart;
-                GameManager.onGameFinished += OnGameFinish;
+                GameManager.onGameFinish += OnGameFinish;
             }
 
             private void OnDestroy()
             {
                 GameManager.onGameStart -= OnGameStart;
-                GameManager.onGameFinished -= OnGameFinish;
+                GameManager.onGameFinish -= OnGameFinish;
             }
 
             private void OnGameStart()
