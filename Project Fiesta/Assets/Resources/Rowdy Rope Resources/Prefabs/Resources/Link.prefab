@@ -11,9 +11,9 @@ GameObject:
   - component: {fileID: 2252292130731402084}
   - component: {fileID: 2131269887872139917}
   - component: {fileID: 6464366975061438418}
-  - component: {fileID: 2092177259876355684}
   - component: {fileID: -5031106692844176618}
   - component: {fileID: -2808559238481990482}
+  - component: {fileID: 6897827171161081961}
   m_Layer: 0
   m_Name: Link
   m_TagString: Rope
@@ -30,7 +30,7 @@ Transform:
   m_GameObject: {fileID: 3772575759793036545}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.3, y: 0.3, z: 0.3}
+  m_LocalScale: {x: 0.1, y: 0.1, z: 0.3}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
@@ -82,19 +82,6 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
---- !u!135 &2092177259876355684
-SphereCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3772575759793036545}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: 0.5
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &-5031106692844176618
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -109,7 +96,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   groundPlane: {fileID: 1725556111600110868, guid: fee07fba20d9a4e8fa225d3b37191e12,
     type: 3}
-  Sc: {fileID: 2092177259876355684}
+  Sc: {fileID: 0}
 --- !u!54 &-2808559238481990482
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -126,3 +113,17 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 112
   m_CollisionDetection: 0
+--- !u!136 &6897827171161081961
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3772575759793036545}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  m_Radius: 0.5
+  m_Height: 1
+  m_Direction: 2
+  m_Center: {x: 0, y: 0, z: 0}

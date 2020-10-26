@@ -221,6 +221,29 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1617658270581024776
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 870366748788770159}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ObservedComponentsFoldoutOpen: 1
+  Group: 0
+  prefixField: -1
+  observableSearch: 2
+  Synchronization: 3
+  OwnershipTransfer: 0
+  ObservedComponents:
+  - {fileID: 870366748788770157}
+  viewIdField: 0
+  InstantiationId: 0
+  isRuntimeInstantiated: 0
 --- !u!1 &870366749020609001
 GameObject:
   m_ObjectHideFlags: 0
@@ -429,6 +452,11 @@ PrefabInstance:
       propertyPath: rotationSpeed
       value: 2
       objectReference: {fileID: 0}
+    - target: {fileID: 1398582739777196350, guid: e45c5eb3fa54d404d9c5c2adc27083a2,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1398582739777196351, guid: e45c5eb3fa54d404d9c5c2adc27083a2,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -486,9 +514,27 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e45c5eb3fa54d404d9c5c2adc27083a2, type: 3}
+--- !u!1 &870366748788770159 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1398582739777196348, guid: e45c5eb3fa54d404d9c5c2adc27083a2,
+    type: 3}
+  m_PrefabInstance: {fileID: 2268946035369071699}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &870366748788770156 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1398582739777196351, guid: e45c5eb3fa54d404d9c5c2adc27083a2,
     type: 3}
   m_PrefabInstance: {fileID: 2268946035369071699}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &870366748788770157 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1398582739777196350, guid: e45c5eb3fa54d404d9c5c2adc27083a2,
+    type: 3}
+  m_PrefabInstance: {fileID: 2268946035369071699}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 870366748788770159}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 18ab694c20fb248758c0a118e7e19e72, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

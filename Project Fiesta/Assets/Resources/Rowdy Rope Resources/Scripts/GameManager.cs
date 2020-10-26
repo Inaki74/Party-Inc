@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
+using System.Linq;
 
 namespace FiestaTime
 {
@@ -9,27 +10,72 @@ namespace FiestaTime
     {
         public class GameManager : FiestaGameManager<GameManager, int>
         {
-            public delegate void CheckpointReach(int checkpoint);
-            public static event CheckpointReach onCheckpointReached;
-
             [SerializeField] private GameObject stagePrefab;
+            [SerializeField] private RopeControllerM rope;
+
+            private Player[] players;
 
             public float startingSpeed;
             public float startingAngle;
 
-            public int movesForSpeedIncrease;
-            public int thresholdInverse;
-            public int thresholdBurst;
-            public int thresholdPeak;
-            public int thresholdDeath;
+            private int movesForSpeedIncrease = 4;
+            private float speedIncreasePerMoves = 0.5f;
+            private int thresholdInverseE = 10;
+            private int thresholdInverseM = 25;
+            private int thresholdInverseH = 50;
+            private int thresholdBurst = 20;
+            private int thresholdPeak = 40;
+            private int thresholdDeath = 100;
+
+            private bool chkpnt_Inverse;
+            private bool chkpnt_Bursts;
+            private bool chkpnt_Peak;
+            private bool chkpnt_Death;
 
             private bool firstRun;
+            private int playersAlive;
+            private bool gameEnded = false;
+
+            private int nextToInsert;
+
+            public bool isHighScore;
+            public int winnerId;
 
             public int currentJump;
+
+            private int superiorBoundRandomInverse = 7;
+            private int inferiorBoundRandomInverse = 5;
+            private int randomInverse = 0;
+
+            private float inferiorBoundAngleNormPos = 270f; // 270 easy
+            private float superiorBoundAngleNormPos = 20f; //20 easy
+            private float inferiorBoundAngleNormNeg = 160f;// 160 easy
+            private float superiorBoundAngleNormNeg = 270f; // 270 easy
+
+            private float inferiorBoundAngleDecPos = 20f;
+            private float superiorBoundAngleDecPos = 60f;
+            private float inferiorBoundAngleDecNeg = 120f;
+            private float superiorBoundAngleDecNeg = 160f;
+
+            private int randomBurst = 0;
+            private int superiorBoundRandomBurst = 7;
+            private int inferiorBoundRandomBurst = 5;
+
+            private int burstDuration;
+            private int superiorBoundBurstDuration = 6;
+            private int inferiorBoundBurstDuration = 4;
+
+            private float decreaseBurstPossibility = 0.5f;
 
             protected override void InStart()
             {
                 firstRun = true;
+                playersAlive = playerCount;
+                nextToInsert = playerCount - 1;
+                players = new Player[playerCount];
+
+                startingAngle = 45.1f;
+                startingAngle = startingAngle * Mathf.Deg2Rad;
             }
 
             protected override void InitializeGameManagerDependantObjects()
@@ -46,25 +92,55 @@ namespace FiestaTime
                 {
                     gameStartCountdown = -1f;
                     firstRun = false;
+                    players = FindObjectsOfType<Player>();
                     OnGameStartInvoke();
                 }
-                else
+                else if (firstRun)
                 {
                     gameStartCountdown -= Time.deltaTime;
                 }
 
+                //Here go difficulty factors
+                if (!gameEnded && PhotonNetwork.IsMasterClient)
+                {
+                    // Inversion mode activated
+                    if (chkpnt_Inverse)
+                    {
+                        InverseMechanic();
+                    }
 
-                //
+                    if (chkpnt_Bursts)
+                    {
+                        BurstMechanic();
+                    }
+                }
+
+                //Here go end
+                if(playerCount == 1 && playersAlive == 0 && !gameEnded && rope.loopCompleted)
+                {
+                    Debug.Log("Game should end");
+                    gameEnded = true;
+                    FinishGame();
+                }
+
+                if (playerCount > 1 && playersAlive <= 1 && !gameEnded && rope.loopCompleted)
+                {
+                    Debug.Log("Game should end");
+                    gameEnded = true;
+                    FinishGame();
+                }
             }
 
             public override void Init()
             {
                 RopeControllerM.onLoopComplete += OnRoundCompleted;
+                Player.onPlayerDied += OnPlayerFinished;
             }
 
             private void OnDestroy()
             {
                 RopeControllerM.onLoopComplete -= OnRoundCompleted;
+                Player.onPlayerDied -= OnPlayerFinished;
             }
 
             private void InitializePlayers()
@@ -87,11 +163,60 @@ namespace FiestaTime
             private void InitializeStage()
             {
                 //Instantiate(stagePrefab);
+                rope.enabled = true;
             }
 
             private void InitializeUI()
             {
                 Instantiate(UIPrefab);
+            }
+
+            private void FinishGame()
+            {
+                winnerId = FindWinner();
+                OnGameFinishInvoke();
+            }
+
+            private int FindWinner()
+            {
+                foreach(Player p in players)
+                {
+                    // If the player isnt in the list, its because:
+                    // It never lost
+                    // It lost but got through the sync somehow.
+                    AddPlayerResult(p.photonView.Owner.ActorNumber, currentJump);
+                }
+
+                PlayerResultsHelper.PrintArray(playerResults);
+                return CheckWinner();
+            }
+
+            public bool MyPlayerHasLost()
+            {
+                foreach(var p in players)
+                {
+                    if(p.photonView.Owner.ActorNumber == PhotonNetwork.LocalPlayer.ActorNumber)
+                    {
+                        return p.hasLost;
+                    }
+                }
+
+                return true;
+            }
+
+            private int CheckWinner()
+            {
+                var ordered = playerResults.OrderByDescending(p => p.scoring);
+                PlayerResults<int>[] o = ordered.ToArray();
+
+                for(int i = 1; i < o.Length; i++)
+                {
+                    if (o[0].Equals(o[1])){
+                        return -1;
+                    }
+                }
+
+                return o[0].playerId;
             }
 
             private void SetPlayerPositions()
@@ -121,34 +246,197 @@ namespace FiestaTime
                 }
             }
 
+            private void InverseMechanic()
+            {
+                // We reached zero, time to inverse
+                if(randomInverse == 0)
+                {
+                    // Regenerate the random inverse number
+                    randomInverse = Random.Range(inferiorBoundRandomInverse, superiorBoundRandomInverse + 1);
+
+                    // Decide where to inverse
+                    float whereToInverse = 0f;
+                    // The a number decides if its a deceiving inverse or a normal inverse
+                    float a = Random.Range(0f, 1f);
+
+                    if (rope.rotationSpeed > 0f)
+                    {
+                       if(a < 0.75f)
+                        {
+                            // Normal inverse
+                            whereToInverse = Random.Range(inferiorBoundAngleNormPos, superiorBoundAngleNormPos);
+                        }
+                        else
+                        {
+                            // Deceiving inverse
+                            whereToInverse = Random.Range(inferiorBoundAngleDecPos, superiorBoundAngleDecPos);
+                        }
+                    }else if(rope.rotationSpeed < 0f)
+                    {
+                        if (a < 0.75f)
+                        {
+                            whereToInverse = Random.Range(inferiorBoundAngleNormNeg, superiorBoundAngleNormNeg);
+                        }
+                        else
+                        {
+                            whereToInverse = Random.Range(inferiorBoundAngleDecNeg, superiorBoundAngleDecNeg);
+                        }
+                    }
+
+                    Debug.Log("Inverting at: " + whereToInverse * Mathf.Deg2Rad + " radians");
+                    // Inverse
+                    rope.InvertRope(whereToInverse * Mathf.Deg2Rad);
+                }
+            }
+
+            private void BurstMechanic()
+            {
+                if(randomBurst == 0)
+                {
+                    burstDuration = Random.Range(inferiorBoundBurstDuration, superiorBoundBurstDuration + 1);
+                    randomBurst = Random.Range(inferiorBoundRandomBurst + burstDuration, superiorBoundRandomBurst + burstDuration + 1);
+
+                    float howMuchBurst = 0f;
+                    float a = Random.Range(0f, 1f);
+                    if(decreaseBurstPossibility < 0f)
+                    {
+                        decreaseBurstPossibility = 0.01f;
+                    }
+
+                    if(rope.rotationSpeed > 0f)
+                    {
+                        if(a > decreaseBurstPossibility)
+                        {
+                            //Increase
+                            decreaseBurstPossibility += 0.1f;
+                            howMuchBurst = 3f;
+                        }
+                        else
+                        {
+                            //Decrease
+                            decreaseBurstPossibility -= 0.1f;
+                            howMuchBurst = -3f;
+                        }
+                    }else if (rope.rotationSpeed < 0f)
+                    {
+                        if (a > decreaseBurstPossibility)
+                        {
+                            decreaseBurstPossibility += 0.1f;
+                            howMuchBurst = 3f;
+                        }
+                        else
+                        {
+                            decreaseBurstPossibility -= 0.1f;
+                            howMuchBurst = -3f;
+                        }
+                    }
+
+                    rope.BurstRope(howMuchBurst);
+                    StartCoroutine(ResetBurstCo(-howMuchBurst, currentJump + burstDuration));
+                }
+            }
+
+            private IEnumerator ResetBurstCo(float amount, int duration)
+            {
+                Debug.Log("Waiting for reset");
+                yield return new WaitUntil(() => currentJump >= duration);
+                Debug.Log("BURST RESET!");
+
+                rope.BurstRope(amount);
+            }
+
             private void CheckCheckpoints()
             {
                 // Check currentJump
                 // Here invoke the checkpoints
                 if(currentJump % movesForSpeedIncrease == 0)
                 {
-                    onCheckpointReached?.Invoke(0);
+                    if (!chkpnt_Peak)
+                    {
+                        // Increase speed
+                        rope.rotationSpeed += speedIncreasePerMoves * Mathf.Sign(rope.rotationSpeed);
+                    }
                 }
 
-                if(currentJump == thresholdInverse)
+                if(randomInverse != 0)
                 {
-                    onCheckpointReached?.Invoke(1);
+                    randomInverse--;
                 }
 
-                if(currentJump == thresholdBurst)
+                if(randomBurst != 0)
                 {
-                    onCheckpointReached?.Invoke(2);
+                    randomBurst--;
                 }
 
-                if(currentJump == thresholdPeak)
+                if(currentJump >= thresholdInverseE)
                 {
-                    onCheckpointReached?.Invoke(3);
+                    chkpnt_Inverse = true;
                 }
 
-                if(currentJump == thresholdDeath)
+                if(currentJump >= thresholdBurst)
                 {
-                    onCheckpointReached?.Invoke(4);
+                    chkpnt_Bursts = true;
                 }
+
+                if (currentJump == thresholdInverseM)
+                {
+                    superiorBoundRandomInverse = 8;
+                    inferiorBoundRandomInverse = 6;
+                    inferiorBoundAngleNormPos = 240f; // 240 medium
+                    superiorBoundAngleNormPos = 290f; // 290 medium
+                    inferiorBoundAngleNormNeg = 250f;// 250 medium
+                    superiorBoundAngleNormNeg = 320f; // 320 medium
+                }
+
+                if (currentJump == thresholdPeak)
+                {
+                    chkpnt_Peak = true;
+                    rope.rotationSpeed += 2f;
+                }
+
+                if (currentJump == thresholdInverseH)
+                {
+                    superiorBoundRandomInverse = 9;
+                    inferiorBoundRandomInverse = 7;
+                    inferiorBoundAngleNormPos = 180f; // 180 hard
+                    superiorBoundAngleNormPos = 210f; //210 hard
+                    inferiorBoundAngleNormNeg = 340f;// 340 hard
+                    superiorBoundAngleNormNeg = 359.9f; // 359.9 hard
+                }
+
+                if (currentJump == thresholdDeath)
+                {
+                    chkpnt_Death = true;
+                }
+            }
+
+            private bool PlayerResultInList(int playerId)
+            {
+                // Cant use LINQ contains, the EQUALS is already defined with score
+
+                foreach(var p in playerResults)
+                {
+                    if (p.playerId == playerId) return true;
+                }
+
+                return false;
+            }
+
+            private void AddPlayerResult(int playerId, int score)
+            {
+                // Safeguard, just in case someone accessed off sync.
+                if (PlayerResultInList(playerId)) return;
+
+                Debug.Log("Added results of: " + playerId + " of score: " + score);
+                PlayerResults<int> thisPlayerResult = new PlayerResults<int>();
+                thisPlayerResult.playerId = playerId;
+                thisPlayerResult.scoring = score;
+
+                playerResults[nextToInsert] = thisPlayerResult;
+                nextToInsert--;
+                playersAlive--;
+
+                if (playerId == PhotonNetwork.LocalPlayer.ActorNumber) isHighScore = GeneralHelperFunctions.DetermineHighScoreInt(Constants.RR_KEY_HISCORE, thisPlayerResult.scoring, true);
             }
 
             private void OnRoundCompleted()
@@ -156,6 +444,21 @@ namespace FiestaTime
                 currentJump += 1;
 
                 CheckCheckpoints();
+            }
+
+            private void OnPlayerFinished(int playerId, int score)
+            {
+                Debug.Log("Player " + playerId + " finished.");
+                AddPlayerResult(playerId, score);
+                // Give the result to the other players
+                photonView.RPC("RPC_SendPlayerResult", RpcTarget.Others, playerId, score);
+            }
+
+            [PunRPC]
+            public void RPC_SendPlayerResult(int playerId, int score)
+            {
+                Debug.Log("Player " + playerId + " finished over the net.");
+                AddPlayerResult(playerId, score);
             }
         }
     }

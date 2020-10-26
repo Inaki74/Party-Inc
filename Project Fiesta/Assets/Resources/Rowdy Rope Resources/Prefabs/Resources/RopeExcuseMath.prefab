@@ -49,7 +49,7 @@ MonoBehaviour:
     type: 3}
   startPoint: {fileID: 1398582740581494376}
   endPoint: {fileID: 1398582740245686279}
-  separation: 0.6
+  separation: 0.3
   angle: 0
   rotationSpeed: 1
 --- !u!1 &1398582740245686279

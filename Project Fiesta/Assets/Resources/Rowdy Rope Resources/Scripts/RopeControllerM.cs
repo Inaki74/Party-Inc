@@ -1,12 +1,13 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Photon.Pun;
 
 namespace FiestaTime
 {
     namespace RR
     {
-        public class RopeControllerM : MonoBehaviour
+        public class RopeControllerM : MonoBehaviourPun, IPunObservable
         {
             public delegate void ActionLoopCompleted();
             public static event ActionLoopCompleted onLoopComplete;
@@ -21,32 +22,16 @@ namespace FiestaTime
 
             private float distanceStartEnd;
             private float startingAngle;
-            private float speedIncreasePerRound = 0.2f; 
 
             private bool gameStarted;
             private bool firstRun;
+            public bool loopCompleted = true;
 
-            private bool chkpnt_Inverse;
-            private bool chkpnt_Bursts;
-            private bool chkpnt_Peak;
-            private bool chkpnt_Death;
+
 
             public float angle;
             public float rotationSpeed = 1f;
-
-            // Start is called before the first frame update
-            void Start()
-            {
-                firstRun = true;
-                gameStarted = false;
-
-                distanceStartEnd = Vector3.Distance(startPoint.transform.position, endPoint.transform.position);
-
-                startingAngle = GameManager.Current.startingAngle;
-                angle = startingAngle;
-                rotationSpeed = 0f;
-                InstantiateRope();
-            }
+            public float lastRotationSign;
 
             // Update is called once per frame
             void Update()
@@ -62,33 +47,60 @@ namespace FiestaTime
                     Debug.DrawRay(transform.position, transform.TransformDirection(new Vector3(Mathf.Cos(angle), Mathf.Sin(angle), 0f) * 5f), Color.red);
                     angle += Time.deltaTime * rotationSpeed;
 
-                    if(angle > 5 * Mathf.PI /2 && rotationSpeed > 0f)
+                    if (angle > Mathf.PI * 2)
                     {
-                        // Round completed
-                        onLoopComplete?.Invoke();
-                        angle = Mathf.PI/2;
+                        loopCompleted = false;
+                        angle = 0f;
                     }
 
-                    if (angle < Mathf.PI/ 2 && rotationSpeed < 0f)
+                    if (angle < Mathf.PI && angle > 175f * Mathf.Deg2Rad && rotationSpeed < 0f)
                     {
-                        // Round completed
+                        loopCompleted = false;
+                    }
+
+                    if (angle < 0f)
+                    {
+                        loopCompleted = false;
+                        angle = Mathf.PI * 2;
+                    }
+
+                    if (rotationSpeed < 0f && angle < Mathf.PI / 4 && !loopCompleted)
+                    {
+                        loopCompleted = true;
                         onLoopComplete?.Invoke();
-                        angle = 5 * Mathf.PI / 2;
+                    }
+                    if (rotationSpeed > 0f && angle > 3 * Mathf.PI / 4 && !loopCompleted)
+                    {
+                        loopCompleted = true;
+                        onLoopComplete?.Invoke();
                     }
                 }
-                
+
+            }
+
+            private void OnEnable()
+            {
+                firstRun = true;
+                gameStarted = false;
+
+                distanceStartEnd = Vector3.Distance(startPoint.transform.position, endPoint.transform.position);
+
+                startingAngle = GameManager.Current.startingAngle;
+                angle = startingAngle;
+                rotationSpeed = 0f;
+                InstantiateRope();
             }
 
             private void Awake()
             {
                 GameManager.onGameStart += OnGameStart;
-                GameManager.onCheckpointReached += OnCheckPointReached;
+                GameManager.onGameFinish += OnGameFinish;
             }
 
             private void OnDestroy()
             {
                 GameManager.onGameStart -= OnGameStart;
-                GameManager.onCheckpointReached -= OnCheckPointReached;
+                GameManager.onGameFinish -= OnGameFinish;
             }
 
             private void InstantiateRope()
@@ -106,7 +118,7 @@ namespace FiestaTime
 
                     float radius = Mathf.Pow(z, 2) / 40 - z / 2;
 
-                    ropeAux.Add(GO.GetComponent<RopeLinkM>().Init(this, radius, z, i, startingAngle * Mathf.Deg2Rad));
+                    ropeAux.Add(GO.GetComponent<RopeLinkM>().Init(this, radius, z, i, startingAngle));
 
                     z += separation;
                     i++;
@@ -115,41 +127,75 @@ namespace FiestaTime
                 ropeLinks = ropeAux.ToArray();
             }
 
+            public void InvertRope(float where)
+            {
+                StartCoroutine(InvertCo(where));
+            }
+
+            private IEnumerator InvertCo(float where)
+            {
+                if (rotationSpeed > 0f)
+                    yield return new WaitUntil(() => angle > where && angle < where + 10f * Mathf.Deg2Rad);
+                else if (rotationSpeed < 0f)
+                    yield return new WaitUntil(() => angle < where && angle > where - 10f * Mathf.Deg2Rad);
+
+                rotationSpeed *= -1;
+                loopCompleted = true;
+                photonView.RPC("RPC_SendInversion", RpcTarget.Others);
+            }
+
+            public void BurstRope(float amount)
+            {
+                StartCoroutine(BurstCo(amount));
+            }
+
+            private IEnumerator BurstCo(float amount)
+            {
+                if (rotationSpeed > 0f)
+                    yield return new WaitUntil(() => angle > 100f * Mathf.Deg2Rad && angle < 100f * Mathf.Deg2Rad + 10f * Mathf.Deg2Rad);
+                else if (rotationSpeed < 0f)
+                    yield return new WaitUntil(() => angle < 80f * Mathf.Deg2Rad && angle > 80f * Mathf.Deg2Rad - 10f * Mathf.Deg2Rad);
+
+                rotationSpeed += amount * Mathf.Sign(rotationSpeed);
+                photonView.RPC("RPC_SendBurst", RpcTarget.Others, amount);
+            }
+
             private void OnGameStart()
             {
                 gameStarted = true;
             }
 
-            private void OnCheckPointReached(int checkpoint)
+            private void OnGameFinish()
             {
-                switch (checkpoint)
+                gameStarted = false;
+                //loopCompleted = true;
+                rotationSpeed = 0f;
+            }
+
+            [PunRPC]
+            public void RPC_SendInversion()
+            {
+                rotationSpeed *= -1;
+                loopCompleted = true;
+            }
+
+            [PunRPC]
+            public void RPC_SendBurst(float amount)
+            {
+                rotationSpeed += amount * Mathf.Sign(rotationSpeed);
+            }
+
+            public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+            {
+                if (stream.IsWriting)
                 {
-                    case 0:
-                        // Mini Speed increase checkpoint
-                        if (!chkpnt_Peak)
-                        {
-                            // Increase speed
-                            // rotationalSpeed += speedIncreasePerRound; ?
-                        }
-                        break;
-                    case 1:
-                        // Inversion checkpoint
-                        chkpnt_Inverse = true;
-                        break;
-                    case 2:
-                        // Speed bursts checkpoint
-                        chkpnt_Bursts = true;
-                        break;
-                    case 3:
-                        // Speed peak
-                        chkpnt_Peak = true;
-                        break;
-                    case 4:
-                        // Death mode
-                        chkpnt_Death = true;
-                        break;
-                    default:
-                        break;
+                    if(gameStarted && GameManager.Current.MyPlayerHasLost())
+                        stream.SendNext(rotationSpeed);
+                }
+                else
+                {
+                    if (gameStarted && GameManager.Current.MyPlayerHasLost())
+                        rotationSpeed = (float)stream.ReceiveNext();
                 }
             }
         }

@@ -11,7 +11,7 @@ namespace FiestaTime
             // Transform of the xz plane.
             [SerializeField] private GameObject groundPlane;
             private RopeControllerM ropeController;
-            [SerializeField] private SphereCollider Sc;
+            [SerializeField] private CapsuleCollider Cc;
 
             private int positionInArray;
 
@@ -30,15 +30,15 @@ namespace FiestaTime
 
             public RopeLinkM Init(RopeControllerM rope, float rad, float z, int pos, float angle)
             {
-                if (Sc == null) Sc = GetComponent<SphereCollider>();
+                if (Cc == null) Cc = GetComponent<CapsuleCollider>();
 
                 ropeController = rope;
                 radius = rad;
                 currentAngle = angle;
-                transform.localPosition = new Vector3(radius, 0f, z);
+                transform.localPosition = new Vector3(0f, radius, z);
                 positionInArray = pos;
 
-                distanceToGrounded = 2 * Sc.bounds.extents.y;
+                distanceToGrounded = 6 * Cc.bounds.extents.y;
 
                 distanceToPlane = Vector3.Distance(ropeController.gameObject.transform.position, groundPlane.transform.position);
 
@@ -59,18 +59,17 @@ namespace FiestaTime
 
             private void OnCollisionEnter(Collision collision)
             {
-                if(collision.gameObject.tag == "Player")
+                if (collision.gameObject.tag == "Player")
                 {
-                    Debug.Log("TOuched you yo.");
                     // Kill player basically
-                    collision.rigidbody.AddForce((transform.position - lastPosition) * ropeController.rotationSpeed, ForceMode.Impulse);
+                    collision.gameObject.GetComponent<Player>().Die((transform.position - lastPosition) * ropeController.rotationSpeed);
                 }
             }
 
             private bool CheckIfWillBeGrounded()
             {
                 // If this cycle is beneath the threshold or if the next cycle is beneath the threshold
-                return transform.position.y + Mathf.Sin(currentAngle + Time.deltaTime * ropeController.rotationSpeed) * radius < -distanceToPlane + distanceToGrounded;
+                return transform.position.y + Mathf.Sin(currentAngle + Time.deltaTime * ropeController.rotationSpeed) * radius < -distanceToPlane + groundPlane.GetComponent<MeshCollider>().bounds.extents.y + distanceToGrounded;
             }
 
             private void MoveLink()
@@ -99,7 +98,7 @@ namespace FiestaTime
                     if (willTouchGround)
                     {
                         // Define distance ground
-                        distanceGround =  -distanceToPlane + distanceToGrounded;
+                        distanceGround =  -distanceToPlane + +groundPlane.GetComponent<MeshCollider>().bounds.extents.y + distanceToGrounded;
 
                         transform.localPosition = new Vector3(Mathf.Cos(currentAngle) * radius,
                                                           distanceGround,

@@ -28,12 +28,23 @@ namespace FiestaTime
         }
     }
 
+    public static class PlayerResultsHelper
+    {
+        public static void PrintArray(PlayerResults<int>[] pr)
+        {
+            foreach(var p in pr)
+            {
+                Debug.Log(p.ToString())
+;            }
+        }
+    }
+
     /// <summary>
     /// This class defines a FiestaTime GameManager, and posseses everything every GameManager probably has.
     /// </summary>
     /// <typeparam name="G"> The GameManager type </typeparam>
     /// <typeparam name="T"> The Scoring Type </typeparam>
-    public class FiestaGameManager<G, T> : MonoSingleton<G> where G : MonoSingleton<G>
+    public abstract class FiestaGameManager<G, T> : MonoSingleton<G> where G : MonoSingleton<G>
     {
         // The network controller in the scene.
         protected NetworkGameRoomController networkController;
@@ -102,20 +113,14 @@ namespace FiestaTime
         /// <summary>
         /// Use this instead of start
         /// </summary>
-        protected virtual void InStart()
-        {
-
-        }
+        protected abstract void InStart();
 
         /// <summary>
         /// Put in here the instantiations of everything you know depends on the game managers existance and isnt already on the scene. (Like players)
         /// Probably networked objects will lie here.
         /// This method will run after every player has connected.
         /// </summary>
-        protected virtual void InitializeGameManagerDependantObjects()
-        {
-
-        }
+        protected abstract void InitializeGameManagerDependantObjects();
     }
 }
 
