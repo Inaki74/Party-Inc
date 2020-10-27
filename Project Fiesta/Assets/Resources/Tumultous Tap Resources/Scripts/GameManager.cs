@@ -116,14 +116,6 @@ namespace FiestaTime
 
             private void OrderResults()
             {
-                // Get the amount of false and trues 
-                // Get all those who crossed the line
-                // Get all those who didnt
-                // Order those
-                // Order those
-                // Place first the crossed list
-                // Place second the not crossed list
-
                 int falseCounts = 0;
                 int trueCounts = 0; 
                 foreach(PlayerResults<float> res in playerResults)

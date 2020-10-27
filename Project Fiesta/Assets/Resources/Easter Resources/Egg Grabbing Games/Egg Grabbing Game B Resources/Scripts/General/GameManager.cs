@@ -17,6 +17,8 @@ namespace FiestaTime
         /// <summary>
         /// The game manager, responsible of starting the game and managing its functionality.
         /// </summary>
+        ///
+        // Change to FiestaManager
         public class GameManager : MonoSingleton<GameManager>
         {
             #region Events
@@ -31,7 +33,7 @@ namespace FiestaTime
             #endregion
 
             // Path to the Egg Maps directory, relative to the resources folder //TODO: Check if this is consistent with other devices.
-            private static string path = "Easter Resources/Egg Grabbing Games/Egg Grabbing Game B Resources/EggMaps/";
+            private static string Path = "Easter Resources/Egg Grabbing Games/Egg Grabbing Game B Resources/EggMaps/";
 
             #region General Game Settings
             [Header("General Game Settings")]
@@ -40,15 +42,6 @@ namespace FiestaTime
             public int amountOfMediumMaps = 4;
             public int amountOfHardMaps = 2;
             #endregion
-
-            [Header("Difficulty isnt working right now")]
-            public EGGBDifficulty difficulty;
-            public enum EGGBDifficulty
-            {
-                easy,
-                medium,
-                hard
-            }
 
             #region Spawner Settings
             [Header("Spawner Game Settings")]
@@ -74,18 +67,19 @@ namespace FiestaTime
             [SerializeField] private GameObject uiPrefab;
 
             #region Network Decided Settings
-            private Vector3 playerOneMiddleLane;
+            private Vector3 playerOneMiddleLane; // Make positions vector.
             private Vector3 playerTwoMiddleLane;
             #endregion
 
             #region Unity Callbacks
+            // wtf is this
             public override void Init()
             {
                 base.Init();
 
                 EasterEgg.onObtainEgg += OnEggObtain;
-                eggMaps = new int[amountOfEasyMaps + amountOfMediumMaps + amountOfHardMaps][,];
-                if (PhotonNetwork.IsMasterClient) { eggMaps = InitializeEggMaps(); NotifyPlayersMaps(); }
+                eggMaps = new int[amountOfEasyMaps + amountOfMediumMaps + amountOfHardMaps][,]; // SHould be in start
+                if (PhotonNetwork.IsMasterClient) { eggMaps = InitializeEggMaps(); NotifyPlayersMaps(); } // too
             }
 
             private void OnDestroy()
@@ -102,9 +96,9 @@ namespace FiestaTime
                 gameStarted = false;
                 currentTime = 0;
 
-                InitializeGameSettings();
+                InitializeGameSettings();// redo
 
-                InitializePlayer();
+                InitializePlayer(); // redo
 
                 Instantiate(uiPrefab);
 
@@ -117,6 +111,7 @@ namespace FiestaTime
                 // START GAME (run once per game)
                 if (currentTime > countdown + 1 && !gameStarted)
                 {
+                    // Redo
                     var GO = Instantiate(spawnerManagerPrefab);
 
                     Debug.Log("GameManager: Instantiating Egg Spawner, " + PhotonNetwork.NickName);
@@ -130,23 +125,26 @@ namespace FiestaTime
 
                 if (isGameFinished && !runOnce)
                 {
+                    // re think
                     if (PhotonNetwork.IsMasterClient)
                     {
                         winner = DecideWinner();
                         photonView.RPC("RPC_SendFinishedGame", RpcTarget.Others, isGameFinished, winner);
                     }
 
+                    // looks about fine
                     onGameFinish?.Invoke();
                     StartCoroutine("GameFinishCo");
                     runOnce = true;
                 }
 
-                photonView.RPC("RPC_SendCountdown", RpcTarget.Others, currentTime);
+                photonView.RPC("RPC_SendCountdown", RpcTarget.Others, currentTime); // shouldnt be here
             }
             #endregion
 
             #region Private Methods
 
+            // redo
             private int DecideWinner()
             {
                 int ret = 0;
@@ -208,16 +206,16 @@ namespace FiestaTime
                 {
                     if (e < amountOfEasyMaps)
                     {
-                        decided = path + "Easy/eggmp_Easy" + randomNumberE[e];
+                        decided = Path + "Easy/eggmp_Easy" + randomNumberE[e];
                     }
                     else if (e >= amountOfEasyMaps && e < amountOfEasyMaps + amountOfMediumMaps)
                     {
-                        decided = path + "Medium/eggmp_Medium" + randomNumberM[m];
+                        decided = Path + "Medium/eggmp_Medium" + randomNumberM[m];
                         m++;
                     }
                     else
                     {
-                        decided = path + "Hard/eggmp_Hard" + randomNumberH[h];
+                        decided = Path + "Hard/eggmp_Hard" + randomNumberH[h];
                         h++;
                     }
                     aux[e] = Resources.Load(decided, typeof(Array2DInt)) as Array2DInt;
@@ -237,7 +235,7 @@ namespace FiestaTime
 
             private int TotalAmountOfMaps(string difficulty)
             {
-                Object[] all = Resources.LoadAll(path + difficulty, typeof(Array2DInt)).Cast<Array2DInt>().ToArray();
+                Object[] all = Resources.LoadAll(Path + difficulty, typeof(Array2DInt)).Cast<Array2DInt>().ToArray();
                 Resources.UnloadUnusedAssets();
                 return all.Length;
             }
@@ -307,6 +305,7 @@ namespace FiestaTime
             /// <summary>
             /// Initializes the unmodifiable settings of the game which are dependant on the amount of players playing.
             /// </summary>
+            /// REDO
             private void InitializeGameSettings()
             {
                 playerTwoMiddleLane = Constants.TWOPLAYER_MID_LANE_PLYRTWO;
@@ -325,6 +324,7 @@ namespace FiestaTime
             /// <summary>
             /// Initializes the player/s.
             /// </summary>
+            /// REDO
             private void InitializePlayer()
             {
                 Vector3 decidedVector;

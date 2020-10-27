@@ -148,7 +148,7 @@ namespace FiestaTime
                 {
                     //Ours
                     stream.SendNext(transform.position);
-                    stream.SendNext(gameObject.activeInHierarchy);
+                    stream.SendNext(gameObject.activeInHierarchy); // Change to RPC
                     stream.SendNext(anim.GetBool(Constants.BOOL_BROKENEGG_ANIM));
                     stream.SendNext(Rb.velocity);
                 }

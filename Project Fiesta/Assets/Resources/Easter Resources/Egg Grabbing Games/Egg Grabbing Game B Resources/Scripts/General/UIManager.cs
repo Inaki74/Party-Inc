@@ -32,7 +32,7 @@ namespace FiestaTime
                 playerScore = 0;
                 GetTotalScore();
 
-                InitializeUI();
+                InitializeUI(); // redo
             }
 
             private void Awake()
@@ -54,6 +54,7 @@ namespace FiestaTime
             }
             #endregion
 
+            //Redo
             private void InitializeUI()
             {
                 if (PhotonNetwork.CurrentRoom.PlayerCount == 2)
@@ -133,6 +134,7 @@ namespace FiestaTime
             /// What happens when the player obtains an egg.
             /// </summary>
             /// <param name="score"></param>
+            /// Re think
             private void OnEggObtain(int score)
             {
                 playerScore += score;
@@ -141,6 +143,7 @@ namespace FiestaTime
                 playerScoreText.text = str;
             }
 
+            // Re think
             private void OnEnemyScoreChange(int score)
             {
                 string str = "SCORE@" + score;
