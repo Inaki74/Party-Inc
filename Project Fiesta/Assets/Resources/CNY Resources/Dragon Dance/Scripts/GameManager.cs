@@ -8,18 +8,14 @@ namespace FiestaTime
 {
     namespace DD
     {
-        public class GameManager : MonoSingleton<GameManager>
+        public class GameManager : FiestaGameManager<GameManager, int>
         {
-            private Vector3[] playerPositions = new Vector3[4];
 
             //The sequence map of moves to be generated.
             public int[] sequenceMap = new int[12];
             public int amountOfMovesThisRound = 4;
             public float countdownGameStart;
 
-            public int playersInGame;
-
-            public PlayerResults<int>[] playerResults;
             public int winnerId;
             public bool isHighScore;
 
@@ -42,9 +38,6 @@ namespace FiestaTime
 
             #region Events
 
-            public delegate void ActionGameStart();
-            public static event ActionGameStart onGameStart;
-
             public delegate void ActionSectionAdvance(int nextPhase);
             public static event ActionSectionAdvance onNextPhase;
 
@@ -54,17 +47,13 @@ namespace FiestaTime
             private bool startedGame;
             private bool localPlayerReady;
 
-            [SerializeField] private GameObject playerPrefab;
-            [SerializeField] private GameObject UIPrefab;
-
             #region Game Loop
 
-            void Start()
+            protected override void InStart()
             {
+                Debug.Log("Barrack Obama Start");
                 startedGame = false;
-
-                playersInGame = PhotonNetwork.PlayerList.Length;
-                playersLostAr = new bool[playersInGame];
+                playersLostAr = new bool[playerCount];
 
                 fieryRoundsTimeForInputDiscount = (timeForInput - minTimeForInput) / 10;
                 fieryRoundsTimeToSeeMoveDiscount = (timeToSeeMove - minTimeToSeeMove) / 10;
@@ -81,7 +70,11 @@ namespace FiestaTime
 
                 // Set that no one is ready yet.
                 ResetRemotePlayersReady();
+            }
 
+            protected override void InitializeGameManagerDependantObjects()
+            {
+                Debug.Log("Barrack Obama Init");
                 // Initialize players
                 InitializePlayers();
 
@@ -91,6 +84,7 @@ namespace FiestaTime
 
             private void Update()
             {
+                Debug.Log("Barrack Obama Update");
                 if(!startedGame && countdownGameStart <= -1f)
                 {
                     startedGame = true;
@@ -174,8 +168,7 @@ namespace FiestaTime
                 }
 
                 // Outro
-                // TODO: Decide winner, put on a FINISH screen.
-                if (playersInGame > 1) DecideWinner();
+                if (playerCount > 1) DecideWinner();
                 else
                 {
                     winnerId = PhotonNetwork.LocalPlayer.ActorNumber;
@@ -239,10 +232,10 @@ namespace FiestaTime
 
             private PlayerResults<int>[] GetPlayerResults()
             {
-                PlayerResults<int>[] ret = new PlayerResults<int>[playersInGame];
+                PlayerResults<int>[] ret = new PlayerResults<int>[playerCount];
                 Player[] players = FindObjectsOfType<Player>();
 
-                for(int i = 0; i < playersInGame; i++)
+                for(int i = 0; i < playerCount; i++)
                 {
                     ret[i] = players[i].myResults;
                 }
@@ -259,14 +252,14 @@ namespace FiestaTime
 
                 Vector3 decidedVec = Vector3.zero;
 
-                for (int i = 0; i < playersInGame; i++)
+                for (int i = 0; i < playerCount; i++)
                 {
                     if (PhotonNetwork.LocalPlayer.ActorNumber == PhotonNetwork.PlayerList[i].ActorNumber)
                     {
                         decidedVec = playerPositions[i];
                     }
                 }
-
+                Debug.Log(playerPrefab.name);
                 PhotonNetwork.Instantiate(playerPrefab.name, decidedVec, Quaternion.identity);
             }
 
@@ -332,7 +325,7 @@ namespace FiestaTime
             {
                 int playersStanding = 0;
 
-                for(int i = 0; i < playersInGame; i++)
+                for(int i = 0; i < playerCount; i++)
                 {
                     bool lost = (bool) playersLost[PhotonNetwork.PlayerList[i].ActorNumber];
                     playersLostAr[i] = lost;
@@ -340,7 +333,7 @@ namespace FiestaTime
                     if (!lost) playersStanding++;
                 }
 
-                if(playersInGame > 1)
+                if(playerCount > 1)
                 {
                     return playersStanding <= 1;
                 }

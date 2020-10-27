@@ -10,6 +10,8 @@ using Photon.Realtime;
 
 namespace FiestaTime
 {
+    // TODO: Rework this broken ass code and game.
+    // Its so spaghetti it hurts my pride and eyes.
     namespace EGG
     {
         /// <summary>

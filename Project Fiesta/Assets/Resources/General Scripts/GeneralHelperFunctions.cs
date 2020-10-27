@@ -11,12 +11,12 @@ namespace FiestaTime
         /// </summary>
         public static bool DetermineHighScoreInt(string hiScoreKey, int newScore, bool needsToBeBigger)
         {
-            Debug.Log(newScore);
+            //Debug.Log(newScore);
             int highScore = 0;
             if (PlayerPrefs.HasKey(hiScoreKey))
             {
                 highScore = PlayerPrefs.GetInt(hiScoreKey);
-                Debug.Log("Old high score" + highScore);
+                //Debug.Log("Old high score" + highScore);
                 // Had high score, check
                 if (needsToBeBigger)
                 {
@@ -25,7 +25,7 @@ namespace FiestaTime
                         // New High score
                         highScore = newScore;
                         PlayerPrefs.SetInt(hiScoreKey, highScore);
-                        Debug.Log("New high score" + highScore);
+                        //Debug.Log("New high score" + highScore);
                         return true;
                     }
                 }
@@ -36,7 +36,7 @@ namespace FiestaTime
                         // New High score
                         highScore = newScore;
                         PlayerPrefs.SetInt(hiScoreKey, highScore);
-                        Debug.Log("New high score" + highScore);
+                        //Debug.Log("New high score" + highScore);
                         return true;
                     }
                 }
@@ -46,7 +46,7 @@ namespace FiestaTime
             {
                 highScore = newScore;
                 PlayerPrefs.SetInt(hiScoreKey, highScore);
-                Debug.Log("New high score" + highScore);
+                //Debug.Log("New high score" + highScore);
                 return true;
             }
 
@@ -63,7 +63,7 @@ namespace FiestaTime
             if (PlayerPrefs.HasKey(hiScoreKey))
             {
                 highScore = PlayerPrefs.GetFloat(hiScoreKey);
-                Debug.Log("Old high score" + highScore);
+                //Debug.Log("Old high score" + highScore);
                 // Had high score, check
                 if (needsToBeBigger)
                 {
@@ -72,7 +72,7 @@ namespace FiestaTime
                         // New High score
                         highScore = newScore;
                         PlayerPrefs.SetFloat(hiScoreKey, highScore);
-                        Debug.Log("New high score" + highScore);
+                        //Debug.Log("New high score" + highScore);
                         return true;
                     }
                 }
@@ -83,7 +83,7 @@ namespace FiestaTime
                         // New High score
                         highScore = newScore;
                         PlayerPrefs.SetFloat(hiScoreKey, highScore);
-                        Debug.Log("New high score" + highScore);
+                        //Debug.Log("New high score" + highScore);
                         return true;
                     }
                 }
@@ -93,7 +93,7 @@ namespace FiestaTime
             {
                 highScore = newScore;
                 PlayerPrefs.SetFloat(hiScoreKey, highScore);
-                Debug.Log("New high score" + highScore);
+                //Debug.Log("New high score" + highScore);
                 return true;
             }
 

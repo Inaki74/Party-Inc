@@ -27,12 +27,12 @@ namespace FiestaTime
             private void OnEnable()
             {
                 // Set active for the amount of players playing.
-                for (int i = 0; i < GameManager.Current.playersInGame; i++)
+                for (int i = 0; i < GameManager.Current.playerCount; i++)
                 {
                     players[i].SetActive(true);
                 }
 
-                if(GameManager.Current.playersInGame == 1)
+                if(GameManager.Current.playerCount == 1)
                 {
                     highScores.SetActive(true);
                     highScore.text = PlayerPrefs.GetInt(Constants.DD_KEY_HISCORE).ToString();

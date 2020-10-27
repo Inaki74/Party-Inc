@@ -52,6 +52,10 @@ MonoBehaviour:
   - RPC_SendIfRight
   - RPC_Disable
   - RPC_SendPlayerResult
+  - RPC_SendPlayersReady
+  - RPC_InformPlayerLost
+  - RPC_SendInversion
+  - RPC_SendBurst
   DisableAutoOpenWizard: 1
   ShowSettings: 0
   DevRegionSetOnce: 1

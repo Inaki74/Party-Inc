@@ -18,6 +18,7 @@ namespace FiestaTime
         private const int maxEggPlayers = 2;
         private const int maxDdPlayers = 4;
         private const int maxTtPlayers = 4;
+        private const int maxRrPlayers = 4;
 
         private List<RoomInfo> currentRoomList;
 
@@ -79,6 +80,12 @@ namespace FiestaTime
         {
             if (gameToJoin == "")
                 JoinARoom("TT_", maxTtPlayers);
+        }
+
+        public void JoinRR()
+        {
+            if (gameToJoin == "")
+                JoinARoom("RR_", maxRrPlayers);
         }
 
         public void JoinARoom(string gameJoining, int maxPlayersAllowed)

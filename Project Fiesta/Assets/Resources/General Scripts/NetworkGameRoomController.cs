@@ -11,6 +11,8 @@ namespace FiestaTime
     {
         [SerializeField] private GameObject gameManager;
 
+        public bool playersAreReady;
+
         Hashtable playersReady = new Hashtable();
 
         #region Unity Callbacks
@@ -61,7 +63,9 @@ namespace FiestaTime
         {
             yield return new WaitUntil(() => PlayersLoadedGame());
 
-            PhotonNetwork.InstantiateRoomObject(gameManager.name, Vector3.zero, Quaternion.identity);
+            playersAreReady = true;
+            if (PhotonNetwork.IsMasterClient) photonView.RPC("RPC_SendPlayersReady", RpcTarget.Others, playersAreReady);
+            //PhotonNetwork.InstantiateRoomObject(gameManager.name, Vector3.zero, Quaternion.identity);
         }
 
         /// <summary>
@@ -99,6 +103,12 @@ namespace FiestaTime
                 playersReady.Remove(id);
                 playersReady.Add(id, true);
             }
+        }
+
+        [PunRPC]
+        public void RPC_SendPlayersReady(bool ready)
+        {
+            playersAreReady = ready;
         }
 
         #region PUN Callbacks

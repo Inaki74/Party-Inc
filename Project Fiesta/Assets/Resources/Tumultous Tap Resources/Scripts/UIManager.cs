@@ -13,8 +13,6 @@ namespace FiestaTime
             [SerializeField] private Text countdownText;
             [SerializeField] private Text timerText;
 
-            [SerializeField] private float countdown;
-
             [SerializeField] private GameObject finishScreen;
 
             private bool gameRunning = false;
@@ -37,13 +35,13 @@ namespace FiestaTime
             private void Awake()
             {
                 GameManager.onGameStart += OnGameStart;
-                GameManager.onGameFinished += OnGameFinish;
+                GameManager.onGameFinish += OnGameFinish;
             }
 
             private void OnDestroy()
             {
                 GameManager.onGameStart -= OnGameStart;
-                GameManager.onGameFinished -= OnGameFinish;
+                GameManager.onGameFinish -= OnGameFinish;
             }
 
             private void OnGameStart()

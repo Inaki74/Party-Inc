@@ -508,41 +508,6 @@ PrefabInstance:
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
       objectReference: {fileID: 1581109745}
-    - target: {fileID: 6811778602800222762, guid: 495afc8eeb16e4827bed1151078a2063,
-        type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: BtnLeaveRoom
-      objectReference: {fileID: 0}
-    - target: {fileID: 6811778602800222765, guid: 495afc8eeb16e4827bed1151078a2063,
-        type: 3}
-      propertyPath: m_AnchoredPosition.y
-      value: -450
-      objectReference: {fileID: 0}
-    - target: {fileID: 6811778603552528906, guid: 495afc8eeb16e4827bed1151078a2063,
-        type: 3}
-      propertyPath: m_AnchoredPosition.y
-      value: -350
-      objectReference: {fileID: 0}
-    - target: {fileID: 6811778604314160770, guid: 495afc8eeb16e4827bed1151078a2063,
-        type: 3}
-      propertyPath: m_AnchoredPosition.y
-      value: -550
-      objectReference: {fileID: 0}
-    - target: {fileID: 6811778604314160770, guid: 495afc8eeb16e4827bed1151078a2063,
-        type: 3}
-      propertyPath: m_SizeDelta.x
-      value: 200
-      objectReference: {fileID: 0}
-    - target: {fileID: 6811778604314160770, guid: 495afc8eeb16e4827bed1151078a2063,
-        type: 3}
-      propertyPath: m_SizeDelta.y
-      value: 75
-      objectReference: {fileID: 0}
-    - target: {fileID: 6811778604471875772, guid: 495afc8eeb16e4827bed1151078a2063,
-        type: 3}
-      propertyPath: m_AnchoredPosition.y
-      value: 250
-      objectReference: {fileID: 0}
     - target: {fileID: 6811778604748000901, guid: 495afc8eeb16e4827bed1151078a2063,
         type: 3}
       propertyPath: m_LocalPosition.x
