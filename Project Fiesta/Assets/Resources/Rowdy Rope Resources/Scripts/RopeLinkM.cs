@@ -6,6 +6,9 @@ namespace FiestaTime
 {
     namespace RR
     {
+        /// <summary>
+        /// The link moves mathematically and has a big pre-condition: the ground and the rope are both parallel.
+        /// </summary>
         public class RopeLinkM : MonoBehaviour
         {
             // Transform of the xz plane.
@@ -27,6 +30,7 @@ namespace FiestaTime
             private float currentAngle;
             private float firstGroundAngle;
             private float distanceGround;
+
 
             public RopeLinkM Init(RopeControllerM rope, float rad, float z, int pos, float angle)
             {
@@ -66,12 +70,19 @@ namespace FiestaTime
                 }
             }
 
+            /// <summary>
+            /// Checks if the link will be below ground on the next frame.
+            /// </summary>
+            /// <returns></returns>
             private bool CheckIfWillBeGrounded()
             {
                 // If this cycle is beneath the threshold or if the next cycle is beneath the threshold
                 return transform.position.y + Mathf.Sin(currentAngle + Time.deltaTime * ropeController.rotationSpeed) * radius < -distanceToPlane + groundPlane.GetComponent<MeshCollider>().bounds.extents.y + distanceToGrounded;
             }
 
+            /// <summary>
+            ///  Moves the link mathematically.
+            /// </summary>
             private void MoveLink()
             {
                 Vector3 nextPos = new Vector3(Mathf.Cos(currentAngle) * radius,

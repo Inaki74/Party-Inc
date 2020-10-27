@@ -1,5 +1,4 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
 using System.Linq;
@@ -8,15 +7,19 @@ namespace FiestaTime
 {
     namespace RR
     {
+        /// <summary>
+        /// The game manager class.
+        /// </summary>
         public class GameManager : FiestaGameManager<GameManager, int>
         {
-            [SerializeField] private GameObject stagePrefab;
             [SerializeField] private RopeControllerM rope;
 
             private Player[] players;
 
             public float startingSpeed;
             public float startingAngle;
+
+            #region Checkpoint Variables
 
             private int movesForSpeedIncrease = 4;
             private float speedIncreasePerMoves = 0.5f;
@@ -30,7 +33,8 @@ namespace FiestaTime
             private bool chkpnt_Inverse;
             private bool chkpnt_Bursts;
             private bool chkpnt_Peak;
-            private bool chkpnt_Death;
+
+            #endregion
 
             private bool firstRun;
             private int playersAlive;
@@ -42,6 +46,8 @@ namespace FiestaTime
             public int winnerId;
 
             public int currentJump;
+
+            #region Inverse Mechanic Variables
 
             private int superiorBoundRandomInverse = 7;
             private int inferiorBoundRandomInverse = 5;
@@ -57,6 +63,10 @@ namespace FiestaTime
             private float inferiorBoundAngleDecNeg = 120f;
             private float superiorBoundAngleDecNeg = 160f;
 
+            #endregion
+
+            #region Burst Mechanic Variables
+
             private int randomBurst = 0;
             private int superiorBoundRandomBurst = 7;
             private int inferiorBoundRandomBurst = 5;
@@ -67,6 +77,9 @@ namespace FiestaTime
 
             private float decreaseBurstPossibility = 0.5f;
 
+            #endregion
+
+            #region Fiesta Overrides
             protected override void InStart()
             {
                 firstRun = true;
@@ -83,6 +96,21 @@ namespace FiestaTime
                 InitializePlayers();
                 InitializeStage();
                 InitializeUI();
+            }
+
+            public override void Init()
+            {
+                RopeControllerM.onLoopComplete += OnRoundCompleted;
+                Player.onPlayerDied += OnPlayerFinished;
+            }
+
+            #endregion
+
+            #region Unity Callbacks
+            private void OnDestroy()
+            {
+                RopeControllerM.onLoopComplete -= OnRoundCompleted;
+                Player.onPlayerDied -= OnPlayerFinished;
             }
 
             // Update is called once per frame
@@ -115,33 +143,18 @@ namespace FiestaTime
                     }
                 }
 
-                //Here go end
-                if(playerCount == 1 && playersAlive == 0 && !gameEnded && rope.loopCompleted)
+                if (playerCount > 1 && playersAlive <= 0 && !gameEnded && rope.loopCompleted)
                 {
                     Debug.Log("Game should end");
                     gameEnded = true;
-                    FinishGame();
-                }
-
-                if (playerCount > 1 && playersAlive <= 1 && !gameEnded && rope.loopCompleted)
-                {
-                    Debug.Log("Game should end");
-                    gameEnded = true;
-                    FinishGame();
+                    winnerId = FindWinner();
+                    OnGameFinishInvoke();
                 }
             }
 
-            public override void Init()
-            {
-                RopeControllerM.onLoopComplete += OnRoundCompleted;
-                Player.onPlayerDied += OnPlayerFinished;
-            }
+            #endregion
 
-            private void OnDestroy()
-            {
-                RopeControllerM.onLoopComplete -= OnRoundCompleted;
-                Player.onPlayerDied -= OnPlayerFinished;
-            }
+            #region Initializations
 
             private void InitializePlayers()
             {
@@ -171,54 +184,6 @@ namespace FiestaTime
                 Instantiate(UIPrefab);
             }
 
-            private void FinishGame()
-            {
-                winnerId = FindWinner();
-                OnGameFinishInvoke();
-            }
-
-            private int FindWinner()
-            {
-                foreach(Player p in players)
-                {
-                    // If the player isnt in the list, its because:
-                    // It never lost
-                    // It lost but got through the sync somehow.
-                    AddPlayerResult(p.photonView.Owner.ActorNumber, currentJump);
-                }
-
-                PlayerResultsHelper.PrintArray(playerResults);
-                return CheckWinner();
-            }
-
-            public bool MyPlayerHasLost()
-            {
-                foreach(var p in players)
-                {
-                    if(p.photonView.Owner.ActorNumber == PhotonNetwork.LocalPlayer.ActorNumber)
-                    {
-                        return p.hasLost;
-                    }
-                }
-
-                return true;
-            }
-
-            private int CheckWinner()
-            {
-                var ordered = playerResults.OrderByDescending(p => p.scoring);
-                PlayerResults<int>[] o = ordered.ToArray();
-
-                for(int i = 1; i < o.Length; i++)
-                {
-                    if (o[0].Equals(o[1])){
-                        return -1;
-                    }
-                }
-
-                return o[0].playerId;
-            }
-
             private void SetPlayerPositions()
             {
                 switch (playerCount)
@@ -246,6 +211,15 @@ namespace FiestaTime
                 }
             }
 
+            #endregion
+
+            
+
+            #region Mechanics
+
+            /// <summary>
+            /// The function that manages the rope inversion mechanic.
+            /// </summary>
             private void InverseMechanic()
             {
                 // We reached zero, time to inverse
@@ -289,6 +263,9 @@ namespace FiestaTime
                 }
             }
 
+            /// <summary>
+            /// The function that manages the rope burst speeds mechanic.
+            /// </summary>
             private void BurstMechanic()
             {
                 if(randomBurst == 0)
@@ -336,6 +313,9 @@ namespace FiestaTime
                 }
             }
 
+            /// <summary>
+            /// A co-routine that waits until enough rounds have happened to reset the burst speed change.
+            /// </summary>
             private IEnumerator ResetBurstCo(float amount, int duration)
             {
                 Debug.Log("Waiting for reset");
@@ -345,11 +325,110 @@ namespace FiestaTime
                 rope.BurstRope(amount);
             }
 
+            #endregion
+
+            #region Game Results Functions
+            /// <summary>
+            /// Finds the winner of the game.
+            /// </summary>
+            /// <returns></returns>
+            private int FindWinner()
+            {
+                foreach (Player p in players)
+                {
+                    // If the player isnt in the list, its because:
+                    // It never lost
+                    // It lost but got through the sync somehow.
+                    AddPlayerResult(p.photonView.Owner.ActorNumber, currentJump);
+                }
+
+                PlayerResultsHelper.PrintArray(playerResults);
+                return CheckWinner();
+            }
+
+            /// <summary>
+            /// Ultimately checks the winner.
+            /// </summary>
+            /// <returns></returns>
+            private int CheckWinner()
+            {
+                var ordered = playerResults.OrderByDescending(p => p.scoring);
+                PlayerResults<int>[] o = ordered.ToArray();
+
+                for (int i = 1; i < o.Length; i++)
+                {
+                    if (o[0].Equals(o[1]))
+                    {
+                        return -1;
+                    }
+                }
+
+                return o[0].playerId;
+            }
+
+            /// <summary>
+            /// Checks if a player result is in the list.
+            /// </summary>
+            /// <param name="playerId"></param>
+            /// <returns></returns>
+            private bool PlayerResultInList(int playerId)
+            {
+                // Cant use LINQ contains, the EQUALS is already defined with score
+
+                foreach(var p in playerResults)
+                {
+                    if (p.playerId == playerId) return true;
+                }
+
+                return false;
+            }
+
+            /// <summary>
+            /// Adds player results to the list.
+            /// </summary>
+            /// <param name="playerId"></param>
+            /// <param name="score"></param>
+            private void AddPlayerResult(int playerId, int score)
+            {
+                // Safeguard, just in case someone accessed off sync.
+                if (PlayerResultInList(playerId)) return;
+
+                Debug.Log("Added results of: " + playerId + " of score: " + score);
+                PlayerResults<int> thisPlayerResult = new PlayerResults<int>();
+                thisPlayerResult.playerId = playerId;
+                thisPlayerResult.scoring = score;
+
+                playerResults[nextToInsert] = thisPlayerResult;
+                nextToInsert--;
+                playersAlive--;
+
+                if (playerId == PhotonNetwork.LocalPlayer.ActorNumber) isHighScore = GeneralHelperFunctions.DetermineHighScoreInt(Constants.RR_KEY_HISCORE, thisPlayerResult.scoring, true);
+            }
+
+            #endregion
+
+            #region Event Functions
+
+            private void OnRoundCompleted()
+            {
+                currentJump += 1;
+
+                CheckCheckpoints();
+            }
+
+            private void OnPlayerFinished(int playerId, int score)
+            {
+                Debug.Log("Player " + playerId + " finished.");
+                AddPlayerResult(playerId, score);
+                // Give the result to the other players
+                photonView.RPC("RPC_SendPlayerResult", RpcTarget.Others, playerId, score);
+            }
+
             private void CheckCheckpoints()
             {
                 // Check currentJump
                 // Here invoke the checkpoints
-                if(currentJump % movesForSpeedIncrease == 0)
+                if (currentJump % movesForSpeedIncrease == 0)
                 {
                     if (!chkpnt_Peak)
                     {
@@ -358,22 +437,22 @@ namespace FiestaTime
                     }
                 }
 
-                if(randomInverse != 0)
+                if (randomInverse != 0)
                 {
                     randomInverse--;
                 }
 
-                if(randomBurst != 0)
+                if (randomBurst != 0)
                 {
                     randomBurst--;
                 }
 
-                if(currentJump >= thresholdInverseE)
+                if (currentJump >= thresholdInverseE)
                 {
                     chkpnt_Inverse = true;
                 }
 
-                if(currentJump >= thresholdBurst)
+                if (currentJump >= thresholdBurst)
                 {
                     chkpnt_Bursts = true;
                 }
@@ -406,53 +485,26 @@ namespace FiestaTime
 
                 if (currentJump == thresholdDeath)
                 {
-                    chkpnt_Death = true;
+                    rope.rotationSpeed += 4f;
                 }
             }
 
-            private bool PlayerResultInList(int playerId)
-            {
-                // Cant use LINQ contains, the EQUALS is already defined with score
+            #endregion
 
-                foreach(var p in playerResults)
+            public bool MyPlayerHasLost()
+            {
+                foreach (var p in players)
                 {
-                    if (p.playerId == playerId) return true;
+                    if (p.photonView.Owner.ActorNumber == PhotonNetwork.LocalPlayer.ActorNumber)
+                    {
+                        return p.hasLost;
+                    }
                 }
 
-                return false;
+                return true;
             }
 
-            private void AddPlayerResult(int playerId, int score)
-            {
-                // Safeguard, just in case someone accessed off sync.
-                if (PlayerResultInList(playerId)) return;
-
-                Debug.Log("Added results of: " + playerId + " of score: " + score);
-                PlayerResults<int> thisPlayerResult = new PlayerResults<int>();
-                thisPlayerResult.playerId = playerId;
-                thisPlayerResult.scoring = score;
-
-                playerResults[nextToInsert] = thisPlayerResult;
-                nextToInsert--;
-                playersAlive--;
-
-                if (playerId == PhotonNetwork.LocalPlayer.ActorNumber) isHighScore = GeneralHelperFunctions.DetermineHighScoreInt(Constants.RR_KEY_HISCORE, thisPlayerResult.scoring, true);
-            }
-
-            private void OnRoundCompleted()
-            {
-                currentJump += 1;
-
-                CheckCheckpoints();
-            }
-
-            private void OnPlayerFinished(int playerId, int score)
-            {
-                Debug.Log("Player " + playerId + " finished.");
-                AddPlayerResult(playerId, score);
-                // Give the result to the other players
-                photonView.RPC("RPC_SendPlayerResult", RpcTarget.Others, playerId, score);
-            }
+            #region RPCs
 
             [PunRPC]
             public void RPC_SendPlayerResult(int playerId, int score)
@@ -460,6 +512,8 @@ namespace FiestaTime
                 Debug.Log("Player " + playerId + " finished over the net.");
                 AddPlayerResult(playerId, score);
             }
+
+            #endregion
         }
     }
 }

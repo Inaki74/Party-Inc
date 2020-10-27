@@ -7,6 +7,9 @@ namespace FiestaTime
 {
     namespace RR
     {
+        /// <summary>
+        /// A rope thats managed mathematically in opposition to physics.
+        /// </summary>
         public class RopeControllerM : MonoBehaviourPun, IPunObservable
         {
             public delegate void ActionLoopCompleted();
@@ -32,6 +35,8 @@ namespace FiestaTime
             public float angle;
             public float rotationSpeed = 1f;
             public float lastRotationSign;
+
+            #region Unity Callbacks
 
             // Update is called once per frame
             void Update()
@@ -103,6 +108,8 @@ namespace FiestaTime
                 GameManager.onGameFinish -= OnGameFinish;
             }
 
+            #endregion
+
             private void InstantiateRope()
             {
                 // Instantiate the objects and store them in respective arrays.
@@ -127,11 +134,22 @@ namespace FiestaTime
                 ropeLinks = ropeAux.ToArray();
             }
 
+            #region Mechanic Functions
+
+            /// <summary>
+            /// The public function that calls the rope inversion.
+            /// </summary>
+            /// <param name="where"></param>
             public void InvertRope(float where)
             {
                 StartCoroutine(InvertCo(where));
             }
 
+            /// <summary>
+            /// The function waits until the rope has reached a fair place to invert.
+            /// </summary>
+            /// <param name="where"></param>
+            /// <returns></returns>
             private IEnumerator InvertCo(float where)
             {
                 if (rotationSpeed > 0f)
@@ -144,11 +162,20 @@ namespace FiestaTime
                 photonView.RPC("RPC_SendInversion", RpcTarget.Others);
             }
 
+            /// <summary>
+            /// The public function that calls the rope speed burst.
+            /// </summary>
+            /// <param name="where"></param>
             public void BurstRope(float amount)
             {
                 StartCoroutine(BurstCo(amount));
             }
 
+            /// <summary>
+            /// The function waits until the rope has reached a fair place to speed up.
+            /// </summary>
+            /// <param name="where"></param>
+            /// <returns></returns>
             private IEnumerator BurstCo(float amount)
             {
                 if (rotationSpeed > 0f)
@@ -159,6 +186,10 @@ namespace FiestaTime
                 rotationSpeed += amount * Mathf.Sign(rotationSpeed);
                 photonView.RPC("RPC_SendBurst", RpcTarget.Others, amount);
             }
+
+            #endregion
+
+            #region Event Functions
 
             private void OnGameStart()
             {
@@ -171,6 +202,10 @@ namespace FiestaTime
                 //loopCompleted = true;
                 rotationSpeed = 0f;
             }
+
+            #endregion
+
+            #region Photon Sync
 
             [PunRPC]
             public void RPC_SendInversion()
@@ -198,6 +233,8 @@ namespace FiestaTime
                         rotationSpeed = (float)stream.ReceiveNext();
                 }
             }
+
+            #endregion
         }
     }
 }
