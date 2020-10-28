@@ -14,8 +14,6 @@ namespace FiestaTime
         /// </summary>
         public class EggPoolManager : MonoBehaviour
         {
-            private int amountOfEggs = 2;
-
             [SerializeField] private Transform eggHolder;
 
             [SerializeField] private GameObject easterEggPrefab;

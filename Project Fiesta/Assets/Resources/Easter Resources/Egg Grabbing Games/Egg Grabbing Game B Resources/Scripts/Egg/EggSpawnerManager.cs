@@ -58,14 +58,14 @@ namespace FiestaTime
             #region Unity Callbacks
             private void Start()
             {
-                if (leftSpawnerGO != null) { leftSpawnerGO.transform.position = middleSpawnerPosition + Vector3.left * 2; }
-                else leftSpawnerGO = InstantiateSpawner(middleSpawnerPosition + Vector3.left * 2);
+                if (leftSpawnerGO != null) { leftSpawnerGO.transform.position = middleSpawnerPosition + Vector3.left * 1.5f; }
+                else leftSpawnerGO = InstantiateSpawner(middleSpawnerPosition + Vector3.left * 1.5f);
 
                 if (middleSpawnerGO != null) { middleSpawnerGO.transform.position = middleSpawnerPosition; }
                 else middleSpawnerGO = InstantiateSpawner(middleSpawnerPosition);
 
-                if (rightSpawnerGO != null) { rightSpawnerGO.transform.position = middleSpawnerPosition + Vector3.right * 2; }
-                else rightSpawnerGO = InstantiateSpawner(middleSpawnerPosition + Vector3.right * 2);
+                if (rightSpawnerGO != null) { rightSpawnerGO.transform.position = middleSpawnerPosition + Vector3.right * 1.5f; }
+                else rightSpawnerGO = InstantiateSpawner(middleSpawnerPosition + Vector3.right * 1.5f);
 
                 leftSpawner = leftSpawnerGO.GetComponent<EggSpawner>();
                 middleSpawner = middleSpawnerGO.GetComponent<EggSpawner>();

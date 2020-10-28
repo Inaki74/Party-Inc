@@ -13,12 +13,9 @@ namespace FiestaTime
         /// </summary>
         public class UIManager : MonoBehaviour
         {
-            public int playerScore;
             public int totalScore = 0;
 
             #region UI Elements
-            public Text playerScoreText;
-            public Text enemyScoreText;
             public Text totalScoreText;
             public Text countdownText;
 
@@ -29,64 +26,23 @@ namespace FiestaTime
             #region Unity Callbacks
             void Start()
             {
-                playerScore = 0;
                 GetTotalScore();
 
-                InitializeUI(); // redo
+                GameStartCountdown();
             }
 
             private void Awake()
             {
-                EasterEgg.onObtainEgg += OnEggObtain;
                 EasterEgg.onSpawnEgg += OnEggSpawn;
-                GameManager.onGameStart += GameStartCountdown;
                 GameManager.onGameFinish += GameFinishDisplay;
-                GameManager.onEnemyScore += OnEnemyScoreChange;
             }
 
             private void OnDestroy()
             {
-                EasterEgg.onObtainEgg -= OnEggObtain;
                 EasterEgg.onSpawnEgg -= OnEggSpawn;
-                GameManager.onGameStart -= GameStartCountdown;
                 GameManager.onGameFinish -= GameFinishDisplay;
-                GameManager.onEnemyScore -= OnEnemyScoreChange;
             }
             #endregion
-
-            //Redo
-            private void InitializeUI()
-            {
-                if (PhotonNetwork.CurrentRoom.PlayerCount == 2)
-                {
-                    if (PhotonNetwork.IsMasterClient)
-                    {
-                        playerScoreText.rectTransform.anchorMin = new Vector2(0, 1);
-                        playerScoreText.rectTransform.anchorMax = new Vector2(0, 1);
-                        playerScoreText.rectTransform.anchoredPosition = new Vector3(Constants.XPOS_PLYRONESCORE_UI, -50, 0);
-
-                        enemyScoreText.rectTransform.anchorMin = new Vector2(1, 1);
-                        enemyScoreText.rectTransform.anchorMax = new Vector2(1, 1);
-                        enemyScoreText.rectTransform.anchoredPosition = new Vector3(Constants.XPOS_PLYRTWOSCORE_UI, -50, 0);
-                    }
-                    else
-                    {
-                        enemyScoreText.rectTransform.anchorMin = new Vector2(0, 1);
-                        enemyScoreText.rectTransform.anchorMax = new Vector2(0, 1);
-                       enemyScoreText.rectTransform.anchoredPosition = new Vector3(Constants.XPOS_PLYRONESCORE_UI, -50, 0);
-
-                        playerScoreText.rectTransform.anchorMin = new Vector2(1, 1);
-                        playerScoreText.rectTransform.anchorMax = new Vector2(1, 1);
-                        playerScoreText.rectTransform.anchoredPosition = new Vector3(Constants.XPOS_PLYRTWOSCORE_UI, -50, 0);
-                    }
-                }
-                else
-                {
-                    //-1242, +992
-                    playerScoreText.rectTransform.anchoredPosition = new Vector3(Constants.XPOS_PLYRONESCORE_UI, -50, 0);
-                    enemyScoreText.rectTransform.anchoredPosition = new Vector3(Constants.XPOS_PLYRONESCORE_UI, 500, 0);
-                }
-            }
 
             /// <summary>
             /// Countdown coroutine starter.
@@ -128,27 +84,6 @@ namespace FiestaTime
                 string str = "LEFT@" + totalScore;
                 str = str.Replace("@", System.Environment.NewLine);
                 totalScoreText.text = str;
-            }
-
-            /// <summary>
-            /// What happens when the player obtains an egg.
-            /// </summary>
-            /// <param name="score"></param>
-            /// Re think
-            private void OnEggObtain(int score)
-            {
-                playerScore += score;
-                string str = "SCORE@" + playerScore;
-                str = str.Replace("@", System.Environment.NewLine);
-                playerScoreText.text = str;
-            }
-
-            // Re think
-            private void OnEnemyScoreChange(int score)
-            {
-                string str = "SCORE@" + score;
-                str = str.Replace("@", System.Environment.NewLine);
-                enemyScoreText.text = str;
             }
 
             /// <summary>

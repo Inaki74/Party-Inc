@@ -268,7 +268,7 @@ namespace FiestaTime
             /// </summary>
             private void SetPlayerPositions()
             {
-                switch (PhotonNetwork.CurrentRoom.PlayerCount)
+                switch (playerCount)
                 {
                     case 1:
                         playerPositions[0] = new Vector3(0f, 0.5f, -16f);
@@ -287,8 +287,6 @@ namespace FiestaTime
                         playerPositions[1] = new Vector3(-0.85f, 0.5f, -16f);
                         playerPositions[2] = new Vector3(0.85f, 0.5f, -16f);
                         playerPositions[3] = new Vector3(2.5f, 0.5f, -16f);
-                        break;
-                    default:
                         break;
                 }
             }
