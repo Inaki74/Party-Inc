@@ -8,12 +8,13 @@ namespace FiestaTime
 {
     namespace EGG
     {
-        public class Player : MonoBehaviourPun
+        public class Player : MonoBehaviourPun, IPunObservable
         {
             #region Components
             [SerializeField]
             public Camera MainCamera { get; private set; }
             private PlayerInputManager InputManager;
+            private PlayerPreferencesManager playerUI;
             private MeshRenderer Mr;
             private BoxCollider Bc;
             #endregion
@@ -21,6 +22,17 @@ namespace FiestaTime
             public float movementSpeed;
             public float stunTime;
 
+            private PlayerResults<int> myResults;
+            public PlayerResults<int> MyResults {
+                get
+                {
+                    return myResults;
+                }
+                private set
+                {
+                    myResults = value;
+                }
+            }
 
             #region Instance Variables
             private Vector3 railLeft;
@@ -36,21 +48,44 @@ namespace FiestaTime
             #region Unity Callback Functions
             private void Start()
             {
-                InputManager = GetComponent<PlayerInputManager>();
-                MainCamera = FindObjectOfType<Camera>();
-                Bc = GetComponent<BoxCollider>();
-                Mr = GetComponent<MeshRenderer>();
+                if (InputManager == null)
+                {
+                    InputManager = GetComponent<PlayerInputManager>();
+                }
+                if (MainCamera == null)
+                {
+                    MainCamera = FindObjectOfType<Camera>();
+                }
+                if (Bc == null)
+                {
+                    Bc = GetComponent<BoxCollider>();
+                }
+                if (Mr == null)
+                {
+                    Mr = GetComponent<MeshRenderer>();
+                }
+                foreach(PlayerPreferencesManager p in FindObjectsOfType<PlayerPreferencesManager>())
+                {
+                    if (p.photonView.IsMine)
+                    {
+                        playerUI = p;
+                        break;
+                    }
+                }
 
-                if (!photonView.IsMine) return;
+                if (photonView.IsMine)
+                {
+                    railMiddle = transform.position;
+                    railRight = railMiddle + Vector3.right * 1.5f;
+                    railLeft = railMiddle + Vector3.left * 1.5f;
+                    transform.position = railMiddle;
 
-                railMiddle = transform.position;
-                railRight = railMiddle + Vector3.right * 2;
-                railLeft = railMiddle + Vector3.left * 2;
+                    runOnce = true;
+                    isStunned = false;
 
-                runOnce = true;
-                isStunned = false;
-
-                transform.position = railMiddle;
+                    myResults.playerId = PhotonNetwork.LocalPlayer.ActorNumber;
+                    myResults.scoring = 0;
+                }
             }
 
             private void FixedUpdate()
@@ -73,13 +108,13 @@ namespace FiestaTime
 
             private void Awake()
             {
-                EasterEgg.onObtainEgg += OnRottenObtain;
+                EasterEgg.onObtainEgg += OnEggObtain;
                 GameManager.onGameFinish += OnGameFinish;
             }
 
             private void OnDestroy()
             {
-                EasterEgg.onObtainEgg -= OnRottenObtain;
+                EasterEgg.onObtainEgg -= OnEggObtain;
                 GameManager.onGameFinish -= OnGameFinish;
             }
             #endregion
@@ -138,7 +173,7 @@ namespace FiestaTime
                 return transform.position.x == v.x;
             }
 
-            private void OnRottenObtain(int scoreModifier)
+            private void OnEggObtain(int scoreModifier)
             {
                 if (!photonView.IsMine) return;
 
@@ -146,6 +181,8 @@ namespace FiestaTime
                 {
                     StartCoroutine("StunnedCo");
                 }
+                myResults.scoring += scoreModifier;
+                playerUI.UpdateScore(myResults.scoring);
             }
 
             public bool GetIfStunned()
@@ -155,7 +192,27 @@ namespace FiestaTime
 
             public void OnGameFinish()
             {
+                if (photonView.IsMine) GameManager.Current.isHighScore = GeneralHelperFunctions.DetermineHighScoreInt(FiestaTime.Constants.EGG_KEY_HISCORE, MyResults.scoring, true);
+
                 StopAllCoroutines();
+            }
+
+            public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+            {
+                if (stream.IsWriting)
+                {
+                    stream.SendNext(myResults.playerId);
+                    stream.SendNext(myResults.scoring);
+                }
+                else
+                {
+                    PlayerResults<int> aux = new PlayerResults<int>();
+
+                    aux.playerId = (int)stream.ReceiveNext();
+                    aux.scoring = (int)stream.ReceiveNext();
+
+                    myResults = aux;
+                }
             }
         }
 

@@ -17,38 +17,24 @@ namespace FiestaTime
         /// <summary>
         /// The game manager, responsible of starting the game and managing its functionality.
         /// </summary>
-        public class GameManager : MonoSingleton<GameManager>
+        ///
+        // Change to FiestaManager
+        public class GameManager : FiestaGameManager<GameManager, int>
         {
             #region Events
-            public delegate void ActionGameStart();
-            public static event ActionGameStart onGameStart;
-
-            public delegate void ActionGameFinish();
-            public static event ActionGameFinish onGameFinish;
-
             public delegate void ActionEnemyScore(int score);
             public static event ActionEnemyScore onEnemyScore;
             #endregion
 
             // Path to the Egg Maps directory, relative to the resources folder //TODO: Check if this is consistent with other devices.
-            private static string path = "Easter Resources/Egg Grabbing Games/Egg Grabbing Game B Resources/EggMaps/";
+            private static string Path = "Easter Resources/Egg Grabbing Games/Egg Grabbing Game B Resources/EggMaps/";
 
             #region General Game Settings
             [Header("General Game Settings")]
-            public float countdown;
             public int amountOfEasyMaps = 4;
             public int amountOfMediumMaps = 4;
             public int amountOfHardMaps = 2;
             #endregion
-
-            [Header("Difficulty isnt working right now")]
-            public EGGBDifficulty difficulty;
-            public enum EGGBDifficulty
-            {
-                easy,
-                medium,
-                hard
-            }
 
             #region Spawner Settings
             [Header("Spawner Game Settings")]
@@ -57,121 +43,171 @@ namespace FiestaTime
             #endregion
 
             [SerializeField] public int[][,] eggMaps;
-            private float currentTime;
             private bool gameStarted;
             private bool runOnce = false;
             private int startingEggCount = 0;
             public bool isGameFinished;
             public bool isHighScore;
-            public int playerScore;
-            public int enemyScore;
-            public int winner;
+            public int winnerId;
 
             [SerializeField] private GameObject playerAssetsPrefab;
-            [SerializeField] private GameObject playerPrefab;
             [SerializeField] private GameObject spawnerManagerPrefab;
             [SerializeField] private GameObject eggPoolManagerPrefab;
-            [SerializeField] private GameObject uiPrefab;
 
-            #region Network Decided Settings
-            private Vector3 playerOneMiddleLane;
-            private Vector3 playerTwoMiddleLane;
+            #region FiestaFunctions
+
+            protected override void InStart()
+            {
+                eggMaps = new int[amountOfEasyMaps + amountOfMediumMaps + amountOfHardMaps][,];
+
+                if (PhotonNetwork.IsMasterClient)
+                {
+                    eggMaps = InitializeEggMaps();
+                    NotifyPlayersMaps();
+                }
+
+                isGameFinished = false;
+                gameStarted = false;
+            }
+
+            protected override void InitializeGameManagerDependantObjects()
+            {
+                InitializePlayer();
+
+                Instantiate(UIPrefab);
+
+                OnGameStartInvoke();
+            }
             #endregion
 
             #region Unity Callbacks
-            public override void Init()
-            {
-                base.Init();
-
-                EasterEgg.onObtainEgg += OnEggObtain;
-                eggMaps = new int[amountOfEasyMaps + amountOfMediumMaps + amountOfHardMaps][,];
-                if (PhotonNetwork.IsMasterClient) { eggMaps = InitializeEggMaps(); NotifyPlayersMaps(); }
-            }
-
-            private void OnDestroy()
-            {
-                EasterEgg.onObtainEgg -= OnEggObtain;
-            }
-
-            void Start()
-            {
-                if (PhotonNetwork.IsMasterClient) PhotonNetwork.InstantiateRoomObject(eggPoolManagerPrefab.name, new Vector3(0, 12f, 0), Quaternion.identity);
-
-                isGameFinished = false;
-
-                gameStarted = false;
-                currentTime = 0;
-
-                InitializeGameSettings();
-
-                InitializePlayer();
-
-                Instantiate(uiPrefab);
-
-                onGameStart?.Invoke();
-            }
-
             void Update()
             {
-                currentTime += Time.deltaTime;
                 // START GAME (run once per game)
-                if (currentTime > countdown + 1 && !gameStarted)
+                if (gameStartCountdown <= -1f && !gameStarted)
                 {
-                    var GO = Instantiate(spawnerManagerPrefab);
-
-                    Debug.Log("GameManager: Instantiating Egg Spawner, " + PhotonNetwork.NickName);
-
-                    if (PhotonNetwork.IsMasterClient)
-                        GO.GetComponent<EggSpawnerManager>().SetSettings(waveIntervals, timeLimitOffset, playerOneMiddleLane);
-                    else GO.GetComponent<EggSpawnerManager>().SetSettings(waveIntervals, timeLimitOffset, playerTwoMiddleLane);
+                    InstantiateSpawnerManagers();
 
                     gameStarted = true;
+                }
+                else
+                {
+                    gameStartCountdown -= Time.deltaTime;
                 }
 
                 if (isGameFinished && !runOnce)
                 {
-                    if (PhotonNetwork.IsMasterClient)
-                    {
-                        winner = DecideWinner();
-                        photonView.RPC("RPC_SendFinishedGame", RpcTarget.Others, isGameFinished, winner);
-                    }
-
-                    onGameFinish?.Invoke();
-                    StartCoroutine("GameFinishCo");
+                    FinishGame();
                     runOnce = true;
                 }
-
-                photonView.RPC("RPC_SendCountdown", RpcTarget.Others, currentTime);
             }
             #endregion
 
             #region Private Methods
 
-            private int DecideWinner()
+            /// <summary>
+            /// Initializes position vector.
+            /// </summary>
+            private void SetPositionsVector()
             {
-                int ret = 0;
-
-                if(PhotonNetwork.PlayerList.Count() == 1)
+                switch (playerCount)
                 {
-                    return -1;
+                    case 1:
+                        playerPositions[0] = Vector3.zero;
+                        break;
+                    case 2:
+                        playerPositions[0] = new Vector3(4f, 0f, 0f);
+                        playerPositions[1] = new Vector3(-4f, 0f, 0f);
+                        break;
+                    case 3:
+                        playerPositions[0] = new Vector3(5f, 0f, 0f);
+                        playerPositions[1] = new Vector3(0f, 0f, 0f);
+                        playerPositions[2] = new Vector3(-5f, 0f, 0f);
+                        break;
+                    case 4:
+                        playerPositions[0] = new Vector3(6f, 0f, 0f);
+                        playerPositions[1] = new Vector3(2f, 0f, 0f);
+                        playerPositions[2] = new Vector3(-2f, 0f, 0f);
+                        playerPositions[3] = new Vector3(-6f, 0f, 0f);
+                        break;
+                    default:
+                        break;
                 }
+            }
 
-                if(playerScore > enemyScore)
+            /// <summary>
+            /// Initializes the player/s.
+            /// </summary>
+            private void InitializePlayer()
+            {
+                SetPositionsVector();
+
+                Vector3 decidedVector = Vector3.zero;
+
+                for(int i = 0; i < playerCount; i++)
                 {
-                    ret = PhotonNetwork.LocalPlayer.ActorNumber; //Master client wins
-                }
-                else if(playerScore < enemyScore)
-                {
-                    foreach(var player in PhotonNetwork.PlayerList)
+                    if(PhotonNetwork.PlayerList[i].ActorNumber == PhotonNetwork.LocalPlayer.ActorNumber)
                     {
-                        if(PhotonNetwork.LocalPlayer.ActorNumber != player.ActorNumber)
-                        {
-                            ret = player.ActorNumber; // Other client wins
-                        }
+                        decidedVector = playerPositions[i];
                     }
                 }
 
-                return ret;
+                PhotonNetwork.Instantiate(playerAssetsPrefab.name, decidedVector, Quaternion.identity);
+                PhotonNetwork.Instantiate(playerPrefab.name, decidedVector + new Vector3(0f, 0.7f, 0f), Quaternion.identity);
+            }
+
+            private void InstantiateSpawnerManagers()
+            {
+                var GO = Instantiate(spawnerManagerPrefab);
+
+                Vector3 decidedVector = Vector3.zero;
+
+                for (int i = 0; i < playerCount; i++)
+                {
+                    if (PhotonNetwork.PlayerList[i].ActorNumber == PhotonNetwork.LocalPlayer.ActorNumber)
+                    {
+                        decidedVector = playerPositions[i];
+                    }
+                }
+
+                GO.GetComponent<EggSpawnerManager>().SetSettings(waveIntervals, timeLimitOffset, decidedVector);
+            }
+
+            private void FinishGame()
+            {
+                DecideWinner();
+
+                OnGameFinishInvoke();
+                StartCoroutine("GameFinishCo");
+            }
+
+            private void DecideWinner()
+            {
+                playerResults = GetPlayerResults();
+
+                int max = -1;
+                for (int i = 0; i < playerResults.Length; i++)
+                {
+                    if (playerResults[i].scoring > max)
+                    {
+                        max = playerResults[i].scoring;
+                        winnerId = playerResults[i].playerId;
+                    }
+                }
+
+                PlayerResults<int> aux = new PlayerResults<int>();
+                aux.scoring = max;
+                int hap = 0;
+                foreach (PlayerResults<int> result in playerResults)
+                {
+                    if (result.Equals(aux)) hap++;
+                }
+
+                if (hap > 1)
+                {
+                    //Draw
+                    winnerId = -1;
+                }
             }
 
             /// <summary>
@@ -185,8 +221,19 @@ namespace FiestaTime
                 Resources.UnloadUnusedAssets();
 
                 StopAllCoroutines();
+            }
 
-                if (photonView.IsMine) isHighScore = GeneralHelperFunctions.DetermineHighScoreInt(FiestaTime.Constants.EGG_KEY_HISCORE, playerScore, true);
+            private PlayerResults<int>[] GetPlayerResults()
+            {
+                PlayerResults<int>[] ret = new PlayerResults<int>[playerCount];
+                Player[] players = FindObjectsOfType<Player>();
+
+                for (int i = 0; i < playerCount; i++)
+                {
+                    ret[i] = players[i].MyResults;
+                }
+
+                return ret;
             }
 
             /// <summary>
@@ -202,22 +249,22 @@ namespace FiestaTime
 
                 int m = 0;
                 int h = 0;
-                string decided = "";
 
                 for (int e = 0; e < randomNumberE.Length + randomNumberM.Length + randomNumberH.Length; e++)
                 {
+                    string decided = "";
                     if (e < amountOfEasyMaps)
                     {
-                        decided = path + "Easy/eggmp_Easy" + randomNumberE[e];
+                        decided = Path + "Easy/eggmp_Easy" + randomNumberE[e];
                     }
                     else if (e >= amountOfEasyMaps && e < amountOfEasyMaps + amountOfMediumMaps)
                     {
-                        decided = path + "Medium/eggmp_Medium" + randomNumberM[m];
+                        decided = Path + "Medium/eggmp_Medium" + randomNumberM[m];
                         m++;
                     }
                     else
                     {
-                        decided = path + "Hard/eggmp_Hard" + randomNumberH[h];
+                        decided = Path + "Hard/eggmp_Hard" + randomNumberH[h];
                         h++;
                     }
                     aux[e] = Resources.Load(decided, typeof(Array2DInt)) as Array2DInt;
@@ -237,7 +284,7 @@ namespace FiestaTime
 
             private int TotalAmountOfMaps(string difficulty)
             {
-                Object[] all = Resources.LoadAll(path + difficulty, typeof(Array2DInt)).Cast<Array2DInt>().ToArray();
+                Object[] all = Resources.LoadAll(Path + difficulty, typeof(Array2DInt)).Cast<Array2DInt>().ToArray();
                 Resources.UnloadUnusedAssets();
                 return all.Length;
             }
@@ -304,39 +351,6 @@ namespace FiestaTime
                 return totalCount;
             }
 
-            /// <summary>
-            /// Initializes the unmodifiable settings of the game which are dependant on the amount of players playing.
-            /// </summary>
-            private void InitializeGameSettings()
-            {
-                playerTwoMiddleLane = Constants.TWOPLAYER_MID_LANE_PLYRTWO;
-
-                if (PhotonNetwork.CurrentRoom.PlayerCount == 2)
-                {
-                    Debug.Log("GameManager: Setting up for two players...");
-                    playerOneMiddleLane = Constants.TWOPLAYER_MID_LANE_PLYRONE;
-                }
-                else
-                {
-                    playerOneMiddleLane = Constants.ONEPLAYER_MID_LANE;
-                }
-            }
-
-            /// <summary>
-            /// Initializes the player/s.
-            /// </summary>
-            private void InitializePlayer()
-            {
-                Vector3 decidedVector;
-
-                if (PhotonNetwork.IsMasterClient) decidedVector = playerOneMiddleLane;
-                else decidedVector = playerTwoMiddleLane;
-
-                var holder = PhotonNetwork.Instantiate(playerAssetsPrefab.name, decidedVector, Quaternion.identity);
-                var plyr = PhotonNetwork.Instantiate(playerPrefab.name, decidedVector + new Vector3(0f, 0.7f, 0f), Quaternion.identity);
-
-            }
-
             private void NotifyPlayersMaps()
             {
                 int[][][] ret = new int[amountOfEasyMaps + amountOfMediumMaps + amountOfHardMaps][][];
@@ -378,31 +392,16 @@ namespace FiestaTime
             public void SetGameFinished(bool b)
             {
                 isGameFinished = b;
-            }
-
-            /// <summary>
-            /// Actions to do when an onObtainEgg event is triggered. Sets the player score.
-            /// </summary>
-            /// <param name="score"></param>
-            public void OnEggObtain(int score)
-            {
-                playerScore += score;
-                photonView.RPC("RPC_SendScore", RpcTarget.Others, playerScore);
+                photonView.RPC("RPC_SendFinishedGame", RpcTarget.Others, b);
             }
             #endregion
 
             #region PUN RPC
-            [PunRPC]
-            public void RPC_SendCountdown(float time)
-            {
-                currentTime = time;
-            }
 
             [PunRPC]
-            public void RPC_SendFinishedGame(bool finished, int theWinner)
+            public void RPC_SendFinishedGame(bool finished)
             {
                 isGameFinished = finished;
-                winner = theWinner;
             }
 
             [PunRPC]
@@ -414,13 +413,6 @@ namespace FiestaTime
                     eggMaps[i] = SerializationHelperClass.DeserializeTDArray(received[i]);
                 }
                 startingEggCount = (int)args[1];
-            }
-
-            [PunRPC]
-            public void RPC_SendScore(int score)
-            {
-                enemyScore = score;
-                onEnemyScore?.Invoke(score);
             }
             #endregion
 

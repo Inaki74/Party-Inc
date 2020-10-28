@@ -14,15 +14,11 @@ namespace FiestaTime
             public static GameObject LocalPlayerInstance;
 
             public Animator animations;
-            public Text nameText;
+            [SerializeField] private Text nameText;
+            [SerializeField] private Text scoreText;
 
             private string decidedCharacter;
             private string playerName;
-
-            private void Awake()
-            {
-
-            }
 
             // Start is called before the first frame update
             void Start()
@@ -50,6 +46,18 @@ namespace FiestaTime
                         //Put on Santa Claus animations and sprites
                         break;
                 }
+            }
+
+            public void UpdateScore(int score)
+            {
+                scoreText.text = string.Format("{0:0}", score);
+                photonView.RPC("RPC_SendNewScore", RpcTarget.Others, score);
+            }
+
+            [PunRPC]
+            public void RPC_SendNewScore(int score)
+            {
+                scoreText.text = string.Format("{0:0}", score);
             }
         }
 

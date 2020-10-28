@@ -14,8 +14,6 @@ namespace FiestaTime
         /// </summary>
         public class EggPoolManager : MonoBehaviour
         {
-            private int amountOfEggs = 2;
-
             [SerializeField] private Transform eggHolder;
 
             [SerializeField] private GameObject easterEggPrefab;
@@ -29,23 +27,6 @@ namespace FiestaTime
             void Start()
             {
                 eggHolder = GetComponentInChildren<Transform>();
-                //InitializeEggs(amountOfEggs);
-            }
-
-            /// <summary>
-            /// Initializes the first eggs on start.
-            /// </summary>
-            /// <param name="n"></param>
-            private void InitializeEggs(int n)
-            {
-                for (int i = 0; i < n; i++)
-                {
-                    GenerateEgg(0);
-
-                    GenerateEgg(1);
-
-                    GenerateEgg(2);
-                }
             }
 
             /// <summary>

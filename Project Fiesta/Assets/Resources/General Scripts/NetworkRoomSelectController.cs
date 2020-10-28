@@ -15,7 +15,7 @@ namespace FiestaTime
     /// </summary>
     public class NetworkRoomSelectController : MonoBehaviourPunCallbacks
     {
-        private const int maxEggPlayers = 2;
+        private const int maxEggPlayers = 4;
         private const int maxDdPlayers = 4;
         private const int maxTtPlayers = 4;
         private const int maxRrPlayers = 4;

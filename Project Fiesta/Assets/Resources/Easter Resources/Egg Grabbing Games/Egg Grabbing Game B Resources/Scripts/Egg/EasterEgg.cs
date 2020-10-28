@@ -47,12 +47,6 @@ namespace FiestaTime
             public SphereCollider Sc;
             #endregion
 
-            #region Physics Variables
-            #endregion
-
-            #region Boolean Variables
-            #endregion
-
             #region Unity Callbacks
             private void Awake()
             {
@@ -65,6 +59,7 @@ namespace FiestaTime
 
             private void OnEnable()
             {
+                photonView.RPC("RPC_SendActive", RpcTarget.Others, true);
                 Sc.enabled = true;
                 Rb.useGravity = true;
             }
@@ -123,6 +118,7 @@ namespace FiestaTime
                 onObtainEgg?.Invoke(scoreModifier);
                 //Play OnObtain animation (specific to each egg though)
                 gameObject.SetActive(false);
+                photonView.RPC("RPC_SendActive", RpcTarget.Others, false);
             }
 
             /// <summary>
@@ -140,6 +136,13 @@ namespace FiestaTime
             {
                 anim.SetBool(Constants.BOOL_BROKENEGG_ANIM, false);
                 gameObject.SetActive(false);
+                photonView.RPC("RPC_SendActive", RpcTarget.Others, false);
+            }
+
+            [PunRPC]
+            public void RPC_SendActive(bool b)
+            {
+                gameObject.SetActive(b);
             }
 
             public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
@@ -148,7 +151,6 @@ namespace FiestaTime
                 {
                     //Ours
                     stream.SendNext(transform.position);
-                    stream.SendNext(gameObject.activeInHierarchy);
                     stream.SendNext(anim.GetBool(Constants.BOOL_BROKENEGG_ANIM));
                     stream.SendNext(Rb.velocity);
                 }
@@ -156,7 +158,6 @@ namespace FiestaTime
                 {
                     //Others
                     transform.position = (Vector3)stream.ReceiveNext();
-                    gameObject.SetActive((bool)stream.ReceiveNext());
                     anim.SetBool(Constants.BOOL_BROKENEGG_ANIM, (bool)stream.ReceiveNext());
                     Rb.velocity = (Vector3)stream.ReceiveNext();
                 }

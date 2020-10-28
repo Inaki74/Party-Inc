@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using Photon.Pun;
 using UnityEngine.UI;
+using System.Linq;
 
 namespace FiestaTime
 {
@@ -14,80 +15,119 @@ namespace FiestaTime
         /// </summary>
         public class GameFinishedScreen : MonoBehaviour
         {
+            [Header("Players in the list, in order")]
+            [SerializeField] private GameObject[] players;
+            [SerializeField] private GameObject highScores;
+
+            [SerializeField] private Text highScore;
             [SerializeField] private Text flavourTitle;
-            [SerializeField] private Text playerOneName;
-            [SerializeField] private Text playerOneScore;
-            [SerializeField] private Text playerTwoName;
-            [SerializeField] private Text playerTwoScore;
+
+            [Header("Players in the list, in order")]
+            [SerializeField] private Text[] playerPlacings;
+            [SerializeField] private Text[] playerNames;
+            [SerializeField] private Text[] playerScores;
 
             private void OnEnable()
             {
-                if (GameManager.Current.winner == -1)
+                // Set active for the amount of players playing.
+                for (int i = 0; i < GameManager.Current.playerCount; i++)
                 {
-                    // One player mode
-                    DisplayPlayerResults();
+                    players[i].SetActive(true);
+                }
 
-                    if(GameManager.Current.isHighScore)
+                if (GameManager.Current.playerCount == 1)
+                {
+                    highScores.SetActive(true);
+                    highScore.text = PlayerPrefs.GetInt(FiestaTime.Constants.EGG_KEY_HISCORE).ToString();
+
+                    playerNames[0].text = PhotonNetwork.LocalPlayer.NickName;
+                    playerPlacings[0].enabled = false;
+                    playerScores[0].text = GameManager.Current.playerResults[0].scoring.ToString();
+
+                    if (GameManager.Current.isHighScore)
                     {
                         flavourTitle.text = "CONGRATULATIONS! New high score!";
+                        highScore.color = Color.yellow;
                     }
                     else
                     {
                         flavourTitle.text = "You'll get that high score someday!";
                     }
-                    
                 }
                 else
                 {
-                    // Two players
-                    DisplayWinner();
-                }
-            }
+                    // Set the list with winners and losers
+                    SetPositionsList();
 
-            /// <summary>
-            /// Displays one player mode results.
-            /// </summary>
-            private void DisplayPlayerResults()
-            {
-                playerOneName.text = PhotonNetwork.LocalPlayer.NickName;
-                playerOneName.color = new Color(1f, 1f, 0f);
-                playerOneScore.text = GameManager.Current.playerScore.ToString();
-
-                playerTwoName.text = "High Score:";
-                playerTwoScore.text = PlayerPrefs.GetInt(FiestaTime.Constants.EGG_KEY_HISCORE).ToString(); // Player two here will act as the high score (you play against yourself)
-            }
-
-            /// <summary>
-            /// Displays two player mode results.
-            /// </summary>
-            private void DisplayWinner()
-            {
-                int playerNumber = PhotonNetwork.LocalPlayer.ActorNumber;
-
-                if (GameManager.Current.winner == playerNumber)
-                {
-                    flavourTitle.text = "CONGRATULATIONS! You win!";
-                }
-                else
-                {
-                    flavourTitle.text = "Better luck next time!";
-                }
-
-                if (GameManager.Current.winner == 0)
-                {
-                    flavourTitle.text = "Unbelievable! Draw!";
-                }
-
-                playerOneName.text = PhotonNetwork.LocalPlayer.NickName;
-                playerOneName.color = new Color(1f, 1f, 0f);
-                playerOneScore.text = GameManager.Current.playerScore.ToString();
-
-                foreach (var player in PhotonNetwork.PlayerList)
-                {
-                    if (player.ActorNumber != playerNumber)
+                    // Set flavour text
+                    if (GameManager.Current.winnerId == -1)
                     {
-                        playerTwoName.text = player.NickName;
-                        playerTwoScore.text = GameManager.Current.enemyScore.ToString();
+                        flavourTitle.text = "Unbelievable! Its a draw!";
+                    }
+                    else
+                    {
+                        if (GameManager.Current.winnerId == PhotonNetwork.LocalPlayer.ActorNumber)
+                        {
+                            flavourTitle.text = "CONGRATULATIONS! You win!";
+                        }
+                        else
+                        {
+                            flavourTitle.text = "Welp... Can't have them all buddy.";
+                        }
+                    }
+                }
+
+
+            }
+
+            private void SetPositionsList()
+            {
+                var aux = GameManager.Current.playerResults.OrderByDescending(r => r.scoring);
+                PlayerResults<int>[] res = aux.ToArray();
+                int place = 0;
+                int lastScore = -1;
+                for (int i = 0; i < res.Length; i++)
+                {
+                    if (res[i].scoring != lastScore)
+                    {
+                        place++;
+                    }
+                    lastScore = res[i].scoring;
+
+                    switch (place)
+                    {
+                        case 1:
+                            playerPlacings[i].text = "1st";
+                            break;
+                        case 2:
+                            playerPlacings[i].text = "2nd";
+                            break;
+                        case 3:
+                            playerPlacings[i].text = "3rd";
+                            break;
+                        case 4:
+                            playerPlacings[i].text = "4th";
+                            break;
+                        default:
+                            Debug.Log("FinishScreenUI, result not possible");
+                            break;
+                    }
+
+                    playerScores[i].text = res[i].scoring.ToString();
+
+                    foreach (var player in PhotonNetwork.PlayerList)
+                    {
+                        if (res[i].playerId == player.ActorNumber)
+                        {
+                            playerNames[i].text = player.NickName;
+                        }
+                    }
+
+                    if (res[i].playerId == PhotonNetwork.LocalPlayer.ActorNumber)
+                    {
+                        playerNames[i].color = Color.yellow;
+                        playerPlacings[i].color = Color.yellow;
+                        playerScores[i].color = Color.yellow;
                     }
                 }
             }
