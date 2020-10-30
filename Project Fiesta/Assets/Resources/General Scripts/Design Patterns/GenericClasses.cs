@@ -95,7 +95,7 @@ namespace FiestaTime
         /// <returns></returns>
         private IEnumerator AllPlayersReady()
         {
-            yield return new WaitUntil(() => networkController.playersAreReady);
+            yield return new WaitUntil(() => networkController.playersAreReady || !PhotonNetwork.IsConnected);
 
             InitializeGameManagerDependantObjects();
         }
