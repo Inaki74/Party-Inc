@@ -1,6 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Cinemachine;
+using Photon.Pun;
 
 namespace FiestaTime
 {
@@ -20,9 +22,14 @@ namespace FiestaTime
                 }
             }
 
+            [SerializeField] private GameObject _generatorPrefab;
+            [SerializeField] private GameObject _gameCamera;
+
             protected override void InitializeGameManagerDependantObjects()
             {
-                //throw new System.NotImplementedException();
+                InitializeProceduralGenerator();
+
+                InitializePlayers();
             }
 
             protected override void InStart()
@@ -34,6 +41,57 @@ namespace FiestaTime
             void Update()
             {
 
+            }
+
+            private void SetPlayerPositions()
+            {
+                switch (playerCount)
+                {
+                    case 1:
+                        playerPositions[0] = new Vector3(0f, 1f, 0f);
+                        break;
+                    case 2:
+                        playerPositions[0] = new Vector3(-5f, 1f, 0f);
+                        playerPositions[1] = new Vector3(5f, 1f, 0f);
+                        break;
+                    case 3:
+                        playerPositions[0] = new Vector3(-10f, 1f, 0f);
+                        playerPositions[1] = new Vector3(0f, 1f, 0f);
+                        playerPositions[2] = new Vector3(10f, 1f, 0f);
+                        break;
+                    case 4:
+                        playerPositions[0] = new Vector3(-15f, 1f, 0f);
+                        playerPositions[1] = new Vector3(-5f, 1f, 0f);
+                        playerPositions[2] = new Vector3(5f, 1f, 0f);
+                        playerPositions[3] = new Vector3(15f, 1f, 0f);
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            private void InitializePlayers()
+            {
+                SetPlayerPositions();
+
+                Vector3 decidedPosition = Vector3.zero;
+
+                for (int i = 0; i < playerCount; i++)
+                {
+                    if (PhotonNetwork.PlayerList[i].ActorNumber == PhotonNetwork.LocalPlayer.ActorNumber)
+                    {
+                        decidedPosition = playerPositions[i];
+                    }
+                }
+
+                PhotonNetwork.Instantiate(playerPrefab.name, decidedPosition, Quaternion.identity);
+            }
+
+            private void InitializeProceduralGenerator()
+            {
+                GameObject generator = PhotonNetwork.InstantiateRoomObject(_generatorPrefab.name, new Vector3(10f, 18f, -13f), Quaternion.identity);
+
+                _gameCamera.GetComponent<CinemachineVirtualCamera>().Follow = generator.transform;
             }
         }
     }

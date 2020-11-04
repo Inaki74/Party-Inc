@@ -19,10 +19,16 @@ namespace FiestaTime
         /// </summary>
         public class Tile : MonoBehaviour
         {
+            private const int TilesToDisable = 16;
+
             [SerializeField] private GameObject _middleObstaclePoint;
 
-            private int[] _obstacles = new int[3];
-            private float _obstacleZAlignment;
+            private GameObject[] _obstacleGOs = new GameObject[3];
+
+            public int[] Obstacles { get; private set; } = new int[3];
+            public float ObstacleZAlignment { get; private set; }
+
+            private int _tileCount = 0;
             private int _player;
             
             // Start is called before the first frame update
@@ -30,37 +36,53 @@ namespace FiestaTime
             {
                 // First settings
 
-                // We set the obstacle alignment randomly between -3 and 3
-                _obstacleZAlignment = Random.Range(-3, 4);
-
-                DecideObstacles();
-
-                // We place the obstacles
-                PlaceObstacles();
+                Obstacles[0] = 0;
+                Obstacles[1] = 0;
+                Obstacles[2] = 0;
             }
 
             private void OnEnable()
             {
-                //Re randomize
-
-                // We set the obstacle alignment randomly between -3 and 3
-                _obstacleZAlignment = Random.Range(-3, 4);
-
-                DecideObstacles();
-
-                // We place the obstacles
-                PlaceObstacles();
+                
             }
 
             private void OnDisable()
             {
                 // Reset
+                ObstacleZAlignment = 0;
+                _tileCount = 0;
+
+                for(int i = 0; i < 3; i++)
+                {
+                    if(_obstacleGOs[i] != null)
+                    {
+                        _obstacleGOs[i].transform.parent = ObstaclePoolManager.Current.ObstacleHolder.transform;
+                        _obstacleGOs[i].SetActive(false);
+                    }
+                    
+                    Obstacles[i] = 0;
+                }
             }
 
-            // Update is called once per frame
-            void Update()
+            private void Awake()
             {
-                // Dont think ill use it.
+                InvisibleTrolleyController.onPassedTile += OnTilePassed;
+            }
+
+            private void OnDestroy()
+            {
+                InvisibleTrolleyController.onPassedTile -= OnTilePassed;
+            }
+
+            // Check if its time for the tile to be disabled
+            private void OnTilePassed()
+            {
+                _tileCount++;
+
+                if(_tileCount >= TilesToDisable)
+                {
+                    gameObject.SetActive(false);
+                }
             }
 
             private void DecideObstacles()
@@ -78,7 +100,7 @@ namespace FiestaTime
                 {
                     for (int i = 0; i < 3; i++)
                     {
-                        if (_obstacles[i] == 1)
+                        if (Obstacles[i] == 1)
                         {
                             passes = passes || false;
                         }
@@ -98,7 +120,7 @@ namespace FiestaTime
             {
                 for (int i = 0; i < 3; i++)
                 {
-                    _obstacles[i] = Random.Range(0, 4);
+                    Obstacles[i] = Random.Range(0, 4);
                 }
             }
 
@@ -116,10 +138,48 @@ namespace FiestaTime
                         displacement = new Vector3(3f, 0f, 0f);
                     }
                     //Ask for obstacles
-                    // GameObject obstacle = obstaclePool.GetObstacle(_obstacles[i]);
-                    // Make obstacle child of Tile
-                    // obstacle.localPosition = _middleObstaclePoint.localPosistion + displacement + new Vector3(0f, 0f, _obstacleZAlignment);
+                    if(Obstacles[i] != 0)
+                    {
+                        GameObject obstacle = ObstaclePoolManager.Current.RequestObstacle(Obstacles[i]);
+                        // Make obstacle child of Tile
+                        obstacle.transform.parent = transform;
+                        obstacle.transform.localPosition = _middleObstaclePoint.transform.localPosition + displacement + new Vector3(0f, 2f, ObstacleZAlignment);
+                        _obstacleGOs[i] = obstacle;
+                    }
+                    else
+                    {
+                        _obstacleGOs[i] = null;
+                    }
+                    
                 }
+            }
+
+            public void PersonalizeTile(int[] obs, float zAlign)
+            {
+                Obstacles = obs;
+                ObstacleZAlignment = zAlign;
+
+                PlaceObstacles();
+            }
+
+            public bool ReRandomize()
+            {
+                //Re randomize
+
+                // We set the obstacle alignment randomly between -3 and 3
+                ObstacleZAlignment = Random.Range(-3, 4);
+
+                DecideObstacles();
+
+                // We place the obstacles
+                PlaceObstacles();
+
+                return true;
+            }
+
+            public void SetTileCount(int set)
+            {
+                _tileCount = set;
             }
         }
     }

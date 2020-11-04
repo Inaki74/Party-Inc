@@ -44,4 +44,10 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/RowdyRope.unity
     guid: 2337a39dd43a5490f9512fb979620ea1
+  - enabled: 1
+    path: Assets/Scenes/SS_GameLobby.unity
+    guid: 1ac24b05e60f7444b96d551794ce382f
+  - enabled: 1
+    path: Assets/Scenes/SpeedySprint.unity
+    guid: 95737879909544ddf96374ba2a72617d
   m_configObjects: {}

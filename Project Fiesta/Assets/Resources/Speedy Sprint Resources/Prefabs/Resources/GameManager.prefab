@@ -43,8 +43,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7f0c1252f120b4dca89367c29f835fea, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerPrefab: {fileID: 0}
+  playerPrefab: {fileID: 1766456455375161628, guid: 9e4a0b7b3f8ae46e5b992f24ffea2e25,
+    type: 3}
   UIPrefab: {fileID: 0}
   playerCount: 0
   gameStartCountdown: 3
-  _movingSpeed: 0
+  _movingSpeed: 5
+  _generatorPrefab: {fileID: 3773267776140033010, guid: 4fca39f08254745c386e625032491cd8,
+    type: 3}
+  _gameCamera: {fileID: 0}

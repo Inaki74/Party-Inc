@@ -7,7 +7,7 @@ namespace FiestaTime
 {
     namespace SS
     {
-        public class TilePoolManager : MonoBehaviour
+        public class TilePoolManager : MonoSingleton<TilePoolManager>
         {
             [SerializeField] private Transform _tileHolder;
 
@@ -17,15 +17,35 @@ namespace FiestaTime
             // Start is called before the first frame update
             void Start()
             {
-
+                for(int i = 0; i < 80; i++)
+                {
+                    GenerateTile();
+                }
             }
 
             private void GenerateTile()
             {
-                  GameObject newTile = PhotonNetwork.Instantiate(_tilePrefab.name, new Vector3(0, 13f, 0), Quaternion.identity);
+                //PhotonNetwork.Instantiate(_tilePrefab.name, new Vector3(0, 13f, 0), Quaternion.identity);
+                  GameObject newTile = Instantiate(_tilePrefab);
                   newTile.transform.parent = _tileHolder.transform;
                   newTile.SetActive(false);
                   _tiles.Add(newTile);
+            }
+
+            public GameObject RequestTile()
+            {
+                //Get Tile
+                foreach (GameObject tile in _tiles)
+                {
+                    if (!tile.activeInHierarchy)
+                    {
+                        tile.SetActive(true);
+                        return tile;
+                    }
+                }
+
+                GenerateTile();
+                return RequestTile();
             }
         }
     }
