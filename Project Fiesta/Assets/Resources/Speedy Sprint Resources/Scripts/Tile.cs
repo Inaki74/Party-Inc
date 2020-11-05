@@ -16,6 +16,8 @@ namespace FiestaTime
         ///     - Enabled, when enabled they should rerandomize all of their settings.
         ///
         /// Their settings include: the line in which obstacles are generated (30% - 70% of the tiles length), which obstacles are generated.
+        ///
+        /// DEPRECATED
         /// </summary>
         public class Tile : MonoBehaviour
         {

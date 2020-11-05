@@ -9,6 +9,7 @@ TagManager:
   - DeathPlane
   - FinishPlane
   - Rope
+  - Obstacle
   layers:
   - Default
   - TransparentFX

@@ -6,6 +6,9 @@ namespace FiestaTime
 {
     namespace SS
     {
+        /// <summary>
+        /// DEPRECATED
+        /// </summary>
         public class ObstaclePoolManager : MonoSingleton<ObstaclePoolManager>
         {
             [SerializeField] private Transform _obstacleHolder;

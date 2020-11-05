@@ -7,6 +7,9 @@ namespace FiestaTime
 {
     namespace SS
     {
+        /// <summary>
+        /// DEPRECATED
+        /// </summary>
         public class TilePoolManager : MonoSingleton<TilePoolManager>
         {
             [SerializeField] private Transform _tileHolder;

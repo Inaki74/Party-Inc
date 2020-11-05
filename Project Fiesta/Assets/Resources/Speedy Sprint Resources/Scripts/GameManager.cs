@@ -25,11 +25,13 @@ namespace FiestaTime
             [SerializeField] private GameObject _generatorPrefab;
             [SerializeField] private GameObject _gameCamera;
 
+            public static string SubsectionsPath = "Speedy Sprint Resources/Prefabs/Resources/Sub-Sections/";
+
             protected override void InitializeGameManagerDependantObjects()
             {
-                InitializeProceduralGenerator();
+                //InitializeProceduralGenerator();
 
-                InitializePlayers();
+                //InitializePlayers();
             }
 
             protected override void InStart()

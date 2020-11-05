@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
+using System.Linq;
 
 namespace FiestaTime
 {
@@ -13,14 +14,31 @@ namespace FiestaTime
         /// First we place the tiles -> Then we place obstacles if there is one, this obstacle is placed at a certain percentage of the tile (30%-70% of the planes length) and is managed by each tile.
         /// We see roughly 13 tiles at one time. With movement, that can amount to 15 tiles. So there should be 20 tiles already loaded. Plus three tiles that will be unloaded once they
         /// reach the end of the line (to save memory, TilePool? ObstaclePool?).
+        ///
+        /// LAST PARAGRAPH IS DEPRECATED
+        ///
+        /// Remake: The procedural generator takes the sub-section prefabs and composes them into sections.
+        /// Each section is composed of 5 sub-sections. Each sub-section is abstracted as a number, so as to send over the network. Therefore each section is a length 5 vector.
+        /// The game is the infinite string of these sections, each different from one another.
+        /// Sub-sections will be designed within Unity and stored as prefabs. There will be easy, medium and hard sub-sections.
+        /// Sections will have certain number of easy, medium and hard sub-sections. These scale with the games length.
+        /// Sections are then formed by code, randomly, with some rules in place (no two same patterns in a row, or such things).
+        /// There will be a "SubsectionPool" which stores the entire sub-section, then they are placed in their respective lanes.
+        /// The game will pre load like 3 sub-sections ahead and will un-load 2 sub-sections behind, per lane.
+        /// The spacing of each sub-section is determined by the amount of tiles each sub-section occupies. Each tile is 10 units X and Z.
         /// </summary>
         public class ProceduralGeneratorController : MonoBehaviourPun
         {
-            private Tile[,] _tiles; // 20 4
             [SerializeField] private GameObject _laneOneSpawner;
             [SerializeField] private GameObject _laneTwoSpawner;
             [SerializeField] private GameObject _laneThreeSpawner;
             [SerializeField] private GameObject _laneFourSpawner;
+
+            private int[] _nextSubsections = new int[5];
+            private int[] _lastSubsections = new int[5];
+            private int _easyThisRound = 5;
+            private int _mediumThisRound = 0;
+            private int _hardThisRound = 0;
 
             private float _currentZ;
 
@@ -28,11 +46,10 @@ namespace FiestaTime
             // Start is called before the first frame update
             void Start()
             {
-                _tiles = new Tile[20,GameManager.Current.playerCount];  /// Dont know if ill need it
 
                 DecideSpawnerPositions();
 
-                InstantiateFirstTiles();
+                GenerateSubsectionRandomization(_easyThisRound, _mediumThisRound, _hardThisRound);
             }
 
             // Update is called once per frame
@@ -84,39 +101,29 @@ namespace FiestaTime
                 }
             }
 
-            private void InstantiateFirstTiles()
+            private void GenerateSubsectionRandomization(int easy, int medium, int hard)
             {
-                InstantiateFirstTilesForLane(_laneOneSpawner);
-
-                if (_laneTwoSpawner.activeInHierarchy)
+                for(int i = 0; i < easy + medium + hard; i++)
                 {
-                    InstantiateFirstTilesForLane(_laneTwoSpawner);
+                    //_nextSubsections[i] = Random.Range
                 }
+            }
 
-                if (_laneThreeSpawner.activeInHierarchy)
-                {
-                    InstantiateFirstTilesForLane(_laneThreeSpawner);
-                }
+            private int TotalAmountOfSubsections(string difficulty)
+            {
+                Object[] all = Resources.LoadAll(GameManager.SubsectionsPath + difficulty, typeof(GameObject)).Cast<GameObject>().ToArray();
+                Resources.UnloadUnusedAssets();
+                return all.Length;
+            }
 
-                if (_laneFourSpawner.activeInHierarchy)
-                {
-                    InstantiateFirstTilesForLane(_laneFourSpawner);
-                }
+            private void InstantiateFirstSections()
+            {
+                
             }
 
             private void InstantiateFirstTilesForLane(GameObject spawner)
             {
-                float z = -10;
-                for (int i = 0; i < 15; i++)
-                {
-                    GameObject tile = TilePoolManager.Current.RequestTile();
-                    tile.transform.position = new Vector3(spawner.transform.position.x, 0.1f, z);
-                    tile.GetComponent<Tile>().SetTileCount(15 - i);
-
-                    z += 10;
-                }
-
-                _currentZ = z;
+                
             }
 
             private void InstantiateTileForLane(Tile template, GameObject spawner, float z)
