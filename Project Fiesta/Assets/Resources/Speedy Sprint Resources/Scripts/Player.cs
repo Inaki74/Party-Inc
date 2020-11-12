@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Photon.Pun;
 
 namespace FiestaTime
 {
@@ -10,11 +11,13 @@ namespace FiestaTime
         /// State machine would be overkill, since theres only 4 states.
         /// </summary>
         [RequireComponent(typeof(Rigidbody))]
-        public class Player : MonoBehaviour
+        public class Player : MonoBehaviourPun, IPunObservable
         {
             private Rigidbody _rb;
             private CapsuleCollider _cc;
             private PlayerInputManager _inputManager;
+
+            private bool _hasLost;
 
             [SerializeField] float _jumpStrength;
 
@@ -52,6 +55,14 @@ namespace FiestaTime
             [SerializeField] private LayerMask _whatIsGround;
             [SerializeField] private float _distanceGround;
 
+            // Network variables
+
+            private bool _infoReceived;
+            private Vector3 _lastPos;
+            private Vector3 _lastVel;
+            private float _lastDrag;
+            private Quaternion _lastRot;
+
             // Start is called before the first frame update
             void Start()
             {
@@ -85,6 +96,18 @@ namespace FiestaTime
             // Update is called once per frame
             void Update()
             {
+                if (!photonView.IsMine && PhotonNetwork.IsConnected && _infoReceived)
+                {
+                    transform.position = Vector3.Lerp(transform.position, _lastPos, Time.deltaTime);
+                    _rb.velocity = _lastVel;
+                    _rb.drag = _lastDrag;
+                    if (_hasLost)
+                    {
+                        transform.rotation = Quaternion.Lerp(transform.rotation, _lastRot, Time.deltaTime);
+                    }
+                    return;
+                }
+
                 bool isGrounded = CheckIfGrounded();
 
                 StateLogic(isGrounded);
@@ -265,6 +288,41 @@ namespace FiestaTime
                 {
                     Debug.DrawRay(transform.position - new Vector3(0f, _cc.bounds.extents.y - _cc.bounds.extents.y / 10, 0f), transform.TransformDirection(Vector3.down), Color.green, _distanceGround);
                     return false;
+                }
+            }
+
+            [PunRPC]
+            public void RPC_InformPlayerLost()
+            {
+                _hasLost = true;
+            }
+
+            public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+            {
+                if (stream.IsWriting)
+                {
+                    stream.SendNext(_rb.velocity);
+                    stream.SendNext(transform.position);
+                    stream.SendNext(_rb.drag);
+                    if (_hasLost) stream.SendNext(transform.rotation);
+                }
+                else
+                {
+                    _lastVel = (Vector3)stream.ReceiveNext();
+                    _lastPos = (Vector3)stream.ReceiveNext();
+                    _lastDrag = (float)stream.ReceiveNext();
+
+                    float lag = Mathf.Abs((float)(PhotonNetwork.Time - info.SentServerTime));
+
+                    _lastPos += lag * _lastVel;
+
+                    _infoReceived = true;
+
+                    if (_hasLost)
+                    {
+                        _rb.constraints = RigidbodyConstraints.None;
+                        _lastRot = (Quaternion)stream.ReceiveNext();
+                    }
                 }
             }
         }

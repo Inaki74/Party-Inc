@@ -29,9 +29,9 @@ namespace FiestaTime
 
             protected override void InitializeGameManagerDependantObjects()
             {
-                //InitializeProceduralGenerator();
+                InitializeProceduralGenerator();
 
-                //InitializePlayers();
+                InitializePlayers();
             }
 
             protected override void InStart()
@@ -50,22 +50,22 @@ namespace FiestaTime
                 switch (playerCount)
                 {
                     case 1:
-                        playerPositions[0] = new Vector3(0f, 1f, 0f);
+                        playerPositions[0] = new Vector3(0f, 1f, 20f);
                         break;
                     case 2:
-                        playerPositions[0] = new Vector3(-5f, 1f, 0f);
-                        playerPositions[1] = new Vector3(5f, 1f, 0f);
+                        playerPositions[0] = new Vector3(-5f, 1f, 20f);
+                        playerPositions[1] = new Vector3(5f, 1f, 20f);
                         break;
                     case 3:
-                        playerPositions[0] = new Vector3(-10f, 1f, 0f);
-                        playerPositions[1] = new Vector3(0f, 1f, 0f);
-                        playerPositions[2] = new Vector3(10f, 1f, 0f);
+                        playerPositions[0] = new Vector3(-10f, 1f, 20f);
+                        playerPositions[1] = new Vector3(0f, 1f, 20f);
+                        playerPositions[2] = new Vector3(10f, 1f, 20f);
                         break;
                     case 4:
-                        playerPositions[0] = new Vector3(-15f, 1f, 0f);
-                        playerPositions[1] = new Vector3(-5f, 1f, 0f);
-                        playerPositions[2] = new Vector3(5f, 1f, 0f);
-                        playerPositions[3] = new Vector3(15f, 1f, 0f);
+                        playerPositions[0] = new Vector3(-15f, 1f, 20f);
+                        playerPositions[1] = new Vector3(-5f, 1f, 20f);
+                        playerPositions[2] = new Vector3(5f, 1f, 20f);
+                        playerPositions[3] = new Vector3(15f, 1f, 20f);
                         break;
                     default:
                         break;
@@ -91,7 +91,7 @@ namespace FiestaTime
 
             private void InitializeProceduralGenerator()
             {
-                GameObject generator = PhotonNetwork.InstantiateRoomObject(_generatorPrefab.name, new Vector3(10f, 18f, -13f), Quaternion.identity);
+                GameObject generator = PhotonNetwork.InstantiateRoomObject(_generatorPrefab.name, new Vector3(15f, 17f, 7f), Quaternion.identity);
 
                 _gameCamera.GetComponent<CinemachineVirtualCamera>().Follow = generator.transform;
             }

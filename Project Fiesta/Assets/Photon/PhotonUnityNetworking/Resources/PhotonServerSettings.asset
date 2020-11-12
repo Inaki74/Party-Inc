@@ -59,6 +59,7 @@ MonoBehaviour:
   - RPC_SendActive
   - RPC_SendNewScore
   - RPC_SendTile
+  - RPC_SendSection
   DisableAutoOpenWizard: 1
   ShowSettings: 0
   DevRegionSetOnce: 1

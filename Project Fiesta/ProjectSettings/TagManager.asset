@@ -10,6 +10,7 @@ TagManager:
   - FinishPlane
   - Rope
   - Obstacle
+  - CheckpointPlane
   layers:
   - Default
   - TransparentFX

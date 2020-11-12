@@ -16,27 +16,34 @@ namespace FiestaTime
         public class InvisibleTrolleyController : MonoBehaviour
         {
             public delegate void ActionPassedTile();
-            public static event ActionPassedTile onPassedTile;
+            public static event ActionPassedTile onPassedSection;
 
-            private float _zCount = 0;
+            private int _subsectionCount = 0;
             // Start is called before the first frame update
             void Start()
             {
 
             }
 
+            private void OnTriggerEnter(Collider other)
+            {
+                if(other.tag == "CheckpointPlane")
+                {
+                    Debug.Log("AAAA");
+                    _subsectionCount++;
+
+                    if (_subsectionCount >= 5f)
+                    {
+                        _subsectionCount = 0;
+                        onPassedSection?.Invoke();
+                    }
+                }
+            }
+
             // Update is called once per frame
             void Update()
             {
-                if(_zCount >= 10f)
-                {
-                    Debug.Log("Invisible trolley zCount");
-                    _zCount = 0f;
-                    onPassedTile?.Invoke();
-                }
-
                 transform.position += Vector3.forward * GameManager.Current.MovingSpeed * Time.deltaTime;
-                _zCount += GameManager.Current.MovingSpeed * Time.deltaTime;
             }
         }
     }

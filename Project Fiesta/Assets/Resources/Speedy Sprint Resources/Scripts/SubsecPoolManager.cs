@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 
 namespace FiestaTime
 {
@@ -9,21 +10,65 @@ namespace FiestaTime
         public class SubsecPoolManager : MonoSingleton<SubsecPoolManager>
         {
             [SerializeField] private Transform _subsectionHolder;
+            public Transform SubsectionHolder
+            {
+                get
+                {
+                    return _subsectionHolder;
+                }
+
+                private set
+                {
+                    _subsectionHolder = value;
+                }
+            }
 
             [SerializeField] private GameObject[] _subsecPrefabsEasy;
             [SerializeField] private GameObject[] _subsecPrefabsMedium;
             [SerializeField] private GameObject[] _subsecPrefabsHard;
 
-            
-
             private List<GameObject> _subsecs = new List<GameObject>();
             // Start is called before the first frame update
+
+            private void LoadAllSubsections()
+            {
+                var loadedEasy = Resources.LoadAll(GameManager.SubsectionsPath + "Easy", typeof(GameObject)).Cast<GameObject>();
+                List<GameObject> easy = new List<GameObject>();
+
+                foreach(GameObject sub in loadedEasy)
+                {
+                    easy.Add(sub);
+                }
+
+                var loadedMedium = Resources.LoadAll(GameManager.SubsectionsPath + "Medium", typeof(GameObject)).Cast<GameObject>();
+                List<GameObject> med = new List<GameObject>();
+
+                foreach (GameObject sub in loadedMedium)
+                {
+                    med.Add(sub);
+                }
+
+                var loadedHard = Resources.LoadAll(GameManager.SubsectionsPath + "Hard", typeof(GameObject)).Cast<GameObject>();
+                List<GameObject> hard = new List<GameObject>();
+
+                foreach (GameObject sub in loadedHard)
+                {
+                    hard.Add(sub);
+                }
+
+                _subsecPrefabsEasy = easy.ToArray();
+                _subsecPrefabsMedium = med.ToArray();
+                _subsecPrefabsHard = hard.ToArray();
+            }
+
             void Start()
             {
                 //Resources.Load(decided, typeof(Array2DInt)) as Array2DInt;
-                _subsecPrefabsEasy = Resources.LoadAll(GameManager.SubsectionsPath + "Easy") as GameObject[];
-                _subsecPrefabsMedium = Resources.LoadAll(GameManager.SubsectionsPath + "Medium") as GameObject[];
-                _subsecPrefabsHard = Resources.LoadAll(GameManager.SubsectionsPath + "Hard") as GameObject[];
+
+                LoadAllSubsections();
+
+                
+                ///StartCoroutine("");
 
                 //TODO: See if this is particularly costy.
                 foreach(GameObject sub in _subsecPrefabsEasy)
@@ -41,6 +86,11 @@ namespace FiestaTime
                     GenerateSubsection(sub);
                     GenerateSubsection(sub);
                 }
+            }
+
+            private void OnDestroy()
+            {
+                Resources.UnloadUnusedAssets();
             }
 
             private void GenerateSubsection(GameObject subsection)

@@ -49,6 +49,6 @@ MonoBehaviour:
   playerCount: 0
   gameStartCountdown: 3
   _movingSpeed: 5
-  _generatorPrefab: {fileID: 3773267776140033010, guid: 4fca39f08254745c386e625032491cd8,
+  _generatorPrefab: {fileID: 3037030653792018971, guid: 4fca39f08254745c386e625032491cd8,
     type: 3}
   _gameCamera: {fileID: 0}

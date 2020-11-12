@@ -68,12 +68,12 @@ namespace FiestaTime
 
             private void Awake()
             {
-                InvisibleTrolleyController.onPassedTile += OnTilePassed;
+                //InvisibleTrolleyController.onPassedTile += OnTilePassed;
             }
 
             private void OnDestroy()
             {
-                InvisibleTrolleyController.onPassedTile -= OnTilePassed;
+                //InvisibleTrolleyController.onPassedTile -= OnTilePassed;
             }
 
             // Check if its time for the tile to be disabled

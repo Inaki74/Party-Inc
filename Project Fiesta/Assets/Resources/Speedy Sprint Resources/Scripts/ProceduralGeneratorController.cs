@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
+using Photon.Realtime;
 using System.Linq;
 
 namespace FiestaTime
@@ -27,18 +28,24 @@ namespace FiestaTime
         /// The game will pre load like 3 sub-sections ahead and will un-load 2 sub-sections behind, per lane.
         /// The spacing of each sub-section is determined by the amount of tiles each sub-section occupies. Each tile is 10 units X and Z.
         /// </summary>
-        public class ProceduralGeneratorController : MonoBehaviourPun
+        public class ProceduralGeneratorController : MonoBehaviourPunCallbacks
         {
             [SerializeField] private GameObject _laneOneSpawner;
             [SerializeField] private GameObject _laneTwoSpawner;
             [SerializeField] private GameObject _laneThreeSpawner;
             [SerializeField] private GameObject _laneFourSpawner;
+            [SerializeField] private GameObject _openingSubsection;
 
-            private int[] _nextSubsections = new int[5];
-            private int[] _lastSubsections = new int[5];
+            [SerializeField] private int[] _nextSection = new int[5];
+            [SerializeField] private int[] _lastSection = new int[5];
             private int _easyThisRound = 5;
             private int _mediumThisRound = 0;
             private int _hardThisRound = 0;
+            private int round = 0;
+
+            private int _totalEasy;
+            private int _totalMedium;
+            private int _totalHard;
 
             private float _currentZ;
 
@@ -46,10 +53,16 @@ namespace FiestaTime
             // Start is called before the first frame update
             void Start()
             {
-
                 DecideSpawnerPositions();
 
-                GenerateSubsectionRandomization(_easyThisRound, _mediumThisRound, _hardThisRound);
+                _totalEasy = TotalAmountOfSubsections("Easy");
+                _totalMedium = TotalAmountOfSubsections("Medium");
+                _totalHard = TotalAmountOfSubsections("Hard");
+
+                _nextSection[0] = -1;
+
+                PlaceFirstSubsection();
+                GenerateNextSection();
             }
 
             // Update is called once per frame
@@ -60,12 +73,12 @@ namespace FiestaTime
 
             private void Awake()
             {
-                InvisibleTrolleyController.onPassedTile += GenerateNextTiles;
+                InvisibleTrolleyController.onPassedSection += GenerateNextSection;
             }
 
             private void OnDestroy()
             {
-                InvisibleTrolleyController.onPassedTile -= GenerateNextTiles;
+                InvisibleTrolleyController.onPassedSection -= GenerateNextSection;
             }
 
             private void DecideSpawnerPositions()
@@ -101,12 +114,26 @@ namespace FiestaTime
                 }
             }
 
-            private void GenerateSubsectionRandomization(int easy, int medium, int hard)
+            private int[] GenerateSection(int easy, int medium, int hard)
             {
-                for(int i = 0; i < easy + medium + hard; i++)
+                int[] randomization = new int[5];
+
+                for (int i = 0; i < easy; i++)
                 {
-                    //_nextSubsections[i] = Random.Range
+                    randomization[i] = Random.Range(1, _totalEasy + 1);
                 }
+
+                for (int i = easy; i < easy + medium; i++)
+                {
+                    randomization[i] = Random.Range(1, _totalMedium + 1);
+                }
+
+                for (int i = easy + medium; i < easy+ medium + hard; i++)
+                {
+                    randomization[i] = Random.Range(1, _totalHard + 1);
+                }
+
+                return randomization;
             }
 
             private int TotalAmountOfSubsections(string difficulty)
@@ -116,95 +143,227 @@ namespace FiestaTime
                 return all.Length;
             }
 
-            private void InstantiateFirstSections()
+            private void PlaceFirstSubsection()
             {
-                
-            }
-
-            private void InstantiateFirstTilesForLane(GameObject spawner)
-            {
-                
-            }
-
-            private void InstantiateTileForLane(Tile template, GameObject spawner, float z)
-            {
-                GameObject tile = TilePoolManager.Current.RequestTile();
-                tile.GetComponent<Tile>().PersonalizeTile(template.Obstacles, template.ObstacleZAlignment);
-                tile.transform.position = new Vector3(spawner.transform.position.x, 0.1f, z);
-            }
-
-            /// <summary>
-            /// When instantiating tiles:
-            /// We create/enable the tile.
-            /// THe tile generates its settings.
-            /// We must wait for them to finish.
-            /// We place the tile.
-            /// We send the settings across the network.
-            /// This Generator and all others across the network all create/request three (playerCount - 1) more tiles with the same settings.
-            /// </summary>
-
-            private void GenerateNextTiles()
-            {
-                Debug.Log("Generate Next tile");
-                GameObject tile = TilePoolManager.Current.RequestTile();
-                StartCoroutine(GenerateTilesCo(tile, tile.GetComponent<Tile>()));
-            }
-
-            private IEnumerator GenerateTilesCo(GameObject tileGo, Tile tile)
-            {
-                bool finishedGeneration = tile.ReRandomize();
-
-                yield return new WaitUntil(() => finishedGeneration);
-
-                tileGo.transform.position = new Vector3(_laneOneSpawner.transform.position.x, 0.1f, _currentZ);
+                PlaceFirstSubsectionInLane(_laneOneSpawner);
 
                 if (_laneTwoSpawner.activeInHierarchy)
                 {
-                    InstantiateTileForLane(tile, _laneTwoSpawner, _currentZ);
+                    PlaceFirstSubsectionInLane(_laneTwoSpawner);
                 }
 
                 if (_laneThreeSpawner.activeInHierarchy)
                 {
-                    InstantiateTileForLane(tile, _laneThreeSpawner, _currentZ);
+                    PlaceFirstSubsectionInLane(_laneThreeSpawner);
                 }
 
                 if (_laneFourSpawner.activeInHierarchy)
                 {
-                    InstantiateTileForLane(tile, _laneFourSpawner, _currentZ);
+                    PlaceFirstSubsectionInLane(_laneFourSpawner);
                 }
 
-                _currentZ += 10;
+                _currentZ = 50;
+            }
 
-                if(GameManager.Current.playerCount > 1)
+            private void PlaceFirstSubsectionInLane(GameObject spawner)
+            {
+                GameObject firstSubsection = Instantiate(_openingSubsection);
+                firstSubsection.transform.position = new Vector3(spawner.transform.position.x, 0.1f, 0);
+            }
+
+            private void PlaceSection(int[] section)
+            {
+                for(int i = 0; i < section.Length; i++)
                 {
-                    photonView.RPC("RPC_SendTile", RpcTarget.Others, tile.Obstacles, tile.ObstacleZAlignment);
+                    int subsec = section[i];
+                    string diff = "";
+
+                    if(i < _easyThisRound)
+                    {
+                        diff = "E";
+                    }
+
+                    if(i >= _easyThisRound && i < _easyThisRound + _mediumThisRound)
+                    {
+                        diff = "M";
+                    }
+
+                    if(i >= _easyThisRound + _mediumThisRound && i < _easyThisRound + _mediumThisRound + _hardThisRound)
+                    {
+                        diff = "H";
+                    }
+
+                    int tiles = PlaceSectionInLane(_laneOneSpawner, diff, subsec);
+
+                    if (_laneTwoSpawner.activeInHierarchy)
+                    {
+                        PlaceSectionInLane(_laneTwoSpawner, diff, subsec);
+                    }
+
+                    if (_laneThreeSpawner.activeInHierarchy)
+                    {
+                        PlaceSectionInLane(_laneThreeSpawner, diff, subsec);
+                    }
+
+                    if (_laneFourSpawner.activeInHierarchy)
+                    {
+                        PlaceSectionInLane(_laneFourSpawner, diff, subsec);
+                    }
+
+                    _currentZ += 10 * tiles;
                 }
+
+                if (GameManager.Current.playerCount > 1 && PhotonNetwork.IsMasterClient)
+                {
+                    photonView.RPC("RPC_SendSection", RpcTarget.Others, section);
+                }
+            }
+
+            private int PlaceSectionInLane(GameObject spawner, string diff, int subsec)
+            {
+                GameObject toPlace = SubsecPoolManager.Current.RequestSubsection(diff, subsec);
+                
+                toPlace.transform.position = new Vector3(spawner.transform.position.x, 0.1f, _currentZ);
+
+                return toPlace.GetComponent<SubSectionInfo>().AmountOfTiles;
+            }
+
+            private void GenerateNextSection()
+            {
+                Debug.Log("Generate Next Section");
+                if (!PhotonNetwork.IsMasterClient) return;
+
+                if(_nextSection[0] == -1)
+                {
+                    // First generation
+                    _nextSection = GenerateSection(_easyThisRound, _mediumThisRound, _hardThisRound);
+
+                    PlaceSection(_nextSection);
+
+                    // Ideal to be 2 sections loaded ahead.
+                    GenerateNextSection();
+                }
+                else
+                {
+                    // x generation
+                    _lastSection = _nextSection;
+                    //ChangeDifficulty();
+
+                    int tries = 0;
+
+                    while (!AcceptableSection(_nextSection, _lastSection) && tries <= 5)
+                    {
+                        _nextSection = GenerateSection(_easyThisRound, _mediumThisRound, _hardThisRound);
+                        tries++;
+                    }
+
+                    PlaceSection(_nextSection);
+                }
+            }
+
+            private bool AcceptableSection(int[] section, int[] lastSection)
+            {
+                bool condition1 = true;
+
+                condition1 = !OverlappedSections(section, lastSection);
+
+                return condition1;
+            }
+
+            private bool OverlappedSections(int[] section, int[] lastSection)
+            {
+                // Checks overlap of easy
+                for(int i = 0; i < _easyThisRound; i++)
+                {
+                    for(int j = 0; j < _easyThisRound; j++)
+                    {
+                        if(section[i] == lastSection[j])
+                        {
+                            return true;
+                        }
+                    }
+                }
+
+                // Checks overlap of medium
+                for (int i = _easyThisRound; i < _easyThisRound + _mediumThisRound; i++)
+                {
+                    for(int j = _easyThisRound; j < _mediumThisRound + _easyThisRound; j++)
+                    {
+                        if (section[i] == lastSection[j])
+                        {
+                            return true;
+                        }
+                    }
+                }
+
+                // Checks overlap of hard
+                for (int i = _easyThisRound + _mediumThisRound; i < _easyThisRound + _mediumThisRound + _hardThisRound; i++)
+                {
+                    for (int j = _easyThisRound + _mediumThisRound; j < _easyThisRound + _mediumThisRound + _hardThisRound; j++)
+                    {
+                        if (section[i] == lastSection[j])
+                        {
+                            return true;
+                        }
+                    }
+                }
+
+                return false;
+            }
+
+            private void ChangeDifficulty()
+            {
+                round++;
+
+                switch (round)
+                {
+                    case 1:
+                        _easyThisRound = 3;
+                        _mediumThisRound = 2;
+                        _hardThisRound = 0;
+                        break;
+                    case 2:
+                        _easyThisRound = 2;
+                        _mediumThisRound = 2;
+                        _hardThisRound = 1;
+                        break;
+                    case 3:
+                        _easyThisRound = 1;
+                        _mediumThisRound = 3;
+                        _hardThisRound = 1;
+                        break;
+                    case 4:
+                        _easyThisRound = 0;
+                        _mediumThisRound = 3;
+                        _hardThisRound = 2;
+                        break;
+                    case 5:
+                        _easyThisRound = 0;
+                        _mediumThisRound = 1;
+                        _hardThisRound = 4;
+                        break;
+                    case 6:
+                        _easyThisRound = 0;
+                        _mediumThisRound = 0;
+                        _hardThisRound = 5;
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+
+            public override void OnMasterClientSwitched(Photon.Realtime.Player newMasterClient)
+            {
+                base.OnMasterClientSwitched(newMasterClient);
+                //TODO: Set up the master client switch
+                //newMasterClient.CustomProperties
             }
 
             [PunRPC]
-            public void RPC_SendTile(int[] obs, float zAlign)
+            public void RPC_SendSection(int[] section)
             {
-                Tile tile = new Tile();
-                tile.PersonalizeTile(obs, zAlign);
-
-                InstantiateTileForLane(tile, _laneOneSpawner, _currentZ);
-
-                if (_laneTwoSpawner.activeInHierarchy)
-                {
-                    InstantiateTileForLane(tile, _laneTwoSpawner, _currentZ);
-                }
-
-                if (_laneThreeSpawner.activeInHierarchy)
-                {
-                    InstantiateTileForLane(tile, _laneThreeSpawner, _currentZ);
-                }
-
-                if (_laneFourSpawner.activeInHierarchy)
-                {
-                    InstantiateTileForLane(tile, _laneFourSpawner, _currentZ);
-                }
-
-                _currentZ += 10;
+                PlaceSection(section);
             }
         }
     }
