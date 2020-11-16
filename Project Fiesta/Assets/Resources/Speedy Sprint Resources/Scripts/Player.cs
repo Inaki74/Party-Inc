@@ -19,7 +19,8 @@ namespace FiestaTime
 
             private bool _hasLost;
 
-            [SerializeField] float _jumpStrength;
+            [SerializeField] float _jumpHeight;
+            [SerializeField] float _jumpSpeed;
 
             private Vector3 _velocity;
 
@@ -123,12 +124,13 @@ namespace FiestaTime
 
                 if (_inputManager.JumpInput && _currentState == PlayerStates.Grounded)
                 {
-                    Jump();
+                    _currentState = PlayerStates.Airborne;
+                    StartCoroutine(JumpCo(transform.position.y, _jumpHeight, _jumpSpeed));
                 }
 
-                if(_inputManager.DuckInput && _currentState == PlayerStates.Dropping)
+                if(_currentState == PlayerStates.Dropping)
                 {
-                    _velocity = new Vector3(0f, _droppingForce, GameManager.Current.MovingSpeed);
+                    _velocity = new Vector3(0f, -_droppingForce, GameManager.Current.MovingSpeed);
                 }
 
                 if(_inputManager.MoveInput)
@@ -237,10 +239,29 @@ namespace FiestaTime
                 }
             }
 
-            private void Jump()
+            private IEnumerator JumpCo(float startingY, float height, float velocity)
             {
-                _velocity += new Vector3(0f, _jumpStrength, 0f);
+                _rb.useGravity = false;
+                bool reachedHeight = false;
+
+                while (!reachedHeight && !_inputManager.DuckInput){
+                    Vector3 decidedVector = new Vector3(transform.position.x, startingY + height, transform.position.z);
+                    transform.position = Vector3.Lerp(transform.position, decidedVector, velocity * Time.deltaTime);
+                    reachedHeight = transform.position.y > startingY + height - 0.05;
+                    yield return new WaitForEndOfFrame();
+                }
+
+                float timeFloating = 0.1f;
+
+                while (reachedHeight || timeFloating > 0f)
+                {
+                    reachedHeight = false;
+                    timeFloating -= Time.deltaTime;
+                    transform.position = new Vector3(transform.position.x, startingY + height, transform.position.z);
+                }
+                _rb.useGravity = true;
             }
+
 
             private void Duck()
             {
@@ -268,7 +289,7 @@ namespace FiestaTime
                     transform.localScale = Vector3.MoveTowards(transform.localScale, targetScale, time);
                     if(transform.localScale.y - targetScale.y > 0)
                     {
-                        transform.position = Vector3.MoveTowards(transform.position, transform.position - new Vector3(0f, 0.5f, 0f), time);
+                        transform.position = Vector3.MoveTowards(transform.position, new Vector3(transform.position.x, 0.5f, transform.position.y), time);
                     }
                     
                     yield return new WaitForEndOfFrame();

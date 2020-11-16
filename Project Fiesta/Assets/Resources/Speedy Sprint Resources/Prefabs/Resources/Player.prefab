@@ -126,15 +126,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 30a6de8add0644b5383933765f534555, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _jumpStrength: 2
-  _duckDuration: 1
-  _duckCooldown: 0.4
-  _droppingForce: 0
+  _jumpHeight: 3
+  _jumpSpeed: 8
+  _duckDuration: 0.5
+  _duckCooldown: 0.2
+  _droppingForce: 15
   _laneSwitchSpeed: 25
   _whatIsGround:
     serializedVersion: 2
     m_Bits: 256
-  _distanceGround: 0.3
+  _distanceGround: 0.17
 --- !u!114 &5847497079470382956
 MonoBehaviour:
   m_ObjectHideFlags: 0

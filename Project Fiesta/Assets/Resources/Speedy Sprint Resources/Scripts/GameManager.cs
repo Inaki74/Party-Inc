@@ -24,6 +24,7 @@ namespace FiestaTime
 
             [SerializeField] private GameObject _generatorPrefab;
             [SerializeField] private GameObject _gameCamera;
+            [SerializeField] private GameObject _proceduralGenerator;
 
             public static string SubsectionsPath = "Speedy Sprint Resources/Prefabs/Resources/Sub-Sections/";
 
@@ -91,10 +92,32 @@ namespace FiestaTime
 
             private void InitializeProceduralGenerator()
             {
-                GameObject generator = PhotonNetwork.InstantiateRoomObject(_generatorPrefab.name, new Vector3(15f, 17f, 7f), Quaternion.identity);
-
-                _gameCamera.GetComponent<CinemachineVirtualCamera>().Follow = generator.transform;
+                if (PhotonNetwork.IsMasterClient)
+                {
+                    _proceduralGenerator = PhotonNetwork.Instantiate(_generatorPrefab.name, new Vector3(15f, 17f, 7f), Quaternion.identity);
+                    _gameCamera.GetComponent<CinemachineVirtualCamera>().Follow = _proceduralGenerator.transform;
+                }
+                else
+                {
+                    _gameCamera.GetComponent<CinemachineVirtualCamera>().Follow = FindProceduralGenerator().transform;
+                }
             }
+
+            private GameObject FindProceduralGenerator()
+            {
+                GameObject[] aux = FindObjectsOfType<GameObject>();
+
+                foreach (GameObject a in aux)
+                {
+                    if (a.CompareTag("ProceduralGenerator"))
+                    {
+                        return a;
+                    }
+                }
+
+                return null;
+            }
+
         }
     }
 }

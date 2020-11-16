@@ -12,7 +12,7 @@ namespace FiestaTime
             public bool JumpInputPressed { get; private set; }
             public bool DuckInput { get; private set; }
             public bool MoveInput { get; private set; }
-            public int MoveDirection { get; private set; }
+            public float MoveDirection { get; private set; }
 
             // Start is called before the first frame update
             void Start()
@@ -22,7 +22,33 @@ namespace FiestaTime
 
             // Update is called once per frame
             void Update()
-            { 
+            {
+                //TakeInputPC();
+
+                TakeInputMobile();
+            }
+
+            private void TakeInputMobile()
+            {
+                if (Input.touchCount > 0)
+                {
+                    JumpInput = Input.touches[0].deltaPosition.y > 50f && Input.touches[0].phase != TouchPhase.Ended;
+
+                    DuckInput = Input.touches[0].deltaPosition.y < -100f && Input.touches[0].phase != TouchPhase.Ended;
+
+                    MoveInput = (Input.touches[0].deltaPosition.x > 100f || Input.touches[0].deltaPosition.x < -100f) && Input.touches[0].phase != TouchPhase.Ended;
+
+                    if (MoveInput)
+                    {
+                        MoveDirection = Input.touches[0].deltaPosition.x;
+                    }
+
+                    Input.touches[0].deltaPosition = Vector2.zero;
+                }
+            }
+
+            private void TakeInputPC()
+            {
                 MoveInput = Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.RightArrow);
 
                 if (Input.GetKeyDown(KeyCode.LeftArrow))

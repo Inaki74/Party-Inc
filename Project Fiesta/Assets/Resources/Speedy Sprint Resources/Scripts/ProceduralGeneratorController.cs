@@ -229,11 +229,10 @@ namespace FiestaTime
             }
 
             private void GenerateNextSection()
-            {
+            {   if (!PhotonNetwork.IsMasterClient) return;
                 Debug.Log("Generate Next Section");
-                if (!PhotonNetwork.IsMasterClient) return;
 
-                if(_nextSection[0] == -1)
+                if (_nextSection[0] == -1)
                 {
                     // First generation
                     _nextSection = GenerateSection(_easyThisRound, _mediumThisRound, _hardThisRound);
@@ -363,6 +362,9 @@ namespace FiestaTime
             [PunRPC]
             public void RPC_SendSection(int[] section)
             {
+                Debug.Log(section[0]);
+                Debug.Log(section[1]);
+                Debug.Log(section[2]);
                 PlaceSection(section);
             }
         }
