@@ -143,7 +143,7 @@ namespace FiestaTime
                     }
                 }
 
-                if (playerCount > 1 && playersAlive <= 0 && !gameEnded && rope.loopCompleted)
+                if (playerCount >= 1 && playersAlive <= 0 && !gameEnded && rope.loopCompleted)
                 {
                     Debug.Log("Game should end");
                     gameEnded = true;

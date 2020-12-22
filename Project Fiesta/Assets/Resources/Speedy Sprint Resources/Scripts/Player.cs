@@ -61,6 +61,7 @@ namespace FiestaTime
             private bool _infoReceived;
             private Vector3 _lastPos;
             private Vector3 _lastVel;
+            private Vector3 _lastScale;
             private float _lastDrag;
             private Quaternion _lastRot;
 
@@ -102,6 +103,7 @@ namespace FiestaTime
                     transform.position = Vector3.Lerp(transform.position, _lastPos, Time.deltaTime);
                     _rb.velocity = _lastVel;
                     _rb.drag = _lastDrag;
+                    transform.localScale = Vector3.Lerp(transform.localScale, _lastScale, Time.deltaTime);
                     if (_hasLost)
                     {
                         transform.rotation = Quaternion.Lerp(transform.rotation, _lastRot, Time.deltaTime);
@@ -325,6 +327,7 @@ namespace FiestaTime
                     stream.SendNext(_rb.velocity);
                     stream.SendNext(transform.position);
                     stream.SendNext(_rb.drag);
+                    stream.SendNext(transform.localScale);
                     if (_hasLost) stream.SendNext(transform.rotation);
                 }
                 else
@@ -332,6 +335,7 @@ namespace FiestaTime
                     _lastVel = (Vector3)stream.ReceiveNext();
                     _lastPos = (Vector3)stream.ReceiveNext();
                     _lastDrag = (float)stream.ReceiveNext();
+                    _lastScale = (Vector3)stream.ReceiveNext();
 
                     float lag = Mathf.Abs((float)(PhotonNetwork.Time - info.SentServerTime));
 
