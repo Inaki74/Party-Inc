@@ -49,6 +49,7 @@ namespace FiestaTime
 
             private float _currentZ;
 
+            private bool _started = false;
 
             // Start is called before the first frame update
             void Start()
@@ -62,13 +63,16 @@ namespace FiestaTime
                 _nextSection[0] = -1;
 
                 PlaceFirstSubsection();
-                GenerateNextSection();
             }
 
             // Update is called once per frame
             void Update()
             {
-
+                if(!_started && GameManager.Current.startGeneration)
+                {
+                    _started = true;
+                    GenerateNextSection();
+                }
             }
 
             private void Awake()

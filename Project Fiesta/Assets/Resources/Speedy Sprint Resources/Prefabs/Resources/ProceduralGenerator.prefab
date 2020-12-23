@@ -137,7 +137,7 @@ GameObject:
   - component: {fileID: 2396403959416888577}
   m_Layer: 0
   m_Name: ProceduralGenerator
-  m_TagString: Untagged
+  m_TagString: ProceduralGenerator
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

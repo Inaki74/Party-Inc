@@ -22,15 +22,16 @@ namespace FiestaTime
                 }
             }
 
-            [SerializeField] private GameObject _generatorPrefab;
             [SerializeField] private GameObject _gameCamera;
             [SerializeField] private GameObject _proceduralGenerator;
+
+            public bool startGeneration = false;
 
             public static string SubsectionsPath = "Speedy Sprint Resources/Prefabs/Resources/Sub-Sections/";
 
             protected override void InitializeGameManagerDependantObjects()
             {
-                InitializeProceduralGenerator();
+                startGeneration = true;
 
                 InitializePlayers();
             }
@@ -88,34 +89,6 @@ namespace FiestaTime
                 }
 
                 PhotonNetwork.Instantiate(playerPrefab.name, decidedPosition, Quaternion.identity);
-            }
-
-            private void InitializeProceduralGenerator()
-            {
-                if (PhotonNetwork.IsMasterClient)
-                {
-                    _proceduralGenerator = PhotonNetwork.Instantiate(_generatorPrefab.name, new Vector3(15f, 17f, 7f), Quaternion.identity);
-                    _gameCamera.GetComponent<CinemachineVirtualCamera>().Follow = _proceduralGenerator.transform;
-                }
-                else
-                {
-                    _gameCamera.GetComponent<CinemachineVirtualCamera>().Follow = FindProceduralGenerator().transform;
-                }
-            }
-
-            private GameObject FindProceduralGenerator()
-            {
-                GameObject[] aux = FindObjectsOfType<GameObject>();
-
-                foreach (GameObject a in aux)
-                {
-                    if (a.CompareTag("ProceduralGenerator"))
-                    {
-                        return a;
-                    }
-                }
-
-                return null;
             }
 
         }
