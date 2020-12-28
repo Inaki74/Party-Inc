@@ -1,12 +1,13 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Photon.Pun;
 
 namespace FiestaTime
 {
     namespace SS
     {
-        public class PlayerInputManager : MonoBehaviour
+        public class PlayerInputManager : MonoBehaviourPun
         {
             public bool JumpInput { get; private set; }
             public bool JumpInputPressed { get; private set; }
@@ -23,6 +24,8 @@ namespace FiestaTime
             // Update is called once per frame
             void Update()
             {
+                if (!photonView.IsMine && PhotonNetwork.IsConnected) return;
+
                 //TakeInputPC();
 
                 TakeInputMobile();

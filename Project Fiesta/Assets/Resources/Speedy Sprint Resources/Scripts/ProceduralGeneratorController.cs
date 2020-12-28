@@ -366,9 +366,6 @@ namespace FiestaTime
             [PunRPC]
             public void RPC_SendSection(int[] section)
             {
-                Debug.Log(section[0]);
-                Debug.Log(section[1]);
-                Debug.Log(section[2]);
                 PlaceSection(section);
             }
         }

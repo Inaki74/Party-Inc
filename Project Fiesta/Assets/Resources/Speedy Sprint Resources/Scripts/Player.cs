@@ -59,11 +59,11 @@ namespace FiestaTime
             // Network variables
 
             private bool _infoReceived;
-            private Vector3 _lastPos;
-            private Vector3 _lastVel;
-            private Vector3 _lastScale;
-            private float _lastDrag;
-            private Quaternion _lastRot;
+            private Vector3 _netPos;
+            private Vector3 _netVel;
+            private Vector3 _netScale;
+            private float _netDrag;
+            private Quaternion _netRot;
 
             // Start is called before the first frame update
             void Start()
@@ -100,14 +100,7 @@ namespace FiestaTime
             {
                 if (!photonView.IsMine && PhotonNetwork.IsConnected && _infoReceived)
                 {
-                    transform.position = Vector3.Lerp(transform.position, _lastPos, Time.deltaTime);
-                    _rb.velocity = _lastVel;
-                    _rb.drag = _lastDrag;
-                    transform.localScale = Vector3.Lerp(transform.localScale, _lastScale, Time.deltaTime);
-                    if (_hasLost)
-                    {
-                        transform.rotation = Quaternion.Lerp(transform.rotation, _lastRot, Time.deltaTime);
-                    }
+                    transform.localScale = Vector3.MoveTowards(transform.localScale, _netScale, Time.deltaTime);
                     return;
                 }
 
@@ -118,16 +111,32 @@ namespace FiestaTime
 
             private void FixedUpdate()
             {
+
+                if (!photonView.IsMine && PhotonNetwork.IsConnected)
+                {
+                    Debug.Log("COMPENSATION: " + (_rb.position.magnitude - _netPos.magnitude));
+                    _rb.position = Vector3.Lerp(_rb.position, _netPos, Time.fixedDeltaTime * Mathf.Abs(_rb.position.magnitude - _netPos.magnitude));
+
+                    _rb.velocity = _netVel;
+                    _rb.drag = _netDrag;
+
+                    if (_hasLost)
+                    {
+                        _rb.rotation = Quaternion.Lerp(_rb.rotation, _netRot, Time.fixedDeltaTime);
+                    }
+                    return;
+                }
+
                 // The compensation exists because when the object ducks (shrinks) it hits the ground a bit, slowing down a tiny bit
                 // But can add up and ruin the game. I lerped the position, still doesnt work. DOnt know what to do. So this will do till i find a real solution.
                 // Nevermind, its always going back. I dont know why, and I want to move on. SO heres a compensation.
                 // Nevermind 2, i found out its the intersection point of planes.
-                _velocity = new Vector3(0f, _rb.velocity.y, GameManager.Current.MovingSpeed + _compensation + _duckCompensation);
+                    _velocity = new Vector3(0f, _rb.velocity.y, GameManager.Current.MovingSpeed + _compensation + _duckCompensation);
 
                 if (_inputManager.JumpInput && _currentState == PlayerStates.Grounded)
                 {
                     _currentState = PlayerStates.Airborne;
-                    StartCoroutine(JumpCo(transform.position.y, _jumpHeight, _jumpSpeed));
+                    StartCoroutine(JumpCo(_rb.position.y, _jumpHeight, _jumpSpeed));
                 }
 
                 if(_currentState == PlayerStates.Dropping)
@@ -186,7 +195,7 @@ namespace FiestaTime
                 while (transform.position.x != decidedX)
                 {
                     Vector3 decidedVector = new Vector3(decidedX, transform.position.y, transform.position.z);
-                    transform.position = Vector3.MoveTowards(transform.position, decidedVector, velocity * Time.deltaTime);
+                    _rb.position = Vector3.MoveTowards(_rb.position, decidedVector, velocity * Time.deltaTime);
                     yield return new WaitForEndOfFrame();
                 }
 
@@ -247,9 +256,9 @@ namespace FiestaTime
                 bool reachedHeight = false;
 
                 while (!reachedHeight && !_inputManager.DuckInput){
-                    Vector3 decidedVector = new Vector3(transform.position.x, startingY + height, transform.position.z);
-                    transform.position = Vector3.Lerp(transform.position, decidedVector, velocity * Time.deltaTime);
-                    reachedHeight = transform.position.y > startingY + height - 0.05;
+                    Vector3 decidedVector = new Vector3(_rb.position.x, startingY + height, _rb.position.z);
+                    _rb.position = Vector3.Lerp(_rb.position, decidedVector, velocity * Time.deltaTime);
+                    reachedHeight = _rb.position.y > startingY + height - 0.05;
                     yield return new WaitForEndOfFrame();
                 }
 
@@ -259,7 +268,7 @@ namespace FiestaTime
                 {
                     reachedHeight = false;
                     timeFloating -= Time.deltaTime;
-                    transform.position = new Vector3(transform.position.x, startingY + height, transform.position.z);
+                    transform.position = new Vector3(_rb.position.x, startingY + height, _rb.position.z);
                 }
                 _rb.useGravity = true;
             }
@@ -289,7 +298,7 @@ namespace FiestaTime
                 while (transform.localScale != targetScale)
                 {
                     transform.localScale = Vector3.MoveTowards(transform.localScale, targetScale, time);
-                    if(transform.localScale.y - targetScale.y > 0)
+                    if(transform.localScale.y > targetScale.y)
                     {
                         transform.position = Vector3.MoveTowards(transform.position, new Vector3(transform.position.x, 0.5f, transform.position.y), time);
                     }
@@ -324,29 +333,35 @@ namespace FiestaTime
             {
                 if (stream.IsWriting)
                 {
+                    Debug.Log("PLAYER " + info.Sender.NickName + " about to send position " + _rb.position + " and velocity " + _rb.velocity);
+
                     stream.SendNext(_rb.velocity);
-                    stream.SendNext(transform.position);
+                    stream.SendNext(_rb.position);
                     stream.SendNext(_rb.drag);
                     stream.SendNext(transform.localScale);
                     if (_hasLost) stream.SendNext(transform.rotation);
                 }
                 else
                 {
-                    _lastVel = (Vector3)stream.ReceiveNext();
-                    _lastPos = (Vector3)stream.ReceiveNext();
-                    _lastDrag = (float)stream.ReceiveNext();
-                    _lastScale = (Vector3)stream.ReceiveNext();
+                    _netVel = (Vector3)stream.ReceiveNext();
+                    _netPos = (Vector3)stream.ReceiveNext();
+                    _netDrag = (float)stream.ReceiveNext();
+                    _netScale = (Vector3)stream.ReceiveNext();
+
+                    Debug.Log("PLAYER " + info.Sender.NickName + " received position " + _netPos + " and velocity " + _netVel);
 
                     float lag = Mathf.Abs((float)(PhotonNetwork.Time - info.SentServerTime));
 
-                    _lastPos += lag * _lastVel;
+                    Debug.Log("LAG is " + lag);
+
+                    _netPos += lag * _netVel;
 
                     _infoReceived = true;
 
                     if (_hasLost)
                     {
                         _rb.constraints = RigidbodyConstraints.None;
-                        _lastRot = (Quaternion)stream.ReceiveNext();
+                        _netRot = (Quaternion)stream.ReceiveNext();
                     }
                 }
             }
