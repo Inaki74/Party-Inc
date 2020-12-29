@@ -26,9 +26,9 @@ namespace FiestaTime
             {
                 if (!photonView.IsMine && PhotonNetwork.IsConnected) return;
 
-                //TakeInputPC();
+                TakeInputPC();
 
-                TakeInputMobile();
+                //TakeInputMobile();
             }
 
             private void TakeInputMobile()
