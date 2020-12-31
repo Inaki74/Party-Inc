@@ -193,6 +193,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f90bc40a8cf8c40c092ca86020fb2f08, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _checkpointLayerMask:
+    serializedVersion: 2
+    m_Bits: 512
 --- !u!114 &3037030653792018969
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -250,4 +253,4 @@ Rigidbody:
   m_IsKinematic: 1
   m_Interpolate: 0
   m_Constraints: 118
-  m_CollisionDetection: 0
+  m_CollisionDetection: 3

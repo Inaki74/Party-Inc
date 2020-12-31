@@ -40,13 +40,11 @@ namespace FiestaTime
             private float _currentDuckDuration;
             [SerializeField] private float _duckCooldown;
             private float _currentDuckCooldown;
-            private float _duckCompensationSetting = 0.4f; //Do not change
+            private float _duckCompensationSetting = 0.5f; //Do not change
             private float _duckCompensation;
             private Vector3 _standingScale;
             private Vector3 _duckingScale = new Vector3(1f, 0.5f, 1f);
             [SerializeField] private float _droppingForce;
-
-            private float _compensation = 0.12f; //DO not change
 
             // Movement variables
             private bool _runOnce;
@@ -134,7 +132,7 @@ namespace FiestaTime
 
                 ////////////
 
-                transform.position += Vector3.forward * (GameManager.Current.MovingSpeed + _compensation + _duckCompensation ) * Time.deltaTime;
+                transform.position += Vector3.forward * (GameManager.Current.MovingSpeed + _duckCompensation ) * Time.deltaTime;
 
                 if(_gravity && _currentState == PlayerStates.Airborne)
                 {
@@ -337,12 +335,12 @@ namespace FiestaTime
 
                 if (Physics.Raycast(startPosition, transform.TransformDirection(Vector3.down), out hit, _distanceGround, _whatIsGround))
                 {
-                    Debug.DrawRay(startPosition, transform.TransformDirection(Vector3.down), Color.red, hit.distance);
+                    Debug.DrawRay(startPosition, transform.TransformDirection(Vector3.down) * hit.distance, Color.red, 0f);
                     return true;
                 }
                 else
                 {
-                    Debug.DrawRay(startPosition, transform.TransformDirection(Vector3.down), Color.green, _distanceGround);
+                    Debug.DrawRay(startPosition, transform.TransformDirection(Vector3.down) * _distanceGround, Color.green, 0f);
                     return false;
                 }
             }

@@ -18,32 +18,46 @@ namespace FiestaTime
             public delegate void ActionPassedTile();
             public static event ActionPassedTile onPassedSection;
 
+            [SerializeField] private LayerMask _checkpointLayerMask;
+            private bool _passedSection = true;
+
             private int _subsectionCount = 0;
-            // Start is called before the first frame update
-            void Start()
-            {
-
-            }
-
-            private void OnTriggerEnter(Collider other)
-            {
-                if(other.tag == "CheckpointPlane")
-                {
-                    Debug.Log("AAAA");
-                    _subsectionCount++;
-
-                    if (_subsectionCount >= 5f)
-                    {
-                        _subsectionCount = 0;
-                        onPassedSection?.Invoke();
-                    }
-                }
-            }
 
             // Update is called once per frame
-            void Update()
+            private void Update()
             {
                 transform.position += Vector3.forward * GameManager.Current.MovingSpeed * Time.deltaTime;
+            }
+
+            private void FixedUpdate()
+            {
+                CheckForCheckpoints();
+            }
+
+            private void CheckForCheckpoints()
+            {
+                RaycastHit hit;
+                if (Physics.Raycast(transform.position, transform.TransformDirection(Vector3.forward), out hit, 20f, 1<<9))
+                {
+                    Debug.DrawRay(transform.position, transform.TransformDirection(Vector3.forward) * hit.distance, Color.green, 0f);
+                    if (hit.distance < 2f && _passedSection)
+                    {
+                        Debug.Log("AAAA");
+                        _passedSection = false;
+                        _subsectionCount++;
+
+                        if (_subsectionCount >= 5f)
+                        {
+                            _subsectionCount = 0;
+                            onPassedSection?.Invoke();
+                        }
+                    }
+                }
+                else
+                {
+                    Debug.DrawRay(transform.position, transform.TransformDirection(Vector3.forward) * 20f, Color.red, 0f);
+                    _passedSection = true;
+                }
             }
         }
     }
