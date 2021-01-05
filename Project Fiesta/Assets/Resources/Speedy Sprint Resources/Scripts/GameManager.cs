@@ -22,6 +22,23 @@ namespace FiestaTime
                 }
             }
 
+            [SerializeField] private float _gravity;
+            public float Gravity
+            {
+                get
+                {
+                    return _gravity;
+                }
+                private set
+                {
+                    _gravity = value;
+                }
+            }
+            private float _gravityMovingRatio = 0.51020408163f;
+
+            private float _maxSpeed = 20f;
+            private float _logValue = 8.02255787562f;
+
             [SerializeField] private GameObject _gameCamera;
             [SerializeField] private GameObject _proceduralGenerator;
 
@@ -38,13 +55,26 @@ namespace FiestaTime
 
             protected override void InStart()
             {
+                _gravity = Physics.gravity.y;
+            }
 
+            public override void Init()
+            {
+                Player.onPlayerDied += OnPlayerLost;
+            }
+
+            private void OnDestroy()
+            {
+                Player.onPlayerDied -= OnPlayerLost;
             }
 
             // Update is called once per frame
             void Update()
             {
+                MovingSpeed = 13.2f * Mathf.Log(0.6f * Mathf.Pow(_logValue, 0.5f));
+                Gravity = -1 * (MovingSpeed / _gravityMovingRatio);
 
+                _logValue += Time.deltaTime;
             }
 
             private void SetPlayerPositions()
@@ -89,6 +119,11 @@ namespace FiestaTime
                 }
 
                 PhotonNetwork.Instantiate(playerPrefab.name, decidedPosition, Quaternion.identity);
+            }
+
+            private void OnPlayerLost(int playerId)
+            {
+
             }
 
         }

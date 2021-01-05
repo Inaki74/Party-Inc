@@ -75,12 +75,6 @@ namespace FiestaTime
             private double _currentSendTime;
             [SerializeField] private float _networkTeleportDistance;
 
-            // Move
-
-            // check
-
-            // save
-
             // Start is called before the first frame update
             void Start()
             {
@@ -110,8 +104,6 @@ namespace FiestaTime
             // Update is called once per frame
             void Update()
             {
-                Debug.Log(Time.deltaTime);
-
                 if (!photonView.IsMine && PhotonNetwork.IsConnected && _infoReceived)
                 {
                     double timeToSend = _currentSendTime - _lastSendTime;
@@ -177,12 +169,8 @@ namespace FiestaTime
                     }
                 }
 
-                if (!_isGrounded)
-                {
-                    CheckIfMissedGround();
-                }
-
                 CheckIfDead(Vector3.forward);
+                CheckIfDead(Vector3.back);
                 CheckIfDead(Vector3.left);
                 CheckIfDead(Vector3.right);
             }
@@ -196,7 +184,7 @@ namespace FiestaTime
             {
                 if (_yVelocity > _yVelocityCap * -1 && _yVelocity < _yVelocityCap)
                 {
-                    _yVelocity += Physics.gravity.y * Time.deltaTime;
+                    _yVelocity += GameManager.Current.Gravity * Time.deltaTime;
                 }
                 transform.position += Vector3.up * _yVelocity * Time.deltaTime;
             }
@@ -312,14 +300,14 @@ namespace FiestaTime
                     yield return new WaitForEndOfFrame();
                 }
 
-                float timeFloating = 0.1f;
+                //float timeFloating = 0.05f;
 
-                while (reachedHeight || timeFloating > 0f)
-                {
-                    reachedHeight = false;
-                    timeFloating -= Time.deltaTime;
-                    yield return new WaitForEndOfFrame();
-                };
+                //while (reachedHeight || timeFloating > 0f)
+                //{
+                //    reachedHeight = false;
+                //    timeFloating -= Time.deltaTime;
+                //    yield return new WaitForEndOfFrame();
+                //};
                 _gravity = true;
             }
 
@@ -383,14 +371,14 @@ namespace FiestaTime
             {
                 RaycastHit hit;
 
-                if (Physics.Raycast(transform.position, transform.TransformDirection(direction), out hit, 5f, 1 << 8))
+                if (Physics.Raycast(_feet.transform.position, _feet.transform.TransformDirection(direction), out hit, 5f, 1 << 8))
                 {
-                    Debug.DrawRay(transform.position, transform.TransformDirection(direction) * hit.distance, Color.green, 0f);
-                    if (hit.distance < 0.1f)
+                    Debug.DrawRay(_feet.transform.position, _feet.transform.TransformDirection(direction) * hit.distance, Color.green, 0f);
+                    if (hit.distance < 0.2f)
                     {
                         PlayerDie();
                     }
-                }else Debug.DrawRay(transform.position, transform.TransformDirection(direction) * 5f, Color.red, 0f);
+                }else Debug.DrawRay(_feet.transform.position, _feet.transform.TransformDirection(direction) * 5f, Color.red, 0f);
             }
 
             private void PlayerDie()
