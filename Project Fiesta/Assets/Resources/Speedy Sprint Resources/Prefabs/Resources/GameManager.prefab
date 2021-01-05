@@ -48,7 +48,7 @@ MonoBehaviour:
   UIPrefab: {fileID: 0}
   playerCount: 0
   gameStartCountdown: 3
-  _movingSpeed: 50
+  _movingSpeed: 15
   _gameCamera: {fileID: 0}
   _proceduralGenerator: {fileID: 0}
   startGeneration: 0

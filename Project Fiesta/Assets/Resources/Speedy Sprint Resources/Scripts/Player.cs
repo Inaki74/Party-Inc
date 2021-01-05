@@ -17,15 +17,23 @@ namespace FiestaTime
             private CapsuleCollider _cc;
             private PlayerInputManager _inputManager;
 
+            [SerializeField] private GameObject _upperBody;
+            [SerializeField] private GameObject _lowerBody;
+
+            public delegate void ActionPlayerLost(int playerId);
+            public static event ActionPlayerLost onPlayerDied;
+
             private bool _hasLost;
 
             [SerializeField] float _jumpHeight;
             [SerializeField] float _jumpSpeed;
 
+            [SerializeField] GameObject _feet;
             private bool _isGrounded;
             private bool _gravity = true;
             private float _yVelocity = 0f;
             private float _yVelocityCap = 50f;
+            private Vector3 _oldFeetPos;
             private enum PlayerStates
             {
                 Airborne,
@@ -40,10 +48,6 @@ namespace FiestaTime
             private float _currentDuckDuration;
             [SerializeField] private float _duckCooldown;
             private float _currentDuckCooldown;
-            private float _duckCompensationSetting = 0.5f; //Do not change
-            private float _duckCompensation;
-            private Vector3 _standingScale;
-            private Vector3 _duckingScale = new Vector3(1f, 0.5f, 1f);
             [SerializeField] private float _droppingForce;
 
             // Movement variables
@@ -71,6 +75,12 @@ namespace FiestaTime
             private double _currentSendTime;
             [SerializeField] private float _networkTeleportDistance;
 
+            // Move
+
+            // check
+
+            // save
+
             // Start is called before the first frame update
             void Start()
             {
@@ -89,14 +99,10 @@ namespace FiestaTime
 
                 _currentDuckDuration = _duckDuration + 1;
 
-                _standingScale = transform.localScale;
-
                 _runOnce = true;
                 _middleRailX = transform.position.x;
                 _leftRailX = _middleRailX - 3;
                 _rightRailX = _middleRailX + 3;
-
-                _duckCompensation = 0f;
 
                 _currentState = PlayerStates.Grounded;
             }
@@ -104,6 +110,8 @@ namespace FiestaTime
             // Update is called once per frame
             void Update()
             {
+                Debug.Log(Time.deltaTime);
+
                 if (!photonView.IsMine && PhotonNetwork.IsConnected && _infoReceived)
                 {
                     double timeToSend = _currentSendTime - _lastSendTime;
@@ -128,13 +136,15 @@ namespace FiestaTime
                     return;
                 }
 
+                _oldFeetPos = _feet.transform.position;
+
+                _isGrounded = CheckIfGrounded(transform.position);
+                
                 StateLogic();
 
-                ////////////
+                transform.position += Vector3.forward * GameManager.Current.MovingSpeed * Time.deltaTime;
 
-                transform.position += Vector3.forward * (GameManager.Current.MovingSpeed + _duckCompensation ) * Time.deltaTime;
-
-                if(_gravity && _currentState == PlayerStates.Airborne)
+                if(_gravity && _currentState == PlayerStates.Airborne && !_isGrounded)
                 {
                     SimulateGravity();
                 }
@@ -143,13 +153,17 @@ namespace FiestaTime
                     _yVelocity = 0f;
                 }
 
-                if (_inputManager.JumpInput && _currentState == PlayerStates.Grounded)
+                if (_inputManager.JumpInput && (_currentState == PlayerStates.Grounded || _currentState == PlayerStates.Ducking))
                 {
+                    if(_currentState == PlayerStates.Ducking)
+                    {
+                        UnDuck();
+                    }
                     _currentState = PlayerStates.Airborne;
                     StartCoroutine(JumpCo(transform.position.y, _jumpHeight, _jumpSpeed));
                 }
 
-                if (_currentState == PlayerStates.Dropping)
+                if (_currentState == PlayerStates.Dropping && !_isGrounded)
                 {
                     transform.position += Vector3.up * -_droppingForce * Time.deltaTime;
                 }
@@ -162,11 +176,20 @@ namespace FiestaTime
                         StartCoroutine(MoveToCo(_laneSwitchSpeed, _inputManager.MoveDirection));
                     }
                 }
+
+                if (!_isGrounded)
+                {
+                    CheckIfMissedGround();
+                }
+
+                CheckIfDead(Vector3.forward);
+                CheckIfDead(Vector3.left);
+                CheckIfDead(Vector3.right);
             }
 
             private void FixedUpdate()
             {
-                _isGrounded = CheckIfGrounded(transform.position);
+                
             }
 
             private void SimulateGravity()
@@ -239,26 +262,31 @@ namespace FiestaTime
                     }
                 }
 
-                // If its not grounded its in the air.
-                if (!_isGrounded && _currentState != PlayerStates.Dropping && _currentState != PlayerStates.Ducking)
+                if (_isGrounded)
                 {
-                    _currentState = PlayerStates.Airborne;
-                }
-
-                // If ducked in the air, it must fall quick. Once it reaches the ground, duck.
-                if (_currentState == PlayerStates.Dropping && _isGrounded)
-                {
-                    Duck();
-                }
-
-                // If grounded, set state to grounded. If came from ducking, unduck.
-                if (_currentDuckDuration > _duckDuration && _isGrounded)
-                {
-                    if (_currentState == PlayerStates.Ducking)
+                    // If ducked in the air, it must fall quick. Once it reaches the ground, duck.
+                    if (_currentState == PlayerStates.Dropping)
                     {
-                        UnDuck();
+                        Duck();
                     }
-                    _currentState = PlayerStates.Grounded;
+
+                    // If grounded, set state to grounded. If came from ducking, unduck.
+                    if (_currentDuckDuration > _duckDuration)
+                    {
+                        if(_currentState == PlayerStates.Ducking)
+                        {
+                            UnDuck();
+                        }
+                        _currentState = PlayerStates.Grounded;
+                    }
+                }
+                else
+                {
+                    // If its not grounded its in the air.
+                    if (_currentState != PlayerStates.Dropping && _currentState != PlayerStates.Ducking)
+                    {
+                        _currentState = PlayerStates.Airborne;
+                    }
                 }
 
                 if (_currentState == PlayerStates.Ducking)
@@ -284,14 +312,14 @@ namespace FiestaTime
                     yield return new WaitForEndOfFrame();
                 }
 
-                float timeFloating = 0.2f;
+                float timeFloating = 0.1f;
 
                 while (reachedHeight || timeFloating > 0f)
                 {
                     reachedHeight = false;
                     timeFloating -= Time.deltaTime;
                     yield return new WaitForEndOfFrame();
-                }
+                };
                 _gravity = true;
             }
 
@@ -301,32 +329,19 @@ namespace FiestaTime
 
                 _currentDuckDuration = 0.00001f;
                 _currentDuckCooldown = _duckCooldown;
-                _duckCompensation = _duckCompensationSetting;
 
-                StopCoroutine("DuckCo");
-                StartCoroutine(DuckCo(_duckingScale, 0.1f));
+                _cc.center = new Vector3(0f, -0.5f, 0f);
+                _cc.height = 1;
+
+                _upperBody.SetActive(false);
             }
 
             private void UnDuck()
             {
-                _duckCompensation = 0f;
-                StopCoroutine("DuckCo");
-                StartCoroutine(DuckCo(_standingScale, 0.1f));
-            }
-
-            private IEnumerator DuckCo(Vector3 targetScale, float time)
-            {
-                while (transform.localScale != targetScale)
-                {
-                    transform.localScale = Vector3.MoveTowards(transform.localScale, targetScale, time);
-                    if(transform.localScale.y > targetScale.y)
-                    {
-                        Debug.Log("A2");
-                        transform.position = Vector3.MoveTowards(transform.position, new Vector3(transform.position.x, 0.5f, transform.position.y), time);
-                    }
-                    
-                    yield return new WaitForEndOfFrame();
-                }
+                _currentDuckDuration = _duckDuration + 0.00001f;
+                _cc.center = new Vector3(0f, 0f, 0f);
+                _cc.height = 2;
+                _upperBody.SetActive(true);
             }
 
             private bool CheckIfGrounded(Vector3 startPosition)
@@ -345,10 +360,72 @@ namespace FiestaTime
                 }
             }
 
+            private void CheckIfMissedGround()
+            {
+                RaycastHit hit;
+                //_oldFeetPos - _feet.transform.position   Vector3.Distance(_feet.transform.position, _oldFeetPos)
+                if (Physics.Raycast(_feet.transform.position, _feet.transform.TransformDirection(_oldFeetPos - _feet.transform.position), out hit, Vector3.Distance(_feet.transform.position, _oldFeetPos), _whatIsGround))
+                {
+                    // We missed the ground, time to correct position
+                    Debug.Log("Got through");
+                    Debug.DrawRay(_feet.transform.position, _feet.transform.TransformDirection(_oldFeetPos - _feet.transform.position) * hit.distance, Color.cyan, 0f);
+
+                    transform.position = hit.point + new Vector3(0f, 0.2f, 0f); 
+                }
+                else
+                {
+                    Debug.Log("Didnt get through");
+                    Debug.DrawRay(_feet.transform.position, _feet.transform.TransformDirection(_oldFeetPos - _feet.transform.position) * Vector3.Distance(_feet.transform.position, _oldFeetPos), Color.blue, 0f);
+                }
+            }
+
+            private void CheckIfDead(Vector3 direction)
+            {
+                RaycastHit hit;
+
+                if (Physics.Raycast(transform.position, transform.TransformDirection(direction), out hit, 5f, 1 << 8))
+                {
+                    Debug.DrawRay(transform.position, transform.TransformDirection(direction) * hit.distance, Color.green, 0f);
+                    if (hit.distance < 0.1f)
+                    {
+                        PlayerDie();
+                    }
+                }else Debug.DrawRay(transform.position, transform.TransformDirection(direction) * 5f, Color.red, 0f);
+            }
+
+            private void PlayerDie()
+            {
+                gameObject.SetActive(false);
+                _hasLost = true;
+                onPlayerDied?.Invoke(PhotonNetwork.LocalPlayer.ActorNumber);
+                photonView.RPC("RPC_InformPlayerLost", RpcTarget.All, PhotonNetwork.LocalPlayer.ActorNumber);
+                photonView.RPC("RPC_Disable", RpcTarget.All);
+            }
+
+            private void OnTriggerEnter(Collider other)
+            {
+                if (!photonView.IsMine && PhotonNetwork.IsConnected)
+                {
+                    return;
+                }
+
+                if (other.gameObject.tag == "Obstacle")
+                {
+                    PlayerDie();
+                }
+            }
+
             [PunRPC]
-            public void RPC_InformPlayerLost()
+            public void RPC_Disable()
+            {
+                gameObject.SetActive(false);
+            }
+
+            [PunRPC]
+            public void RPC_InformPlayerLost(int playerId)
             {
                 _hasLost = true;
+                onPlayerDied?.Invoke(playerId);
             }
 
             public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
