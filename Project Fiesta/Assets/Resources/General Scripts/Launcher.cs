@@ -22,12 +22,22 @@ namespace FiestaTime
         [SerializeField] private Button startButton;
         [SerializeField] private Text connectingText;
 
+        [SerializeField] private bool testingFrames;
+        [SerializeField] private int frames;
+
         #endregion
 
         #region Unity Callbacks
 
         void Start()
         {
+            Application.targetFrameRate = 60;
+
+            if (testingFrames)
+            {
+                Application.targetFrameRate = frames;
+            }
+
             if (!PhotonNetwork.IsConnected)
             {
                 PhotonNetwork.ConnectUsingSettings();

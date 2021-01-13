@@ -34,10 +34,14 @@ namespace FiestaTime
                     _gravity = value;
                 }
             }
-            private float _gravityMovingRatio = 0.51020408163f;
+            private float _gravityMovingRatio = 0.46666666666f;
 
             private float _maxSpeed = 20f;
             private float _logValue = 8.02255787562f;
+
+            private int _nextToInsert = 0;
+            private float _timeElapsed;
+            private bool _isHighScore;
 
             [SerializeField] private GameObject _gameCamera;
             [SerializeField] private GameObject _proceduralGenerator;
@@ -55,7 +59,7 @@ namespace FiestaTime
 
             protected override void InStart()
             {
-                _gravity = Physics.gravity.y;
+                _gravity = -15;
             }
 
             public override void Init()
@@ -82,22 +86,22 @@ namespace FiestaTime
                 switch (playerCount)
                 {
                     case 1:
-                        playerPositions[0] = new Vector3(0f, 1f, 20f);
+                        playerPositions[0] = new Vector3(0f, 1f, 0f);
                         break;
                     case 2:
-                        playerPositions[0] = new Vector3(-5f, 1f, 20f);
-                        playerPositions[1] = new Vector3(5f, 1f, 20f);
+                        playerPositions[0] = new Vector3(-5f, 1f, 0f);
+                        playerPositions[1] = new Vector3(5f, 1f, 0f);
                         break;
                     case 3:
-                        playerPositions[0] = new Vector3(-10f, 1f, 20f);
-                        playerPositions[1] = new Vector3(0f, 1f, 20f);
-                        playerPositions[2] = new Vector3(10f, 1f, 20f);
+                        playerPositions[0] = new Vector3(-10f, 1f, 0f);
+                        playerPositions[1] = new Vector3(0f, 1f, 0f);
+                        playerPositions[2] = new Vector3(10f, 1f, 0f);
                         break;
                     case 4:
-                        playerPositions[0] = new Vector3(-15f, 1f, 20f);
-                        playerPositions[1] = new Vector3(-5f, 1f, 20f);
-                        playerPositions[2] = new Vector3(5f, 1f, 20f);
-                        playerPositions[3] = new Vector3(15f, 1f, 20f);
+                        playerPositions[0] = new Vector3(-15f, 1f, 0f);
+                        playerPositions[1] = new Vector3(-5f, 1f, 0f);
+                        playerPositions[2] = new Vector3(5f, 1f, 0f);
+                        playerPositions[3] = new Vector3(15f, 1f, 0f);
                         break;
                     default:
                         break;
@@ -123,7 +127,26 @@ namespace FiestaTime
 
             private void OnPlayerLost(int playerId)
             {
+                PlayerResults<float> results = new PlayerResults<float>();
+                results.playerId = playerId;
+                results.scoring = _timeElapsed;
+                playerResults[_nextToInsert] = results;
+                _nextToInsert++;
 
+                if (PhotonNetwork.LocalPlayer.ActorNumber == playerId) _isHighScore = GeneralHelperFunctions.DetermineHighScoreFloat(Constants.SS_KEY_HISCORE, results.scoring, true);
+
+                photonView.RPC("RPC_SendPlayerResult", RpcTarget.Others, results.playerId, results.scoring);
+            }
+
+            [PunRPC]
+            public void RPC_SendPlayerResult(int playerId, float time)
+            {
+                PlayerResults<float> thisPlayerResult = new PlayerResults<float>();
+                thisPlayerResult.playerId = playerId;
+                thisPlayerResult.scoring = time;
+
+                playerResults[_nextToInsert] = thisPlayerResult;
+                _nextToInsert++;
             }
 
         }

@@ -25,7 +25,7 @@ namespace FiestaTime
             private bool _terribleWorkaround;
             private float _terribleWorkaroundTime;
 
-            private int _subsectionCount = 2;
+            private int _subsectionCount = 3;
 
             private void Update()
             {
@@ -51,7 +51,7 @@ namespace FiestaTime
 
             private void OnEnable()
             {
-                _subsectionCount = 2;
+                _subsectionCount = 3;
 
                 _terribleWorkaround = true;
                 _terribleWorkaroundTime = 2f;
@@ -59,7 +59,7 @@ namespace FiestaTime
 
             private void OnDisable()
             {
-                _subsectionCount = 2;
+                _subsectionCount = 3;
             }
 
             private void OnPassedSection()

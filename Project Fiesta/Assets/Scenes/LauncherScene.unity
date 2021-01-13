@@ -943,7 +943,7 @@ GameObject:
   - component: {fileID: 1707334455}
   - component: {fileID: 1707334456}
   m_Layer: 0
-  m_Name: NetworkController
+  m_Name: LauncherController
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -978,6 +978,8 @@ MonoBehaviour:
   nameInput: {fileID: 1015788276}
   startButton: {fileID: 429554077}
   connectingText: {fileID: 637714349}
+  testingFrames: 0
+  frames: 0
 --- !u!1 &1878232930
 GameObject:
   m_ObjectHideFlags: 0

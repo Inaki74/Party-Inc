@@ -9,11 +9,13 @@ namespace FiestaTime
     {
         public class PlayerInputManager : MonoBehaviourPun
         {
+            [SerializeField] private float _inputAcceptanceLength;
+
             public bool JumpInput { get; private set; }
             public bool JumpInputPressed { get; private set; }
             public bool DuckInput { get; private set; }
             public bool MoveInput { get; private set; }
-            public float MoveDirection { get; private set; }
+            public int MoveDirection { get; private set; }
 
             // Start is called before the first frame update
             void Start()
@@ -26,27 +28,124 @@ namespace FiestaTime
             {
                 if (!photonView.IsMine && PhotonNetwork.IsConnected) return;
 
-                TakeInputPC();
-
-                //TakeInputMobile();
+                if(Application.platform == RuntimePlatform.Android || Application.platform == RuntimePlatform.IPhonePlayer)
+                {
+                    TakeInputMobile();
+                }
+                else
+                {
+                    TakeInputPC();
+                }
             }
 
             private void TakeInputMobile()
             {
+                MoveInput = false; JumpInput = false; DuckInput = false;
+                MoveDirection = 0;
+
                 if (Input.touchCount > 0)
                 {
-                    JumpInput = Input.touches[0].deltaPosition.y > 50f && Input.touches[0].phase != TouchPhase.Ended;
-
-                    DuckInput = Input.touches[0].deltaPosition.y < -100f && Input.touches[0].phase != TouchPhase.Ended;
-
-                    MoveInput = (Input.touches[0].deltaPosition.x > 100f || Input.touches[0].deltaPosition.x < -100f) && Input.touches[0].phase != TouchPhase.Ended;
-
-                    if (MoveInput)
+                    if(Input.touches[0].phase == TouchPhase.Began)
                     {
-                        MoveDirection = Input.touches[0].deltaPosition.x;
+                        StopCoroutine("CoTouchManagement");
+                        StartCoroutine("CoTouchManagement");
+                    }
+                }
+            }
+
+            private IEnumerator CoTouchManagement()
+            {
+                bool foundInput = false;
+                Vector3 startPoint = Input.touches[0].position;
+                Vector3 endPoint = startPoint;
+                while(Input.touches[0].phase != TouchPhase.Ended)
+                {
+                    MoveInput = false; JumpInput = false; DuckInput = false;
+                    MoveDirection = 0;
+
+                    endPoint = Input.touches[0].position;
+
+                    if(Vector3.Distance(startPoint, endPoint) > _inputAcceptanceLength && !foundInput)
+                    {
+                        foundInput = true;
+                        DetermineInput(startPoint, endPoint);
                     }
 
-                    Input.touches[0].deltaPosition = Vector2.zero;
+                    
+                    yield return new WaitForEndOfFrame();
+                }
+            }
+
+            private void DetermineInput(Vector3 start, Vector3 end)
+            {
+                Vector3 directionVector = end - start;
+                float ratio = directionVector.x / directionVector.y;
+
+                if (directionVector.x > 0f)
+                {
+                    if(directionVector.y > 0f)
+                    {
+                        if (ratio <= 0.577f)
+                        {
+                            JumpInput = true;
+                            return;
+                        }
+
+                        if (ratio > 0.577f)
+                        {
+                            MoveInput = true;
+                            MoveDirection = 1;
+                            return;
+                        }
+                    }
+                    else
+                    {
+                        if (ratio <= -0.557f)
+                        {
+                            MoveInput = true;
+                            MoveDirection = 1;
+                            return;
+                        }
+
+                        if (ratio > -0.557f)
+                        {
+                            DuckInput = true;
+                            return;
+                        }
+                    }
+                }
+                else
+                {
+                    if(directionVector.y > 0f)
+                    {
+                        if (ratio > -0.577f)
+                        {
+                            JumpInput = true;
+                            return;
+                        }
+
+                        if (ratio <= -0.577f)
+                        {
+                            MoveInput = true;
+                            MoveDirection = -1;
+                            return;
+                        }
+                    }
+                    else
+                    {
+                        if (ratio >= 0.557f)
+                        {
+                            MoveInput = true;
+                            MoveDirection = -1;
+                            return;
+                        }
+
+                        if (ratio < 0.557f)
+                        {
+                            DuckInput = true;
+                            return;
+                        }
+                    }
                 }
             }
 

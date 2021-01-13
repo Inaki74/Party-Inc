@@ -46,7 +46,7 @@ namespace FiestaTime
                         _passedSection = false;
                         _subsectionCount++;
 
-                        if (_subsectionCount >= 5f)
+                        if (_subsectionCount >= 3)
                         {
                             _subsectionCount = 0;
                             onPassedSection?.Invoke();

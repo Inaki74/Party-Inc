@@ -19,13 +19,13 @@ namespace FiestaTime
         /// LAST PARAGRAPH IS DEPRECATED
         ///
         /// Remake: The procedural generator takes the sub-section prefabs and composes them into sections.
-        /// Each section is composed of 5 sub-sections. Each sub-section is abstracted as a number, so as to send over the network. Therefore each section is a length 5 vector.
+        /// Each section is composed of 3 sub-sections. Each sub-section is abstracted as a number, so as to send over the network. Therefore each section is a length 3 vector.
         /// The game is the infinite string of these sections, each different from one another.
         /// Sub-sections will be designed within Unity and stored as prefabs. There will be easy, medium and hard sub-sections.
         /// Sections will have certain number of easy, medium and hard sub-sections. These scale with the games length.
         /// Sections are then formed by code, randomly, with some rules in place (no two same patterns in a row, or such things).
         /// There will be a "SubsectionPool" which stores the entire sub-section, then they are placed in their respective lanes.
-        /// The game will pre load like 3 sub-sections ahead and will un-load 2 sub-sections behind, per lane.
+        /// The game will pre load like 3 sections ahead and will un-load 2 sections behind, per lane.
         /// The spacing of each sub-section is determined by the amount of tiles each sub-section occupies. Each tile is 10 units X and Z.
         /// </summary>
         public class ProceduralGeneratorController : MonoBehaviourPunCallbacks
@@ -36,9 +36,13 @@ namespace FiestaTime
             [SerializeField] private GameObject _laneFourSpawner;
             [SerializeField] private GameObject _openingSubsection;
 
-            [SerializeField] private int[] _nextSection = new int[5];
-            [SerializeField] private int[] _lastSection = new int[5];
-            private int _easyThisRound = 5;
+            [SerializeField] private GameObject test;
+
+            [SerializeField] private bool _syncTest;
+
+            [SerializeField] private int[] _nextSection = new int[3];
+            [SerializeField] private int[] _lastSection = new int[3];
+            private int _easyThisRound = 3;
             private int _mediumThisRound = 0;
             private int _hardThisRound = 0;
             private int round = 0;
@@ -54,15 +58,20 @@ namespace FiestaTime
             // Start is called before the first frame update
             void Start()
             {
-                DecideSpawnerPositions();
+                
 
                 _totalEasy = TotalAmountOfSubsections("Easy");
                 _totalMedium = TotalAmountOfSubsections("Medium");
                 _totalHard = TotalAmountOfSubsections("Hard");
 
+                if (!_syncTest)
+                {
+                    _totalEasy -= 1;
+                }
+
                 _nextSection[0] = -1;
 
-                PlaceFirstSubsection();
+                
             }
 
             // Update is called once per frame
@@ -70,8 +79,21 @@ namespace FiestaTime
             {
                 if(!_started && GameManager.Current.startGeneration)
                 {
+                    //float z = 10f;
+                    //for (int i = 0; i < GameManager.Current.playerCount; i++)
+                    //{
+                    //    Instantiate(test, new Vector3(0f, 1f, z), Quaternion.identity);
+                    //    z += 10f;
+                    //}
+                    DecideSpawnerPositions();
+                    PlaceFirstSubsection();
+
                     _started = true;
-                    GenerateNextSection();
+
+                    if(PhotonNetwork.IsMasterClient)
+                    {
+                        GenerateNextSection();
+                    }
                 }
             }
 
@@ -120,7 +142,7 @@ namespace FiestaTime
 
             private int[] GenerateSection(int easy, int medium, int hard)
             {
-                int[] randomization = new int[5];
+                int[] randomization = new int[3];
 
                 for (int i = 0; i < easy; i++)
                 {
@@ -233,8 +255,27 @@ namespace FiestaTime
             }
 
             private void GenerateNextSection()
-            {   if (!PhotonNetwork.IsMasterClient) return;
+            {   if (!PhotonNetwork.IsMasterClient && PhotonNetwork.IsConnected) return;
                 Debug.Log("Generate Next Section");
+
+                if (_syncTest)
+                {
+                    _nextSection[0] = 1024;
+                    _nextSection[1] = 1024;
+                    _nextSection[2] = 1024;
+
+                    if (_nextSection[0] == -1)
+                    {
+                        PlaceSection(_nextSection);
+
+                        GenerateNextSection();
+                    }
+                    else
+                    {
+                        PlaceSection(_nextSection);
+                    }
+                    return;
+                }
 
                 if (_nextSection[0] == -1)
                 {
@@ -321,34 +362,34 @@ namespace FiestaTime
                 switch (round)
                 {
                     case 1:
-                        _easyThisRound = 3;
-                        _mediumThisRound = 2;
+                        _easyThisRound = 2;
+                        _mediumThisRound = 1;
                         _hardThisRound = 0;
                         break;
                     case 2:
-                        _easyThisRound = 2;
+                        _easyThisRound = 1;
                         _mediumThisRound = 2;
-                        _hardThisRound = 1;
+                        _hardThisRound = 0;
                         break;
                     case 3:
-                        _easyThisRound = 1;
+                        _easyThisRound = 0;
                         _mediumThisRound = 3;
-                        _hardThisRound = 1;
+                        _hardThisRound = 0;
                         break;
                     case 4:
                         _easyThisRound = 0;
-                        _mediumThisRound = 3;
-                        _hardThisRound = 2;
+                        _mediumThisRound = 2;
+                        _hardThisRound = 1;
                         break;
                     case 5:
                         _easyThisRound = 0;
                         _mediumThisRound = 1;
-                        _hardThisRound = 4;
+                        _hardThisRound = 2;
                         break;
                     case 6:
                         _easyThisRound = 0;
                         _mediumThisRound = 0;
-                        _hardThisRound = 5;
+                        _hardThisRound = 3;
                         break;
                     default:
                         break;
