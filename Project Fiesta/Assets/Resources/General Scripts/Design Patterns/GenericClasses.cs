@@ -75,6 +75,8 @@ namespace FiestaTime
 
         private void Start()
         {
+            Debug.Log("Default GM Start");
+
             networkController = FindObjectOfType<NetworkGameRoomController>();
 
             if(networkController == null && PhotonNetwork.IsConnected)
@@ -82,11 +84,18 @@ namespace FiestaTime
                 Debug.LogError("CRITICAL: No Network Controller found in scene.");
             }
 
-            playerCount = PhotonNetwork.PlayerList.Length;
             playerResults = new PlayerResults<T>[playerCount];
 
             InStart();
             StartCoroutine("AllPlayersReady");
+        }
+
+        public override void Init()
+        {
+            base.Init();
+
+            Debug.Log("Default GM Awake");
+            playerCount = PhotonNetwork.PlayerList.Length;
         }
 
         /// <summary>

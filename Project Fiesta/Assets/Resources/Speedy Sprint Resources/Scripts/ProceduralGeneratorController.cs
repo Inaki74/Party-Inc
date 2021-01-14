@@ -85,9 +85,7 @@ namespace FiestaTime
                     //    Instantiate(test, new Vector3(0f, 1f, z), Quaternion.identity);
                     //    z += 10f;
                     //}
-                    DecideSpawnerPositions();
-                    PlaceFirstSubsection();
-
+                    
                     _started = true;
 
                     if(PhotonNetwork.IsMasterClient)
@@ -100,6 +98,10 @@ namespace FiestaTime
             private void Awake()
             {
                 InvisibleTrolleyController.onPassedSection += GenerateNextSection;
+
+                DecideSpawnerPositions();
+
+                PlaceFirstSubsection();
             }
 
             private void OnDestroy()

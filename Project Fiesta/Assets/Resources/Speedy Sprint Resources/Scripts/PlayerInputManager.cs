@@ -17,6 +17,8 @@ namespace FiestaTime
             public bool MoveInput { get; private set; }
             public int MoveDirection { get; private set; }
 
+            public Queue<string> currentInputs = new Queue<string>();
+
             // Start is called before the first frame update
             void Start()
             {
@@ -69,6 +71,22 @@ namespace FiestaTime
                     {
                         foundInput = true;
                         DetermineInput(startPoint, endPoint);
+
+                        if (JumpInput)
+                        {
+                            currentInputs.Enqueue("Jump");
+                        }
+                        if (MoveInput)
+                        {
+                            if(MoveDirection == 1)
+                            {
+                                currentInputs.Enqueue("MoveRight");
+                            }
+                            else
+                            {
+                                currentInputs.Enqueue("MoveLeft");
+                            }
+                        }
                     }
 
                     
@@ -151,6 +169,9 @@ namespace FiestaTime
 
             private void TakeInputPC()
             {
+                MoveInput = false; JumpInput = false; DuckInput = false;
+                MoveDirection = 0;
+
                 MoveInput = Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.RightArrow);
 
                 if (Input.GetKeyDown(KeyCode.LeftArrow))
@@ -165,9 +186,23 @@ namespace FiestaTime
 
                 JumpInput = Input.GetKeyDown(KeyCode.UpArrow);
 
-                JumpInput = Input.GetKey(KeyCode.UpArrow);
-
                 DuckInput = Input.GetKeyDown(KeyCode.DownArrow);
+
+                if (JumpInput)
+                {
+                    currentInputs.Enqueue("Jump");
+                }
+                if (MoveInput)
+                {
+                    if (MoveDirection == 1)
+                    {
+                        currentInputs.Enqueue("MoveRight");
+                    }
+                    else
+                    {
+                        currentInputs.Enqueue("MoveLeft");
+                    }
+                }
             }
         }
     }

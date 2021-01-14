@@ -60,6 +60,8 @@ MonoBehaviour:
   - RPC_SendNewScore
   - RPC_SendTile
   - RPC_SendSection
+  - RPC_PlayerDied
+  - Bro
   DisableAutoOpenWizard: 1
   ShowSettings: 0
   DevRegionSetOnce: 1

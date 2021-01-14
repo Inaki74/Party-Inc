@@ -64,6 +64,8 @@ namespace FiestaTime
 
             public override void Init()
             {
+                base.Init();
+                
                 Player.onPlayerDied += OnPlayerLost;
             }
 
