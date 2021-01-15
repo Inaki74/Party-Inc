@@ -22,7 +22,7 @@ namespace FiestaTime
             {
                 Debug.Log("UIManager start");
                 countdownText.enabled = true;
-                
+
                 timerText.text = "00:00.00";
             }
 
@@ -54,6 +54,5 @@ namespace FiestaTime
             }
         }
     }
+
 }
-
-

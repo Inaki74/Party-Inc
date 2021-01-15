@@ -77,7 +77,7 @@ namespace FiestaTime
             // Update is called once per frame
             void Update()
             {
-                if(!_started && GameManager.Current.GameBegan)
+                if(!_started && GameManager.Current.startGeneration)
                 {
                     //float z = 10f;
                     //for (int i = 0; i < GameManager.Current.playerCount; i++)

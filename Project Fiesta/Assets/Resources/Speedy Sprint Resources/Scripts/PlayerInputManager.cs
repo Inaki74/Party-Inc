@@ -46,7 +46,6 @@ namespace FiestaTime
                 {
                     if(Input.touches[0].phase == TouchPhase.Began)
                     {
-                        Debug.Log("Start Input Coroutine");
                         StopCoroutine("CoTouchManagement");
                         StartCoroutine("CoTouchManagement");
                     }
@@ -76,7 +75,7 @@ namespace FiestaTime
                         }
                         if (MoveInput)
                         {
-                            if (MoveDirection == 1)
+                            if(MoveDirection == 1)
                             {
                                 currentInputs.Enqueue("MoveRight");
                             }
@@ -86,6 +85,7 @@ namespace FiestaTime
                             }
                         }
                     }
+
                     
                     yield return new WaitForEndOfFrame();
                 }
@@ -103,7 +103,6 @@ namespace FiestaTime
                         if (ratio <= 0.577f)
                         {
                             JumpInput = true;
-                            Debug.Log("Jump");
                             return;
                         }
 

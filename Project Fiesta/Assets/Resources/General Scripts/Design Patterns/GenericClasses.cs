@@ -97,7 +97,6 @@ namespace FiestaTime
             base.Init();
 
             Debug.Log("Default GM Awake");
-            Debug.Log(PhotonNetwork.PlayerList.Length);
             playerCount = PhotonNetwork.PlayerList.Length;
             PlayersConnectedAndReady = false;
         }

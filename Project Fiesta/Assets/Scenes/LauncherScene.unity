@@ -942,6 +942,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1707334455}
   - component: {fileID: 1707334456}
+  - component: {fileID: 1707334457}
   m_Layer: 0
   m_Name: LauncherController
   m_TagString: Untagged
@@ -980,6 +981,19 @@ MonoBehaviour:
   connectingText: {fileID: 637714349}
   testingFrames: 0
   frames: 0
+--- !u!114 &1707334457
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1707334454}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b61c60d38639484ebbd7f2100dd3d08, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  LogTrafficStats: 1
 --- !u!1 &1878232930
 GameObject:
   m_ObjectHideFlags: 0

@@ -62,11 +62,8 @@ MonoBehaviour:
   - RPC_SendSection
   - RPC_PlayerDied
   - Bro
-  - RPC_GameBegin
-  - RPC_SendStartTime
-  - RPC_SendInGameTime
   - RPC_SendBegin
-  - RPC_SendZToBe
+  - RPC_SendInGameTime
   DisableAutoOpenWizard: 1
   ShowSettings: 0
   DevRegionSetOnce: 1

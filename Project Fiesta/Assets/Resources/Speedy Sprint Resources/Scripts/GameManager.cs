@@ -34,12 +34,9 @@ namespace FiestaTime
                     _gravity = value;
                 }
             }
-
-            public bool GameBegan { get; private set; }
-            public float InGameTime { get; private set; }
-            public float ZToBe { get; private set; }
-
             private float _gravityMovingRatio = 0.46666666666f;
+
+            private float _maxSpeed = 20f;
             private float _logValue = 8.02255787562f;
 
             private int _nextToInsert = 0;
@@ -49,14 +46,19 @@ namespace FiestaTime
             [SerializeField] private GameObject _gameCamera;
             [SerializeField] private GameObject _proceduralGenerator;
 
-            private float _startTime;
-            private float _masterClientAvgDeltaTime;
-            private float realGameStartCountdown ;
+            public bool GameBegan { get; private set; }
+            public float InGameTime { get; private set; }
+
+            private float _realGameStartCountdown;
+
+            public bool startGeneration = false;
 
             public static string SubsectionsPath = "Speedy Sprint Resources/Prefabs/Resources/Sub-Sections/";
 
             protected override void InitializeGameManagerDependantObjects()
             {
+                startGeneration = true;
+
                 InitializePlayers();
             }
 
@@ -66,8 +68,7 @@ namespace FiestaTime
                 _gravity = -15;
                 MovingSpeed = 0f;
                 InGameTime = 0f;
-                ZToBe = -10f;
-                if(PhotonNetwork.IsMasterClient || !PhotonNetwork.IsConnected) realGameStartCountdown  = gameStartCountdown + 1;
+                if (PhotonNetwork.IsMasterClient || !PhotonNetwork.IsConnected) _realGameStartCountdown = gameStartCountdown + 1;
             }
 
             public override void Init()
@@ -85,27 +86,28 @@ namespace FiestaTime
             // Update is called once per frame
             void Update()
             {
-                if (!PhotonNetwork.IsMasterClient && PhotonNetwork.IsConnected) return;
-
                 if (GameBegan)
                 {
                     MovingSpeed = 13.2f * Mathf.Log(0.6f * Mathf.Pow(InGameTime + _logValue, 0.5f));
                     Gravity = -1 * (MovingSpeed / _gravityMovingRatio);
+
                     InGameTime += Time.deltaTime;
-                    ZToBe += MovingSpeed * Time.deltaTime;
-                    photonView.RPC("RPC_SendZToBe", RpcTarget.Others, ZToBe);
                     photonView.RPC("RPC_SendInGameTime", RpcTarget.Others, InGameTime);
                 }
 
-                if (!GameBegan && realGameStartCountdown <= 0f)
+                if(PhotonNetwork.IsMasterClient || !PhotonNetwork.IsConnected)
                 {
-                    GameBegan = true;
-                    photonView.RPC("RPC_SendBegin", RpcTarget.Others, GameBegan);
+                    if (!GameBegan && _realGameStartCountdown <= 0f)
+                    {
+                        GameBegan = true;
+                        photonView.RPC("RPC_SendBegin", RpcTarget.Others, GameBegan);
+                    }
+                    else if (!GameBegan)
+                    {
+                        _realGameStartCountdown -= Time.deltaTime;
+                    }
                 }
-                else if (!GameBegan)
-                {
-                    realGameStartCountdown -= Time.deltaTime;
-                }
+                
             }
 
             private void SetPlayerPositions()
@@ -186,12 +188,6 @@ namespace FiestaTime
             public void RPC_SendInGameTime(float time)
             {
                 InGameTime = time;
-            }
-
-            [PunRPC]
-            public void RPC_SendZToBe(float z)
-            {
-                ZToBe = z;
             }
 
         }
