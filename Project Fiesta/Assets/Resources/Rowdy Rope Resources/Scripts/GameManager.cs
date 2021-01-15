@@ -100,8 +100,6 @@ namespace FiestaTime
 
             public override void Init()
             {
-                base.Init();
-
                 RopeControllerM.onLoopComplete += OnRoundCompleted;
                 Player.onPlayerDied += OnPlayerFinished;
             }

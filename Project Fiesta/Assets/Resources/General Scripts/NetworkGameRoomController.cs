@@ -61,7 +61,6 @@ namespace FiestaTime
         /// <returns></returns>
         private IEnumerator StartGameCo()
         {
-            yield return new WaitForSeconds(0.5f);
             yield return new WaitUntil(() => PlayersLoadedGame());
 
             playersAreReady = true;
