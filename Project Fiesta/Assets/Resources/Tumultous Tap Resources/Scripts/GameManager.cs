@@ -66,6 +66,8 @@ namespace FiestaTime
 
             public override void Init()
             {
+                base.Init();
+
                 PlayerController.onCrossFinishLine += OnPlayerWon;
                 PlayerController.onPlayerDied += OnPlayerLost;
             }

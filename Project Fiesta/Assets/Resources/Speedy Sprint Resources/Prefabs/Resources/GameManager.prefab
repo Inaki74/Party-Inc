@@ -53,7 +53,6 @@ MonoBehaviour:
   _gravity: 0
   _gameCamera: {fileID: 0}
   _proceduralGenerator: {fileID: 0}
-  startGeneration: 0
 --- !u!114 &4132299811167119029
 MonoBehaviour:
   m_ObjectHideFlags: 0

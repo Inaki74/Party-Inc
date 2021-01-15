@@ -31,7 +31,7 @@ namespace FiestaTime
 
         void Start()
         {
-            Application.targetFrameRate = 90;
+            Application.targetFrameRate = 60;
 
             if (testingFrames)
             {

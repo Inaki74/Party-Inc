@@ -73,6 +73,8 @@ namespace FiestaTime
         // I think all of our games will have some type of countdown.
         public float gameStartCountdown = 3f; //Have to take into account the start text
 
+        public bool PlayersConnectedAndReady { get; private set; }
+
         private void Start()
         {
             Debug.Log("Default GM Start");
@@ -95,7 +97,9 @@ namespace FiestaTime
             base.Init();
 
             Debug.Log("Default GM Awake");
+            Debug.Log(PhotonNetwork.PlayerList.Length);
             playerCount = PhotonNetwork.PlayerList.Length;
+            PlayersConnectedAndReady = false;
         }
 
         /// <summary>
@@ -105,6 +109,8 @@ namespace FiestaTime
         private IEnumerator AllPlayersReady()
         {
             yield return new WaitUntil(() => networkController.playersAreReady || !PhotonNetwork.IsConnected);
+
+            PlayersConnectedAndReady = true;
 
             InitializeGameManagerDependantObjects();
         }

@@ -119,6 +119,8 @@ namespace FiestaTime
             // Update is called once per frame
             void Update()
             {
+                if (!GameManager.Current.GameBegan) return;
+
                 _isGrounded = CheckIfGrounded(transform.position);
 
                 if (!photonView.IsMine && PhotonNetwork.IsConnected && _infoReceived)
@@ -386,15 +388,6 @@ namespace FiestaTime
 
                 while (reachedHeight || timeFloating > 0f)
                 {
-                    timeElapsed += Time.deltaTime;
-                    distanceTravelled += Time.deltaTime * GameManager.Current.MovingSpeed;
-
-                    if (distanceTravelled >= 1f)
-                    {
-                        Debug.Log(timeElapsed);
-                        distanceTravelled = -10000;
-                    }
-
                     reachedHeight = false;
                     timeFloating -= Time.deltaTime;
                     yield return new WaitForEndOfFrame();
@@ -498,7 +491,7 @@ namespace FiestaTime
 
             private void PositionPrediction(double timeToSend)
             {
-                transform.position += Vector3.forward * GameManager.Current.MovingSpeed * Time.deltaTime;
+                transform.position = Vector3.Lerp(_lastPos, _netPos, (float)(_time / timeToSend));
 
                 if (_gravity && !_isGrounded)
                 {
@@ -563,13 +556,10 @@ namespace FiestaTime
 
             public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
             {
+                if (!GameManager.Current.PlayersConnectedAndReady || _inputManager == null) return;
+
                 if (stream.IsWriting)
                 {
-                    //stream.SendNext(_isJumping);
-                    //stream.SendNext(_isMoving);
-                    //stream.SendNext(_gravity && _currentState == PlayerStates.Airborne && !_isGrounded);
-                    //stream.SendNext(_currentState == PlayerStates.Dropping && !_isGrounded);
-
                     SendInputs(stream, _inputManager.currentInputs);
 
                     stream.SendNext(transform.position);
@@ -578,11 +568,6 @@ namespace FiestaTime
                 }
                 else
                 {
-                    //_netJump = (bool)stream.ReceiveNext();
-                    //_netMove = (bool)stream.ReceiveNext();
-                    //_netFalling = (bool)stream.ReceiveNext();
-                    //_netDropping = (bool)stream.ReceiveNext();
-
                     ReceiveInputs(stream);
 
                     _netPos = (Vector3)stream.ReceiveNext();
