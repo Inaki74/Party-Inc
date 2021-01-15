@@ -28,9 +28,9 @@ namespace FiestaTime
             // Update is called once per frame
             void Update()
             {
-                if (!photonView.IsMine && PhotonNetwork.IsConnected) return;
+                if ((!photonView.IsMine && PhotonNetwork.IsConnected) || !GameManager.Current.GameBegan) return;
 
-                if(Application.platform == RuntimePlatform.Android || Application.platform == RuntimePlatform.IPhonePlayer)
+                if(Application.isMobilePlatform)
                 {
                     TakeInputMobile();
                 }
@@ -42,9 +42,6 @@ namespace FiestaTime
 
             private void TakeInputMobile()
             {
-                MoveInput = false; JumpInput = false; DuckInput = false;
-                MoveDirection = 0;
-
                 if (Input.touchCount > 0)
                 {
                     if(Input.touches[0].phase == TouchPhase.Began)
@@ -60,7 +57,7 @@ namespace FiestaTime
                 bool foundInput = false;
                 Vector3 startPoint = Input.touches[0].position;
                 Vector3 endPoint = startPoint;
-                while(Input.touches[0].phase != TouchPhase.Ended)
+                while(Input.touches[0].phase != TouchPhase.Ended && Input.touchCount > 0)
                 {
                     MoveInput = false; JumpInput = false; DuckInput = false;
                     MoveDirection = 0;

@@ -46,6 +46,11 @@ namespace FiestaTime
             [SerializeField] private GameObject _gameCamera;
             [SerializeField] private GameObject _proceduralGenerator;
 
+            public bool GameBegan { get; private set; }
+            public float InGameTime { get; private set; }
+
+            private float _realGameStartCountdown;
+
             public bool startGeneration = false;
 
             public static string SubsectionsPath = "Speedy Sprint Resources/Prefabs/Resources/Sub-Sections/";
@@ -59,7 +64,11 @@ namespace FiestaTime
 
             protected override void InStart()
             {
+                GameBegan = false;
                 _gravity = -15;
+                MovingSpeed = 0f;
+                InGameTime = 0f;
+                if (PhotonNetwork.IsMasterClient || !PhotonNetwork.IsConnected) _realGameStartCountdown = gameStartCountdown + 1;
             }
 
             public override void Init()
@@ -77,10 +86,28 @@ namespace FiestaTime
             // Update is called once per frame
             void Update()
             {
-                MovingSpeed = 13.2f * Mathf.Log(0.6f * Mathf.Pow(_logValue, 0.5f));
-                Gravity = -1 * (MovingSpeed / _gravityMovingRatio);
+                if (GameBegan)
+                {
+                    MovingSpeed = 13.2f * Mathf.Log(0.6f * Mathf.Pow(InGameTime + _logValue, 0.5f));
+                    Gravity = -1 * (MovingSpeed / _gravityMovingRatio);
 
-                _logValue += Time.deltaTime;
+                    InGameTime += Time.deltaTime;
+                    photonView.RPC("RPC_SendInGameTime", RpcTarget.Others, InGameTime);
+                }
+
+                if(PhotonNetwork.IsMasterClient || !PhotonNetwork.IsConnected)
+                {
+                    if (!GameBegan && _realGameStartCountdown <= 0f)
+                    {
+                        GameBegan = true;
+                        photonView.RPC("RPC_SendBegin", RpcTarget.Others, GameBegan);
+                    }
+                    else if (!GameBegan)
+                    {
+                        _realGameStartCountdown -= Time.deltaTime;
+                    }
+                }
+                
             }
 
             private void SetPlayerPositions()
@@ -88,22 +115,22 @@ namespace FiestaTime
                 switch (playerCount)
                 {
                     case 1:
-                        playerPositions[0] = new Vector3(0f, 1f, 0f);
+                        playerPositions[0] = new Vector3(0f, 1f, -10f);
                         break;
                     case 2:
-                        playerPositions[0] = new Vector3(-5f, 1f, 0f);
-                        playerPositions[1] = new Vector3(5f, 1f, 0f);
+                        playerPositions[0] = new Vector3(-5f, 1f, -10f);
+                        playerPositions[1] = new Vector3(5f, 1f, -10f);
                         break;
                     case 3:
-                        playerPositions[0] = new Vector3(-10f, 1f, 0f);
-                        playerPositions[1] = new Vector3(0f, 1f, 0f);
-                        playerPositions[2] = new Vector3(10f, 1f, 0f);
+                        playerPositions[0] = new Vector3(-10f, 1f, -10f);
+                        playerPositions[1] = new Vector3(0f, 1f, -10f);
+                        playerPositions[2] = new Vector3(10f, 1f, -10f);
                         break;
                     case 4:
-                        playerPositions[0] = new Vector3(-15f, 1f, 0f);
-                        playerPositions[1] = new Vector3(-5f, 1f, 0f);
-                        playerPositions[2] = new Vector3(5f, 1f, 0f);
-                        playerPositions[3] = new Vector3(15f, 1f, 0f);
+                        playerPositions[0] = new Vector3(-15f, 1f, -10f);
+                        playerPositions[1] = new Vector3(-5f, 1f, -10f);
+                        playerPositions[2] = new Vector3(5f, 1f, -10f);
+                        playerPositions[3] = new Vector3(15f, 1f, -10f);
                         break;
                     default:
                         break;
@@ -149,6 +176,18 @@ namespace FiestaTime
 
                 playerResults[_nextToInsert] = thisPlayerResult;
                 _nextToInsert++;
+            }
+
+            [PunRPC]
+            public void RPC_SendBegin(bool gameBegan)
+            {
+                GameBegan = gameBegan;
+            }
+
+            [PunRPC]
+            public void RPC_SendInGameTime(float time)
+            {
+                InGameTime = time;
             }
 
         }

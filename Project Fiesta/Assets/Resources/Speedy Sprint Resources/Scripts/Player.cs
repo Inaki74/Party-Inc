@@ -563,6 +563,8 @@ namespace FiestaTime
 
             public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
             {
+                if (!GameManager.Current.PlayersConnectedAndReady || _inputManager == null) return;
+
                 if (stream.IsWriting)
                 {
                     //stream.SendNext(_isJumping);
