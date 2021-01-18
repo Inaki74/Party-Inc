@@ -34,11 +34,7 @@ namespace FiestaTime
                     _gravity = value;
                 }
             }
-            public bool IsHighScore { private set; get; }
-            public int WinnerId { private set; get; }
-            public bool GameBegan { get; private set; }
-            public float InGameTime { get; private set; }
-
+            
             private double _gameBeginTime;
 
             private float _gravityMovingRatio = 0.46666666666f;
@@ -51,11 +47,7 @@ namespace FiestaTime
             [SerializeField] private GameObject _gameCamera;
             [SerializeField] private GameObject _proceduralGenerator;
 
-            private bool _startCountdown;
-            private double _startTime;
             private float _realGameStartCountdown;
-            
-            
 
             public static string SubsectionsPath = "Speedy Sprint Resources/Prefabs/Resources/Sub-Sections/";
 
@@ -72,20 +64,8 @@ namespace FiestaTime
                 _gravity = -15;
                 MovingSpeed = 0f;
                 InGameTime = 0f;
-                if (PhotonNetwork.IsMasterClient || !PhotonNetwork.IsConnected)
-                {
-                    CustomProps = new ExitGames.Client.Photon.Hashtable();
-                    _startTime = PhotonNetwork.Time;
-                    _startCountdown = true;
-                    CustomProps.Add("StartTime", _startTime);
-                    PhotonNetwork.CurrentRoom.SetCustomProperties(CustomProps);
-                }
-                else
-                {
-                    StartCoroutine("WaitForPropertiesCo");
-                }
-
-                if (!PhotonNetwork.IsConnectedAndReady) _realGameStartCountdown = gameStartCountdown + 1f; _startCountdown = true;
+                
+                if (!PhotonNetwork.IsConnectedAndReady) _realGameStartCountdown = gameStartCountdown; _startCountdown = true;
             }
 
             public override void Init()
@@ -115,16 +95,16 @@ namespace FiestaTime
                 {
                     if (PhotonNetwork.IsConnectedAndReady && _startCountdown)
                     {
-                        if (_startTime != 0 && (float)(PhotonNetwork.Time - _startTime) >= gameStartCountdown + 1f)
+                        if (_startTime != 0 && (float)(PhotonNetwork.Time - _startTime) >= gameStartCountdown + 0.5f)
                         {
                             GameBegan = true;
                             _gameBeginTime = PhotonNetwork.Time;
-                            if (PhotonNetwork.IsConnectedAndReady) photonView.RPC("RPC_SendBegin", RpcTarget.Others, _gameBeginTime, GameBegan);
+                            if (PhotonNetwork.IsConnectedAndReady) photonView.RPC("RPC_SendBegin", RpcTarget.Others, _gameBeginTime);
                         }
                     }
                     else if (_startCountdown)
                     {
-                        if (_realGameStartCountdown <= 0f)
+                        if (_realGameStartCountdown <= -0.5f)
                         {
                             GameBegan = true;
                             _realGameStartCountdown = float.MaxValue;
@@ -243,27 +223,11 @@ namespace FiestaTime
             }
 
             [PunRPC]
-            public void RPC_SendBegin(double startT, bool gameBegan)
+            public void RPC_SendBegin(double startT)
             {
                 _gameBeginTime = startT;
-                GameBegan = gameBegan;
             }
 
-            [PunRPC]
-            public void RPC_SendInGameTime(float time)
-            {
-                InGameTime = time;
-            }
-
-            private IEnumerator WaitForPropertiesCo()
-            {
-                yield return new WaitUntil(() => _receivedProperties);
-
-                _startTime = double.Parse(CustomProps["StartTime"].ToString());
-                _startCountdown = true;
-            }
-
-            
         }
     }
 }

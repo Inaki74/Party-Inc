@@ -42,7 +42,6 @@ namespace FiestaTime
                     Debug.DrawRay(transform.position, transform.TransformDirection(Vector3.forward) * hit.distance, Color.green, 0f);
                     if (hit.distance < 2f && _passedSection)
                     {
-                        Debug.Log("AAAA");
                         _passedSection = false;
                         _subsectionCount++;
 

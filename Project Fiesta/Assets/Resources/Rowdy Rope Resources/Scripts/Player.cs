@@ -27,7 +27,6 @@ namespace FiestaTime
 
             private bool cheatInput;
             private bool jumpInput;
-            private bool jumpPressed;
             public bool hasLost;
             private bool isGrounded;
 
@@ -87,17 +86,22 @@ namespace FiestaTime
 
             private void CheckForInput()
             {
-                cheatInput = Input.GetKey(KeyCode.Space);
-
-                jumpInput = Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W);
-
-                jumpPressed = Input.GetKey(KeyCode.UpArrow) || Input.GetKey(KeyCode.W);
-
-                if(Input.touchCount > 0)
+                if (Application.isMobilePlatform)
                 {
-                    jumpInput = Input.touches[0].phase == TouchPhase.Began;
+                    if (Input.touchCount > 0)
+                    {
+                        jumpInput = true;
+                    }
+                    else
+                    {
+                        jumpInput = false;
+                    }
+                }
+                else
+                {
+                    cheatInput = Input.GetKey(KeyCode.Space);
 
-                    jumpPressed = jumpInput || Input.touches[0].phase == TouchPhase.Moved || Input.touches[0].phase == TouchPhase.Stationary;
+                    jumpInput = Input.GetKey(KeyCode.UpArrow) || Input.GetKey(KeyCode.W);
                 }
             }
 
@@ -127,7 +131,7 @@ namespace FiestaTime
                 {
                     Rb.drag = fallingDrag;
                 }
-                else if (!hasLost && jumpPressed)
+                else if (!hasLost && jumpInput)
                 {
                     Rb.drag = jumpingDrag;
                 }

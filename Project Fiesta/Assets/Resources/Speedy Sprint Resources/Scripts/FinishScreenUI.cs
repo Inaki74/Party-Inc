@@ -37,7 +37,7 @@ namespace FiestaTime
                 if (GameManager.Current.playerCount == 1)
                 {
                     highScores.SetActive(true);
-                    highScore.text = GeneralHelperFunctions.ShowInMinutes(PlayerPrefs.GetFloat(Constants.TT_KEY_HISCORE));
+                    highScore.text = GeneralHelperFunctions.ShowInMinutes(PlayerPrefs.GetFloat(Constants.SS_KEY_HISCORE));
 
                     playerNames[0].text = PhotonNetwork.LocalPlayer.NickName;
                     playerPlacings[0].enabled = false;

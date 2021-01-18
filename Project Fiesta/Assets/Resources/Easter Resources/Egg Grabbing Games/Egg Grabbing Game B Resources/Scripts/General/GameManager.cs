@@ -43,7 +43,6 @@ namespace FiestaTime
             #endregion
 
             [SerializeField] public int[][,] eggMaps;
-            private bool gameStarted;
             private bool runOnce = false;
             private int startingEggCount = 0;
             public bool isGameFinished;
@@ -67,7 +66,7 @@ namespace FiestaTime
                 }
 
                 isGameFinished = false;
-                gameStarted = false;
+                GameBegan = false;
             }
 
             protected override void InitializeGameManagerDependantObjects()
@@ -83,16 +82,25 @@ namespace FiestaTime
             #region Unity Callbacks
             void Update()
             {
-                // START GAME (run once per game)
-                if (gameStartCountdown <= -1f && !gameStarted)
+                if (PhotonNetwork.IsConnectedAndReady && _startCountdown && !GameBegan)
                 {
-                    InstantiateSpawnerManagers();
-
-                    gameStarted = true;
+                    if (_startTime != 0 && (float)(PhotonNetwork.Time - _startTime) >= gameStartCountdown)
+                    {
+                        GameBegan = true;
+                        InstantiateSpawnerManagers();
+                    }
                 }
-                else
+                else if (_startCountdown && !GameBegan)
                 {
-                    gameStartCountdown -= Time.deltaTime;
+                    if (gameStartCountdown <= 0f)
+                    {
+                        GameBegan = true;
+                        gameStartCountdown = float.MaxValue;
+                    }
+                    else
+                    {
+                        gameStartCountdown -= Time.deltaTime;
+                    }
                 }
 
                 if (isGameFinished && !runOnce)

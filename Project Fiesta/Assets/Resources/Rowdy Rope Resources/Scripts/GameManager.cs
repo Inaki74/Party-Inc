@@ -36,7 +36,6 @@ namespace FiestaTime
 
             #endregion
 
-            private bool firstRun;
             private int playersAlive;
             private bool gameEnded = false;
 
@@ -82,7 +81,7 @@ namespace FiestaTime
             #region Fiesta Overrides
             protected override void InStart()
             {
-                firstRun = true;
+                GameBegan = false;
                 playersAlive = playerCount;
                 nextToInsert = playerCount - 1;
                 players = new Player[playerCount];
@@ -118,16 +117,28 @@ namespace FiestaTime
             // Update is called once per frame
             void Update()
             {
-                if(gameStartCountdown <= -1f && firstRun)
+                if (PhotonNetwork.IsConnectedAndReady && _startCountdown && !GameBegan)
                 {
-                    gameStartCountdown = -1f;
-                    firstRun = false;
-                    players = FindObjectsOfType<Player>();
-                    OnGameStartInvoke();
+                    if (_startTime != 0 && (float)(PhotonNetwork.Time - _startTime) >= gameStartCountdown + 1f)
+                    {
+                        GameBegan = true;
+                        players = FindObjectsOfType<Player>();
+                        OnGameStartInvoke();
+                    }
                 }
-                else if (firstRun)
+                else if (_startCountdown && !GameBegan)
                 {
-                    gameStartCountdown -= Time.deltaTime;
+                    if (gameStartCountdown <= -1f)
+                    {
+                        GameBegan = true;
+                        gameStartCountdown = float.MaxValue;
+                        players = FindObjectsOfType<Player>();
+                        OnGameStartInvoke();
+                    }
+                    else
+                    {
+                        gameStartCountdown -= Time.deltaTime;
+                    }
                 }
 
                 //Here go difficulty factors

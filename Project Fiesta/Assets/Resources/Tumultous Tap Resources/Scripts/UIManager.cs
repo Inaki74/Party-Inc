@@ -29,7 +29,7 @@ namespace FiestaTime
             // Update is called once per frame
             void Update()
             {
-                if(gameRunning) timerText.text = GeneralHelperFunctions.ShowInMinutes(GameManager.Current.inGameTime);
+                if(gameRunning) timerText.text = GeneralHelperFunctions.ShowInMinutes(GameManager.Current.InGameTime);
             }
 
             private void Awake()

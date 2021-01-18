@@ -16,6 +16,10 @@ namespace FiestaTime
             private Rigidbody _rb;
             private CapsuleCollider _cc;
             private PlayerInputManager _inputManager;
+            [SerializeField] private MeshRenderer _ubmr;
+            [SerializeField] private MeshRenderer _lbmr;
+            [SerializeField] private Material mine;
+            
             [SerializeField] private GameObject _deathParticles;
 
             [SerializeField] private GameObject _upperBody;
@@ -104,6 +108,12 @@ namespace FiestaTime
                 _rightRailX = _middleRailX + 3;
 
                 _currentState = PlayerStates.Grounded;
+
+                if (photonView.IsMine)
+                {
+                    _ubmr.material = mine;
+                    _lbmr.material = mine;
+                }
             }
 
             // Update is called once per frame
