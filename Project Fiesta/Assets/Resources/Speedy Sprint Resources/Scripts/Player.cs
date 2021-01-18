@@ -32,12 +32,11 @@ namespace FiestaTime
 
             private float _timeFloatingRatio = 1.7f;
 
+            [SerializeField] GameObject _head;
+            [SerializeField] GameObject _body;
             [SerializeField] GameObject _feet;
             private bool _isGrounded;
             private bool _gravity = true;
-            private float _yVelocity = 0f;
-            private float _yVelocityCap = 50f;
-            private Vector3 _oldFeetPos;
             private enum PlayerStates
             {
                 Airborne,
@@ -72,18 +71,9 @@ namespace FiestaTime
             private bool _infoReceived;
             private Vector3 _netPos;
             
-            private Quaternion _netRot;
             private Vector3 _lastPos;
-            private Quaternion _lastRot;
-
-            private bool _isJumping;
-            private bool _isMoving;
 
             private bool _netDuck;
-            private bool _netJump;
-            private bool _netMove;
-            private bool _netFalling;
-            private bool _netDropping;
 
             private float _time;
             private double _lastSendTime;
@@ -131,18 +121,12 @@ namespace FiestaTime
 
                     _upperBody.SetActive(_netDuck);
 
-                    if (_hasLost)
-                    {
-                        transform.rotation = Quaternion.Lerp(_lastRot, _netRot, (float)(_time / timeToSend));
-                    }
                     return;
                 }
 
                 _jumpSpeed = GameManager.Current.Gravity * -1 / 1.25f;
 
                 _timeFloating = _timeFloatingRatio / GameManager.Current.MovingSpeed;
-
-                _oldFeetPos = _feet.transform.position;
 
                 StateLogic();
 
@@ -151,10 +135,6 @@ namespace FiestaTime
                 if(_gravity && _currentState == PlayerStates.Airborne && !_isGrounded)
                 {
                     SimulateGravity();
-                }
-                else
-                {
-                    _yVelocity = 0f;
                 }
 
                 if (_inputManager.JumpInput && (_currentState == PlayerStates.Grounded || _currentState == PlayerStates.Ducking))
@@ -187,23 +167,27 @@ namespace FiestaTime
                     }
                 }
 
-                CheckIfDead(Vector3.forward);
-                CheckIfDead(Vector3.back);
-                CheckIfDead(Vector3.left);
-                CheckIfDead(Vector3.right);
-            }
+                CheckIfDead(_feet.transform, Vector3.forward);
+                CheckIfDead(_feet.transform, Vector3.back);
+                CheckIfDead(_feet.transform, Vector3.left);
+                CheckIfDead(_feet.transform, Vector3.right);
 
-            private void FixedUpdate()
-            {
-                
+                CheckIfDead(_body.transform, Vector3.forward);
+                CheckIfDead(_body.transform, Vector3.back);
+                CheckIfDead(_body.transform, Vector3.left);
+                CheckIfDead(_body.transform, Vector3.right);
+
+                if (_upperBody.activeInHierarchy)
+                {
+                    CheckIfDead(_head.transform, Vector3.forward);
+                    CheckIfDead(_head.transform, Vector3.back);
+                    CheckIfDead(_head.transform, Vector3.left);
+                    CheckIfDead(_head.transform, Vector3.right);
+                }
             }
 
             private void SimulateGravity()
             {
-                if (_yVelocity > _yVelocityCap * -1 && _yVelocity < _yVelocityCap)
-                {
-                    //_yVelocity += GameManager.Current.Gravity * Time.deltaTime;
-                }
                 transform.position += Vector3.up * GameManager.Current.Gravity * Time.deltaTime;
             }
 
@@ -213,7 +197,6 @@ namespace FiestaTime
                 {
                     if(_movementBuffer[i] != 0)
                     {
-                        _isMoving = true;
                         float decidedX = _middleRailX;
                         float currentX = transform.position.x;
 
@@ -248,12 +231,11 @@ namespace FiestaTime
 
                         while (transform.position.x != decidedX)
                         {
-                            Debug.Log("A1");
+                            //Debug.Log("A1");
                             Vector3 decidedVector = new Vector3(decidedX, transform.position.y, transform.position.z);
                             transform.position = Vector3.MoveTowards(transform.position, decidedVector, velocity * Time.deltaTime);
                             yield return new WaitForEndOfFrame();
                         }
-                        _isMoving = false;
                     }
                 }
                 _movementBuffer[0] = 0f;
@@ -301,7 +283,7 @@ namespace FiestaTime
 
                     while (transform.position.x != decidedX)
                     {
-                        Debug.Log("A1");
+                        //Debug.Log("A1");
                         Vector3 decidedVector = new Vector3(decidedX, transform.position.y, transform.position.z);
                         transform.position = Vector3.MoveTowards(transform.position, decidedVector, velocity * Time.deltaTime);
                         yield return new WaitForEndOfFrame();
@@ -367,16 +349,12 @@ namespace FiestaTime
             private IEnumerator JumpCo(float startingY, float height, float velocity)
             {
                 _gravity = false;
-                _isJumping = true;
                 bool reachedHeight = false;
-
-                float timeElapsed = 0f;
-                float distanceTravelled = 0f;
 
                 while (!reachedHeight && !_inputManager.DuckInput){
 
                     Vector3 decidedVector = new Vector3(transform.position.x, startingY + height, transform.position.z);
-                    Debug.Log("A3");
+                    //Debug.Log("A3");
                     transform.position = Vector3.MoveTowards(transform.position, decidedVector, velocity * Time.deltaTime);
                     reachedHeight = transform.position.y > startingY + height - 0.2;
                     yield return new WaitForEndOfFrame();
@@ -386,20 +364,10 @@ namespace FiestaTime
 
                 while (reachedHeight || timeFloating > 0f)
                 {
-                    timeElapsed += Time.deltaTime;
-                    distanceTravelled += Time.deltaTime * GameManager.Current.MovingSpeed;
-
-                    if (distanceTravelled >= 1f)
-                    {
-                        Debug.Log(timeElapsed);
-                        distanceTravelled = -10000;
-                    }
-
                     reachedHeight = false;
                     timeFloating -= Time.deltaTime;
                     yield return new WaitForEndOfFrame();
                 };
-                _isJumping = false;
                 _gravity = true;
             }
 
@@ -440,37 +408,21 @@ namespace FiestaTime
                 }
             }
 
-            private void CheckIfMissedGround()
+            private void CheckIfDead(Transform trans, Vector3 direction)
             {
-                RaycastHit hit;
-                //_oldFeetPos - _feet.transform.position   Vector3.Distance(_feet.transform.position, _oldFeetPos)
-                if (Physics.Raycast(_feet.transform.position, _feet.transform.TransformDirection(_oldFeetPos - _feet.transform.position), out hit, Vector3.Distance(_feet.transform.position, _oldFeetPos), _whatIsGround))
-                {
-                    // We missed the ground, time to correct position
-                    Debug.Log("Got through");
-                    Debug.DrawRay(_feet.transform.position, _feet.transform.TransformDirection(_oldFeetPos - _feet.transform.position) * hit.distance, Color.cyan, 0f);
+                if (_hasLost) return;
 
-                    transform.position = hit.point + new Vector3(0f, 0.2f, 0f); 
-                }
-                else
-                {
-                    Debug.Log("Didnt get through");
-                    Debug.DrawRay(_feet.transform.position, _feet.transform.TransformDirection(_oldFeetPos - _feet.transform.position) * Vector3.Distance(_feet.transform.position, _oldFeetPos), Color.blue, 0f);
-                }
-            }
-
-            private void CheckIfDead(Vector3 direction)
-            {
                 RaycastHit hit;
 
-                if (Physics.Raycast(_feet.transform.position, _feet.transform.TransformDirection(direction), out hit, 5f, 1 << 8))
+                if (Physics.Raycast(trans.position, trans.TransformDirection(direction), out hit, 5f, 1 << 8))
                 {
-                    Debug.DrawRay(_feet.transform.position, _feet.transform.TransformDirection(direction) * hit.distance, Color.green, 0f);
-                    if (hit.distance < 0.1f)
+                    Debug.DrawRay(trans.position, trans.TransformDirection(direction) * hit.distance, Color.green, 0f);
+                    if (hit.distance < 0.6f)
                     {
+                        Debug.Log("Dead by CheckIfDead");
                         PlayerDie();
                     }
-                }else Debug.DrawRay(_feet.transform.position, _feet.transform.TransformDirection(direction) * 5f, Color.red, 0f);
+                }else Debug.DrawRay(trans.position, trans.TransformDirection(direction) * 5f, Color.red, 0f);
             }
 
             private void PlayerDie()
@@ -498,27 +450,9 @@ namespace FiestaTime
 
             private void PositionPrediction(double timeToSend)
             {
-                transform.position += Vector3.forward * GameManager.Current.MovingSpeed * Time.deltaTime;
-
-                if (_gravity && !_isGrounded)
-                {
-                    SimulateGravity();
-                }
-                else
-                {
-                    _yVelocity = 0f;
-                }
+                transform.position = Vector3.Lerp(_lastPos, _netPos, (float)(_time / timeToSend));
 
                 StartCoroutine("RecreateInputsCo");
-
-                //if (_netFalling || _netJump || _netMove)
-                //{
-                //    transform.position = Vector3.Lerp(_lastPos, _netPos, (float)(_time / timeToSend));
-                //}
-                //else
-                //{
-                //    transform.position += Vector3.forward * GameManager.Current.MovingSpeed * Time.deltaTime;
-                //}
             }
 
             private IEnumerator RecreateInputsCo()
@@ -549,7 +483,7 @@ namespace FiestaTime
             [PunRPC]
             public void RPC_PlayerDied()
             {
-                Debug.Log("DUDE DIED");
+                //Debug.Log("DUDE DIED");
                 Instantiate(_deathParticles, transform.position, Quaternion.identity);
                 gameObject.SetActive(false);
             }
@@ -558,7 +492,6 @@ namespace FiestaTime
             public void RPC_InformPlayerLost(int playerId)
             {
                 _hasLost = true;
-                onPlayerDied?.Invoke(playerId);
             }
 
             public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
@@ -567,24 +500,13 @@ namespace FiestaTime
 
                 if (stream.IsWriting)
                 {
-                    //stream.SendNext(_isJumping);
-                    //stream.SendNext(_isMoving);
-                    //stream.SendNext(_gravity && _currentState == PlayerStates.Airborne && !_isGrounded);
-                    //stream.SendNext(_currentState == PlayerStates.Dropping && !_isGrounded);
-
                     SendInputs(stream, _inputManager.currentInputs);
 
                     stream.SendNext(transform.position);
                     stream.SendNext(_upperBody.activeInHierarchy);
-                    if (_hasLost) stream.SendNext(transform.rotation);
                 }
                 else
                 {
-                    //_netJump = (bool)stream.ReceiveNext();
-                    //_netMove = (bool)stream.ReceiveNext();
-                    //_netFalling = (bool)stream.ReceiveNext();
-                    //_netDropping = (bool)stream.ReceiveNext();
-
                     ReceiveInputs(stream);
 
                     _netPos = (Vector3)stream.ReceiveNext();
@@ -596,13 +518,6 @@ namespace FiestaTime
                     _lastPos = transform.position;
 
                     _infoReceived = true;
-
-                    if (_hasLost)
-                    {
-                        _rb.constraints = RigidbodyConstraints.None;
-                        _netRot = (Quaternion)stream.ReceiveNext();
-                        _lastRot = transform.rotation;
-                    }
                 }
             }
 
@@ -624,10 +539,8 @@ namespace FiestaTime
                 {
                     string parcel = (string)stream.ReceiveNext();
                     inputsToDo.Enqueue(parcel);
-                    Debug.Log(parcel);
                 }
             }
-
         }
     }
 }

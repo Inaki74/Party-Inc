@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Cinemachine;
+using System.Linq;
 using Photon.Pun;
 
 namespace FiestaTime
@@ -34,41 +34,58 @@ namespace FiestaTime
                     _gravity = value;
                 }
             }
-            private float _gravityMovingRatio = 0.46666666666f;
-
-            private float _maxSpeed = 20f;
-            private float _logValue = 8.02255787562f;
-
-            private int _nextToInsert = 0;
-            private float _timeElapsed;
-            private bool _isHighScore;
-
-            [SerializeField] private GameObject _gameCamera;
-            [SerializeField] private GameObject _proceduralGenerator;
-
+            public bool IsHighScore { private set; get; }
+            public int WinnerId { private set; get; }
             public bool GameBegan { get; private set; }
             public float InGameTime { get; private set; }
 
-            private float _realGameStartCountdown;
+            private double _gameBeginTime;
 
-            public bool startGeneration = false;
+            private float _gravityMovingRatio = 0.46666666666f;
+            private float _logValue = 8.02255787562f;
+
+            private int _nextToInsert = 0;
+            private int _playersAlive;
+            private bool _runOnce = false;
+            
+            [SerializeField] private GameObject _gameCamera;
+            [SerializeField] private GameObject _proceduralGenerator;
+
+            private bool _startCountdown;
+            private double _startTime;
+            private float _realGameStartCountdown;
+            
+            
 
             public static string SubsectionsPath = "Speedy Sprint Resources/Prefabs/Resources/Sub-Sections/";
 
             protected override void InitializeGameManagerDependantObjects()
             {
-                startGeneration = true;
-
                 InitializePlayers();
             }
 
             protected override void InStart()
             {
+                _playersAlive = playerCount;
                 GameBegan = false;
+                _startCountdown = false;
                 _gravity = -15;
                 MovingSpeed = 0f;
                 InGameTime = 0f;
-                if (PhotonNetwork.IsMasterClient || !PhotonNetwork.IsConnected) _realGameStartCountdown = gameStartCountdown + 1;
+                if (PhotonNetwork.IsMasterClient || !PhotonNetwork.IsConnected)
+                {
+                    CustomProps = new ExitGames.Client.Photon.Hashtable();
+                    _startTime = PhotonNetwork.Time;
+                    _startCountdown = true;
+                    CustomProps.Add("StartTime", _startTime);
+                    PhotonNetwork.CurrentRoom.SetCustomProperties(CustomProps);
+                }
+                else
+                {
+                    StartCoroutine("WaitForPropertiesCo");
+                }
+
+                if (!PhotonNetwork.IsConnectedAndReady) _realGameStartCountdown = gameStartCountdown + 1f; _startCountdown = true;
             }
 
             public override void Init()
@@ -91,23 +108,68 @@ namespace FiestaTime
                     MovingSpeed = 13.2f * Mathf.Log(0.6f * Mathf.Pow(InGameTime + _logValue, 0.5f));
                     Gravity = -1 * (MovingSpeed / _gravityMovingRatio);
 
-                    InGameTime += Time.deltaTime;
-                    photonView.RPC("RPC_SendInGameTime", RpcTarget.Others, InGameTime);
+                    if (PhotonNetwork.IsConnectedAndReady) InGameTime = (float)(PhotonNetwork.Time - _gameBeginTime);
+                    else InGameTime += Time.deltaTime;
+                }
+                else
+                {
+                    if (PhotonNetwork.IsConnectedAndReady && _startCountdown)
+                    {
+                        if (_startTime != 0 && (float)(PhotonNetwork.Time - _startTime) >= gameStartCountdown + 1f)
+                        {
+                            GameBegan = true;
+                            _gameBeginTime = PhotonNetwork.Time;
+                            if (PhotonNetwork.IsConnectedAndReady) photonView.RPC("RPC_SendBegin", RpcTarget.Others, _gameBeginTime, GameBegan);
+                        }
+                    }
+                    else if (_startCountdown)
+                    {
+                        if (_realGameStartCountdown <= 0f)
+                        {
+                            GameBegan = true;
+                            _realGameStartCountdown = float.MaxValue;
+                        }
+                        else
+                        {
+                            _realGameStartCountdown -= Time.deltaTime;
+                        }
+                    }
                 }
 
-                if(PhotonNetwork.IsMasterClient || !PhotonNetwork.IsConnected)
+                if (_playersAlive == 0 && !_runOnce && PhotonNetwork.IsConnectedAndReady) 
                 {
-                    if (!GameBegan && _realGameStartCountdown <= 0f)
-                    {
-                        GameBegan = true;
-                        photonView.RPC("RPC_SendBegin", RpcTarget.Others, GameBegan);
-                    }
-                    else if (!GameBegan)
-                    {
-                        _realGameStartCountdown -= Time.deltaTime;
-                    }
+                    _runOnce = true;
+                    GameBegan = false;
+                    MovingSpeed = 0f;
+
+                    FinishGame();
                 }
-                
+            }
+
+            private void FinishGame()
+            {
+                var aux = playerResults.OrderByDescending(result => result.scoring);
+                playerResults = aux.ToArray();
+
+                FindWinner();
+
+                OnGameFinishInvoke();
+            }
+
+            private void FindWinner()
+            {
+                float contenderScore = playerResults.First().scoring;
+                int contender = playerResults.First().playerId;
+                int hap = 0;
+
+                for (int i = 0; i < playerResults.Count(); i++)
+                {
+                    if (playerResults[i].scoring == contenderScore) hap++;
+                }
+
+                if (hap > 1) contender = -1;
+
+                WinnerId = contender;
             }
 
             private void SetPlayerPositions()
@@ -158,11 +220,12 @@ namespace FiestaTime
             {
                 PlayerResults<float> results = new PlayerResults<float>();
                 results.playerId = playerId;
-                results.scoring = _timeElapsed;
+                results.scoring = InGameTime;
                 playerResults[_nextToInsert] = results;
                 _nextToInsert++;
+                _playersAlive--;
 
-                if (PhotonNetwork.LocalPlayer.ActorNumber == playerId) _isHighScore = GeneralHelperFunctions.DetermineHighScoreFloat(Constants.SS_KEY_HISCORE, results.scoring, true);
+                if (PhotonNetwork.LocalPlayer.ActorNumber == playerId) IsHighScore = GeneralHelperFunctions.DetermineHighScoreFloat(Constants.SS_KEY_HISCORE, results.scoring, true);
 
                 photonView.RPC("RPC_SendPlayerResult", RpcTarget.Others, results.playerId, results.scoring);
             }
@@ -176,11 +239,13 @@ namespace FiestaTime
 
                 playerResults[_nextToInsert] = thisPlayerResult;
                 _nextToInsert++;
+                _playersAlive--;
             }
 
             [PunRPC]
-            public void RPC_SendBegin(bool gameBegan)
+            public void RPC_SendBegin(double startT, bool gameBegan)
             {
+                _gameBeginTime = startT;
                 GameBegan = gameBegan;
             }
 
@@ -190,6 +255,15 @@ namespace FiestaTime
                 InGameTime = time;
             }
 
+            private IEnumerator WaitForPropertiesCo()
+            {
+                yield return new WaitUntil(() => _receivedProperties);
+
+                _startTime = double.Parse(CustomProps["StartTime"].ToString());
+                _startCountdown = true;
+            }
+
+            
         }
     }
 }

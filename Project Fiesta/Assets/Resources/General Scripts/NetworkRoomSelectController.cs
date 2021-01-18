@@ -159,6 +159,12 @@ namespace FiestaTime
             Debug.Log("Fiesta Time/ RoomController: Room creation failed, reason: " + message + " error code: " + returnCode + ". Try again later.");
         }
 
+        public override void OnLeftRoom()
+        {
+            base.OnLeftRoom();
+            Debug.Log("Fiesta Time/ RoomController: Left room.");
+        }
+
         #endregion
 
         public void ReturnToLobby()

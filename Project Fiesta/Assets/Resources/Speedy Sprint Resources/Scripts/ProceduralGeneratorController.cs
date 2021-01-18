@@ -38,7 +38,10 @@ namespace FiestaTime
 
             [SerializeField] private GameObject test;
 
-            [SerializeField] private bool _syncTest;
+            [Tooltip("Activate to test a sub-section, this option will make the spawner spawn only this sub-section.")]
+            [SerializeField] private bool _subSectionTest;
+            [Header("E.g: M5 (Medium 5)")]
+            [SerializeField] private string _subSectionToTest;
 
             [SerializeField] private int[] _nextSection = new int[3];
             [SerializeField] private int[] _lastSection = new int[3];
@@ -58,37 +61,21 @@ namespace FiestaTime
             // Start is called before the first frame update
             void Start()
             {
-                
-
                 _totalEasy = TotalAmountOfSubsections("Easy");
                 _totalMedium = TotalAmountOfSubsections("Medium");
                 _totalHard = TotalAmountOfSubsections("Hard");
 
-                if (!_syncTest)
-                {
-                    _totalEasy -= 1;
-                }
-
                 _nextSection[0] = -1;
-
-                
             }
 
             // Update is called once per frame
             void Update()
             {
-                if(!_started && GameManager.Current.startGeneration)
+                if(!_started && GameManager.Current.GameBegan)
                 {
-                    //float z = 10f;
-                    //for (int i = 0; i < GameManager.Current.playerCount; i++)
-                    //{
-                    //    Instantiate(test, new Vector3(0f, 1f, z), Quaternion.identity);
-                    //    z += 10f;
-                    //}
-                    
                     _started = true;
 
-                    if(PhotonNetwork.IsMasterClient)
+                    if(PhotonNetwork.IsMasterClient || !PhotonNetwork.IsConnectedAndReady)
                     {
                         GenerateNextSection();
                     }
@@ -260,11 +247,31 @@ namespace FiestaTime
             {   if (!PhotonNetwork.IsMasterClient && PhotonNetwork.IsConnected) return;
                 Debug.Log("Generate Next Section");
 
-                if (_syncTest)
+                if (_subSectionTest)
                 {
-                    _nextSection[0] = 1024;
-                    _nextSection[1] = 1024;
-                    _nextSection[2] = 1024;
+                    char diff = _subSectionToTest[0];
+                    int subSectionId = int.Parse(_subSectionToTest.Substring(1));
+                    if (diff == 'E')
+                    {
+                        _easyThisRound = 3;
+                        _mediumThisRound = 0;
+                        _hardThisRound = 0;
+                    }else if(diff == 'M')
+                    {
+                        _easyThisRound = 0;
+                        _mediumThisRound = 3;
+                        _hardThisRound = 0;
+                    }
+                    else
+                    {
+                        _easyThisRound = 0;
+                        _mediumThisRound = 0;
+                        _hardThisRound = 3;
+                    }
+
+                    _nextSection[0] = subSectionId;
+                    _nextSection[1] = subSectionId;
+                    _nextSection[2] = subSectionId;
 
                     if (_nextSection[0] == -1)
                     {

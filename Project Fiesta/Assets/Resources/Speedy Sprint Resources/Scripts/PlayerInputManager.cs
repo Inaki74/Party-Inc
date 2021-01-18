@@ -19,12 +19,6 @@ namespace FiestaTime
 
             public Queue<string> currentInputs = new Queue<string>();
 
-            // Start is called before the first frame update
-            void Start()
-            {
-
-            }
-
             // Update is called once per frame
             void Update()
             {
@@ -86,7 +80,6 @@ namespace FiestaTime
                         }
                     }
 
-                    
                     yield return new WaitForEndOfFrame();
                 }
             }

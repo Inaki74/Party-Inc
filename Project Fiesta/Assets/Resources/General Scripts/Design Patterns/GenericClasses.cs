@@ -67,13 +67,17 @@ namespace FiestaTime
         // Every game has a count of players.
         public int playerCount;
 
-        // Every game has a players that start somewhere.
-        protected Vector3[] playerPositions = new Vector3[4];
-
         // I think all of our games will have some type of countdown.
         public float gameStartCountdown = 3f; //Have to take into account the start text
 
-        public bool PlayersConnectedAndReady { get; private set; }
+        public bool PlayersConnectedAndReady { get; protected set; }
+
+        public ExitGames.Client.Photon.Hashtable CustomProps { get; protected set; }
+
+        protected bool _receivedProperties;
+
+        // Every game has a players that start somewhere.
+        protected Vector3[] playerPositions = new Vector3[4];
 
         private void Start()
         {
@@ -135,6 +139,14 @@ namespace FiestaTime
         /// This method will run after every player has connected.
         /// </summary>
         protected abstract void InitializeGameManagerDependantObjects();
+
+        public override void OnRoomPropertiesUpdate(ExitGames.Client.Photon.Hashtable propertiesThatChanged)
+        {
+            Debug.Log("FiestaTime/GameManager: Custom Properties changed.");
+            base.OnRoomPropertiesUpdate(propertiesThatChanged);
+            _receivedProperties = true;
+            CustomProps = propertiesThatChanged;
+        }
     }
 }
 

@@ -134,9 +134,17 @@ namespace FiestaTime
 
             private bool IsSubsection(string name, string difficulty, int number)
             {
+                name = name.ToUpper();
+                name = name.Replace("(CLONE)", "").Trim();
                 string find = difficulty + number; //eg E1 or E15 or H2
 
-                return name.Contains(find);
+                int lenF = find.Length;
+                int lenN = name.Length;
+                int letterPos = lenN - lenF;
+
+                string compare = name.Substring(letterPos);
+
+                return compare.Equals(find);
             }
         }
     }

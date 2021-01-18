@@ -8,7 +8,7 @@ using System.Linq;
 
 namespace FiestaTime
 {
-    namespace TT
+    namespace SS
     {
         public class FinishScreenUI : MonoBehaviour
         {
@@ -36,33 +36,21 @@ namespace FiestaTime
 
                 if (GameManager.Current.playerCount == 1)
                 {
-                    if (GameManager.Current.playerResults[0].reachedEnd)
+                    highScores.SetActive(true);
+                    highScore.text = GeneralHelperFunctions.ShowInMinutes(PlayerPrefs.GetFloat(Constants.TT_KEY_HISCORE));
+
+                    playerNames[0].text = PhotonNetwork.LocalPlayer.NickName;
+                    playerPlacings[0].enabled = false;
+                    playerScores[0].text = GeneralHelperFunctions.ShowInMinutes(GameManager.Current.playerResults[0].scoring);
+
+                    if (GameManager.Current.IsHighScore)
                     {
-                        highScores.SetActive(true);
-                        highScore.text = GeneralHelperFunctions.ShowInMinutes(PlayerPrefs.GetFloat(Constants.TT_KEY_HISCORE));
-
-                        playerNames[0].text = PhotonNetwork.LocalPlayer.NickName;
-                        playerPlacings[0].enabled = false;
-                        playerScores[0].text = GeneralHelperFunctions.ShowInMinutes(GameManager.Current.playerResults[0].scoring);
-
-                        if (GameManager.Current.isHighScore)
-                        {
-                            flavourTitle.text = "CONGRATULATIONS! New high score!";
-                            highScore.color = Color.yellow;
-                        }
-                        else
-                        {
-                            flavourTitle.text = "You'll get that high score someday!";
-                        }
+                        flavourTitle.text = "CONGRATULATIONS! New high score!";
+                        highScore.color = Color.yellow;
                     }
                     else
                     {
-                        timeAchieved.SetActive(false);
-                        players[0].SetActive(false);
-                        flavourTitle.rectTransform.anchoredPosition = new Vector2(0, -150f);
-                        flavourTitle.text = "Here's Johhny!";
-                        flavourTitle.fontSize = 90;
-                        flavourTitle.color = Color.red;
+                        flavourTitle.text = "You'll get that high score someday!";
                     }
                 }
                 else
@@ -71,14 +59,14 @@ namespace FiestaTime
                     SetPositionsList();
 
                     // Set flavour text
-                    if (GameManager.Current.winnerId == -1)
+                    if (GameManager.Current.WinnerId == -1)
                     {
                         // Don think a draw is possible, but ynever know so im leaving this.
                         flavourTitle.text = "Unbelievable! Its a draw!";
                     }
                     else
                     {
-                        if (GameManager.Current.winnerId == PhotonNetwork.LocalPlayer.ActorNumber)
+                        if (GameManager.Current.WinnerId == PhotonNetwork.LocalPlayer.ActorNumber)
                         {
                             flavourTitle.text = "CONGRATULATIONS! You win!";
                         }
@@ -89,22 +77,6 @@ namespace FiestaTime
                     }
                 }
             }
-
-            //private void PrintArray(PlayerResults[] args)
-            //{
-            //    foreach (var o in args)
-            //    {
-            //        foreach (var player in PhotonNetwork.PlayerList)
-            //        {
-            //            if (player.ActorNumber == o.playerId)
-            //            {
-            //                Debug.Log(player.NickName);
-            //            }
-            //        }
-
-            //        Debug.Log(o.ToString());
-            //    }
-            //}
 
             private void SetPositionsList()
             {
@@ -135,7 +107,7 @@ namespace FiestaTime
                             playerPlacings[i].text = "4th";
                             break;
                         default:
-                            Debug.Log("FinishScreenUI, result not possible");
+                            Debug.Log("SS/FinishScreenUI, result not possible");
                             break;
                     }
 
@@ -154,11 +126,6 @@ namespace FiestaTime
                         playerNames[i].color = Color.yellow;
                         playerPlacings[i].color = Color.yellow;
                         playerScores[i].color = Color.yellow;
-                    }
-
-                    if (!res[i].reachedEnd)
-                    {
-                        playerScores[i].color = Color.red;
                     }
                 }
             }
