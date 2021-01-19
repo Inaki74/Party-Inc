@@ -44,6 +44,11 @@ namespace FiestaTime
                         StartCoroutine("CoTouchManagement");
                     }
                 }
+                else
+                {
+                    MoveInput = false; JumpInput = false; DuckInput = false;
+                    MoveDirection = 0;
+                }
             }
 
             private IEnumerator CoTouchManagement()

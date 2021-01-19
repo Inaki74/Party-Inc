@@ -39,6 +39,7 @@ namespace FiestaTime
             [SerializeField] GameObject _head;
             [SerializeField] GameObject _body;
             [SerializeField] GameObject _feet;
+            [SerializeField] GameObject _below;
             private bool _isGrounded;
             private bool _gravity = true;
             private enum PlayerStates
@@ -194,6 +195,8 @@ namespace FiestaTime
                     CheckIfDead(_head.transform, Vector3.left);
                     CheckIfDead(_head.transform, Vector3.right);
                 }
+
+                CheckIfPassedGround(_below.transform);
             }
 
             private void SimulateGravity()
@@ -433,6 +436,22 @@ namespace FiestaTime
                         PlayerDie();
                     }
                 }else Debug.DrawRay(trans.position, trans.TransformDirection(direction) * 5f, Color.red, 0f);
+            }
+
+            private void CheckIfPassedGround(Transform trans)
+            {
+                RaycastHit hit;
+
+                if (Physics.Raycast(trans.position, trans.TransformDirection(Vector3.up), out hit, 1000f, 1 << 10))
+                {
+                    Debug.DrawRay(trans.position, trans.TransformDirection(Vector3.up) * hit.distance, Color.red, 0f);
+                    transform.position = hit.point + new Vector3(0f, 1.1f, 0f);
+                }
+                else
+                {
+                    Debug.DrawRay(trans.position, trans.TransformDirection(Vector3.up) * 1000f, Color.green, 0f);
+                    
+                }
             }
 
             private void PlayerDie()
