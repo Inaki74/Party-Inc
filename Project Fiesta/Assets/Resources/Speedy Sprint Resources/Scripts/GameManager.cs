@@ -10,6 +10,7 @@ namespace FiestaTime
     {
         public class GameManager : FiestaGameManager<GameManager, float>
         {
+            // Moving Speed in all components
             [SerializeField] private float _movingSpeed;
             public float MovingSpeed {
                 get
@@ -22,6 +23,7 @@ namespace FiestaTime
                 }
             }
 
+            // Gravity of the game
             [SerializeField] private float _gravity;
             public float Gravity
             {
@@ -34,10 +36,14 @@ namespace FiestaTime
                     _gravity = value;
                 }
             }
-            
+
+            // PhotonNetwork time in which the game began.
             private double _gameBeginTime;
 
+            // Ration between MovingSpeed and Gravity
             private float _gravityMovingRatio = 0.46666666666f;
+
+            // Value so that Moving Speed is 7 when time = 0
             private float _logValue = 8.02255787562f;
 
             private int _nextToInsert = 0;
@@ -85,14 +91,20 @@ namespace FiestaTime
             {
                 if (GameBegan)
                 {
-                    MovingSpeed = 13.2f * Mathf.Log(0.6f * Mathf.Pow(InGameTime + _logValue, 0.5f));
+                    // Increase the moving speed per design decisions.
+                    MovingSpeed = 6.6f * Mathf.Log(0.6f * (InGameTime + _logValue));
+
+                    // Gravity must be increased with moving speed to maintain the jump lengths.
                     Gravity = -1 * (MovingSpeed / _gravityMovingRatio);
 
+                    // InGameTime calculation
                     if (PhotonNetwork.IsConnectedAndReady) InGameTime = (float)(PhotonNetwork.Time - _gameBeginTime);
                     else InGameTime += Time.deltaTime;
                 }
                 else
                 {
+                    // TIMER to start
+
                     if (PhotonNetwork.IsConnectedAndReady && _startCountdown)
                     {
                         if (_startTime != 0 && (float)(PhotonNetwork.Time - _startTime) >= gameStartCountdown + 0.5f)
@@ -116,6 +128,7 @@ namespace FiestaTime
                     }
                 }
 
+                // Game finish logic
                 if (_playersAlive == 0 && !_runOnce && PhotonNetwork.IsConnectedAndReady) 
                 {
                     _runOnce = true;
@@ -126,16 +139,25 @@ namespace FiestaTime
                 }
             }
 
+            /// <summary>
+            /// Function that finishes the game
+            /// </summary>
             private void FinishGame()
             {
+                // Order list
                 var aux = playerResults.OrderByDescending(result => result.scoring);
                 playerResults = aux.ToArray();
 
+                // Find a winner
                 FindWinner();
 
+                // Invoke finishing functions
                 OnGameFinishInvoke();
             }
 
+            /// <summary>
+            /// Function that finds who is the winner.
+            /// </summary>
             private void FindWinner()
             {
                 float contenderScore = playerResults.First().scoring;
@@ -152,6 +174,9 @@ namespace FiestaTime
                 WinnerId = contender;
             }
 
+            /// <summary>
+            /// Sets player positions taking account amount of players.
+            /// </summary>
             private void SetPlayerPositions()
             {
                 switch (playerCount)
@@ -179,6 +204,9 @@ namespace FiestaTime
                 }
             }
 
+            /// <summary>
+            /// Spawns players and gives them their position.
+            /// </summary>
             private void InitializePlayers()
             {
                 SetPlayerPositions();
@@ -196,6 +224,10 @@ namespace FiestaTime
                 PhotonNetwork.Instantiate(playerPrefab.name, decidedPosition, Quaternion.identity);
             }
 
+            /// <summary>
+            /// Event function triggered when a player loses.
+            /// </summary>
+            /// <param name="playerId"></param>
             private void OnPlayerLost(int playerId)
             {
                 PlayerResults<float> results = new PlayerResults<float>();

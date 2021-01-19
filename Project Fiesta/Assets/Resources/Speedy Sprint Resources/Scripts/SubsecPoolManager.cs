@@ -30,6 +30,9 @@ namespace FiestaTime
             private List<GameObject> _subsecs = new List<GameObject>();
             // Start is called before the first frame update
 
+            /// <summary>
+            /// Loads Sub-section prefabs.
+            /// </summary>
             private void LoadAllSubsections()
             {
                 var loadedEasy = Resources.LoadAll(GameManager.SubsectionsPath + "Easy", typeof(GameObject)).Cast<GameObject>();
@@ -63,12 +66,7 @@ namespace FiestaTime
 
             void Start()
             {
-                //Resources.Load(decided, typeof(Array2DInt)) as Array2DInt;
-
                 LoadAllSubsections();
-
-                
-                ///StartCoroutine("");
 
                 //TODO: See if this is particularly costy.
                 foreach(GameObject sub in _subsecPrefabsEasy)
@@ -93,26 +91,37 @@ namespace FiestaTime
                 Resources.UnloadUnusedAssets();
             }
 
+            /// <summary>
+            /// Creates a new sub-section of the kind.
+            /// </summary>
+            /// <param name="subsection"></param>
             private void GenerateSubsection(GameObject subsection)
             {
-                //PhotonNetwork.Instantiate(_tilePrefab.name, new Vector3(0, 13f, 0), Quaternion.identity);
                 GameObject newSubsec = Instantiate(subsection);
                 newSubsec.transform.parent = _subsectionHolder.transform;
                 newSubsec.SetActive(false);
                 _subsecs.Add(newSubsec);
             }
 
+            /// <summary>
+            /// Get subsection requested.
+            /// </summary>
+            /// <param name="difficulty"></param>
+            /// <param name="number"></param>
+            /// <returns></returns>
             public GameObject RequestSubsection(string difficulty, int number)
             {
-                //Get Tile
+                //Get Subsection
                 GameObject found = null;
                 foreach (GameObject sub in _subsecs)
                 {
+                    // If its what we are looking for
                     if(IsSubsection(sub.name, difficulty, number))
                     {
                         found = sub;
                         if (!sub.activeInHierarchy)
                         {
+                            //Activate and return
                             sub.SetActive(true);
                             return sub;
                         }
@@ -120,6 +129,7 @@ namespace FiestaTime
                     
                 }
 
+                // If we found the sub-section but need more, we create another one.
                 if (found != null)
                 {
                     GenerateSubsection(found);
@@ -132,6 +142,13 @@ namespace FiestaTime
                 return RequestSubsection(difficulty, number);
             }
 
+            /// <summary>
+            /// Determines if its the subsection we are looking for
+            /// </summary>
+            /// <param name="name"></param>
+            /// <param name="difficulty"></param>
+            /// <param name="number"></param>
+            /// <returns>True if its the sub-section</returns>
             private bool IsSubsection(string name, string difficulty, int number)
             {
                 name = name.ToUpper();

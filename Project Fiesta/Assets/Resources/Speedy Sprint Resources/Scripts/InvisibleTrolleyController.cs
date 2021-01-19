@@ -23,6 +23,13 @@ namespace FiestaTime
 
             private int _subsectionCount = 0;
 
+            private int _count = 0;
+
+            private void Start()
+            {
+                Debug.Log("SUB-SECTION PASSED: " + 0 + " TIME: " + 0 + " MOVING SPEED: " + 7);
+            }
+
             // Update is called once per frame
             private void Update()
             {
@@ -44,6 +51,9 @@ namespace FiestaTime
                     {
                         _passedSection = false;
                         _subsectionCount++;
+
+                        _count++;
+                        Debug.Log("SUB-SECTION PASSED: " + _count + " TIME: " + GameManager.Current.InGameTime + " MOVING SPEED: " + GameManager.Current.MovingSpeed);
 
                         if (_subsectionCount >= 3)
                         {

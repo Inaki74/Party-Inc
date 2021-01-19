@@ -30,32 +30,48 @@ namespace FiestaTime
         /// </summary>
         public class ProceduralGeneratorController : MonoBehaviourPunCallbacks
         {
+            // Struct that represents a Sub-Section
+            private struct SubSection
+            {
+                public int id;
+                public char diff;
+            }
+
+            // The spawner objects where the sections will be generated.
             [SerializeField] private GameObject _laneOneSpawner;
             [SerializeField] private GameObject _laneTwoSpawner;
             [SerializeField] private GameObject _laneThreeSpawner;
             [SerializeField] private GameObject _laneFourSpawner;
+
+            // The first subsection of every game
             [SerializeField] private GameObject _openingSubsection;
 
-            [SerializeField] private GameObject test;
-
+            // Options to test sub-sections
             [Tooltip("Activate to test a sub-section, this option will make the spawner spawn only this sub-section.")]
             [SerializeField] private bool _subSectionTest;
             [Header("E.g: M5 (Medium 5)")]
             [SerializeField] private string _subSectionToTest;
 
+            // The next section to spawn and the last one spawned.
             [SerializeField] private int[] _nextSection = new int[3];
             [SerializeField] private int[] _lastSection = new int[3];
+
+            // Amount of easy/medium/hard sub-sections this round.
             private int _easyThisRound = 3;
             private int _mediumThisRound = 0;
             private int _hardThisRound = 0;
+            // Which round are we at.
             private int round = 0;
 
+            // Total amount of easy/medium/hard sub-sections loaded.
             private int _totalEasy;
             private int _totalMedium;
             private int _totalHard;
 
+            // The current Z coordinate we are spawning at.
             private float _currentZ;
 
+            // A _runOnce boolean to run start once in update loop.
             private bool _started = false;
 
             // Start is called before the first frame update
@@ -86,8 +102,10 @@ namespace FiestaTime
             {
                 InvisibleTrolleyController.onPassedSection += GenerateNextSection;
 
+                // We decide where to put the sub-sections (dependent on GameManager's PlayerCount).
                 DecideSpawnerPositions();
 
+                // We place the first sub-section.
                 PlaceFirstSubsection();
             }
 
@@ -96,6 +114,9 @@ namespace FiestaTime
                 InvisibleTrolleyController.onPassedSection -= GenerateNextSection;
             }
 
+            /// <summary>
+            /// Decides where the Section Spawners should be at. Dependant on how many players are in the game.
+            /// </summary>
             private void DecideSpawnerPositions()
             {
                 switch (GameManager.Current.playerCount)
@@ -129,6 +150,13 @@ namespace FiestaTime
                 }
             }
 
+            /// <summary>
+            ///  Function that randomizes the upcoming section.
+            /// </summary>
+            /// <param name="easy">Amount of easy sub-sections</param>
+            /// <param name="medium">Amount of medium sub-sections</param>
+            /// <param name="hard">Amount of hard sub-sections</param>
+            /// <returns></returns>
             private int[] GenerateSection(int easy, int medium, int hard)
             {
                 int[] randomization = new int[3];
@@ -151,6 +179,11 @@ namespace FiestaTime
                 return randomization;
             }
 
+            /// <summary>
+            /// Gets the amount of sub-section assets available for a certain difficulty.
+            /// </summary>
+            /// <param name="difficulty">The difficulty</param>
+            /// <returns></returns>
             private int TotalAmountOfSubsections(string difficulty)
             {
                 Object[] all = Resources.LoadAll(GameManager.SubsectionsPath + difficulty, typeof(GameObject)).Cast<GameObject>().ToArray();
@@ -158,6 +191,9 @@ namespace FiestaTime
                 return all.Length;
             }
 
+            /// <summary>
+            /// Places the first sub-section on all lanes available.
+            /// </summary>
             private void PlaceFirstSubsection()
             {
                 PlaceFirstSubsectionInLane(_laneOneSpawner);
@@ -180,12 +216,20 @@ namespace FiestaTime
                 _currentZ = 50;
             }
 
+            /// <summary>
+            /// Places the first subsection at a spawners transform.
+            /// </summary>
+            /// <param name="spawner">The spawner</param>
             private void PlaceFirstSubsectionInLane(GameObject spawner)
             {
                 GameObject firstSubsection = Instantiate(_openingSubsection);
                 firstSubsection.transform.position = new Vector3(spawner.transform.position.x, 0.1f, 0);
             }
 
+            /// <summary>
+            /// Places an entire section in all lanes.
+            /// </summary>
+            /// <param name="section">The section generated</param>
             private void PlaceSection(int[] section)
             {
                 for(int i = 0; i < section.Length; i++)
@@ -234,6 +278,13 @@ namespace FiestaTime
                 }
             }
 
+            /// <summary>
+            /// Places a section in the corresponding spawners position. Makes a call to the SubsectionPoolManager to get the sub-section and then places it.
+            /// </summary>
+            /// <param name="spawner">THe spawner</param>
+            /// <param name="diff">Subsection difficulty label</param>
+            /// <param name="subsec">Subsection id</param>
+            /// <returns></returns>
             private int PlaceSectionInLane(GameObject spawner, string diff, int subsec)
             {
                 GameObject toPlace = SubsecPoolManager.Current.RequestSubsection(diff, subsec);
@@ -243,49 +294,22 @@ namespace FiestaTime
                 return toPlace.GetComponent<SubSectionInfo>().AmountOfTiles;
             }
 
+            /// <summary>
+            /// Function run by the PassedSection event. When we pass a section, we must generate the next one. This function does that.
+            /// </summary>
             private void GenerateNextSection()
             {   if (!PhotonNetwork.IsMasterClient && PhotonNetwork.IsConnected) return;
-                Debug.Log("Generate Next Section");
+                //Debug.Log("Generate Next Section");
 
+                //If we are testing a subsection.
                 if (_subSectionTest)
                 {
-                    char diff = _subSectionToTest[0];
-                    int subSectionId = int.Parse(_subSectionToTest.Substring(1));
-                    if (diff == 'E')
-                    {
-                        _easyThisRound = 3;
-                        _mediumThisRound = 0;
-                        _hardThisRound = 0;
-                    }else if(diff == 'M')
-                    {
-                        _easyThisRound = 0;
-                        _mediumThisRound = 3;
-                        _hardThisRound = 0;
-                    }
-                    else
-                    {
-                        _easyThisRound = 0;
-                        _mediumThisRound = 0;
-                        _hardThisRound = 3;
-                    }
-
-                    _nextSection[0] = subSectionId;
-                    _nextSection[1] = subSectionId;
-                    _nextSection[2] = subSectionId;
-
-                    if (_nextSection[0] == -1)
-                    {
-                        PlaceSection(_nextSection);
-
-                        GenerateNextSection();
-                    }
-                    else
-                    {
-                        PlaceSection(_nextSection);
-                    }
+                    SubsectionTest();
                     return;
                 }
 
+                // We are in normal mode
+                // If its the first generation
                 if (_nextSection[0] == -1)
                 {
                     // First generation
@@ -298,29 +322,90 @@ namespace FiestaTime
                 }
                 else
                 {
-                    // x generation
+                    // Nth generation
                     _lastSection = _nextSection;
+
+                    // Ramp up the difficulty
                     //ChangeDifficulty();
 
                     int tries = 0;
 
-                    while (!AcceptableSection(_nextSection, _lastSection) && tries <= 5)
+                    // The section generated must be acceptable, we give a maximum of 50 tries for the section to be generated successfully.
+                    do
                     {
                         _nextSection = GenerateSection(_easyThisRound, _mediumThisRound, _hardThisRound);
                         tries++;
-                    }
+                    } while (!AcceptableSection(_nextSection, _lastSection) && tries <= 50);
 
                     PlaceSection(_nextSection);
                 }
             }
 
+            /// <summary>
+            /// FUnction that evaluates if the section is acceptable.
+            /// </summary>
+            /// <param name="section"></param>
+            /// <param name="lastSection"></param>
+            /// <returns>True if acceptable</returns>
             private bool AcceptableSection(int[] section, int[] lastSection)
             {
-                bool condition1 = true;
 
-                condition1 = !OverlappedSections(section, lastSection);
+                return true;
 
-                return condition1;
+                bool condition1 = !OverlappedSections(section, lastSection);
+
+                bool condition2 = !SameSubsectionsInOneSection(section);
+
+                bool condition3 = !RepeatedSubsectionsInARowWithinTwoSections(section, lastSection);
+
+                return condition1 && condition2 && condition3;
+            }
+
+            private bool RepeatedSubsectionsInARowWithinTwoSections(int[] section, int[] lastSection)
+            {
+                return true;
+            }
+
+            private bool SameSubsectionsInOneSection(int[] section)
+            {
+                if (_easyThisRound == _mediumThisRound && _mediumThisRound == _hardThisRound) return false;
+
+                for (int i = 0; i < _easyThisRound; i++)
+                {
+                    for (int j = 0; j < _easyThisRound; j++)
+                    {
+                        if (section[i] == section[j])
+                        {
+                            return true;
+                        }
+                    }
+                }
+
+                // Checks overlap of medium
+                for (int i = _easyThisRound; i < _easyThisRound + _mediumThisRound; i++)
+                {
+                    for (int j = _easyThisRound; j < _mediumThisRound + _easyThisRound; j++)
+                    {
+                        if (section[i] == section[j])
+                        {
+                            return true;
+                        }
+                    }
+                }
+
+                // Checks overlap of hard
+                for (int i = _easyThisRound + _mediumThisRound; i < _easyThisRound + _mediumThisRound + _hardThisRound; i++)
+                {
+                    for (int j = _easyThisRound + _mediumThisRound; j < _easyThisRound + _mediumThisRound + _hardThisRound; j++)
+                    {
+                        if (section[i] == section[j])
+                        {
+                            return true;
+                        }
+                    }
+                }
+
+                return false;
             }
 
             private bool OverlappedSections(int[] section, int[] lastSection)
@@ -364,6 +449,9 @@ namespace FiestaTime
                 return false;
             }
 
+            /// <summary>
+            /// Function that ramps up the difficulty.
+            /// </summary>
             private void ChangeDifficulty()
             {
                 round++;
@@ -402,6 +490,48 @@ namespace FiestaTime
                         break;
                     default:
                         break;
+                }
+            }
+
+            /// <summary>
+            /// Function that runs when we activate the testing boolean.
+            /// </summary>
+            private void SubsectionTest()
+            {
+                char diff = _subSectionToTest[0];
+                int subSectionId = int.Parse(_subSectionToTest.Substring(1));
+                if (diff == 'E')
+                {
+                    _easyThisRound = 3;
+                    _mediumThisRound = 0;
+                    _hardThisRound = 0;
+                }
+                else if (diff == 'M')
+                {
+                    _easyThisRound = 0;
+                    _mediumThisRound = 3;
+                    _hardThisRound = 0;
+                }
+                else
+                {
+                    _easyThisRound = 0;
+                    _mediumThisRound = 0;
+                    _hardThisRound = 3;
+                }
+
+                _nextSection[0] = subSectionId;
+                _nextSection[1] = subSectionId;
+                _nextSection[2] = subSectionId;
+
+                if (_nextSection[0] == -1)
+                {
+                    PlaceSection(_nextSection);
+
+                    GenerateNextSection();
+                }
+                else
+                {
+                    PlaceSection(_nextSection);
                 }
             }
 

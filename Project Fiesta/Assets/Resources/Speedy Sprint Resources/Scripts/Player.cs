@@ -13,15 +13,20 @@ namespace FiestaTime
         [RequireComponent(typeof(Rigidbody))]
         public class Player : MonoBehaviourPun, IPunObservable
         {
+            // Components
             private Rigidbody _rb;
             private CapsuleCollider _cc;
             private PlayerInputManager _inputManager;
+
+            // Mesh variables
             [SerializeField] private MeshRenderer _ubmr;
             [SerializeField] private MeshRenderer _lbmr;
             [SerializeField] private Material mine;
-            
+
+            // The death particles
             [SerializeField] private GameObject _deathParticles;
 
+            // The body parts of our player, useful when ducking.
             [SerializeField] private GameObject _upperBody;
             [SerializeField] private GameObject _lowerBody;
 
@@ -30,18 +35,25 @@ namespace FiestaTime
 
             private bool _hasLost;
 
+            // Jump variables
             [SerializeField] private float _jumpHeight;
-            [SerializeField] private float _jumpSpeed;
-            [SerializeField] private float _timeFloating = 0.1444639f;
+            [SerializeField] private float _jumpSpeed; //Increases with global Moving Speed.
+            [SerializeField] private float _timeFloating = 0.1444639f; //Decreases with global Moving Speed so that it floats enough time to traverse _timeFloatingRation units while floating.
+            private float _timeFloatingRatio = 1.7f; //Amount of units traversed while floating
 
-            private float _timeFloatingRatio = 1.7f;
-
+            // Transform points to raycast from.
             [SerializeField] GameObject _head;
             [SerializeField] GameObject _body;
             [SerializeField] GameObject _feet;
             [SerializeField] GameObject _below;
+
+            // Gravity related variables
             private bool _isGrounded;
             private bool _gravity = true;
+            [SerializeField] private LayerMask _whatIsGround;
+            [SerializeField] private float _distanceGround;
+
+            // Player states to limit player
             private enum PlayerStates
             {
                 Airborne,
@@ -67,19 +79,13 @@ namespace FiestaTime
             private float _middleRailX;
             private float _rightRailX;
 
-            [SerializeField] private LayerMask _whatIsGround;
-            [SerializeField] private float _distanceGround;
-
             // Network variables
             private Queue<string> inputsToDo = new Queue<string>();
 
             private bool _infoReceived;
             private Vector3 _netPos;
-            
             private Vector3 _lastPos;
-
             private bool _netDuck;
-
             private float _time;
             private double _lastSendTime;
             private double _currentSendTime;
@@ -120,10 +126,12 @@ namespace FiestaTime
             // Update is called once per frame
             void Update()
             {
+                // Check if we are grounded
                 _isGrounded = CheckIfGrounded(transform.position);
 
                 if (!photonView.IsMine && PhotonNetwork.IsConnected && _infoReceived)
                 {
+                    // Code that runs on other clients.
                     double timeToSend = _currentSendTime - _lastSendTime;
 
                     _time += Time.deltaTime;
@@ -135,84 +143,174 @@ namespace FiestaTime
                     return;
                 }
 
+                // Jump speed scaling
                 _jumpSpeed = GameManager.Current.Gravity * -1 / 1.25f;
 
+                // Time floating scaling
                 _timeFloating = _timeFloatingRatio / GameManager.Current.MovingSpeed;
 
-                StateLogic();
+                // Manage state logic changes
+                StateChangeLogic();
 
+                // Move forward
                 transform.position += Vector3.forward * GameManager.Current.MovingSpeed * Time.deltaTime;
 
-                if(_gravity && _currentState == PlayerStates.Airborne && !_isGrounded)
+                // Act per new states
+                StateActionLogic();
+
+                // Check if we collided with obstacles that aren't labeled as obstacles (like platforms, which are ground and obstacles)
+                // This is done in various different parts of the body
+                //Feet
+                CheckIfDeadEncapsulation(_feet.transform);
+
+                //Body
+                CheckIfDeadEncapsulation(_body.transform);
+
+                if (_upperBody.activeInHierarchy)
+                {
+                    //Head if not ducking
+                    CheckIfDeadEncapsulation(_head.transform);
+                }
+
+                // Check if we fell through the ground
+                CheckIfPassedGround(_below.transform);
+            }
+
+            /// <summary>
+            /// Simulates gravity for the player. Not a realistic simulation in any way.
+            /// </summary>
+            private void SimulateGravity()
+            {
+                transform.position += Vector3.up * GameManager.Current.Gravity * Time.deltaTime;
+            }
+
+            /// <summary>
+            /// Manages most State Changing logic, and also ducks in the according occasions.
+            /// </summary>
+            private void StateChangeLogic()
+            {
+                // If we duck
+                if (_inputManager.DuckInput)
+                {
+                    // And are grounded and cooldown is done
+                    if (_currentState == PlayerStates.Grounded && _currentDuckCooldown < 0f)
+                    {
+                        Duck();
+                    }
+
+                    // If in the air, drop and then duck
+                    if (_currentState == PlayerStates.Airborne)
+                    {
+                        _currentState = PlayerStates.Dropping;
+                    }
+                }
+
+                // If we are in the ground
+                if (_isGrounded)
+                {
+                    // If ducked in the air, it must fall quick. Once it reaches the ground, duck.
+                    if (_currentState == PlayerStates.Dropping)
+                    {
+                        Duck();
+                    }
+
+                    // If grounded, set state to grounded. If came from ducking, unduck.
+                    if (_currentDuckDuration > _duckDuration)
+                    {
+                        if(_currentState == PlayerStates.Ducking)
+                        {
+                            UnDuck();
+                        }
+                        _currentState = PlayerStates.Grounded;
+                    }
+                }
+                else
+                {
+                    // If its not grounded its in the air.
+                    if (_currentState != PlayerStates.Dropping && _currentState != PlayerStates.Ducking)
+                    {
+                        _currentState = PlayerStates.Airborne;
+                    }
+                }
+
+                // If ducking
+                if (_currentState == PlayerStates.Ducking)
+                {
+                    _currentDuckDuration += Time.deltaTime;
+                }
+                else
+                {
+                    _currentDuckCooldown -= Time.deltaTime;
+                }
+            }
+
+            /// <summary>
+            /// Encapsulates most of the logic of what to do depending on our states
+            /// </summary>
+            private void StateActionLogic()
+            {
+                // If in the air, gravity is activated and not grounded (these should be the same, oops)
+                if (_gravity && _currentState == PlayerStates.Airborne && !_isGrounded)
                 {
                     SimulateGravity();
                 }
 
+                // If we jump and are grounded or ducking
                 if (_inputManager.JumpInput && (_currentState == PlayerStates.Grounded || _currentState == PlayerStates.Ducking))
                 {
-                    if(_currentState == PlayerStates.Ducking)
+                    // First unduck
+                    if (_currentState == PlayerStates.Ducking)
                     {
                         UnDuck();
                     }
-                    _currentState = PlayerStates.Airborne;
+                    // Then jump
+                    _currentState = PlayerStates.Airborne; // We shouldnt change state here (that should be in StateLogic()) but I need it here!
                     StartCoroutine(JumpCo(transform.position.y, _jumpHeight, _jumpSpeed));
                 }
 
+                // If we are dropping
                 if (_currentState == PlayerStates.Dropping && !_isGrounded)
                 {
                     transform.position += Vector3.up * -_droppingForce * Time.deltaTime;
                 }
 
+                // If we move
                 if (_inputManager.MoveInput)
                 {
-                    if(_moves <= 1 && _movementBuffer[_moves] == 0f)
+                    // Buffer the inputs
+                    if (_moves <= 1 && _movementBuffer[_moves] == 0f)
                     {
                         _movementBuffer[_moves] = _inputManager.MoveDirection;
                         _moves++;
                     }
 
+                    // Move
                     if (_runOnce)
                     {
                         _runOnce = false;
                         StartCoroutine(MoveToCo(_laneSwitchSpeed));
                     }
                 }
-
-                CheckIfDead(_feet.transform, Vector3.forward);
-                CheckIfDead(_feet.transform, Vector3.back);
-                CheckIfDead(_feet.transform, Vector3.left);
-                CheckIfDead(_feet.transform, Vector3.right);
-
-                CheckIfDead(_body.transform, Vector3.forward);
-                CheckIfDead(_body.transform, Vector3.back);
-                CheckIfDead(_body.transform, Vector3.left);
-                CheckIfDead(_body.transform, Vector3.right);
-
-                if (_upperBody.activeInHierarchy)
-                {
-                    CheckIfDead(_head.transform, Vector3.forward);
-                    CheckIfDead(_head.transform, Vector3.back);
-                    CheckIfDead(_head.transform, Vector3.left);
-                    CheckIfDead(_head.transform, Vector3.right);
-                }
-
-                CheckIfPassedGround(_below.transform);
             }
 
-            private void SimulateGravity()
-            {
-                transform.position += Vector3.up * GameManager.Current.Gravity * Time.deltaTime;
-            }
-
+            /// <summary>
+            /// Coroutine Function that moves our player to another lane. It moves statically from a lane to another (discretely). It also acts on its input buffer.
+            /// </summary>
+            /// <param name="velocity">Speed of move</param>
+            /// <returns></returns>
             private IEnumerator MoveToCo(float velocity)
             {
+                // Go through our input buffer
                 for (int i = 0; i < _movementBuffer.Length; i++)
                 {
-                    if(_movementBuffer[i] != 0)
+                    // If its a movement
+                    if (_movementBuffer[i] != 0)
                     {
+                        // Initial state of movement
                         float decidedX = _middleRailX;
                         float currentX = transform.position.x;
 
+                        // Decide where are we moving
                         if (currentX == _leftRailX)
                         {
                             if (_movementBuffer[i] < 0f)
@@ -241,7 +339,9 @@ namespace FiestaTime
                                 decidedX = _rightRailX;
                             }
                         }
+                        // end decision
 
+                        // Move
                         while (transform.position.x != decidedX)
                         {
                             //Debug.Log("A1");
@@ -251,6 +351,7 @@ namespace FiestaTime
                         }
                     }
                 }
+                // Reset input buffer
                 _movementBuffer[0] = 0f;
                 _movementBuffer[1] = 0f;
                 _moves = 0;
@@ -258,6 +359,12 @@ namespace FiestaTime
                 _runOnce = true;
             }
 
+            /// <summary>
+            /// Variation of MoveToCo, but for network recreation. Same logic.
+            /// </summary>
+            /// <param name="velocity"></param>
+            /// <param name="direction"></param>
+            /// <returns></returns>
             private IEnumerator MoveToNetCo(float velocity, int direction)
             {
                 if (direction != 0)
@@ -306,66 +413,22 @@ namespace FiestaTime
                 _runOnce = true;
             }
 
-
-            private void StateLogic()
-            {
-                if (_inputManager.DuckInput)
-                {
-                    if (_currentState == PlayerStates.Grounded && _currentDuckCooldown < 0f)
-                    {
-                        Duck();
-                    }
-
-                    if (_currentState == PlayerStates.Airborne)
-                    {
-                        _currentState = PlayerStates.Dropping;
-                    }
-                }
-
-                if (_isGrounded)
-                {
-                    // If ducked in the air, it must fall quick. Once it reaches the ground, duck.
-                    if (_currentState == PlayerStates.Dropping)
-                    {
-                        Duck();
-                    }
-
-                    // If grounded, set state to grounded. If came from ducking, unduck.
-                    if (_currentDuckDuration > _duckDuration)
-                    {
-                        if(_currentState == PlayerStates.Ducking)
-                        {
-                            UnDuck();
-                        }
-                        _currentState = PlayerStates.Grounded;
-                    }
-                }
-                else
-                {
-                    // If its not grounded its in the air.
-                    if (_currentState != PlayerStates.Dropping && _currentState != PlayerStates.Ducking)
-                    {
-                        _currentState = PlayerStates.Airborne;
-                    }
-                }
-
-                if (_currentState == PlayerStates.Ducking)
-                {
-                    _currentDuckDuration += Time.deltaTime;
-                }
-                else
-                {
-                    _currentDuckCooldown -= Time.deltaTime;
-                }
-            }
-
+            /// <summary>
+            /// Coroutine Function to jump. The player jumps and then is suspended in the air for a bit (gravity is off) before falling.
+            /// </summary>
+            /// <param name="startingY"></param>
+            /// <param name="height"></param>
+            /// <param name="velocity"></param>
+            /// <returns></returns>
             private IEnumerator JumpCo(float startingY, float height, float velocity)
             {
+                // We deactivate gravity so it doesn't affect the jump
                 _gravity = false;
                 bool reachedHeight = false;
 
-                while (!reachedHeight && !_inputManager.DuckInput){
-
+                // Jump
+                while (!reachedHeight && !_inputManager.DuckInput)
+                {
                     Vector3 decidedVector = new Vector3(transform.position.x, startingY + height, transform.position.z);
                     //Debug.Log("A3");
                     transform.position = Vector3.MoveTowards(transform.position, decidedVector, velocity * Time.deltaTime);
@@ -375,15 +438,18 @@ namespace FiestaTime
 
                 float timeFloating = _timeFloating;
 
-                while (reachedHeight || timeFloating > 0f)
+                // Float for a certain time
+                while (timeFloating > 0f)
                 {
-                    reachedHeight = false;
                     timeFloating -= Time.deltaTime;
                     yield return new WaitForEndOfFrame();
                 };
                 _gravity = true;
             }
 
+            /// <summary>
+            /// Function that makes our character duck. This is done through the deactivation of the upper collider (and mesh).
+            /// </summary>
             private void Duck()
             {
                 _currentState = PlayerStates.Ducking;
@@ -397,6 +463,9 @@ namespace FiestaTime
                 _upperBody.SetActive(false);
             }
 
+            /// <summary>
+            /// Function that makes our character unduck. This is done through the reactivation of the upper collider (and mesh).
+            /// </summary>
             private void UnDuck()
             {
                 _currentDuckDuration = _duckDuration + 0.00001f;
@@ -405,6 +474,11 @@ namespace FiestaTime
                 _upperBody.SetActive(true);
             }
 
+            /// <summary>
+            /// Checks with a raycast if we are grounded
+            /// </summary>
+            /// <param name="startPosition"></param>
+            /// <returns></returns>
             private bool CheckIfGrounded(Vector3 startPosition)
             {
                 RaycastHit hit;
@@ -421,10 +495,13 @@ namespace FiestaTime
                 }
             }
 
+            /// <summary>
+            /// Checks through raycasting if we collided a non-obstacle. Die if it does.
+            /// </summary>
+            /// <param name="trans"></param>
+            /// <param name="direction"></param>
             private void CheckIfDead(Transform trans, Vector3 direction)
             {
-                if (_hasLost) return;
-
                 RaycastHit hit;
 
                 if (Physics.Raycast(trans.position, trans.TransformDirection(direction), out hit, 5f, 1 << 8))
@@ -438,6 +515,20 @@ namespace FiestaTime
                 }else Debug.DrawRay(trans.position, trans.TransformDirection(direction) * 5f, Color.red, 0f);
             }
 
+            private void CheckIfDeadEncapsulation(Transform trans)
+            {
+                if (_hasLost) return;
+
+                CheckIfDead(trans, Vector3.forward);
+                CheckIfDead(trans, Vector3.back);
+                CheckIfDead(trans, Vector3.left);
+                CheckIfDead(trans, Vector3.right);
+            }
+
+            /// <summary>
+            /// Function that checks if we went through the ground by raycasting infinitely into the sky. If we did, it corrects the position.
+            /// </summary>
+            /// <param name="trans"></param>
             private void CheckIfPassedGround(Transform trans)
             {
                 RaycastHit hit;
@@ -454,12 +545,20 @@ namespace FiestaTime
                 }
             }
 
+            /// <summary>
+            /// Function that runs when a player dies.
+            /// </summary>
             private void PlayerDie()
             {
+                // We lost
                 _hasLost = true;
+
+                // Invoke events and RPC calls to inform of your death.
                 onPlayerDied?.Invoke(PhotonNetwork.LocalPlayer.ActorNumber);
                 photonView.RPC("RPC_InformPlayerLost", RpcTarget.Others, PhotonNetwork.LocalPlayer.ActorNumber);
                 photonView.RPC("RPC_PlayerDied", RpcTarget.Others);
+
+                // Instantiates some death particles and deactivates the object.
                 Instantiate(_deathParticles, transform.position, Quaternion.identity);
                 gameObject.SetActive(false);
             }
@@ -477,13 +576,25 @@ namespace FiestaTime
                 }
             }
 
+            /////////// NETWORK //////////////
+
+            /// <summary>
+            /// Predicts the position through the network.
+            /// </summary>
+            /// <param name="timeToSend"></param>
             private void PositionPrediction(double timeToSend)
             {
+                // Lerp with the network position
                 transform.position = Vector3.Lerp(_lastPos, _netPos, (float)(_time / timeToSend));
 
+                // Recreate any inputs sent.
                 StartCoroutine("RecreateInputsCo");
             }
 
+            /// <summary>
+            /// Coroutine Function that recreates the inputs given by the player through the network.
+            /// </summary>
+            /// <returns></returns>
             private IEnumerator RecreateInputsCo()
             {
                 while(inputsToDo.Count != 0)
@@ -550,6 +661,11 @@ namespace FiestaTime
                 }
             }
 
+            /// <summary>
+            /// Sends input from the queue through the network.
+            /// </summary>
+            /// <param name="stream"></param>
+            /// <param name="q"></param>
             private void SendInputs(PhotonStream stream, Queue<string> q)
             {
                 stream.SendNext(q.Count);
@@ -560,6 +676,10 @@ namespace FiestaTime
                 }
             }
 
+            /// <summary>
+            /// Receives inputs from the network and places them into the inputs queue.
+            /// </summary>
+            /// <param name="stream"></param>
             private void ReceiveInputs(PhotonStream stream)
             {
                 int length = (int)stream.ReceiveNext();
