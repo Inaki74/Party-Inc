@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 6286465082845043636}
   - component: {fileID: 2343526105075984715}
   m_Layer: 0
-  m_Name: SyncTest_E-2
+  m_Name: SyncTest_E1024
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -47,7 +47,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6ee4b656de5c14698a809f8ba0f7d9a9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _amountOfTiles: 5
+  _ground: {fileID: 6286465083282087767}
 --- !u!1 &6286465083282087767
 GameObject:
   m_ObjectHideFlags: 0

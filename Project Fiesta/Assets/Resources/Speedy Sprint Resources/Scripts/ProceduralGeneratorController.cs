@@ -128,22 +128,22 @@ namespace FiestaTime
                         _laneFourSpawner.SetActive(false);
                         break;
                     case 2:
-                        _laneOneSpawner.transform.position = new Vector3(-5f, _laneOneSpawner.transform.position.y, _laneOneSpawner.transform.position.z);
-                        _laneTwoSpawner.transform.position = new Vector3(5f, _laneTwoSpawner.transform.position.y, _laneTwoSpawner.transform.position.z);
+                        _laneOneSpawner.transform.position = new Vector3(-7f, _laneOneSpawner.transform.position.y, _laneOneSpawner.transform.position.z);
+                        _laneTwoSpawner.transform.position = new Vector3(7f, _laneTwoSpawner.transform.position.y, _laneTwoSpawner.transform.position.z);
                         _laneThreeSpawner.SetActive(false);
                         _laneFourSpawner.SetActive(false);
                         break;
                     case 3:
-                        _laneOneSpawner.transform.position = new Vector3(-10f, _laneOneSpawner.transform.position.y, _laneOneSpawner.transform.position.z);
+                        _laneOneSpawner.transform.position = new Vector3(-12f, _laneOneSpawner.transform.position.y, _laneOneSpawner.transform.position.z);
                         _laneTwoSpawner.transform.position = new Vector3(0f, _laneTwoSpawner.transform.position.y, _laneTwoSpawner.transform.position.z);
-                        _laneThreeSpawner.transform.position = new Vector3(10f, _laneThreeSpawner.transform.position.y, _laneThreeSpawner.transform.position.z);
+                        _laneThreeSpawner.transform.position = new Vector3(12f, _laneThreeSpawner.transform.position.y, _laneThreeSpawner.transform.position.z);
                         _laneFourSpawner.SetActive(false);
                         break;
                     case 4:
-                        _laneOneSpawner.transform.position = new Vector3(-15f, _laneOneSpawner.transform.position.y, _laneOneSpawner.transform.position.z);
-                        _laneTwoSpawner.transform.position = new Vector3(-5f, _laneTwoSpawner.transform.position.y, _laneTwoSpawner.transform.position.z);
-                        _laneThreeSpawner.transform.position = new Vector3(5f, _laneThreeSpawner.transform.position.y, _laneThreeSpawner.transform.position.z);
-                        _laneFourSpawner.transform.position = new Vector3(15f, _laneFourSpawner.transform.position.y, _laneFourSpawner.transform.position.z);
+                        _laneOneSpawner.transform.position = new Vector3(-18f, _laneOneSpawner.transform.position.y, _laneOneSpawner.transform.position.z);
+                        _laneTwoSpawner.transform.position = new Vector3(-6f, _laneTwoSpawner.transform.position.y, _laneTwoSpawner.transform.position.z);
+                        _laneThreeSpawner.transform.position = new Vector3(6f, _laneThreeSpawner.transform.position.y, _laneThreeSpawner.transform.position.z);
+                        _laneFourSpawner.transform.position = new Vector3(18f, _laneFourSpawner.transform.position.y, _laneFourSpawner.transform.position.z);
                         break;
                     default:
                         break;
@@ -326,7 +326,7 @@ namespace FiestaTime
                     _lastSection = _nextSection;
 
                     // Ramp up the difficulty
-                    //ChangeDifficulty();
+                    ChangeDifficulty();
 
                     int tries = 0;
 

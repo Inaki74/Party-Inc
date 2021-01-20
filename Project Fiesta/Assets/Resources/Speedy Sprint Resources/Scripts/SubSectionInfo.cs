@@ -6,29 +6,26 @@ namespace FiestaTime
 {
     namespace SS
     {
+        [ExecuteInEditMode]
         public class SubSectionInfo : MonoBehaviour
         {
-            [Header("Place amount of tiles, no more no less")]
-            [SerializeField] private int _amountOfTiles;
-            public int AmountOfTiles
-            {
-                get
-                {
-                    return _amountOfTiles;
-                }
-                private set
-                {
-                    _amountOfTiles = value;
-                }
-            }
+            public int AmountOfTiles { get; private set; }
+
+            [SerializeField] private GameObject _ground;
 
             private bool _terribleWorkaround;
             private float _terribleWorkaroundTime;
 
             private int _subsectionCount = 3;
 
+
             private void Update()
             {
+                if (Application.isEditor)
+                {
+                    PositionTiles();
+                }
+
                 if(_terribleWorkaroundTime < 0)
                 {
                     _terribleWorkaround = false;
@@ -42,6 +39,10 @@ namespace FiestaTime
             private void Awake()
             {
                 InvisibleTrolleyController.onPassedSection += OnPassedSection;
+
+                var children = _ground.GetComponentsInChildren<Tile>();
+
+                AmountOfTiles = children.Length;
             }
 
             private void OnDestroy()
@@ -72,6 +73,18 @@ namespace FiestaTime
                 {
                     transform.parent = SubsecPoolManager.Current.SubsectionHolder.transform;
                     gameObject.SetActive(false);
+                }
+            }
+
+            private void PositionTiles()
+            {
+                var children = _ground.GetComponentsInChildren<Tile>();
+                float z = 0;
+
+                foreach (var Tile in children)
+                {
+                    Tile.transform.position = transform.position + new Vector3(0f, 0.1f, z);
+                    z += 10f;
                 }
             }
         }

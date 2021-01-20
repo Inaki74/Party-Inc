@@ -10,6 +10,7 @@ namespace FiestaTime
     {
         public class GameManager : FiestaGameManager<GameManager, float>
         {
+            [SerializeField] private bool _testMovingSpeed;
             // Moving Speed in all components
             [SerializeField] private float _movingSpeed;
             public float MovingSpeed {
@@ -92,7 +93,7 @@ namespace FiestaTime
                 if (GameBegan)
                 {
                     // Increase the moving speed per design decisions.
-                    MovingSpeed = 6.6f * Mathf.Log(0.6f * (InGameTime + _logValue));
+                    if(!_testMovingSpeed) MovingSpeed = 6.6f * Mathf.Log(0.6f * (InGameTime + _logValue));
 
                     // Gravity must be increased with moving speed to maintain the jump lengths.
                     Gravity = -1 * (MovingSpeed / _gravityMovingRatio);
@@ -185,19 +186,19 @@ namespace FiestaTime
                         playerPositions[0] = new Vector3(0f, 1f, -10f);
                         break;
                     case 2:
-                        playerPositions[0] = new Vector3(-5f, 1f, -10f);
-                        playerPositions[1] = new Vector3(5f, 1f, -10f);
+                        playerPositions[0] = new Vector3(-7f, 1f, -10f);
+                        playerPositions[1] = new Vector3(7f, 1f, -10f);
                         break;
                     case 3:
-                        playerPositions[0] = new Vector3(-10f, 1f, -10f);
+                        playerPositions[0] = new Vector3(-12f, 1f, -10f);
                         playerPositions[1] = new Vector3(0f, 1f, -10f);
-                        playerPositions[2] = new Vector3(10f, 1f, -10f);
+                        playerPositions[2] = new Vector3(12f, 1f, -10f);
                         break;
                     case 4:
-                        playerPositions[0] = new Vector3(-15f, 1f, -10f);
-                        playerPositions[1] = new Vector3(-5f, 1f, -10f);
-                        playerPositions[2] = new Vector3(5f, 1f, -10f);
-                        playerPositions[3] = new Vector3(15f, 1f, -10f);
+                        playerPositions[0] = new Vector3(-18f, 1f, -10f);
+                        playerPositions[1] = new Vector3(-6f, 1f, -10f);
+                        playerPositions[2] = new Vector3(6f, 1f, -10f);
+                        playerPositions[3] = new Vector3(18f, 1f, -10f);
                         break;
                     default:
                         break;

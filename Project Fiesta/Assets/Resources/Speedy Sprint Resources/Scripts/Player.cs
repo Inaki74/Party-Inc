@@ -507,7 +507,7 @@ namespace FiestaTime
                 if (Physics.Raycast(trans.position, trans.TransformDirection(direction), out hit, 5f, 1 << 8))
                 {
                     Debug.DrawRay(trans.position, trans.TransformDirection(direction) * hit.distance, Color.green, 0f);
-                    if (hit.distance < 0.6f)
+                    if (hit.distance < 0.6f && hit.transform.gameObject.tag != "Portal")
                     {
                         Debug.Log("Dead by CheckIfDead");
                         PlayerDie();
@@ -520,7 +520,6 @@ namespace FiestaTime
                 if (_hasLost) return;
 
                 CheckIfDead(trans, Vector3.forward);
-                CheckIfDead(trans, Vector3.back);
                 CheckIfDead(trans, Vector3.left);
                 CheckIfDead(trans, Vector3.right);
             }
@@ -585,7 +584,14 @@ namespace FiestaTime
             private void PositionPrediction(double timeToSend)
             {
                 // Lerp with the network position
-                transform.position = Vector3.Lerp(_lastPos, _netPos, (float)(_time / timeToSend));
+                if(Vector3.Distance(_lastPos, _netPos) > 5f)
+                {
+                    transform.position = _netPos;
+                }
+                else
+                {
+                    transform.position = Vector3.Lerp(_lastPos, _netPos, (float)(_time / timeToSend));
+                }
 
                 // Recreate any inputs sent.
                 StartCoroutine("RecreateInputsCo");

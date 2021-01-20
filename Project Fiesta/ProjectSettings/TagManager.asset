@@ -12,6 +12,8 @@ TagManager:
   - Obstacle
   - ProceduralGenerator
   - CheckpointPlane
+  - Portal
+  - Tile
   layers:
   - Default
   - TransparentFX
