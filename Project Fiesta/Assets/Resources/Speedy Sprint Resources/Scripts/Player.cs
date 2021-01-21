@@ -250,7 +250,7 @@ namespace FiestaTime
             private void StateActionLogic()
             {
                 // If in the air, gravity is activated and not grounded (these should be the same, oops)
-                if (_gravity && _currentState == PlayerStates.Airborne && !_isGrounded)
+                if (_gravity && (_currentState == PlayerStates.Airborne || _currentState == PlayerStates.Ducking || _currentState == PlayerStates.Dropping) && !_isGrounded)
                 {
                     SimulateGravity();
                 }

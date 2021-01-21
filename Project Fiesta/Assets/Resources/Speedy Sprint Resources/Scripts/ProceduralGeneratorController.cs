@@ -53,11 +53,11 @@ namespace FiestaTime
             [SerializeField] private string _subSectionToTest;
 
             // The next section to spawn and the last one spawned.
-            [SerializeField] private int[] _nextSection = new int[3];
-            [SerializeField] private int[] _lastSection = new int[3];
+            [SerializeField] private int[] _nextSection = new int[2];
+            [SerializeField] private int[] _lastSection = new int[2];
 
             // Amount of easy/medium/hard sub-sections this round.
-            private int _easyThisRound = 3;
+            private int _easyThisRound = 2;
             private int _mediumThisRound = 0;
             private int _hardThisRound = 0;
             // Which round are we at.
@@ -159,21 +159,21 @@ namespace FiestaTime
             /// <returns></returns>
             private int[] GenerateSection(int easy, int medium, int hard)
             {
-                int[] randomization = new int[3];
+                int[] randomization = new int[2];
 
-                for (int i = 0; i < easy; i++)
+                for (int i = 0; i < hard; i++)
                 {
-                    randomization[i] = Random.Range(1, _totalEasy + 1);
+                    randomization[i] = Random.Range(1, _totalHard + 1);
                 }
 
-                for (int i = easy; i < easy + medium; i++)
+                for (int i = hard; i < hard + medium; i++)
                 {
                     randomization[i] = Random.Range(1, _totalMedium + 1);
                 }
 
-                for (int i = easy + medium; i < easy+ medium + hard; i++)
+                for (int i = hard + medium; i < easy + medium + hard; i++)
                 {
-                    randomization[i] = Random.Range(1, _totalHard + 1);
+                    randomization[i] = Random.Range(1, _totalEasy + 1);
                 }
 
                 return randomization;
@@ -223,7 +223,7 @@ namespace FiestaTime
             private void PlaceFirstSubsectionInLane(GameObject spawner)
             {
                 GameObject firstSubsection = Instantiate(_openingSubsection);
-                firstSubsection.transform.position = new Vector3(spawner.transform.position.x, 0.1f, 0);
+                firstSubsection.transform.position = new Vector3(spawner.transform.position.x, 0.1f, -28);
             }
 
             /// <summary>
@@ -237,19 +237,19 @@ namespace FiestaTime
                     int subsec = section[i];
                     string diff = "";
 
-                    if(i < _easyThisRound)
+                    if(i < _hardThisRound)
                     {
-                        diff = "E";
+                        diff = "H";
                     }
 
-                    if(i >= _easyThisRound && i < _easyThisRound + _mediumThisRound)
+                    if(i >= _hardThisRound && i < _hardThisRound + _mediumThisRound)
                     {
                         diff = "M";
                     }
 
-                    if(i >= _easyThisRound + _mediumThisRound && i < _easyThisRound + _mediumThisRound + _hardThisRound)
+                    if(i >= _hardThisRound + _mediumThisRound && i < _easyThisRound + _mediumThisRound + _hardThisRound)
                     {
-                        diff = "H";
+                        diff = "E";
                     }
 
                     int tiles = PlaceSectionInLane(_laneOneSpawner, diff, subsec);
@@ -370,9 +370,9 @@ namespace FiestaTime
             {
                 if (_easyThisRound == _mediumThisRound && _mediumThisRound == _hardThisRound) return false;
 
-                for (int i = 0; i < _easyThisRound; i++)
+                for (int i = 0; i < _hardThisRound; i++)
                 {
-                    for (int j = 0; j < _easyThisRound; j++)
+                    for (int j = 0; j < _hardThisRound; j++)
                     {
                         if (section[i] == section[j])
                         {
@@ -382,9 +382,9 @@ namespace FiestaTime
                 }
 
                 // Checks overlap of medium
-                for (int i = _easyThisRound; i < _easyThisRound + _mediumThisRound; i++)
+                for (int i = _hardThisRound; i < _hardThisRound + _mediumThisRound; i++)
                 {
-                    for (int j = _easyThisRound; j < _mediumThisRound + _easyThisRound; j++)
+                    for (int j = _hardThisRound; j < _mediumThisRound + _hardThisRound; j++)
                     {
                         if (section[i] == section[j])
                         {
@@ -394,9 +394,9 @@ namespace FiestaTime
                 }
 
                 // Checks overlap of hard
-                for (int i = _easyThisRound + _mediumThisRound; i < _easyThisRound + _mediumThisRound + _hardThisRound; i++)
+                for (int i = _hardThisRound + _mediumThisRound; i < _easyThisRound + _mediumThisRound + _hardThisRound; i++)
                 {
-                    for (int j = _easyThisRound + _mediumThisRound; j < _easyThisRound + _mediumThisRound + _hardThisRound; j++)
+                    for (int j = _hardThisRound + _mediumThisRound; j < _easyThisRound + _mediumThisRound + _hardThisRound; j++)
                     {
                         if (section[i] == section[j])
                         {
@@ -410,41 +410,6 @@ namespace FiestaTime
 
             private bool OverlappedSections(int[] section, int[] lastSection)
             {
-                // Checks overlap of easy
-                for(int i = 0; i < _easyThisRound; i++)
-                {
-                    for(int j = 0; j < _easyThisRound; j++)
-                    {
-                        if(section[i] == lastSection[j])
-                        {
-                            return true;
-                        }
-                    }
-                }
-
-                // Checks overlap of medium
-                for (int i = _easyThisRound; i < _easyThisRound + _mediumThisRound; i++)
-                {
-                    for(int j = _easyThisRound; j < _mediumThisRound + _easyThisRound; j++)
-                    {
-                        if (section[i] == lastSection[j])
-                        {
-                            return true;
-                        }
-                    }
-                }
-
-                // Checks overlap of hard
-                for (int i = _easyThisRound + _mediumThisRound; i < _easyThisRound + _mediumThisRound + _hardThisRound; i++)
-                {
-                    for (int j = _easyThisRound + _mediumThisRound; j < _easyThisRound + _mediumThisRound + _hardThisRound; j++)
-                    {
-                        if (section[i] == lastSection[j])
-                        {
-                            return true;
-                        }
-                    }
-                }
 
                 return false;
             }
@@ -459,37 +424,29 @@ namespace FiestaTime
                 switch (round)
                 {
                     case 1:
-                        _easyThisRound = 2;
-                        _mediumThisRound = 1;
-                        _hardThisRound = 0;
-                        break;
-                    case 2:
                         _easyThisRound = 1;
-                        _mediumThisRound = 2;
+                        _mediumThisRound = 1;
                         _hardThisRound = 0;
                         break;
                     case 3:
                         _easyThisRound = 0;
-                        _mediumThisRound = 3;
+                        _mediumThisRound = 2;
                         _hardThisRound = 0;
                         break;
                     case 4:
                         _easyThisRound = 0;
-                        _mediumThisRound = 2;
-                        _hardThisRound = 1;
-                        break;
-                    case 5:
-                        _easyThisRound = 0;
                         _mediumThisRound = 1;
-                        _hardThisRound = 2;
+                        _hardThisRound = 1;
                         break;
                     case 6:
                         _easyThisRound = 0;
                         _mediumThisRound = 0;
-                        _hardThisRound = 3;
+                        _hardThisRound = 2;
                         break;
                     default:
                         break;
+
+                // EE EM EM MM MH MH HH
                 }
             }
 
@@ -502,26 +459,25 @@ namespace FiestaTime
                 int subSectionId = int.Parse(_subSectionToTest.Substring(1));
                 if (diff == 'E')
                 {
-                    _easyThisRound = 3;
+                    _easyThisRound = 2;
                     _mediumThisRound = 0;
                     _hardThisRound = 0;
                 }
                 else if (diff == 'M')
                 {
                     _easyThisRound = 0;
-                    _mediumThisRound = 3;
+                    _mediumThisRound = 2;
                     _hardThisRound = 0;
                 }
                 else
                 {
                     _easyThisRound = 0;
                     _mediumThisRound = 0;
-                    _hardThisRound = 3;
+                    _hardThisRound = 2;
                 }
 
                 _nextSection[0] = subSectionId;
                 _nextSection[1] = subSectionId;
-                _nextSection[2] = subSectionId;
 
                 if (_nextSection[0] == -1)
                 {

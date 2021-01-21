@@ -13,11 +13,8 @@ namespace FiestaTime
 
             private void OnTriggerEnter(Collider other)
             {
-                Debug.Log("HIT PORTAL");
-
                 if(other.tag == "Player")
                 {
-                    Debug.Log("PROTAL: Teleporting Player.");
                     other.transform.position = _exitPortalPosition.transform.position;
                 }
             }
