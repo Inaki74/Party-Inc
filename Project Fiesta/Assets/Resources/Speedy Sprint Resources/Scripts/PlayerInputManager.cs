@@ -11,7 +11,7 @@ namespace FiestaTime
         {
             [SerializeField] private float _inputAcceptanceLength;
 
-            private static float _angleBounds = 60f; // The angle in which we want to accept jump/duck instead of move
+            private static float _angleBounds = 45f; // The angle in which we want to accept jump/duck instead of move
 
             public bool JumpInput { get; private set; }
             public bool JumpInputPressed { get; private set; }

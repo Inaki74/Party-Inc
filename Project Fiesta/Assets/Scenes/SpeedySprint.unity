@@ -1359,7 +1359,7 @@ PrefabInstance:
     - target: {fileID: 1333791990138856278, guid: 9e4a0b7b3f8ae46e5b992f24ffea2e25,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: -13.8
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1333791990138856278, guid: 9e4a0b7b3f8ae46e5b992f24ffea2e25,
         type: 3}
@@ -6868,12 +6868,12 @@ PrefabInstance:
     - target: {fileID: 3037030653792018969, guid: 4fca39f08254745c386e625032491cd8,
         type: 3}
       propertyPath: _subSectionTest
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3037030653792018969, guid: 4fca39f08254745c386e625032491cd8,
         type: 3}
       propertyPath: _subSectionToTest
-      value: M1
+      value: E1
       objectReference: {fileID: 0}
     - target: {fileID: 3037030653792018971, guid: 4fca39f08254745c386e625032491cd8,
         type: 3}
@@ -12198,11 +12198,16 @@ PrefabInstance:
     - target: {fileID: 8950952732929816901, guid: e5204e2d5ba8a4bc9a77a59451c7d2aa,
         type: 3}
       propertyPath: _testMovingSpeed
-      value: 0
+      value: 20
       objectReference: {fileID: 0}
     - target: {fileID: 8950952732929816901, guid: e5204e2d5ba8a4bc9a77a59451c7d2aa,
         type: 3}
       propertyPath: _movingSpeed
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8950952732929816901, guid: e5204e2d5ba8a4bc9a77a59451c7d2aa,
+        type: 3}
+      propertyPath: _testingMovingSpeed
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []

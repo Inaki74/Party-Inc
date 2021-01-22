@@ -10,9 +10,6 @@ namespace FiestaTime
     {
         public class GameManager : FiestaGameManager<GameManager, float>
         {
-            [SerializeField] private bool _testingMovingSpeed;
-
-            [SerializeField] private float _testMovingSpeed;
             // Moving Speed in all components
             [SerializeField] private float _movingSpeed;
             public float MovingSpeed {
@@ -47,7 +44,7 @@ namespace FiestaTime
             private float _gravityMovingRatio = 0.46666666666f;
 
             // Value so that Moving Speed is 10 when time = 0
-            private float _logValue = 7.58351747549f;
+            private float _logValue = 10.2677451405f;
             //8.02255787562f
 
             private int _nextToInsert = 0;
@@ -72,7 +69,6 @@ namespace FiestaTime
                 GameBegan = false;
                 _startCountdown = false;
                 _gravity = -15;
-                if(_testingMovingSpeed) MovingSpeed = _testMovingSpeed;
                 InGameTime = 0f;
                 
                 if (!PhotonNetwork.IsConnectedAndReady) _realGameStartCountdown = gameStartCountdown; _startCountdown = true;
@@ -96,7 +92,8 @@ namespace FiestaTime
                 if (GameBegan)
                 {
                     // Increase the moving speed per design decisions.
-                    if(!_testingMovingSpeed) MovingSpeed = 6.6f * Mathf.Log(0.6f * (InGameTime + _logValue));
+                    if(!Testing) MovingSpeed = 5.5f * Mathf.Log(0.6f * (InGameTime + _logValue));
+                    else MovingSpeed = _testMovingSpeed;
 
                     // Gravity must be increased with moving speed to maintain the jump lengths.
                     Gravity = -1 * (MovingSpeed / _gravityMovingRatio);
@@ -262,6 +259,16 @@ namespace FiestaTime
             public void RPC_SendBegin(double startT)
             {
                 _gameBeginTime = startT;
+            }
+
+            // TESTING
+            public bool Testing;
+
+            [SerializeField] private float _testMovingSpeed;
+
+            public void TestSetMoveSpeed(float m)
+            {
+                _testMovingSpeed = m;
             }
 
         }

@@ -46,11 +46,12 @@ namespace FiestaTime
             // The first subsection of every game
             [SerializeField] private GameObject _openingSubsection;
 
-            // Options to test sub-sections
+            // TESTING
             [Tooltip("Activate to test a sub-section, this option will make the spawner spawn only this sub-section.")]
             [SerializeField] private bool _subSectionTest;
             [Header("E.g: M5 (Medium 5)")]
             [SerializeField] private string _subSectionToTest;
+            // TESTING
 
             // The next section to spawn and the last one spawned.
             [SerializeField] private int[] _nextSection = new int[2];
@@ -96,11 +97,14 @@ namespace FiestaTime
                         GenerateNextSection();
                     }
                 }
+
+                _subSectionTest = GameManager.Current.Testing;
             }
 
             private void Awake()
             {
                 InvisibleTrolleyController.onPassedSection += GenerateNextSection;
+                UIManager.onInputDone += OnInputDone;
 
                 // We decide where to put the sub-sections (dependent on GameManager's PlayerCount).
                 DecideSpawnerPositions();
@@ -112,6 +116,7 @@ namespace FiestaTime
             private void OnDestroy()
             {
                 InvisibleTrolleyController.onPassedSection -= GenerateNextSection;
+                UIManager.onInputDone -= OnInputDone;
             }
 
             /// <summary>
@@ -428,17 +433,17 @@ namespace FiestaTime
                         _mediumThisRound = 1;
                         _hardThisRound = 0;
                         break;
-                    case 3:
+                    case 2:
                         _easyThisRound = 0;
                         _mediumThisRound = 2;
                         _hardThisRound = 0;
                         break;
-                    case 4:
+                    case 3:
                         _easyThisRound = 0;
                         _mediumThisRound = 1;
                         _hardThisRound = 1;
                         break;
-                    case 6:
+                    case 4:
                         _easyThisRound = 0;
                         _mediumThisRound = 0;
                         _hardThisRound = 2;
@@ -476,19 +481,28 @@ namespace FiestaTime
                     _hardThisRound = 2;
                 }
 
-                _nextSection[0] = subSectionId;
-                _nextSection[1] = subSectionId;
-
                 if (_nextSection[0] == -1)
                 {
+                    _nextSection[0] = subSectionId;
+                    _nextSection[1] = subSectionId;
+
                     PlaceSection(_nextSection);
 
                     GenerateNextSection();
                 }
                 else
                 {
+                    _nextSection[0] = subSectionId;
+                    _nextSection[1] = subSectionId;
+
                     PlaceSection(_nextSection);
                 }
+            }
+
+            // For testing
+            private void OnInputDone(string input)
+            {
+                _subSectionToTest = input;
             }
 
 

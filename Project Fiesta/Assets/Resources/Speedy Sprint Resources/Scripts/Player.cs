@@ -274,6 +274,7 @@ namespace FiestaTime
                     transform.position += Vector3.up * -_droppingForce * Time.deltaTime;
                 }
 
+
                 // If we move
                 if (_inputManager.MoveInput)
                 {
@@ -287,11 +288,15 @@ namespace FiestaTime
                     // Move
                     if (_runOnce)
                     {
+                        globalCount++;
+                        Debug.Log(globalCount + ") start Moving");
                         _runOnce = false;
                         StartCoroutine(MoveToCo(_laneSwitchSpeed));
                     }
                 }
             }
+
+            private int globalCount;
 
             /// <summary>
             /// Coroutine Function that moves our player to another lane. It moves statically from a lane to another (discretely). It also acts on its input buffer.
@@ -303,15 +308,18 @@ namespace FiestaTime
                 // Go through our input buffer
                 for (int i = 0; i < _movementBuffer.Length; i++)
                 {
+                    Debug.Log("We are Moving"); 
                     // If its a movement
                     if (_movementBuffer[i] != 0)
                     {
+                        Debug.Log("Its a movement");
                         // Initial state of movement
                         float decidedX = _middleRailX;
                         float currentX = transform.position.x;
+                        float myEpsilon = 0.01f;
 
                         // Decide where are we moving
-                        if (currentX == _leftRailX)
+                        if (currentX > _leftRailX - myEpsilon && currentX < _leftRailX + myEpsilon)
                         {
                             if (_movementBuffer[i] < 0f)
                             {
@@ -319,7 +327,9 @@ namespace FiestaTime
                             }
                         }
 
-                        if (currentX == _middleRailX)
+                        
+
+                        if (currentX > _middleRailX - myEpsilon && currentX < _middleRailX + myEpsilon)
                         {
                             if (_movementBuffer[i] > 0f)
                             {
@@ -332,7 +342,7 @@ namespace FiestaTime
                             }
                         }
 
-                        if (currentX == _rightRailX)
+                        if (currentX > _rightRailX - myEpsilon && currentX < _rightRailX + myEpsilon)
                         {
                             if (_movementBuffer[i] > 0f)
                             {
@@ -341,10 +351,12 @@ namespace FiestaTime
                         }
                         // end decision
 
+                        Debug.Log("Decided X: " + decidedX);
+                        Debug.Log("Current X: " + currentX);
                         // Move
                         while (transform.position.x != decidedX)
                         {
-                            //Debug.Log("A1");
+                            Debug.Log("MOOVE");
                             Vector3 decidedVector = new Vector3(decidedX, transform.position.y, transform.position.z);
                             transform.position = Vector3.MoveTowards(transform.position, decidedVector, velocity * Time.deltaTime);
                             yield return new WaitForEndOfFrame();
@@ -507,7 +519,7 @@ namespace FiestaTime
                 if (Physics.Raycast(trans.position, trans.TransformDirection(direction), out hit, 5f, 1 << 8))
                 {
                     Debug.DrawRay(trans.position, trans.TransformDirection(direction) * hit.distance, Color.green, 0f);
-                    if (hit.distance < 0.6f && hit.transform.gameObject.tag != "Portal")
+                    if (hit.distance < 0.2f && hit.transform.gameObject.tag != "Portal")
                     {
                         Debug.Log("Dead by CheckIfDead");
                         PlayerDie();
@@ -549,6 +561,12 @@ namespace FiestaTime
             /// </summary>
             private void PlayerDie()
             {
+                if (GameManager.Current.Testing)
+                {
+                    Instantiate(_deathParticles, transform.position, Quaternion.identity);
+                    return;
+                } 
+
                 // We lost
                 _hasLost = true;
 
