@@ -15,6 +15,7 @@ namespace FiestaTime
         {
             //We might need to synchronize spawners with photon with IPunObservable
 
+            public bool IsMine { get; set; }
             private bool OK;
             private List<int> eggMapCol = new List<int>();
             private Vector3 spawningPosition;
@@ -26,8 +27,9 @@ namespace FiestaTime
             {
                 pool = FindObjectOfType<EggPoolManager>();
                 spawningPosition = transform.position;
-                OK = true;
+                Debug.Log("start");
                 StartCoroutine("WaitForOKCo");
+                OK = true;
             }
 
             private void Update()
@@ -46,7 +48,9 @@ namespace FiestaTime
 
             private void Awake()
             {
+                Debug.Log("Awake");
                 GameManager.onGameFinish += OnGameFinish;
+                //OK = false;
             }
 
             private void OnDestroy()
@@ -77,7 +81,7 @@ namespace FiestaTime
             /// <returns></returns>
             private IEnumerator SpawningCo()
             {
-                foreach (int egg in eggMapCol)
+                foreach (int egg in eggMapCol.ToArray())
                 {
                     SpawnEgg(egg);
                     yield return new WaitForSeconds(waveInterval);
@@ -100,6 +104,8 @@ namespace FiestaTime
 
                 GameObject egg = pool.RequestEgg(t);
                 egg.transform.position = spawningPosition;
+
+                egg.GetComponent<EasterEgg>().IsMine = IsMine;
             }
 
             /// <summary>
@@ -117,6 +123,7 @@ namespace FiestaTime
             /// <param name="routine"></param>
             public void SetRoutine(List<int> routine)
             {
+                Debug.Log("Set Routine");
                 OK = true;
                 eggMapCol = routine;
             }

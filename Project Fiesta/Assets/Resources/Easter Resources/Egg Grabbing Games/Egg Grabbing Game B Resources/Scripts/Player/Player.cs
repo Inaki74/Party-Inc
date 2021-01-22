@@ -175,6 +175,7 @@ namespace FiestaTime
 
             private void OnEggObtain(int scoreModifier)
             {
+                /// ESTO
                 if (!photonView.IsMine) return;
 
                 if (scoreModifier == -1)
@@ -203,6 +204,8 @@ namespace FiestaTime
                 {
                     stream.SendNext(myResults.playerId);
                     stream.SendNext(myResults.scoring);
+                    stream.SendNext(isStunned);
+                    stream.SendNext(transform.position);
                 }
                 else
                 {
@@ -210,6 +213,8 @@ namespace FiestaTime
 
                     aux.playerId = (int)stream.ReceiveNext();
                     aux.scoring = (int)stream.ReceiveNext();
+                    isStunned = (bool)stream.ReceiveNext();
+                    transform.position = (Vector3)stream.ReceiveNext();
 
                     myResults = aux;
                 }

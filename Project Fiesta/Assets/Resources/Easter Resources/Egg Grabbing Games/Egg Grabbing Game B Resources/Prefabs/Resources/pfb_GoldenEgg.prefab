@@ -13,7 +13,6 @@ GameObject:
   - component: {fileID: 4853262422604912916}
   - component: {fileID: 5191324221326283625}
   - component: {fileID: -5733140686265626187}
-  - component: {fileID: 5665331169294075484}
   - component: {fileID: 4579048632934986061}
   m_Layer: 0
   m_Name: pfb_GoldenEgg
@@ -134,29 +133,6 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 64
   m_CollisionDetection: 1
---- !u!114 &5665331169294075484
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 457131422810272502}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ObservedComponentsFoldoutOpen: 1
-  Group: 0
-  prefixField: -1
-  observableSearch: 2
-  Synchronization: 2
-  OwnershipTransfer: 0
-  ObservedComponents:
-  - {fileID: 4579048632934986061}
-  viewIdField: 0
-  InstantiationId: 0
-  isRuntimeInstantiated: 0
 --- !u!114 &4579048632934986061
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -92,6 +92,7 @@ namespace FiestaTime
             /// <param name="score"></param>
             private void OnEggSpawn(int score)
             {
+                ///ESTO
                 totalScore -= score;
                 string str = "LEFT@" + totalScore;
                 str = str.Replace("@", System.Environment.NewLine);

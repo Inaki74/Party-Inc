@@ -41,6 +41,9 @@ namespace FiestaTime
 
     /// <summary>
     /// This class defines a FiestaTime GameManager, and posseses everything every GameManager probably has.
+    /// One should be very careful when changing this piece of code, since it ties to all the games.
+    /// I know this is bad design, but its a sacrifice im willing to make, since its a great to be able to introduce all the basic things
+    /// I need every time I make a new game.
     /// </summary>
     /// <typeparam name="G"> The GameManager type </typeparam>
     /// <typeparam name="T"> The Scoring Type </typeparam>

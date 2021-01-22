@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-using Photon.Pun;
-
 namespace FiestaTime
 {
     namespace EGG
@@ -11,7 +9,7 @@ namespace FiestaTime
         /// <summary>
         /// The falling egg, in charge of itself.
         /// </summary>
-        public class EasterEgg : MonoBehaviourPun, IPunObservable
+        public class EasterEgg : MonoBehaviour
         {
             #region Events
             public delegate void ActionObtain(int score);
@@ -30,6 +28,8 @@ namespace FiestaTime
                 rotten,
                 golden
             }
+
+            public bool IsMine { get; set; }
             #endregion
 
             #region Inspector Assignables
@@ -54,24 +54,43 @@ namespace FiestaTime
                 anim = GetComponent<Animator>();
                 Rb = GetComponent<Rigidbody>();
 
+                IsMine = false;
+
                 SetEgg(eggType);
             }
 
             private void OnEnable()
             {
-                photonView.RPC("RPC_SendActive", RpcTarget.Others, true);
                 Sc.enabled = true;
                 Rb.useGravity = true;
             }
 
+            private void OnDisable()
+            {
+                IsMine = false;
+            }
+
             private void OnCollisionEnter(Collision collision)
             {
-                if (collision.gameObject.tag == "Player" && !collision.gameObject.GetComponent<Player>().GetIfStunned())
+                if (collision.gameObject.tag == "Player")
                 {
-                    Sc.enabled = false;
-                    Rb.useGravity = false;
-                    Rb.velocity = Vector3.zero;
-                    if (photonView.IsMine) OnObtain();
+                    Player p = collision.gameObject.GetComponent<Player>();
+
+                    if (!p.GetIfStunned())
+                    {
+                        Sc.enabled = false;
+                        Rb.useGravity = false;
+                        Rb.velocity = Vector3.zero;
+
+                        if (IsMine)
+                        {
+                            OnObtain();
+                        }
+                        else
+                        {
+                            gameObject.SetActive(false);
+                        }
+                    }
                 }
 
                 if (collision.gameObject.tag == "Ground" || (collision.gameObject.tag == "Egg" && collision.rigidbody.position.y < 2f))
@@ -79,7 +98,7 @@ namespace FiestaTime
                     Sc.enabled = false;
                     Rb.useGravity = false;
                     Rb.velocity = Vector3.zero;
-                    if (photonView.IsMine) OnBreak();
+                    OnBreak();
                 }
             }
             #endregion
@@ -118,7 +137,6 @@ namespace FiestaTime
                 onObtainEgg?.Invoke(scoreModifier);
                 //Play OnObtain animation (specific to each egg though)
                 gameObject.SetActive(false);
-                photonView.RPC("RPC_SendActive", RpcTarget.Others, false);
             }
 
             /// <summary>
@@ -126,7 +144,7 @@ namespace FiestaTime
             /// </summary>
             private void OnBreak()
             {
-                if (scoreModifier != -1)
+                if (scoreModifier != -1 && IsMine)
                     onSpawnEgg?.Invoke(scoreModifier);
                 //Play OnBreak animation (specific to each egg though)
                 anim.SetBool(Constants.BOOL_BROKENEGG_ANIM, true);
@@ -136,31 +154,6 @@ namespace FiestaTime
             {
                 anim.SetBool(Constants.BOOL_BROKENEGG_ANIM, false);
                 gameObject.SetActive(false);
-                photonView.RPC("RPC_SendActive", RpcTarget.Others, false);
-            }
-
-            [PunRPC]
-            public void RPC_SendActive(bool b)
-            {
-                gameObject.SetActive(b);
-            }
-
-            public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
-            {
-                if (stream.IsWriting)
-                {
-                    //Ours
-                    stream.SendNext(transform.position);
-                    stream.SendNext(anim.GetBool(Constants.BOOL_BROKENEGG_ANIM));
-                    stream.SendNext(Rb.velocity);
-                }
-                else
-                {
-                    //Others
-                    transform.position = (Vector3)stream.ReceiveNext();
-                    anim.SetBool(Constants.BOOL_BROKENEGG_ANIM, (bool)stream.ReceiveNext());
-                    Rb.velocity = (Vector3)stream.ReceiveNext();
-                }
             }
         }
 
