@@ -19,6 +19,7 @@ namespace FiestaTime
         private const int maxDdPlayers = 4;
         private const int maxTtPlayers = 4;
         private const int maxRrPlayers = 4;
+        private const int maxSsPlayers = 4;
 
         private List<RoomInfo> currentRoomList;
 
@@ -88,6 +89,12 @@ namespace FiestaTime
                 JoinARoom("RR_", maxRrPlayers);
         }
 
+        public void JoinSS()
+        {
+            if (gameToJoin == "")
+                JoinARoom("SS_", maxSsPlayers);
+        }
+
         public void JoinARoom(string gameJoining, int maxPlayersAllowed)
         {
             gameToJoin = gameJoining;
@@ -150,6 +157,12 @@ namespace FiestaTime
         public override void OnJoinRoomFailed(short returnCode, string message)
         {
             Debug.Log("Fiesta Time/ RoomController: Room creation failed, reason: " + message + " error code: " + returnCode + ". Try again later.");
+        }
+
+        public override void OnLeftRoom()
+        {
+            base.OnLeftRoom();
+            Debug.Log("Fiesta Time/ RoomController: Left room.");
         }
 
         #endregion

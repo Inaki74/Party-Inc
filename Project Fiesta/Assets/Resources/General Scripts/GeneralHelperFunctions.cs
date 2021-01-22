@@ -58,12 +58,12 @@ namespace FiestaTime
         /// </summary>
         public static bool DetermineHighScoreFloat(string hiScoreKey, float newScore, bool needsToBeBigger)
         {
-            Debug.Log(newScore);
             float highScore = 0;
             if (PlayerPrefs.HasKey(hiScoreKey))
             {
                 highScore = PlayerPrefs.GetFloat(hiScoreKey);
-                //Debug.Log("Old high score" + highScore);
+                Debug.Log("Old high score: " + highScore);
+                Debug.Log("Incoming score: " + newScore);
                 // Had high score, check
                 if (needsToBeBigger)
                 {

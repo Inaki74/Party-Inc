@@ -28,7 +28,6 @@ namespace FiestaTime
 
             private void OnEnable()
             {
-                Debug.Log(GameManager.Current.playerCount);
                 // Set active for the amount of players playing.
                 for (int i = 0; i < GameManager.Current.playerCount; i++)
                 {

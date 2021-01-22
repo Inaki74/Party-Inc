@@ -21,9 +21,7 @@ namespace FiestaTime
             private int playersPlaying;
             private bool runOnce = false;
 
-            public float inGameTime = 0;
-
-            public bool gameBegan;
+            private double _gameBeginTime;
 
             protected override void InStart()
             {
@@ -39,20 +37,33 @@ namespace FiestaTime
             // Update is called once per frame
             void Update()
             {
-                if (gameStartCountdown <= -1f) // Taking into account the start text
+                if (PhotonNetwork.IsConnectedAndReady && _startCountdown && !GameBegan)
                 {
-                    if (inGameTime == 0)
+                    if (_startTime != 0 && (float)(PhotonNetwork.Time - _startTime) >= gameStartCountdown)
                     {
-                        gameBegan = true;
-                        gameStartCountdown = -1f;
+                        GameBegan = true;
                         OnGameStartInvoke();
-                    } 
-
-                    if(gameBegan) inGameTime += Time.deltaTime;
+                        _gameBeginTime = PhotonNetwork.Time;
+                        if (PhotonNetwork.IsConnectedAndReady) photonView.RPC("RPC_SendBegin", RpcTarget.Others, _gameBeginTime);
+                    }
                 }
-                else
+                else if (_startCountdown && !GameBegan)
                 {
-                    gameStartCountdown -= Time.deltaTime;
+                    if (gameStartCountdown <= 0f)
+                    {
+                        GameBegan = true;
+                        gameStartCountdown = float.MaxValue;
+                        OnGameStartInvoke();
+                    }
+                    else
+                    {
+                        gameStartCountdown -= Time.deltaTime;
+                    }
+                }
+
+                if (GameBegan)
+                {
+                    InGameTime = (float)(PhotonNetwork.Time - _gameBeginTime);
                 }
 
                 // PlayersLeftToLose - playersCrossedLine = playersPlaying
@@ -66,6 +77,8 @@ namespace FiestaTime
 
             public override void Init()
             {
+                base.Init();
+
                 PlayerController.onCrossFinishLine += OnPlayerWon;
                 PlayerController.onPlayerDied += OnPlayerLost;
             }
@@ -78,7 +91,7 @@ namespace FiestaTime
 
             private void FinishGame()
             {
-                gameBegan = false;
+                GameBegan = false;
                 // Order list
                 OrderResults();
                 // Decide winner
@@ -91,7 +104,7 @@ namespace FiestaTime
             private int DecideWinner()
             {
                 // Game was too short
-                if (inGameTime < 7f)
+                if (InGameTime < 7f)
                 {
                     return -1;
                 }
@@ -215,14 +228,14 @@ namespace FiestaTime
             {
                 PlayerResults<float> thisPlayerResult = new PlayerResults<float>();
                 thisPlayerResult.playerId = playerId;
-                thisPlayerResult.scoring = inGameTime;
+                thisPlayerResult.scoring = InGameTime;
                 thisPlayerResult.reachedEnd = true;
 
                 playerResults[nextToInsert] = thisPlayerResult;
                 nextToInsert++;
                 playersPlaying--;
 
-                Debug.Log("Player won: " + playerId + " , time: " + inGameTime + " , playersLeft: " + playersPlaying);
+                Debug.Log("Player won: " + playerId + " , time: " + InGameTime + " , playersLeft: " + playersPlaying);
 
                 if (playerId == PhotonNetwork.LocalPlayer.ActorNumber) isHighScore = GeneralHelperFunctions.DetermineHighScoreFloat(Constants.TT_KEY_HISCORE, thisPlayerResult.scoring, false);
                 // Give the result to the other players
@@ -233,7 +246,7 @@ namespace FiestaTime
             {
                 PlayerResults<float> thisPlayerResult = new PlayerResults<float>();
                 thisPlayerResult.playerId = playerId;
-                thisPlayerResult.scoring = inGameTime;
+                thisPlayerResult.scoring = InGameTime;
                 thisPlayerResult.reachedEnd = false;
 
                 playerResults[nextToInsert] = thisPlayerResult;
@@ -287,6 +300,12 @@ namespace FiestaTime
                 playerResults[nextToInsert] = thisPlayerResult;
                 nextToInsert++;
                 playersPlaying--;
+            }
+
+            [PunRPC]
+            public void RPC_SendBegin(double startT)
+            {
+                _gameBeginTime = startT;
             }
         }
     }

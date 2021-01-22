@@ -87,7 +87,7 @@ namespace FiestaTime
                 // Make the players move a bit more forward and stop
                 if (crossedLine) return;
 
-                if (GameManager.Current.gameBegan)
+                if (GameManager.Current.GameBegan)
                 {
                     CheckForInput(false);
                     CheckForInputPC();
@@ -115,7 +115,7 @@ namespace FiestaTime
                 // Make the players move a bit more forward and stop
                 if (crossedLine) return;
 
-                if (GameManager.Current.gameBegan) { CheckForInput(true); CheckForInputPC(); }
+                if (GameManager.Current.GameBegan) { CheckForInput(true); CheckForInputPC(); }
             }
 
             private void FixedUpdate()

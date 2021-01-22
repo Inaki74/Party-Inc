@@ -10,7 +10,6 @@ namespace FiestaTime
     {
         public class GameManager : FiestaGameManager<GameManager, int>
         {
-
             //The sequence map of moves to be generated.
             public int[] sequenceMap = new int[12];
             public int amountOfMovesThisRound = 4;
@@ -44,15 +43,13 @@ namespace FiestaTime
             #endregion
 
             private bool isGameRunning = true;
-            private bool startedGame;
             private bool localPlayerReady;
 
             #region Game Loop
 
             protected override void InStart()
             {
-                Debug.Log("Barrack Obama Start");
-                startedGame = false;
+                GameBegan = false;
                 playersLostAr = new bool[playerCount];
 
                 fieryRoundsTimeForInputDiscount = (timeForInput - minTimeForInput) / 10;
@@ -74,7 +71,6 @@ namespace FiestaTime
 
             protected override void InitializeGameManagerDependantObjects()
             {
-                Debug.Log("Barrack Obama Init");
                 // Initialize players
                 InitializePlayers();
 
@@ -84,16 +80,26 @@ namespace FiestaTime
 
             private void Update()
             {
-                Debug.Log("Barrack Obama Update");
-                if(!startedGame && countdownGameStart <= -1f)
+                if (PhotonNetwork.IsConnectedAndReady && _startCountdown && !GameBegan)
                 {
-                    startedGame = true;
-                    // Start game
-                    StartCoroutine(GameLoopCo());
+                    if (_startTime != 0 && (float)(PhotonNetwork.Time - _startTime) >= gameStartCountdown + 1.5f)
+                    {
+                        GameBegan = true;
+                        StartCoroutine(GameLoopCo());
+                    }
                 }
-                else if(countdownGameStart > -1f)
+                else if (_startCountdown && !GameBegan)
                 {
-                    countdownGameStart -= Time.deltaTime;
+                    if (gameStartCountdown <= -1.5f)
+                    {
+                        GameBegan = true;
+                        gameStartCountdown = float.MaxValue;
+                        StartCoroutine(GameLoopCo());
+                    }
+                    else
+                    {
+                        gameStartCountdown -= Time.deltaTime;
+                    }
                 }
             }
 
@@ -180,22 +186,6 @@ namespace FiestaTime
 
                 //Register results in the system, yada yada, profit
             }
-
-            //private void PrintArray(PlayerResults[] args)
-            //{
-            //    foreach (var o in args)
-            //    {
-            //        foreach (var player in PhotonNetwork.PlayerList)
-            //        {
-            //            if (player.ActorNumber == o.playerId)
-            //            {
-            //                Debug.Log(player.NickName);
-            //            }
-            //        }
-
-            //        Debug.Log(o.ToString());
-            //    }
-            //}
 
             #endregion
 

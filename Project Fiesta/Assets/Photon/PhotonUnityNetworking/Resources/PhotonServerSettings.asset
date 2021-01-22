@@ -58,6 +58,12 @@ MonoBehaviour:
   - RPC_SendBurst
   - RPC_SendActive
   - RPC_SendNewScore
+  - RPC_SendTile
+  - RPC_SendSection
+  - RPC_PlayerDied
+  - Bro
+  - RPC_SendBegin
+  - RPC_SendInGameTime
   DisableAutoOpenWizard: 1
   ShowSettings: 0
   DevRegionSetOnce: 1

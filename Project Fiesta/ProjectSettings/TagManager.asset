@@ -9,6 +9,11 @@ TagManager:
   - DeathPlane
   - FinishPlane
   - Rope
+  - Obstacle
+  - ProceduralGenerator
+  - CheckpointPlane
+  - Portal
+  - Tile
   layers:
   - Default
   - TransparentFX
@@ -19,8 +24,8 @@ TagManager:
   - 
   - 
   - Ground
-  - 
-  - 
+  - Checkpoint
+  - GroundFix
   - 
   - 
   - 

@@ -67,14 +67,29 @@ namespace FiestaTime
         // Every game has a count of players.
         public int playerCount;
 
-        // Every game has a players that start somewhere.
-        protected Vector3[] playerPositions = new Vector3[4];
-
         // I think all of our games will have some type of countdown.
         public float gameStartCountdown = 3f; //Have to take into account the start text
 
+        public bool PlayersConnectedAndReady { get; protected set; }
+
+        public ExitGames.Client.Photon.Hashtable CustomProps { get; protected set; }
+
+        public bool IsHighScore { get; protected set; }
+        public int WinnerId { get; protected set; }
+        public bool GameBegan { get; protected set; }
+        public float InGameTime { get; protected set; }
+
+        protected bool _receivedProperties;
+        protected bool _startCountdown;
+        protected double _startTime;
+
+        // Every game has a players that start somewhere.
+        protected Vector3[] playerPositions = new Vector3[4];
+
         private void Start()
         {
+            Debug.Log("Default GM Start");
+
             networkController = FindObjectOfType<NetworkGameRoomController>();
 
             if(networkController == null && PhotonNetwork.IsConnected)
@@ -82,11 +97,32 @@ namespace FiestaTime
                 Debug.LogError("CRITICAL: No Network Controller found in scene.");
             }
 
-            playerCount = PhotonNetwork.PlayerList.Length;
             playerResults = new PlayerResults<T>[playerCount];
+
+            if (PhotonNetwork.IsMasterClient || !PhotonNetwork.IsConnected)
+            {
+                CustomProps = new ExitGames.Client.Photon.Hashtable();
+                _startTime = PhotonNetwork.Time;
+                _startCountdown = true;
+                CustomProps.Add("StartTime", _startTime);
+                PhotonNetwork.CurrentRoom.SetCustomProperties(CustomProps);
+            }
+            else
+            {
+                StartCoroutine("WaitForPropertiesCo");
+            }
 
             InStart();
             StartCoroutine("AllPlayersReady");
+        }
+
+        public override void Init()
+        {
+            base.Init();
+
+            Debug.Log("Default GM Awake");
+            playerCount = PhotonNetwork.PlayerList.Length;
+            PlayersConnectedAndReady = false;
         }
 
         /// <summary>
@@ -95,7 +131,9 @@ namespace FiestaTime
         /// <returns></returns>
         private IEnumerator AllPlayersReady()
         {
-            yield return new WaitUntil(() => networkController.playersAreReady);
+            yield return new WaitUntil(() => networkController.playersAreReady || !PhotonNetwork.IsConnected);
+
+            PlayersConnectedAndReady = true;
 
             InitializeGameManagerDependantObjects();
         }
@@ -121,6 +159,22 @@ namespace FiestaTime
         /// This method will run after every player has connected.
         /// </summary>
         protected abstract void InitializeGameManagerDependantObjects();
+
+        private IEnumerator WaitForPropertiesCo()
+        {
+            yield return new WaitUntil(() => _receivedProperties);
+
+            _startTime = double.Parse(CustomProps["StartTime"].ToString());
+            _startCountdown = true;
+        }
+
+        public override void OnRoomPropertiesUpdate(ExitGames.Client.Photon.Hashtable propertiesThatChanged)
+        {
+            Debug.Log("FiestaTime/GameManager: Custom Properties changed.");
+            base.OnRoomPropertiesUpdate(propertiesThatChanged);
+            _receivedProperties = true;
+            CustomProps = propertiesThatChanged;
+        }
     }
 }
 
