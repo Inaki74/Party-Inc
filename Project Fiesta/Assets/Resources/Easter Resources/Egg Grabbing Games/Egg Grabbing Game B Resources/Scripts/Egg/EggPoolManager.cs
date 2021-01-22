@@ -38,19 +38,19 @@ namespace FiestaTime
                 switch (type)
                 {
                     case 0:
-                        GameObject newEasterEgg = PhotonNetwork.Instantiate(easterEggPrefab.name, new Vector3(0, 13f, 0), Quaternion.identity);
+                        GameObject newEasterEgg = Instantiate(easterEggPrefab, new Vector3(0, 13f, 0), Quaternion.identity);
                         newEasterEgg.transform.parent = eggHolder.transform;
                         newEasterEgg.SetActive(false);
                         easterEggs.Add(newEasterEgg);
                         break;
                     case 1:
-                        GameObject newRottenEgg = PhotonNetwork.Instantiate(rottenEggPrefab.name, new Vector3(0, 13f, 0), Quaternion.identity);
+                        GameObject newRottenEgg = Instantiate(rottenEggPrefab, new Vector3(0, 13f, 0), Quaternion.identity);
                         newRottenEgg.transform.parent = eggHolder.transform;
                         newRottenEgg.SetActive(false);
                         rottenEggs.Add(newRottenEgg);
                         break;
                     case 2:
-                        GameObject newGoldenEgg = PhotonNetwork.Instantiate(goldenEggPrefab.name, new Vector3(0, 13f, 0), Quaternion.identity);
+                        GameObject newGoldenEgg = Instantiate(goldenEggPrefab, new Vector3(0, 13f, 0), Quaternion.identity);
                         newGoldenEgg.transform.parent = eggHolder.transform;
                         newGoldenEgg.SetActive(false);
                         goldenEggs.Add(newGoldenEgg);

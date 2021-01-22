@@ -18,12 +18,15 @@ namespace FiestaTime
             public static int spawnerId;
 
             #region Configurations & Info
-            // The intervals between waves.
+
+            [Header("Spawner Game Settings")]
+            // The waiting time between waves.
             [SerializeField] private float waveIntervals;
+            // The waiting time between maps.
+            [SerializeField] private float timeLimitOffset;
+
             // The wave routines that each spawner must respect.
             [SerializeField] private int[,] eggMap;
-            // The waiting time between waves.
-            [SerializeField] private float timeLimitOffset;
             // Counter of the current wave we are on.
             private int currentWave;
             // The total time of spawning of the eggMap.
@@ -35,15 +38,12 @@ namespace FiestaTime
             #endregion
 
             #region Spawners
-            // Spawners GO
-            private GameObject leftSpawnerGO;
-            private GameObject middleSpawnerGO;
-            private GameObject rightSpawnerGO;
+            [SerializeField] private GameObject playerOneSpawnersGO;
+            [SerializeField] private GameObject playerTwoSpawnersGO;
+            [SerializeField] private GameObject playerThreeSpawnersGO;
+            [SerializeField] private GameObject playerFourSpawnersGO;
 
-            // Spawners
-            private EggSpawner leftSpawner;
-            private EggSpawner middleSpawner;
-            private EggSpawner rightSpawner;
+            private List<EggSpawner> eggSpawners = new List<EggSpawner>();
             #endregion
 
             #region Private Auxiliary Variables
@@ -55,39 +55,23 @@ namespace FiestaTime
             private bool runOnce = true;
             #endregion
 
+            
+
             #region Unity Callbacks
             private void Start()
             {
-                if (leftSpawnerGO != null) { leftSpawnerGO.transform.position = middleSpawnerPosition + Vector3.left * 1.5f; }
-                else leftSpawnerGO = InstantiateSpawner(middleSpawnerPosition + Vector3.left * 1.5f);
+                DecideSpawnerPositions();
 
-                if (middleSpawnerGO != null) { middleSpawnerGO.transform.position = middleSpawnerPosition; }
-                else middleSpawnerGO = InstantiateSpawner(middleSpawnerPosition);
+                SetUpSpawners();
 
-                if (rightSpawnerGO != null) { rightSpawnerGO.transform.position = middleSpawnerPosition + Vector3.right * 1.5f; }
-                else rightSpawnerGO = InstantiateSpawner(middleSpawnerPosition + Vector3.right * 1.5f);
-
-                leftSpawner = leftSpawnerGO.GetComponent<EggSpawner>();
-                middleSpawner = middleSpawnerGO.GetComponent<EggSpawner>();
-                rightSpawner = rightSpawnerGO.GetComponent<EggSpawner>();
-
-                currentWave = 0;
+                currentWave = -1;
                 startTime = Time.time;
-
-                if (FindObjectOfType<GameManager>() == null)
-                {
-                    editorMode = true;
-                }
-                else
-                {
-                    SwapEggMap(0);
-                }
-
-                UpdateAllSpawners(eggMap);
             }
 
             private void Update()
             {
+                if (!GameManager.Current.GameBegan) return;
+
                 currentTime = Time.time;
 
                 if (!editorMode)
@@ -130,22 +114,98 @@ namespace FiestaTime
             #endregion
 
             /// <summary>
-            /// Instantiates the spawners in their appropiate places.
+            /// Decide where to spawn the spawners.
             /// </summary>
-            /// <param name="set">Position to be set</param>
-            /// <returns>The spawner.</returns>
-            private GameObject InstantiateSpawner(Vector3 set)
+            private void DecideSpawnerPositions()
             {
-                set.Set(set.x, 12f, set.z);
+                switch (GameManager.Current.playerCount)
+                {
+                    case 1:
+                        playerOneSpawnersGO.transform.position = new Vector3(0f, 12f, 0f);
+                        playerTwoSpawnersGO.SetActive(false);
+                        playerThreeSpawnersGO.SetActive(false);
+                        playerFourSpawnersGO.SetActive(false);
+                        break;
+                    case 2:
+                        playerOneSpawnersGO.transform.position = new Vector3(-4f, 12f, 0f);
+                        playerTwoSpawnersGO.transform.position = new Vector3(4f, 12f, 0f);
+                        playerThreeSpawnersGO.SetActive(false);
+                        playerFourSpawnersGO.SetActive(false);
+                        break;
+                    case 3:
+                        playerOneSpawnersGO.transform.position = new Vector3(-5f, 12f, 0f);
+                        playerTwoSpawnersGO.transform.position = new Vector3(0f, 12f, 0f);
+                        playerThreeSpawnersGO.transform.position = new Vector3(5f, 12f, 0f);
+                        playerFourSpawnersGO.SetActive(false);
+                        break;
+                    case 4:
+                        playerOneSpawnersGO.transform.position = new Vector3(-6f, 12f, 0f);
+                        playerTwoSpawnersGO.transform.position = new Vector3(-2f, 12f, 0f);
+                        playerThreeSpawnersGO.transform.position = new Vector3(2f, 12f, 0f);
+                        playerFourSpawnersGO.transform.position = new Vector3(6f, 12f, 0f);
+                        break;
+                    default:
+                        break;
+                }
+            }
 
-                Debug.Log("Spawner in play");
+            /// <summary>
+            /// Spawns spawners in their places, saves the Spawners and load their positions.
+            /// </summary>
+            private void SetUpSpawners()
+            {
+                List<Transform> spawnerPositions = new List<Transform>();
 
-                GameObject aux = Instantiate(spawnerPrefab);
+                LoadPositions(spawnerPositions, playerOneSpawnersGO);
 
-                aux.GetComponent<EggSpawner>().SetIntervals(waveIntervals);
-                aux.transform.position = set;
+                if (playerTwoSpawnersGO.activeInHierarchy)
+                {
+                    LoadPositions(spawnerPositions, playerTwoSpawnersGO);
+                }
 
-                return aux;
+                if (playerThreeSpawnersGO.activeInHierarchy)
+                {
+                    LoadPositions(spawnerPositions, playerThreeSpawnersGO);
+                }
+
+                if (playerFourSpawnersGO.activeInHierarchy)
+                {
+                    LoadPositions(spawnerPositions, playerFourSpawnersGO);
+                }
+
+                int c = 0;
+                int p = 0;
+                foreach (Transform go in spawnerPositions)
+                {
+                    GameObject spGo = Instantiate(spawnerPrefab);
+                    EggSpawner sp = spGo.GetComponent<EggSpawner>();
+                    sp.SetIntervals(waveIntervals);
+                    // THis is to make that eggs spawning from certain spawners appear as "theirs"
+                    if (p % GameManager.Current.playerCount == PhotonNetwork.LocalPlayer.ActorNumber - 1)
+                    {
+                        sp.IsMine = true;
+                    }
+                    eggSpawners.Add(sp);
+                    spGo.transform.SetParent(go);
+                    spGo.transform.position = go.position;
+
+                    c++;
+
+                    if (c % 3 == 0) p++;
+                }
+            }
+
+            /// <summary>
+            /// Loads spawner position transforms to a list of transforms.
+            /// </summary>
+            /// <param name="spawnerPositions"></param>
+            /// <param name="spawnerGO"></param>
+            private void LoadPositions(List<Transform> spawnerPositions, GameObject spawnerGO)
+            {
+                foreach (Transform t in spawnerGO.transform)
+                {
+                    spawnerPositions.Add(t);
+                }
             }
 
             /// <summary>
@@ -156,13 +216,37 @@ namespace FiestaTime
                 spawner.SetRoutine(newRoutine);
             }
 
+            /// <summary>
+            /// Updates all spawners spawning routines.
+            /// </summary>
+            /// <param name="map"></param>
             private void UpdateAllSpawners(int[,] map)
             {
                 // Need to serialize map
+                List<int> eggColOne = GetColumnOfMatrix(0, map);
+                List<int> eggColTwo = GetColumnOfMatrix(1, map);
+                List<int> eggColThree = GetColumnOfMatrix(2, map);
 
-                UpdateRoutines(leftSpawner, GetColumnOfMatrix(0, map));
-                UpdateRoutines(middleSpawner, GetColumnOfMatrix(1, map));
-                UpdateRoutines(rightSpawner, GetColumnOfMatrix(2, map));
+                // Load all Spawners
+                int c = 0;
+                foreach(EggSpawner s in eggSpawners)
+                {
+                    Debug.Log("Setting routines: " + c);
+                    if(c % 3 == 0)
+                    {
+                        UpdateRoutines(s, eggColOne);
+                    }
+                    if (c % 3 == 1)
+                    {
+                        UpdateRoutines(s, eggColTwo);
+                    }
+                    if (c % 3 == 2)
+                    {
+                        UpdateRoutines(s, eggColThree);
+                    }
+
+                    c++;
+                }
             }
 
             private void SwapEggMap(int round)
@@ -194,18 +278,6 @@ namespace FiestaTime
                 }
 
                 return aux;
-            }
-
-            /// <summary>
-            /// Sets some personalized settings such as the interval in which eggs spawn and the offset between waves.
-            /// </summary>
-            /// <param name="intervals"></param>
-            /// <param name="offset"></param>
-            public void SetSettings(float intervals, float offset, Vector3 spawnerPosition)
-            {
-                waveIntervals = intervals;
-                timeLimitOffset = offset;
-                middleSpawnerPosition = spawnerPosition;
             }
         }
     }

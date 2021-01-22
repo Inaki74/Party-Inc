@@ -36,12 +36,6 @@ namespace FiestaTime
             public int amountOfHardMaps = 2;
             #endregion
 
-            #region Spawner Settings
-            [Header("Spawner Game Settings")]
-            public float waveIntervals;
-            public float timeLimitOffset;
-            #endregion
-
             [SerializeField] public int[][,] eggMaps;
             private bool runOnce = false;
             private int startingEggCount = 0;
@@ -87,7 +81,6 @@ namespace FiestaTime
                     if (_startTime != 0 && (float)(PhotonNetwork.Time - _startTime) >= gameStartCountdown)
                     {
                         GameBegan = true;
-                        InstantiateSpawnerManagers();
                     }
                 }
                 else if (_startCountdown && !GameBegan)
@@ -124,19 +117,19 @@ namespace FiestaTime
                         playerPositions[0] = Vector3.zero;
                         break;
                     case 2:
-                        playerPositions[0] = new Vector3(4f, 0f, 0f);
-                        playerPositions[1] = new Vector3(-4f, 0f, 0f);
+                        playerPositions[0] = new Vector3(-4f, 0f, 0f);
+                        playerPositions[1] = new Vector3(4f, 0f, 0f);
                         break;
                     case 3:
-                        playerPositions[0] = new Vector3(5f, 0f, 0f);
+                        playerPositions[0] = new Vector3(-5f, 0f, 0f);
                         playerPositions[1] = new Vector3(0f, 0f, 0f);
-                        playerPositions[2] = new Vector3(-5f, 0f, 0f);
+                        playerPositions[2] = new Vector3(5f, 0f, 0f);
                         break;
                     case 4:
-                        playerPositions[0] = new Vector3(6f, 0f, 0f);
-                        playerPositions[1] = new Vector3(2f, 0f, 0f);
-                        playerPositions[2] = new Vector3(-2f, 0f, 0f);
-                        playerPositions[3] = new Vector3(-6f, 0f, 0f);
+                        playerPositions[0] = new Vector3(-6f, 0f, 0f);
+                        playerPositions[1] = new Vector3(-2f, 0f, 0f);
+                        playerPositions[2] = new Vector3(2f, 0f, 0f);
+                        playerPositions[3] = new Vector3(6f, 0f, 0f);
                         break;
                     default:
                         break;
@@ -162,23 +155,6 @@ namespace FiestaTime
 
                 PhotonNetwork.Instantiate(playerAssetsPrefab.name, decidedVector, Quaternion.identity);
                 PhotonNetwork.Instantiate(playerPrefab.name, decidedVector + new Vector3(0f, 0.7f, 0f), Quaternion.identity);
-            }
-
-            private void InstantiateSpawnerManagers()
-            {
-                var GO = Instantiate(spawnerManagerPrefab);
-
-                Vector3 decidedVector = Vector3.zero;
-
-                for (int i = 0; i < playerCount; i++)
-                {
-                    if (PhotonNetwork.PlayerList[i].ActorNumber == PhotonNetwork.LocalPlayer.ActorNumber)
-                    {
-                        decidedVector = playerPositions[i];
-                    }
-                }
-
-                GO.GetComponent<EggSpawnerManager>().SetSettings(waveIntervals, timeLimitOffset, decidedVector);
             }
 
             private void FinishGame()
@@ -359,6 +335,9 @@ namespace FiestaTime
                 return totalCount;
             }
 
+            /// <summary>
+            ///  Serializes and sends the newly generated egg-map through the net.
+            /// </summary>
             private void NotifyPlayersMaps()
             {
                 int[][][] ret = new int[amountOfEasyMaps + amountOfMediumMaps + amountOfHardMaps][][];
