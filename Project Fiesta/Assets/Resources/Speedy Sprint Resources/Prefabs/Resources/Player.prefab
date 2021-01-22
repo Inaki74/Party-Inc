@@ -101,7 +101,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 256
   _distanceGround: 1.25
-  _duckDuration: 0.3
+  _duckDuration: 0.4
   _duckCooldown: 0.2
   _droppingForce: 20
   _laneSwitchSpeed: 25
