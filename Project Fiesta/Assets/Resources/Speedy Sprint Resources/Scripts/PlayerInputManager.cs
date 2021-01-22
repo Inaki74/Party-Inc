@@ -11,6 +11,8 @@ namespace FiestaTime
         {
             [SerializeField] private float _inputAcceptanceLength;
 
+            private static float _angleBounds = 45f; // The angle in which we want to accept jump/duck instead of move
+
             public bool JumpInput { get; private set; }
             public bool JumpInputPressed { get; private set; }
             public bool DuckInput { get; private set; }
@@ -70,18 +72,26 @@ namespace FiestaTime
 
                         if (JumpInput)
                         {
+                            //Debug.Log("JUMP");
                             currentInputs.Enqueue("Jump");
                         }
                         if (MoveInput)
                         {
                             if(MoveDirection == 1)
                             {
+                                //Debug.Log("RIGHT");
                                 currentInputs.Enqueue("MoveRight");
                             }
                             else
                             {
+                                //Debug.Log("LEFT");
                                 currentInputs.Enqueue("MoveLeft");
                             }
+                        }
+
+                        if (DuckInput)
+                        {
+                            //Debug.Log("DUCK");
                         }
                     }
 
@@ -92,19 +102,48 @@ namespace FiestaTime
             private void DetermineInput(Vector3 start, Vector3 end)
             {
                 Vector3 directionVector = end - start;
-                float ratio = directionVector.x / directionVector.y;
+                float ratio = directionVector.y / directionVector.x;
+                float ratioBounds = Mathf.Sin(_angleBounds * Mathf.Deg2Rad) / Mathf.Cos(_angleBounds * Mathf.Deg2Rad);
 
+                //Debug.Log("r = " + ratioBounds + ", f = " + ratio + " from v = " + directionVector);
+
+                // See f = 0 and f = infinity cases
+                if(directionVector.x == 0f && directionVector.y > 0f)
+                {
+                    JumpInput = true;
+                    return;
+                }
+
+                if(directionVector.x == 0f && directionVector.y < 0f) {
+                    DuckInput = true;
+                    return;
+                }
+
+                if(directionVector.y == 0f && directionVector.x > 0f)
+                {
+                    MoveInput = true;
+                    MoveDirection = 1;
+                    return;
+                }
+
+                if(directionVector.y == 0f && directionVector.x < 0f)
+                {
+                    MoveInput = true;
+                    MoveDirection = -1;
+                    return;
+                }
+
+                // See for other cases
                 if (directionVector.x > 0f)
                 {
                     if(directionVector.y > 0f)
                     {
-                        if (ratio <= 0.577f)
+                        if(ratio > ratioBounds)
                         {
                             JumpInput = true;
                             return;
                         }
-
-                        if (ratio > 0.577f)
+                        else
                         {
                             MoveInput = true;
                             MoveDirection = 1;
@@ -113,16 +152,15 @@ namespace FiestaTime
                     }
                     else
                     {
-                        if (ratio <= -0.557f)
+                        if(ratio < -ratioBounds)
+                        {
+                            DuckInput = true;
+                            return;
+                        }
+                        else
                         {
                             MoveInput = true;
                             MoveDirection = 1;
-                            return;
-                        }
-
-                        if (ratio > -0.557f)
-                        {
-                            DuckInput = true;
                             return;
                         }
                     }
@@ -131,31 +169,31 @@ namespace FiestaTime
                 {
                     if(directionVector.y > 0f)
                     {
-                        if (ratio > -0.577f)
+                        if(ratio < -ratioBounds)
                         {
                             JumpInput = true;
                             return;
                         }
-
-                        if (ratio <= -0.577f)
+                        else
                         {
                             MoveInput = true;
                             MoveDirection = -1;
                             return;
                         }
+                        
                     }
                     else
                     {
-                        if (ratio >= 0.557f)
+                        if (ratio > ratioBounds)
+                        {
+                            DuckInput = true;
+                            return;
+
+                        }
+                        else
                         {
                             MoveInput = true;
                             MoveDirection = -1;
-                            return;
-                        }
-
-                        if (ratio < 0.557f)
-                        {
-                            DuckInput = true;
                             return;
                         }
                     }

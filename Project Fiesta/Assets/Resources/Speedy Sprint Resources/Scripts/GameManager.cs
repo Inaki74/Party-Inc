@@ -10,7 +10,6 @@ namespace FiestaTime
     {
         public class GameManager : FiestaGameManager<GameManager, float>
         {
-            [SerializeField] private bool _testMovingSpeed;
             // Moving Speed in all components
             [SerializeField] private float _movingSpeed;
             public float MovingSpeed {
@@ -44,8 +43,9 @@ namespace FiestaTime
             // Ration between MovingSpeed and Gravity
             private float _gravityMovingRatio = 0.46666666666f;
 
-            // Value so that Moving Speed is 7 when time = 0
-            private float _logValue = 8.02255787562f;
+            // Value so that Moving Speed is 10 when time = 0
+            private float _logValue = 10.2677451405f;
+            //8.02255787562f
 
             private int _nextToInsert = 0;
             private int _playersAlive;
@@ -69,7 +69,6 @@ namespace FiestaTime
                 GameBegan = false;
                 _startCountdown = false;
                 _gravity = -15;
-                MovingSpeed = 0f;
                 InGameTime = 0f;
                 
                 if (!PhotonNetwork.IsConnectedAndReady) _realGameStartCountdown = gameStartCountdown; _startCountdown = true;
@@ -93,7 +92,8 @@ namespace FiestaTime
                 if (GameBegan)
                 {
                     // Increase the moving speed per design decisions.
-                    if(!_testMovingSpeed) MovingSpeed = 6.6f * Mathf.Log(0.6f * (InGameTime + _logValue));
+                    if(!Testing) MovingSpeed = 5.5f * Mathf.Log(0.6f * (InGameTime + _logValue));
+                    else MovingSpeed = _testMovingSpeed;
 
                     // Gravity must be increased with moving speed to maintain the jump lengths.
                     Gravity = -1 * (MovingSpeed / _gravityMovingRatio);
@@ -259,6 +259,16 @@ namespace FiestaTime
             public void RPC_SendBegin(double startT)
             {
                 _gameBeginTime = startT;
+            }
+
+            // TESTING
+            public bool Testing;
+
+            [SerializeField] private float _testMovingSpeed;
+
+            public void TestSetMoveSpeed(float m)
+            {
+                _testMovingSpeed = m;
             }
 
         }

@@ -21,10 +21,7 @@ namespace FiestaTime
 
             private void Update()
             {
-                if (Application.isEditor)
-                {
-                    PositionTiles();
-                }
+                PositionTiles();
 
                 if(_terribleWorkaroundTime < 0)
                 {

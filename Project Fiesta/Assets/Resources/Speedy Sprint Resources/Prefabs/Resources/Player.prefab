@@ -101,7 +101,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 256
   _distanceGround: 1.25
-  _duckDuration: 0.5
+  _duckDuration: 0.3
   _duckCooldown: 0.2
   _droppingForce: 20
   _laneSwitchSpeed: 25
@@ -118,7 +118,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bbad8ee8d7a1c46e3aeb5df6550aec7a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _inputAcceptanceLength: 30
+  _inputAcceptanceLength: 25
 --- !u!114 &2323844867759036271
 MonoBehaviour:
   m_ObjectHideFlags: 0

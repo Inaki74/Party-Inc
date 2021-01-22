@@ -6852,18 +6852,28 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3037030653792018969, guid: 4fca39f08254745c386e625032491cd8,
         type: 3}
+      propertyPath: _nextSection.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3037030653792018969, guid: 4fca39f08254745c386e625032491cd8,
+        type: 3}
+      propertyPath: _lastSection.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3037030653792018969, guid: 4fca39f08254745c386e625032491cd8,
+        type: 3}
       propertyPath: _syncTest
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3037030653792018969, guid: 4fca39f08254745c386e625032491cd8,
         type: 3}
       propertyPath: _subSectionTest
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3037030653792018969, guid: 4fca39f08254745c386e625032491cd8,
         type: 3}
       propertyPath: _subSectionToTest
-      value: E3
+      value: E1
       objectReference: {fileID: 0}
     - target: {fileID: 3037030653792018971, guid: 4fca39f08254745c386e625032491cd8,
         type: 3}
@@ -12184,6 +12194,21 @@ PrefabInstance:
         type: 3}
       propertyPath: _gravity
       value: -9.8
+      objectReference: {fileID: 0}
+    - target: {fileID: 8950952732929816901, guid: e5204e2d5ba8a4bc9a77a59451c7d2aa,
+        type: 3}
+      propertyPath: _testMovingSpeed
+      value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 8950952732929816901, guid: e5204e2d5ba8a4bc9a77a59451c7d2aa,
+        type: 3}
+      propertyPath: _movingSpeed
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8950952732929816901, guid: e5204e2d5ba8a4bc9a77a59451c7d2aa,
+        type: 3}
+      propertyPath: _testingMovingSpeed
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e5204e2d5ba8a4bc9a77a59451c7d2aa, type: 3}
