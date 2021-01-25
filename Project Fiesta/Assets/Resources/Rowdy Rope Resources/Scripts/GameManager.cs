@@ -22,7 +22,7 @@ namespace FiestaTime
             #region Checkpoint Variables
 
             private int movesForSpeedIncrease = 4;
-            private float speedIncreasePerMoves = 0.5f;
+            private float speedIncreasePerMoves = 0.45f;
             private int thresholdInverseE = 10;
             private int thresholdInverseM = 25;
             private int thresholdInverseH = 50;
@@ -52,8 +52,8 @@ namespace FiestaTime
             private int inferiorBoundRandomInverse = 5;
             private int randomInverse = 0;
 
-            private float inferiorBoundAngleNormPos = 270f; // 270 easy
-            private float superiorBoundAngleNormPos = 20f; //20 easy
+            private float inferiorBoundAngleNormPos = 260f; // 260 easy
+            private float superiorBoundAngleNormPos = 355f; //355 easy
             private float inferiorBoundAngleNormNeg = 160f;// 160 easy
             private float superiorBoundAngleNormNeg = 270f; // 270 easy
 
@@ -139,6 +139,11 @@ namespace FiestaTime
                     {
                         gameStartCountdown -= Time.deltaTime;
                     }
+                }
+
+                if (GameBegan)
+                {
+                    InGameTime += Time.deltaTime;
                 }
 
                 //Here go difficulty factors
@@ -270,7 +275,17 @@ namespace FiestaTime
                         }
                     }
 
-                    Debug.Log("Inverting at: " + whereToInverse * Mathf.Deg2Rad + " radians");
+                    string difficulty = "EASY";
+                    if(currentJump >= 25 && currentJump < 50)
+                    {
+                        difficulty = "MEDIUM";
+                    }
+                    else if(currentJump >= 50)
+                    {
+                        difficulty = "HARD";
+                    }
+
+                    Debug.Log("DOING " + difficulty + " INVERSION AT: " + whereToInverse + " DEGREES");
                     // Inverse
                     rope.InvertRope(whereToInverse * Mathf.Deg2Rad);
                 }
@@ -299,25 +314,25 @@ namespace FiestaTime
                         {
                             //Increase
                             decreaseBurstPossibility += 0.1f;
-                            howMuchBurst = 3f;
+                            howMuchBurst = 2f;
                         }
                         else
                         {
                             //Decrease
                             decreaseBurstPossibility -= 0.1f;
-                            howMuchBurst = -3f;
+                            howMuchBurst = -2f;
                         }
                     }else if (rope.rotationSpeed < 0f)
                     {
                         if (a > decreaseBurstPossibility)
                         {
                             decreaseBurstPossibility += 0.1f;
-                            howMuchBurst = 3f;
+                            howMuchBurst = 2f;
                         }
                         else
                         {
                             decreaseBurstPossibility -= 0.1f;
-                            howMuchBurst = -3f;
+                            howMuchBurst = -2f;
                         }
                     }
 
@@ -425,6 +440,8 @@ namespace FiestaTime
             private void OnRoundCompleted()
             {
                 currentJump += 1;
+
+                Debug.Log("CURRENT JUMP: " + currentJump + ", CURRENT SPEED: " + rope.rotationSpeed + ", AT TIME: " + InGameTime);
 
                 CheckCheckpoints();
             }
