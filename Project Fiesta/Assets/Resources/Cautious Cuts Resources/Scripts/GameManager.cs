@@ -72,22 +72,22 @@ namespace FiestaTime
                 switch (playerCount)
                 {
                     case 1:
-                        playerPositions[0] = new Vector3(0f, 0f, 0f);
+                        playerPositions[0] = new Vector3(0f, 1.2f, 0f);
                         break;
                     case 2:
-                        playerPositions[0] = new Vector3(0f, 0f, 0f);
-                        playerPositions[1] = new Vector3(0f, 0f, 0f);
+                        playerPositions[0] = new Vector3(4f, 1.2f, 0f);
+                        playerPositions[1] = new Vector3(-4f, 1.2f, 0f);
                         break;
                     case 3:
-                        playerPositions[0] = new Vector3(0f, 0f, 0f);
-                        playerPositions[1] = new Vector3(0f, 0f, 0f);
-                        playerPositions[2] = new Vector3(0f, 0f, 0f);
+                        playerPositions[0] = new Vector3(4f, 1.2f, 0f);
+                        playerPositions[1] = new Vector3(0f, 1.2f, 0f);
+                        playerPositions[2] = new Vector3(-4f, 1.2f, 0f);
                         break;
                     case 4:
-                        playerPositions[0] = new Vector3(0f, 0f, 0f);
-                        playerPositions[1] = new Vector3(0f, 0f, 0f);
-                        playerPositions[2] = new Vector3(0f, 0f, 0f);
-                        playerPositions[3] = new Vector3(0f, 0f, 0f);
+                        playerPositions[0] = new Vector3(6f, 1.2f, 0f);
+                        playerPositions[1] = new Vector3(2f, 1.2f, 0f);
+                        playerPositions[2] = new Vector3(-2f, 1.2f, 0f);
+                        playerPositions[3] = new Vector3(-6f, 1.2f, 0f);
                         break;
                     default:
                         break;

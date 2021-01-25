@@ -33,7 +33,10 @@ namespace FiestaTime
             // Start is called before the first frame update
             void Start()
             {
-
+                GenerateLog();
+                GenerateLog();
+                GenerateLog();
+                GenerateLog();
             }
 
             /// <summary>

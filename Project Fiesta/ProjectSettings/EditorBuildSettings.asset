@@ -50,4 +50,10 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/SpeedySprint.unity
     guid: 95737879909544ddf96374ba2a72617d
+  - enabled: 1
+    path: Assets/Scenes/CC_GameLobby.unity
+    guid: ea2817233e68a4830bf6f2e3723f40b1
+  - enabled: 1
+    path: Assets/Scenes/CautiousCuts.unity
+    guid: 5d47b545da891465aab4db5b7244e15a
   m_configObjects: {}
