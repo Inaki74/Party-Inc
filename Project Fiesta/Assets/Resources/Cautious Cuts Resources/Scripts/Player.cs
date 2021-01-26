@@ -1,11 +1,20 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 
 namespace FiestaTime
 {
     namespace CC
     {
+
+        public struct RayhitLogInfo
+        {
+            public Vector3 logVelocity;
+            public RaycastHit rayHit;
+            public Transform logTransform;
+        }
+
         /// <summary>
         /// This is the 'cutting' of the cutting system.
         /// </summary>
@@ -18,8 +27,16 @@ namespace FiestaTime
 
             [SerializeField] LayerMask _whatIsLog;
 
+            private bool _cutThisRound;
+
+            private bool _firstHit;
+            private List<RayhitLogInfo> _logHits = new List<RayhitLogInfo>();
+            [SerializeField] public float watchCount;
+
             private int _vertexCount;
             private int _maxVertexCount = 7;
+
+            private bool _runOnce = false;
 
             // Start is called before the first frame update
             void Start()
@@ -31,14 +48,18 @@ namespace FiestaTime
 
                 _lr.startColor = _c1;
                 _lr.endColor = _c2;
-                _lr.startWidth = 0.3f;
-                _lr.endWidth = 0f;
+                _lr.startWidth = 0f;
+                _lr.endWidth = 0.3f;
                 _lr.positionCount = 0;
+
+                _cutThisRound = true;
             }
 
             // Update is called once per frame
             void Update()
             {
+                watchCount = _logHits.Count;
+
                 if (Application.isMobilePlatform)
                 {
                     TakeInputMobile();
@@ -46,6 +67,12 @@ namespace FiestaTime
                 else
                 {
 
+                }
+
+                if (!_cutThisRound && _logHits.Count != 0)
+                {
+                    // We got our cut this round
+                    ProcessCut();
                 }
             }
 
@@ -55,32 +82,11 @@ namespace FiestaTime
                 {
                     Touch t = Input.touches[0];
 
-                    if(t.phase == TouchPhase.Moved)
+                    RenderLine(t);
+
+                    if (_cutThisRound)
                     {
-                        RenderLine(t);
-                    }
-
-                    int posCount = _lr.positionCount;
-                    Vector3[] lrPositions = new Vector3[posCount];
-                    _lr.GetPositions(lrPositions);
-
-                    for(int i = 1; i < posCount; i++)
-                    {
-                        Vector3 pos = lrPositions[i];
-                        Vector3 lastPos = lrPositions[i - 1];
-                        float dist = Vector3.Distance(pos, lastPos);
-                        Vector3 direction = pos - lastPos;
-
-                        for(int j = 0; j < 30; j++)
-                        {
-                            float ratio = dist / 30;
-                            Vector3 newPos = lastPos + direction * ratio * j;
-                            RaycastHit hit;
-                            if (CheckForLog(Camera.main.WorldToScreenPoint(newPos), out hit))
-                            {
-                                Debug.Log("HIT LOG");
-                            }
-                        }
+                        GetCutsThisRound();
                     }
 
                     if (t.phase == TouchPhase.Ended)
@@ -88,6 +94,126 @@ namespace FiestaTime
                         ResetLine();
                     }
                 }
+            }
+
+            private void ProcessCut()
+            {
+                int i = 0;
+                Vector3 vAverage = Vector3.zero;
+                float hAverage = 0f;
+                Vector3 zero = _logHits.First().rayHit.point + _logHits.First().logVelocity * Time.fixedDeltaTime;
+
+                // For debugging
+                RayhitLogInfo start = _logHits.First();
+                RayhitLogInfo finish = _logHits.Last();
+                start.logTransform.gameObject.GetComponent<FallingLog>()._start.transform.position = start.rayHit.point;
+                finish.logTransform.gameObject.GetComponent<FallingLog>()._finish.transform.position = finish.rayHit.point;
+                //
+
+                foreach (RayhitLogInfo a in _logHits)
+                {
+                    i++;
+                    Vector3 v = a.logTransform.InverseTransformPoint(a.rayHit.point) + a.logVelocity * Time.fixedDeltaTime;
+                    Vector3 vx = v - a.logTransform.InverseTransformPoint(zero);
+
+                    vAverage += vx;
+                    hAverage += v.y;
+
+                    // Debugging
+                    Debug.Log("HIT POSITION " + i + ": " + vx.x + ", " + vx.y + ", " + vx.z);
+                    //
+                }
+
+                // Debugging
+                Debug.Log("USING A MODEL ON AVERAGES: ");
+                Debug.Log("VECTOR AVERAGES: (" + vAverage.x + ", " + vAverage.y + ", " + vAverage.z + ")");
+                Debug.Log("HEIGHT: " + hAverage/i + " ANGLE: " + Mathf.Atan(vAverage.normalized.y/vAverage.normalized.x) * Mathf.Rad2Deg);
+                //
+
+                _logHits.Clear();
+
+                StartCoroutine(CheckForTimeoutCo(0.5f));
+            }
+
+            private void GetCutsThisRound()
+            {
+                int posCount = _lr.positionCount;
+
+                if (posCount == 1) return;
+
+
+                Vector3[] lrPositions = new Vector3[posCount];
+                _lr.GetPositions(lrPositions);
+
+                for (int i = 1; i < posCount; i++)
+                {
+                    Vector3 pos = lrPositions[i];
+                    Vector3 lastPos = lrPositions[i - 1];
+
+                    // If its the last point
+                    // Make the reverse process (to grab the end of the log)
+                    if(i == posCount - 1)
+                    {
+                        pos = lrPositions[i - 1];
+                        lastPos = lrPositions[i];
+                    }
+
+                    Vector3 newPos = lastPos;
+
+                    int f = 0;
+                    bool isLoop = false;
+                    while (newPos != pos && !isLoop)
+                    {
+                        RaycastHit hit;
+                        if (CheckForLog(Camera.main.WorldToScreenPoint(newPos), out hit))
+                        {
+                            // If its the last point
+                            // and we are at the start of the last point
+                            // then the last point is within the log
+                            if(i == posCount - 1 && newPos == lastPos)
+                            {
+                                pos = lrPositions[i];
+                                lastPos = lrPositions[i - 1];
+
+                                Debug.Log("Its happenen");
+                                //Extend the search
+                                Vector3 dir = lastPos - pos;
+                                Debug.Log(dir * 100);
+                                Debug.Log(newPos);
+                                Debug.Log(lastPos);
+
+                                float distance = 0f;
+                                if(_logHits.Count > 0f) distance = Vector3.Distance(_logHits.First().rayHit.point, lastPos);
+
+                                newPos = lastPos;
+                                pos = lastPos - dir * 30f;
+                                Debug.Log(newPos);
+                            }
+                            MakeRayhitLogInfo(hit);
+                        }
+                        else if (_logHits.Count != 0)
+                        {
+                            _cutThisRound = false;
+                        }
+
+                        newPos = Vector3.MoveTowards(newPos, pos, Time.deltaTime);
+
+                        isLoop = GeneralHelperFunctions.CheckForLoop(f);
+                    }
+                }
+            }
+
+            private IEnumerator CheckForTimeoutCo(float time)
+            {
+                _cutThisRound = false;
+
+                yield return new WaitForSeconds(time); // THis wait will be the spawning of the next log
+
+                _cutThisRound = true;
+
+                //yield return new WaitForSeconds(time);
+
+                
             }
 
             private bool CheckForLog(Vector3 startPosition, out RaycastHit hit)
@@ -104,6 +230,17 @@ namespace FiestaTime
                 }
             }
 
+            private void MakeRayhitLogInfo(RaycastHit hit)
+            {
+                RayhitLogInfo info;
+
+                info.logVelocity = hit.transform.gameObject.GetComponent<Rigidbody>().velocity;
+                info.rayHit = hit;
+                info.logTransform = hit.transform;
+
+                _logHits.Add(info);
+            }
+
             private void RenderLine(Touch t)
             {
                 // Create that sort of 'limited' rendering.
@@ -117,15 +254,21 @@ namespace FiestaTime
                     }
 
                     // Add the position to the end of the vector.
-                    Vector3 tPos = new Vector3(t.position.x, t.position.y, 5);
-                    _lr.SetPosition(_maxVertexCount - 1, Camera.main.ScreenToWorldPoint(tPos));
+                    if (t.phase == TouchPhase.Moved)
+                    {
+                        Vector3 tPos = new Vector3(t.position.x, t.position.y, 5);
+                        _lr.SetPosition(_maxVertexCount - 1, Camera.main.ScreenToWorldPoint(tPos));
+                    }
                 }
                 else
                 {
-                    _lr.positionCount = _vertexCount + 1;
-                    Vector3 tPos = new Vector3(t.position.x, t.position.y, 5);
-                    _lr.SetPosition(_vertexCount, Camera.main.ScreenToWorldPoint(tPos));
-                    _vertexCount++;
+                    if (t.phase == TouchPhase.Moved)
+                    {
+                        _lr.positionCount = _vertexCount + 1;
+                        Vector3 tPos = new Vector3(t.position.x, t.position.y, 5);
+                        _lr.SetPosition(_vertexCount, Camera.main.ScreenToWorldPoint(tPos));
+                        _vertexCount++;
+                    }
                 }
             }
 

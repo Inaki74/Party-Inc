@@ -103,7 +103,7 @@ namespace FiestaTime
             {
                 Vector3 directionVector = end - start;
                 float ratio = directionVector.y / directionVector.x;
-                float ratioBounds = Mathf.Sin(_angleBounds * Mathf.Deg2Rad) / Mathf.Cos(_angleBounds * Mathf.Deg2Rad);
+                float ratioBounds = Mathf.Sin(_angleBounds * Mathf.Deg2Rad) / Mathf.Cos(_angleBounds * Mathf.Deg2Rad); // This is fucking tangent you monke
 
                 //Debug.Log("r = " + ratioBounds + ", f = " + ratio + " from v = " + directionVector);
 

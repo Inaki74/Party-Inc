@@ -109,6 +109,20 @@ namespace FiestaTime
 
             return string.Format("{0:00}", minutes) + ":" + string.Format("{0:00}", seconds) + "." + string.Format("{0:00}", miliseconds);
         }
+
+        public static bool CheckForLoop(int f)
+        {
+            // 3 Conditions
+
+            f++;
+            if (f == 999)
+            {
+                Debug.Log("LOOP");
+                return true;
+            }
+
+            return false;
+        }
     }
 }
 
