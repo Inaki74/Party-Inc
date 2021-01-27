@@ -29,9 +29,8 @@ namespace FiestaTime
 
             private bool _cutThisRound;
 
-            private bool _firstHit;
             private List<RayhitLogInfo> _logHits = new List<RayhitLogInfo>();
-            [SerializeField] public float watchCount;
+            
 
             private int _vertexCount;
             private int _maxVertexCount = 7;
@@ -58,8 +57,6 @@ namespace FiestaTime
             // Update is called once per frame
             void Update()
             {
-                watchCount = _logHits.Count;
-
                 if (Application.isMobilePlatform)
                 {
                     TakeInputMobile();
@@ -101,34 +98,38 @@ namespace FiestaTime
                 int i = 0;
                 Vector3 vAverage = Vector3.zero;
                 float hAverage = 0f;
-                Vector3 zero = _logHits.First().rayHit.point + _logHits.First().logVelocity * Time.fixedDeltaTime;
 
-                // For debugging
                 RayhitLogInfo start = _logHits.First();
-                RayhitLogInfo finish = _logHits.Last();
-                start.logTransform.gameObject.GetComponent<FallingLog>()._start.transform.position = start.rayHit.point;
-                finish.logTransform.gameObject.GetComponent<FallingLog>()._finish.transform.position = finish.rayHit.point;
-                //
+                Vector3 zero = start.logTransform.InverseTransformPoint(start.rayHit.point) + _logHits.First().logVelocity * Time.fixedDeltaTime;
 
+                // Debugging ////////////////////////////////////////////////////////
+                FallingLog theLog = start.logTransform.gameObject.GetComponent<FallingLog>();
+                theLog.CreateEmpty();
+                Debug.Log("START: " + zero.x + ", " + zero.y + ", " + zero.z);
+                //////////////////////////////////////////////////////////////////
                 foreach (RayhitLogInfo a in _logHits)
                 {
                     i++;
                     Vector3 v = a.logTransform.InverseTransformPoint(a.rayHit.point) + a.logVelocity * Time.fixedDeltaTime;
-                    Vector3 vx = v - a.logTransform.InverseTransformPoint(zero);
+                    Vector3 vx = v - zero;
 
                     vAverage += vx;
                     hAverage += v.y;
 
-                    // Debugging
+                    // Debugging  //////////////////////////////////////////////////////////////////
                     Debug.Log("HIT POSITION " + i + ": " + vx.x + ", " + vx.y + ", " + vx.z);
-                    //
+                    theLog.SetHitpoint(a.rayHit.point + a.logVelocity * Time.fixedDeltaTime - a.logTransform.position);
+                    ////////////////////////////////////////////////////////////////////
                 }
 
-                // Debugging
+                float finalHeight = hAverage / i;
+                float finalAngle = Mathf.Atan(vAverage.normalized.y / vAverage.normalized.x) * Mathf.Rad2Deg;
+
+                // Debugging //////////////////////////////////////////////////////////////////
                 Debug.Log("USING A MODEL ON AVERAGES: ");
                 Debug.Log("VECTOR AVERAGES: (" + vAverage.x + ", " + vAverage.y + ", " + vAverage.z + ")");
-                Debug.Log("HEIGHT: " + hAverage/i + " ANGLE: " + Mathf.Atan(vAverage.normalized.y/vAverage.normalized.x) * Mathf.Rad2Deg);
-                //
+                Debug.Log("HEIGHT: " + finalHeight + " ANGLE: " + finalAngle);
+                ////////////////////////////////////////////////////////////////////
 
                 _logHits.Clear();
 
@@ -147,6 +148,7 @@ namespace FiestaTime
 
                 for (int i = 1; i < posCount; i++)
                 {
+                    //bool found = false;
                     Vector3 pos = lrPositions[i];
                     Vector3 lastPos = lrPositions[i - 1];
 
@@ -167,28 +169,6 @@ namespace FiestaTime
                         RaycastHit hit;
                         if (CheckForLog(Camera.main.WorldToScreenPoint(newPos), out hit))
                         {
-                            // If its the last point
-                            // and we are at the start of the last point
-                            // then the last point is within the log
-                            if(i == posCount - 1 && newPos == lastPos)
-                            {
-                                pos = lrPositions[i];
-                                lastPos = lrPositions[i - 1];
-
-                                Debug.Log("Its happenen");
-                                //Extend the search
-                                Vector3 dir = lastPos - pos;
-                                Debug.Log(dir * 100);
-                                Debug.Log(newPos);
-                                Debug.Log(lastPos);
-
-                                float distance = 0f;
-                                if(_logHits.Count > 0f) distance = Vector3.Distance(_logHits.First().rayHit.point, lastPos);
-
-                                newPos = lastPos;
-                                pos = lastPos - dir * 30f;
-                                Debug.Log(newPos);
-                            }
                             MakeRayhitLogInfo(hit);
                         }
                         else if (_logHits.Count != 0)

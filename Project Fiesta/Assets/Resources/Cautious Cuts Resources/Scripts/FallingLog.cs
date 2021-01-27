@@ -9,16 +9,17 @@ namespace FiestaTime
         [RequireComponent(typeof(Rigidbody))]
         public class FallingLog : MonoBehaviour
         {
+            [SerializeField] private GameObject _empty;
+            [SerializeField] private GameObject _hitPoint;
+
             [SerializeField] private Rigidbody _rb;
 
             [SerializeField] private GameObject _mark;
 
-            [SerializeField] public GameObject _start;
-            [SerializeField] public GameObject _finish;
-
             [SerializeField] private float _angle; // Lets make it from -25.00 deg to 25.00 deg
-            [SerializeField] private float _startHeight; // from -0.70 to 0.70
-            [SerializeField] private float _lastHeight;
+            [SerializeField] private float _startHeight; // from -2 to 2
+
+            private GameObject _nextEmpty;
 
             public bool IsMine { get; set; }
             public float LogLength { get; set; }
@@ -31,15 +32,12 @@ namespace FiestaTime
                     _rb = GetComponent<Rigidbody>();
                 }
 
-                LogLength = Vector3.Distance(_start.transform.position, _finish.transform.position);
-
                 SetMark();
             }
 
             // Update is called once per frame
             void Update()
             {
-                LogLength = Vector3.Distance(_start.transform.position, _finish.transform.position);
                 if (transform.position.y < -40f)
                 {
                     transform.SetParent(LogPoolManager.Current.LogHolder);
@@ -48,17 +46,26 @@ namespace FiestaTime
                 }
             }
 
-            private void OnEnable()
-            {
-                LogLength = Vector3.Distance(_start.transform.position, _finish.transform.position);
-            }
-
             private void SetMark()
             {
                 Transform mark = _mark.transform;
 
                 mark.eulerAngles = transform.eulerAngles + new Vector3(0f, 0f, _angle);
                 mark.position = transform.position + new Vector3(0f, _startHeight, 0f);
+            }
+
+            public void CreateEmpty()
+            {
+                GameObject t = Instantiate(_empty, transform.position, Quaternion.identity);
+                t.transform.SetParent(transform);
+                _nextEmpty = t;
+            }
+
+            public void SetHitpoint(Vector3 point)
+            {
+                GameObject p = Instantiate(_hitPoint, transform.position + point, Quaternion.identity);
+                
+                p.transform.SetParent(_nextEmpty.transform);
             }
         }
     }
