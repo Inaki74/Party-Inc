@@ -13,6 +13,7 @@ namespace FiestaTime
             public Vector3 logVelocity;
             public RaycastHit rayHit;
             public Transform logTransform;
+            public Vector3 rayHitCameraPoint;
         }
 
         /// <summary>
@@ -25,7 +26,10 @@ namespace FiestaTime
             [SerializeField] private Color _c1 = Color.yellow;
             [SerializeField] private Color _c2 = Color.red;
 
-            [SerializeField] LayerMask _whatIsLog;
+            [SerializeField] private LayerMask _whatIsLog;
+            [SerializeField] private LayerMask _whatIsCameraPlane;
+
+            [SerializeField] private float _forceOnCut;
 
             private bool _cutThisRound;
 
@@ -121,9 +125,10 @@ namespace FiestaTime
                     theLog.SetHitpoint(a.rayHit.point + a.logVelocity * Time.fixedDeltaTime - a.logTransform.position);
                     ////////////////////////////////////////////////////////////////////
                 }
-
                 float finalHeight = hAverage / i;
                 float finalAngle = Mathf.Atan(vAverage.normalized.y / vAverage.normalized.x) * Mathf.Rad2Deg;
+
+                CutLog(start.logTransform.gameObject);
 
                 // Debugging //////////////////////////////////////////////////////////////////
                 Debug.Log("USING A MODEL ON AVERAGES: ");
@@ -134,6 +139,72 @@ namespace FiestaTime
                 _logHits.Clear();
 
                 StartCoroutine(CheckForTimeoutCo(0.5f));
+            }
+
+            private void CutLog(GameObject log)
+            {
+                // We get the first hitPoint and the last hitPoint
+                float minx = _logHits.Min(info => info.rayHit.point.x);
+                float maxx = _logHits.Max(info => info.rayHit.point.x);
+                RayhitLogInfo minXInfo = _logHits.First(info => info.rayHit.point.x == minx);
+                RayhitLogInfo maxXInfo = _logHits.First(info => info.rayHit.point.x == maxx);
+
+                Vector3 sHPoint = minXInfo.rayHit.point;
+                Vector3 fHPoint = maxXInfo.rayHit.point;
+
+                // The start point is the average of the camera points
+                // The camera points are the points straight from the hit points to the screen plane
+                Vector3 start = (minXInfo.rayHitCameraPoint + maxXInfo.rayHitCameraPoint) /2;
+
+                Vector3 norm;
+                Plane cutter = DefinePlane(
+                    log.transform,
+                    minXInfo.rayHit.point,
+                    maxXInfo.rayHit.point,
+                    start,
+                    out norm
+                );
+
+                GameObject[] slices = Tvtig.Slicer.Slicer.Slice(cutter, log);
+                Destroy(log.gameObject);
+
+                Rigidbody rigidbody = slices[1].GetComponent<Rigidbody>();
+                Vector3 newNormal = norm + Vector3.up * _forceOnCut;
+                rigidbody.AddForce(newNormal, ForceMode.Impulse);
+            }
+
+            private Plane DefinePlane(Transform logT, Vector3 startHp, Vector3 finishHp, Vector3 start, out Vector3 norm)
+            {
+                Plane ret = new Plane();
+
+                // We draw a triangle from the camera and start and finish hitPoints
+                Vector3 sideOne = start - startHp;
+                Vector3 sideTwo = start - finishHp;
+
+                Debug.DrawLine(start, startHp, Color.black, 100f);
+                Debug.DrawLine(start, finishHp, Color.black, 100f);
+
+                Vector3 normal = Vector3.Cross(sideOne, sideTwo).normalized;
+
+                Vector3 tNormal = ((Vector3)(logT.localToWorldMatrix.transpose * normal)).normalized;
+
+                Vector3 tStart = logT.InverseTransformPoint(start);
+
+                GeneralHelperFunctions.DrawPlane(tStart, tNormal);
+
+                ret.SetNormalAndPosition(tNormal, tStart);
+
+                var direction = Vector3.Dot(Vector3.up, tNormal);
+
+                //Flip the plane so that we always know which side the positive mesh is on
+                if (direction < 0)
+                {
+                    ret = ret.flipped;
+                }
+
+                norm = tNormal;
+
+                return ret;
             }
 
             private void GetCutsThisRound()
@@ -167,9 +238,9 @@ namespace FiestaTime
                     while (newPos != pos && !isLoop)
                     {
                         RaycastHit hit;
-                        if (CheckForLog(Camera.main.WorldToScreenPoint(newPos), out hit))
+                        if (CheckForLog(newPos, out hit))
                         {
-                            MakeRayhitLogInfo(hit);
+                            MakeRayhitLogInfo(hit, newPos);
                         }
                         else if (_logHits.Count != 0)
                         {
@@ -198,21 +269,48 @@ namespace FiestaTime
 
             private bool CheckForLog(Vector3 startPosition, out RaycastHit hit)
             {
-                if (Physics.Raycast(Camera.main.ScreenToWorldPoint(startPosition), Camera.main.transform.TransformDirection(Vector3.back), out hit, 100f, _whatIsLog))
+                //Debug.DrawLine(startPosition, Camera.main.transform.TransformPoint(Vector3.back), Color.red, 5f);
+
+                if (Physics.Raycast(startPosition, Camera.main.transform.TransformDirection(Vector3.back), out hit, 100f, _whatIsLog))
                 {
-                    Debug.DrawRay(Camera.main.ScreenToWorldPoint(startPosition), Camera.main.transform.TransformDirection(Vector3.back) * hit.distance, Color.red, 0f);
+                    //Debug.DrawRay(startPosition, Camera.main.transform.TransformDirection(Vector3.back) * hit.distance, Color.red, 0f);
                     return true;
                 }
                 else
                 {
-                    Debug.DrawRay(Camera.main.ScreenToWorldPoint(startPosition), Camera.main.transform.TransformDirection(Vector3.back) * 100f, Color.green, 0f);
+                    //Debug.DrawRay(startPosition, Camera.main.transform.TransformDirection(Vector3.back) * 100f, Color.green, 0f);
                     return false;
                 }
             }
 
-            private void MakeRayhitLogInfo(RaycastHit hit)
+            private bool CheckForPlane(Vector3 startPosition, out RaycastHit hit)
+            {
+                
+                if (Physics.Raycast(startPosition, Camera.main.transform.TransformDirection(Vector3.back), out hit, 100f, _whatIsCameraPlane))
+                {
+                    Debug.DrawRay(startPosition, Camera.main.transform.TransformDirection(Vector3.back) * hit.distance, Color.blue, 0f);
+                    return true;
+                }
+                else
+                {
+                    Debug.DrawRay(startPosition, Camera.main.transform.TransformDirection(Vector3.back) * 100f, Color.green, 0f);
+                    return false;
+                }
+            }
+
+            private void MakeRayhitLogInfo(RaycastHit hit, Vector3 origin)
             {
                 RayhitLogInfo info;
+
+                RaycastHit hat;
+                if(CheckForPlane(origin, out hat))
+                {
+                    info.rayHitCameraPoint = hat.point;
+                }
+                else
+                {
+                    info.rayHitCameraPoint = Vector3.zero;
+                }
 
                 info.logVelocity = hit.transform.gameObject.GetComponent<Rigidbody>().velocity;
                 info.rayHit = hit;

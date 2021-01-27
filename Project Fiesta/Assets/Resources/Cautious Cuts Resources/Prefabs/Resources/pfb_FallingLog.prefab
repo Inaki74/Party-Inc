@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 2193026280036113395}
   - component: {fileID: 5012698578085465848}
   - component: {fileID: 8298266952152741666}
+  - component: {fileID: 5701447072077318391}
   m_Layer: 9
   m_Name: pfb_FallingLog
   m_TagString: Untagged
@@ -131,9 +132,25 @@ MonoBehaviour:
     type: 3}
   _rb: {fileID: 5012698578085465848}
   _mark: {fileID: 8286714812979583863}
-  _angle: 0
-  _startHeight: 0
-  _lastHeight: 0
+  _angle: 15
+  _startHeight: 1
+--- !u!114 &5701447072077318391
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5750966024577089031}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 53197bdb1134e4cb4b731c80d7292e9e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _isSolid: 1
+  _reverseWindTriangles: 0
+  _useGravity: 1
+  _shareVertices: 0
+  _smoothVertices: 1
 --- !u!1 &8286714812979583863
 GameObject:
   m_ObjectHideFlags: 0
