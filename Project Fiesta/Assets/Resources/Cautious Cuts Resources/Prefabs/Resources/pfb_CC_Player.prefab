@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 3036841835095377797}
   - component: {fileID: 7865773939356301708}
   - component: {fileID: 6239419416950368903}
+  - component: {fileID: 8045797731097330398}
   m_Layer: 0
   m_Name: pfb_CC_Player
   m_TagString: Player
@@ -116,12 +117,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 908fb9500589743ec982890e8a48ee27, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _lr: {fileID: 6239419416950368903}
-  _c1: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
-  _c2: {r: 1, g: 0, b: 0, a: 1}
-  _whatIsLog:
-    serializedVersion: 2
-    m_Bits: 512
+  _touchSlicer: {fileID: 8045797731097330398}
 --- !u!120 &6239419416950368903
 LineRenderer:
   m_ObjectHideFlags: 0
@@ -219,3 +215,26 @@ LineRenderer:
     generateLightingData: 0
   m_UseWorldSpace: 1
   m_Loop: 0
+--- !u!114 &8045797731097330398
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2581538135315048442}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b1497a1f721954d0480682317d63ca78, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _lr: {fileID: 6239419416950368903}
+  _c1: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  _c2: {r: 1, g: 0, b: 0, a: 1}
+  _forceOnCut: 5
+  _whatWeAreCuttingLayerMask:
+    serializedVersion: 2
+    m_Bits: 4096
+  _whatIsCameraPlaneLayerMask:
+    serializedVersion: 2
+    m_Bits: 2048
+  _timeForNextCut: 0.2
