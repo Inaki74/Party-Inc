@@ -159,24 +159,22 @@ namespace FiestaTime
                     {
                         if( newPos == lastPos)
                         {
-                            Debug.Log(lastPos);
-                            Debug.Log("POS1" + pos);
                             pos = pos + (lastPos - pos) * 15;
-                            Debug.Log("POS2" + pos);
                         }
 
                         if (i == 1 && newPos == lastPos)
                         {
-                            Debug.Log(lastPos);
-                            Debug.Log("POS1" + pos);
                             pos = pos + (lastPos - pos) * 15;
-                            Debug.Log("POS2" + pos);
                         }
 
                         //if (i == posCount - 1 && i == 1 && newPos == lastPos)
                         //{
                         //    newPos = pos + (lastPos - pos) * 15;
                         //    pos = pos - (lastPos - pos) * 15;
+                        //    Debug.Log(lastPos);
+                        //    Debug.Log("POS1" + pos);
+                        //    pos = pos + (lastPos - pos) * 15;
+                        //    Debug.Log("POS2" + pos);
                         //}
 
                         MakeRayhitSliceInfo(hit, newPos);

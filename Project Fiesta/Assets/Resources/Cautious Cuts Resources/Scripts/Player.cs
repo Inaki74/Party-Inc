@@ -10,6 +10,9 @@ namespace FiestaTime
 
         public class Player : MonoBehaviour
         {
+            public delegate void ActionSliceLog(float h, float a, float t);
+            public static event ActionSliceLog onLogSlicedScore;
+
             [SerializeField] private TouchSlicer _touchSlicer;
 
             private List<RayhitSliceInfo> _logHits = new List<RayhitSliceInfo>();
@@ -46,8 +49,6 @@ namespace FiestaTime
 
                 CreatePosNegSlices(slices);
 
-                Debug.Break();
-
                 _touchSlicer.ClearHits();
                 _logHits.Clear();
 
@@ -76,7 +77,7 @@ namespace FiestaTime
                 Vector3 zero = start.objTransform.InverseTransformPoint(start.rayHit.point) + _logHits.First().objVelocity * Time.fixedDeltaTime;
 
                 theLog.CreateEmpty();
-                Debug.Log("START: " + zero.x + ", " + zero.y + ", " + zero.z);
+                //Debug.Log("START: " + zero.x + ", " + zero.y + ", " + zero.z);
 
                 foreach (RayhitSliceInfo a in _logHits)
                 {
@@ -87,7 +88,7 @@ namespace FiestaTime
                     vAverage += vx;
                     hAverage += v.y;
 
-                    Debug.Log("HIT POSITION " + i + ": " + vx.x + ", " + vx.y + ", " + vx.z);
+                    //Debug.Log("HIT POSITION " + i + ": " + vx.x + ", " + vx.y + ", " + vx.z);
                     theLog.SetHitpoint(a.rayHit.point + a.objVelocity * Time.fixedDeltaTime - a.objTransform.position);
                 }
 
@@ -99,7 +100,6 @@ namespace FiestaTime
 
             private void EvaluateSlice(FallingLog theLog, float height, float angle)
             {
-                Debug.Log(angle);
                 float logH = theLog.GetHeight();
                 float logA = theLog.GetAngle();
 
@@ -143,10 +143,7 @@ namespace FiestaTime
 
                 float finalPercentage = percentageA * 20 / 100 + percentageH * 80 / 100; // Height amounts to 80% of the final score
 
-                Debug.Log("RESULTS FROM CUT: ");
-                Debug.Log("HEIGHT PROXIMITY: " + percentageH.ToString("0.00") + "%");
-                Debug.Log("ANGLE PROXIMITY: " + percentageA.ToString("0.00") + "%");
-                Debug.Log("OVERALL PROXIMITY: " + finalPercentage.ToString("0.00") + "%");
+                onLogSlicedScore.Invoke(percentageH, percentageA, finalPercentage);
             }
         }
     }
