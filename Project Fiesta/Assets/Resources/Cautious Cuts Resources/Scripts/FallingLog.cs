@@ -42,7 +42,7 @@ namespace FiestaTime
 
             private void Update()
             {
-                SetMark();
+                //SetMark();
             }
 
             private void OnDisable()

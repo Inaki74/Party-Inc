@@ -42,10 +42,11 @@ namespace FiestaTime
 
                 CalculateSliceScore(start, theLog);
 
-                Plane cutter;
                 GameObject[] slices = _touchSlicer.Slice(start.objTransform.gameObject, _logHits, false);
 
                 CreatePosNegSlices(slices);
+
+                Debug.Break();
 
                 _touchSlicer.ClearHits();
                 _logHits.Clear();
@@ -74,6 +75,9 @@ namespace FiestaTime
 
                 Vector3 zero = start.objTransform.InverseTransformPoint(start.rayHit.point) + _logHits.First().objVelocity * Time.fixedDeltaTime;
 
+                theLog.CreateEmpty();
+                Debug.Log("START: " + zero.x + ", " + zero.y + ", " + zero.z);
+
                 foreach (RayhitSliceInfo a in _logHits)
                 {
                     i++;
@@ -82,6 +86,9 @@ namespace FiestaTime
 
                     vAverage += vx;
                     hAverage += v.y;
+
+                    Debug.Log("HIT POSITION " + i + ": " + vx.x + ", " + vx.y + ", " + vx.z);
+                    theLog.SetHitpoint(a.rayHit.point + a.objVelocity * Time.fixedDeltaTime - a.objTransform.position);
                 }
 
                 float finalHeight = hAverage / i;

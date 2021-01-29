@@ -47,6 +47,8 @@ namespace FiestaTime
         public bool CanSlice { get; private set; }
         private List<RayhitSliceInfo> _hits = new List<RayhitSliceInfo>();
 
+        public List<Vector3> watch = new List<Vector3>();
+
         // Start is called before the first frame update
         void Start()
         {
@@ -121,7 +123,7 @@ namespace FiestaTime
                 ret = ret.flipped;
             }
 
-            norm = tNormal;
+            norm = normal;
 
             return ret;
         }
@@ -131,7 +133,6 @@ namespace FiestaTime
             int posCount = _lr.positionCount;
 
             if (posCount == 1) return;
-
 
             Vector3[] lrPositions = new Vector3[posCount];
             _lr.GetPositions(lrPositions);
@@ -156,10 +157,33 @@ namespace FiestaTime
                     RaycastHit hit;
                     if (CheckForHit(newPos, out hit))
                     {
+                        if( newPos == lastPos)
+                        {
+                            Debug.Log(lastPos);
+                            Debug.Log("POS1" + pos);
+                            pos = pos + (lastPos - pos) * 15;
+                            Debug.Log("POS2" + pos);
+                        }
+
+                        if (i == 1 && newPos == lastPos)
+                        {
+                            Debug.Log(lastPos);
+                            Debug.Log("POS1" + pos);
+                            pos = pos + (lastPos - pos) * 15;
+                            Debug.Log("POS2" + pos);
+                        }
+
+                        //if (i == posCount - 1 && i == 1 && newPos == lastPos)
+                        //{
+                        //    newPos = pos + (lastPos - pos) * 15;
+                        //    pos = pos - (lastPos - pos) * 15;
+                        //}
+
                         MakeRayhitSliceInfo(hit, newPos);
                     }
-                    else if (_hits.Count != 0)
+                    else if (_hits.Count > 1)
                     {
+                        // At the very least, i need 2 hits
                         SliceThisRound = true;
                     }
 
@@ -179,14 +203,14 @@ namespace FiestaTime
             
             if (rc1 || rc2)
             {
-                if(rc1) Debug.DrawRay(startPosition, Camera.main.transform.TransformDirection(Vector3.back) * hit.distance, Color.red, 0f);
-                if(rc2) Debug.DrawRay(startPosition, Camera.main.transform.TransformDirection(Vector3.forward) * hit.distance, Color.red, 0f);
+                //if(rc1) Debug.DrawRay(startPosition, Camera.main.transform.TransformDirection(Vector3.back) * hit.distance, Color.red, 0f);
+                //if(rc2) Debug.DrawRay(startPosition, Camera.main.transform.TransformDirection(Vector3.forward) * hit.distance, Color.red, 0f);
                 return true;
             }
             else
             {
-                Debug.DrawRay(startPosition, Camera.main.transform.TransformDirection(Vector3.back) * 100f, Color.green, 0f);
-                Debug.DrawRay(startPosition, Camera.main.transform.TransformDirection(Vector3.forward) * 100f, Color.green, 0f);
+                //Debug.DrawRay(startPosition, Camera.main.transform.TransformDirection(Vector3.back) * 100f, Color.green, 0f);
+                //Debug.DrawRay(startPosition, Camera.main.transform.TransformDirection(Vector3.forward) * 100f, Color.green, 0f);
                 return false;
             }
         }
@@ -273,18 +297,19 @@ namespace FiestaTime
             {
                 if (child.name == originalObject.name) continue;
 
-                Debug.Log(child.gameObject.name);
+                GameObject clone = Instantiate(child.gameObject, child.position, child.rotation);
                 if (def.GetSide(child.position))
                 {
                     // positive slices[0]
-                    child.SetParent(slices[0].transform);
-
+                    clone.transform.SetParent(slices[0].transform);
                 }
                 else
                 {
                     // negative slices[1]
-                    child.SetParent(slices[1].transform);
+                    clone.transform.SetParent(slices[1].transform);
                 }
+                clone.transform.localScale = child.localScale;
+                clone.layer = 0;
             }
         }
 
@@ -334,8 +359,8 @@ namespace FiestaTime
             Vector3 norm;
             Plane cutter = DefinePlane(
                 toSlice.transform,
-                minXInfo.rayHit.point,
-                maxXInfo.rayHit.point,
+                sHPoint,
+                fHPoint,
                 start,
                 out norm
             );
@@ -343,6 +368,8 @@ namespace FiestaTime
             Rigidbody toSliceRb = toSlice.GetComponent<Rigidbody>();
 
             GameObject[] slices = Tvtig.Slicer.Slicer.Slice(cutter, toSlice);
+
+            GeneralHelperFunctions.DrawPlane(sHPoint, norm);
 
             TransferChildrenToNewSlices(slices, toSlice, sHPoint, norm);
             
@@ -426,7 +453,6 @@ namespace FiestaTime
             if (destroy) Destroy(toSlice.gameObject);
             else toSlice.SetActive(false);
 
-            cPlane = cutter;
             return slices;
         }
 

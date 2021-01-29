@@ -124,6 +124,18 @@ namespace FiestaTime
             return false;
         }
 
+        public static List<T> VectorToList<T>(T[] theList)
+        {
+            List<T> ret = new List<T>();
+
+            for(int i = 0; i < theList.Length; i++)
+            {
+                ret.Add(theList[i]);
+            }
+
+            return ret;
+        }
+
         public static void DrawPlane(Vector3 position, Vector3 normal)
         {
             Vector3 v3;
