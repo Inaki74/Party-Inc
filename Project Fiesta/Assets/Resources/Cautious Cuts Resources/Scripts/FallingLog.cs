@@ -71,7 +71,7 @@ namespace FiestaTime
             {
                 GameObject p = Instantiate(_hitPoint, transform.position + point, Quaternion.identity);
                 
-                p.transform.SetParent(_nextEmpty.transform);
+                //p.transform.SetParent(_nextEmpty.transform);
             }
 
             public GameObject GetMark()

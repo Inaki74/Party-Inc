@@ -39,7 +39,7 @@ namespace FiestaTime
         [SerializeField] private float _timeForNextCut;
 
         private int _vertexCount;
-        private int _maxVertexCount = 7;
+        private int _maxVertexCount = 10;
 
         // If this is true, then you got a slice this round of slicing.
         public bool SliceThisRound { get;  private set; }
@@ -48,6 +48,10 @@ namespace FiestaTime
         private List<RayhitSliceInfo> _hits = new List<RayhitSliceInfo>();
 
         public List<Vector3> watch = new List<Vector3>();
+
+        public GameObject mark1;
+        public GameObject mark2;
+        public GameObject mark3;
 
         // Start is called before the first frame update
         void Start()
@@ -157,15 +161,59 @@ namespace FiestaTime
                     RaycastHit hit;
                     if (CheckForHit(newPos, out hit))
                     {
-                        if( newPos == lastPos)
+                        if (i == posCount - 1 && newPos == lastPos)
                         {
-                            pos = pos + (lastPos - pos) * 15;
+                            pos = lrPositions[i];
+                            lastPos = lrPositions[i - 1];
+
+                            RaycastHit hit2;
+                            newPos = pos;
+
+                            pos = pos - (lastPos - pos) * Time.deltaTime;
+
+                            while (CheckForHitTwo(pos, out hit2))
+                            {
+                                MakeRayhitSliceInfo(hit2, pos);
+                                pos = pos - (lastPos - pos) * Time.deltaTime;
+                            }
+                        }
+                        else if (i == 1 && newPos == lastPos)
+                        {
+                            bool loop = false;
+                            int j = 0;
+
+                            pos = lrPositions[i - 1];
+                            lastPos = lrPositions[i];
+
+                            RaycastHit hit2;
+                            newPos = pos;
+
+                            mark1.transform.position = lastPos;
+                            mark2.transform.position = pos;
+                            pos = pos - (lastPos - pos) * Time.deltaTime;
+                            mark3.transform.position = pos;
+
+                            while (CheckForHitTwo(pos, out hit2) && !loop)
+                            {
+                                MakeRayhitSliceInfo(hit2, pos);
+                                pos = pos - (lastPos - pos) * Time.deltaTime;
+                                j++;
+                                if (j > 10000)
+                                {
+                                    loop = true;
+                                    Debug.Log("loop");
+                                }
+                            }
+                        }
+                        else
+                        {
+                            MakeRayhitSliceInfo(hit, newPos);
                         }
 
-                        if (i == 1 && newPos == lastPos)
-                        {
-                            pos = pos + (lastPos - pos) * 15;
-                        }
+                        //if (i == 1 && newPos == lastPos)
+                        //{
+                        //    pos = pos + (lastPos - pos) * 15;
+                        //}
 
                         //if (i == posCount - 1 && i == 1 && newPos == lastPos)
                         //{
@@ -177,7 +225,7 @@ namespace FiestaTime
                         //    Debug.Log("POS2" + pos);
                         //}
 
-                        MakeRayhitSliceInfo(hit, newPos);
+                        
                     }
                     else if (_hits.Count > 1)
                     {
@@ -190,16 +238,28 @@ namespace FiestaTime
             }
         }
 
+        private bool CheckForHitTwo(Vector3 startPosition, out RaycastHit hit)
+        {
+            Ray r = new Ray(startPosition, Camera.main.transform.TransformDirection(Vector3.forward) * 100f);
+            if(Physics.Raycast(r, out hit, 100f, _whatWeAreCuttingLayerMask))
+            {
+                
+                Debug.DrawRay(startPosition, Camera.main.transform.TransformDirection(Vector3.forward) * hit.distance, Color.blue, 10f);
+                return true;
+            }
+            else
+            {
+                
+                Debug.DrawRay(startPosition, Camera.main.transform.TransformDirection(Vector3.forward) * 100f, Color.cyan, 10f);
+                return false;
+            }
+        }
+
         private bool CheckForHit(Vector3 startPosition, out RaycastHit hit)
         {
-            bool rc1 = Physics.Raycast(startPosition, Camera.main.transform.TransformDirection(Vector3.back), out hit, 100f, _whatWeAreCuttingLayerMask);
-            bool rc2 = false;
-            if (!rc1)
-            {
-                rc2 = Physics.Raycast(startPosition, Camera.main.transform.TransformDirection(Vector3.forward), out hit, 100f, _whatWeAreCuttingLayerMask);
-            }
+            bool rc1 = Physics.Raycast(startPosition, Camera.main.transform.TransformDirection(Vector3.forward), out hit, 100f, _whatWeAreCuttingLayerMask);
             
-            if (rc1 || rc2)
+            if (rc1)
             {
                 //if(rc1) Debug.DrawRay(startPosition, Camera.main.transform.TransformDirection(Vector3.back) * hit.distance, Color.red, 0f);
                 //if(rc2) Debug.DrawRay(startPosition, Camera.main.transform.TransformDirection(Vector3.forward) * hit.distance, Color.red, 0f);

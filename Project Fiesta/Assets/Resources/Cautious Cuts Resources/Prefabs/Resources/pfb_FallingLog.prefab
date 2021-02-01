@@ -135,7 +135,7 @@ MonoBehaviour:
     type: 3}
   _rb: {fileID: 5012698578085465848}
   _mark: {fileID: 8286714812979583863}
-  _angle: 15
+  _angle: 10
   _startHeight: 1
 --- !u!114 &5701447072077318391
 MonoBehaviour:
@@ -152,7 +152,7 @@ MonoBehaviour:
   _isSolid: 1
   _reverseWindTriangles: 0
   _useGravity: 1
-  _shareVertices: 1
+  _shareVertices: 0
   _smoothVertices: 0
 --- !u!114 &1522381364
 MonoBehaviour:
@@ -224,7 +224,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7391959943787423531}
   m_LocalRotation: {x: -0.7071068, y: 0, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 0, y: 0, z: -0.455}
+  m_LocalPosition: {x: 0, y: 0, z: -0.47}
   m_LocalScale: {x: 0.1, y: 0.1, z: 0.2}
   m_Children: []
   m_Father: {fileID: 8527121768483667019}
@@ -246,7 +246,7 @@ MeshCollider:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7391959943787423531}
   m_Material: {fileID: 0}
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 4
   m_Convex: 1
@@ -278,7 +278,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7575944443113538667}
   m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 0, y: 0, z: 0.455}
+  m_LocalPosition: {x: 0, y: 0, z: 0.47}
   m_LocalScale: {x: 0.1, y: 0.1, z: 0.2}
   m_Children: []
   m_Father: {fileID: 8527121768483667019}
@@ -300,7 +300,7 @@ MeshCollider:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7575944443113538667}
   m_Material: {fileID: 0}
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 4
   m_Convex: 1
@@ -333,7 +333,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8286714812979583863}
-  m_LocalRotation: {x: -0, y: -0, z: 0.1305262, w: 0.9914449}
+  m_LocalRotation: {x: -0, y: -0, z: 0.08715574, w: 0.9961947}
   m_LocalPosition: {x: 0, y: 0.33333334, z: 0}
   m_LocalScale: {x: 1.1, y: 0.01, z: 1.1}
   m_Children: []

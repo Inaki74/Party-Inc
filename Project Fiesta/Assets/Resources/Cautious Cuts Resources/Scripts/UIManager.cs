@@ -38,6 +38,11 @@ namespace FiestaTime
 
                 Player.onLogSlicedScore += DisplayScore;
             }
+
+            private void OnDestroy()
+            {
+                Player.onLogSlicedScore -= DisplayScore;
+            }
         }
     }
 }

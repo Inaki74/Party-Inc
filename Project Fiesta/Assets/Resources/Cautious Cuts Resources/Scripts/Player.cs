@@ -74,15 +74,14 @@ namespace FiestaTime
                 Vector3 vAverage = Vector3.zero;
                 float hAverage = 0f;
 
-                Vector3 zero = start.objTransform.InverseTransformPoint(start.rayHit.point) + _logHits.First().objVelocity * Time.fixedDeltaTime;
+                Vector3 zero = start.objTransform.InverseTransformPoint(start.rayHit.point);// - _logHits.First().objVelocity * Time.fixedDeltaTime;
 
-                theLog.CreateEmpty();
                 //Debug.Log("START: " + zero.x + ", " + zero.y + ", " + zero.z);
 
                 foreach (RayhitSliceInfo a in _logHits)
                 {
                     i++;
-                    Vector3 v = a.objTransform.InverseTransformPoint(a.rayHit.point) + a.objVelocity * Time.fixedDeltaTime;
+                    Vector3 v = a.objTransform.InverseTransformPoint(a.rayHit.point);// - a.objVelocity * Time.fixedDeltaTime;
                     Vector3 vx = v - zero;
 
                     vAverage += vx;
@@ -102,6 +101,9 @@ namespace FiestaTime
             {
                 float logH = theLog.GetHeight();
                 float logA = theLog.GetAngle();
+
+                Debug.Log("LOGHEIGHT " + logH + " : " + height + " CUTHEIGHT");
+                Debug.Log("LOGANGLE " + logA + " : " + angle + " CUTANGLE");
 
                 float percentageH = 0f;
                 float rH = height - logH;
