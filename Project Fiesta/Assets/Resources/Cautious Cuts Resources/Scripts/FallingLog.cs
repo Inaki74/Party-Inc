@@ -6,6 +6,7 @@ namespace FiestaTime
 {
     namespace CC
     {
+        [ExecuteInEditMode]
         [RequireComponent(typeof(Rigidbody))]
         public class FallingLog : MonoBehaviour
         {
@@ -17,7 +18,11 @@ namespace FiestaTime
             [SerializeField] private GameObject _mark;
 
             [SerializeField] private float _angle; // Lets make it from -25.00 deg to 25.00 deg
-            [SerializeField] private float _startHeight; // from -2 to 2
+            [SerializeField] private float _startHeight;
+            public static float MaximumMarkHeight = 1f;
+            public static float MinimumMarkHeight = -1f;
+            public static float MaximumMarkAngle = 20f;
+            public static float MinimumMarkAngle = -20f;
 
             private GameObject _nextEmpty;
 
@@ -35,15 +40,16 @@ namespace FiestaTime
                 SetMark();
             }
 
-            // Update is called once per frame
-            void Update()
+            private void Update()
             {
-                if (transform.position.y < -40f)
-                {
-                    transform.SetParent(LogPoolManager.Current.LogHolder);
-                    _rb.velocity = Vector3.zero;
-                    gameObject.SetActive(false);
-                }
+                //SetMark();
+            }
+
+            private void OnDisable()
+            {
+                transform.rotation = Quaternion.identity;
+                _rb.velocity = Vector3.zero;
+                _rb.angularVelocity = Vector3.zero;
             }
 
             private void SetMark()
@@ -65,7 +71,22 @@ namespace FiestaTime
             {
                 GameObject p = Instantiate(_hitPoint, transform.position + point, Quaternion.identity);
                 
-                p.transform.SetParent(_nextEmpty.transform);
+                //p.transform.SetParent(_nextEmpty.transform);
+            }
+
+            public GameObject GetMark()
+            {
+                return _mark;
+            } 
+
+            public float GetHeight()
+            {
+                return _mark.transform.localPosition.y;
+            }
+
+            public float GetAngle()
+            {
+                return _angle;
             }
         }
     }
