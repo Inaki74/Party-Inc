@@ -16,12 +16,12 @@ namespace FiestaTime
             [SerializeField] private TouchSlicer _touchSlicer;
 
             private List<RayhitSliceInfo> _logHits = new List<RayhitSliceInfo>();
-            
+
 
             // Start is called before the first frame update
             void Start()
             {
-                if(_touchSlicer == null)
+                if (_touchSlicer == null)
                 {
                     _touchSlicer = GetComponent<TouchSlicer>();
                 }
@@ -73,6 +73,7 @@ namespace FiestaTime
                 int i = 0;
                 Vector3 vAverage = Vector3.zero;
                 float hAverage = 0f;
+                float wAverage = 0f;
 
                 Vector3 zero = start.objTransform.InverseTransformPoint(start.rayHit.point);// - _logHits.First().objVelocity * Time.fixedDeltaTime;
 
@@ -86,50 +87,94 @@ namespace FiestaTime
 
                     vAverage += vx;
                     hAverage += v.y;
+                    wAverage += v.x;
 
                     //Debug.Log("HIT POSITION " + i + ": " + vx.x + ", " + vx.y + ", " + vx.z);
-                    theLog.SetHitpoint(a.rayHit.point + a.objVelocity * Time.fixedDeltaTime - a.objTransform.position);
+                    //theLog.SetHitpoint(a.rayHit.point + a.objVelocity * Time.fixedDeltaTime - a.objTransform.position);
                 }
 
                 float finalHeight = hAverage / i;
+                float finalWidth = wAverage / i;
                 float finalAngle = Mathf.Atan(vAverage.normalized.y / vAverage.normalized.x) * Mathf.Rad2Deg;
 
-                EvaluateSlice(theLog, finalHeight, finalAngle);
+                Debug.Log(finalWidth);
+
+                EvaluateSlice(theLog, finalWidth, finalHeight, finalAngle);
             }
 
-            private void EvaluateSlice(FallingLog theLog, float height, float angle)
+            private void EvaluateSlice(FallingLog theLog, float width, float height, float angle)
             {
-                float logH = theLog.GetHeight();
                 float logA = theLog.GetAngle();
+                
 
-                Debug.Log("LOGHEIGHT " + logH + " : " + height + " CUTHEIGHT");
-                Debug.Log("LOGANGLE " + logA + " : " + angle + " CUTANGLE");
-
-                float percentageH = 0f;
-                float rH = height - logH;
-                float rHDiff = Mathf.Abs(height - logH);
-
-                if(rH > 0)
+                if (theLog.LogType == FallingLog.LogClass.Large ||
+                    theLog.LogType == FallingLog.LogClass.Medium ||
+                    theLog.LogType == FallingLog.LogClass.Small_Horizontal ||
+                    theLog.LogType == FallingLog.LogClass.VerySmall_Horizontal)
                 {
-                    //Upper side
-                    float distHToTop = Mathf.Abs(logH - FallingLog.MaximumMarkHeight);
-                    percentageH = 100.00f - rHDiff * 100 / distHToTop;
-                }
-                else if (rH < 0)
-                {
-                    //Lower side
-                    float distHToBottom = Mathf.Abs(logH - FallingLog.MinimumMarkHeight);
-                    percentageH = 100.00f - rHDiff * 100 / distHToBottom;
+                    // HORIZONTAL
+                    float logH = theLog.GetHeight();
+                    float percentageH = EvaluateHeight(logH, height);
+                    //Debug.Log("LOGHEIGHT " + logH + " : " + height + " CUTHEIGHT");
+                    float percentageA = EvaluateAngle(logA, angle);
+
+                    float finalPercentage = percentageA * 20 / 100 + percentageH * 80 / 100; // Height amounts to 80% of the final score
+                    onLogSlicedScore.Invoke(percentageH, percentageA, finalPercentage);
                 }
                 else
                 {
-                    percentageH = 100.00f;
+                    // VERTICAL
+                    angle = Mathf.Abs(angle);
+                    float logW = theLog.GetWidth();
+                    float percentageW = EvaluateWidth(logW, width);
+                    //Debug.Log("LOGWIDTH " + logW + " : " + width + " CUTWIDTH");
+                    float percentageA = EvaluateAngle(logA, angle);
+
+                    float finalPercentage = percentageA * 80 / 100 + percentageW * 20 / 100; // Width amounts to 20% of the final score
+                    onLogSlicedScore.Invoke(percentageW, percentageA, finalPercentage);
                 }
 
+                //Debug.Log("LOGANGLE " + logA + " : " + angle + " CUTANGLE");
+            }
+
+            private float EvaluateWidth(float logW, float width)
+            {
+                float dw = Mathf.Abs(logW - width);
+                float distWToLeft = Mathf.Abs(logW - FallingLog.MinimumMarkWidth);
+                float distWToRight = Mathf.Abs(logW - FallingLog.MaximumMarkWidth);
+
+                if(distWToLeft >= distWToRight)
+                {
+                    return 100.00f - dw * 100 / distWToLeft;
+                }
+                else
+                {
+                    return 100.00f - dw * 100 / distWToRight;
+                }
+            }
+
+            private float EvaluateHeight(float logH, float height)
+            {
+                float dh = Mathf.Abs(logH - height);
+                float distHToBottom = Mathf.Abs(logH - FallingLog.MinimumMarkHeight);
+                float distHToTop = Mathf.Abs(logH - FallingLog.MaximumMarkHeight);
+
+                if (distHToBottom >= distHToTop)
+                {
+                    return 100.00f - dh * 100 / distHToBottom;
+                }
+                else
+                {
+                    return 100.00f - dh * 100 / distHToTop;
+                }
+            }
+
+            private float EvaluateAngle(float logA, float angle)
+            {
                 float percentageA = 0f;
                 float rA = angle - logA;
 
-                if(rA > 0f)
+                if (rA > 0f)
                 {
                     percentageA = 100.00f - rA * 100 / FallingLog.MaximumMarkAngle;
                 }
@@ -137,15 +182,13 @@ namespace FiestaTime
                 {
                     percentageA = 100.00f - rA * 100 / FallingLog.MinimumMarkAngle;
                 }
-                
-                if(percentageA < 0)
+
+                if (percentageA < 0)
                 {
                     percentageA = 0f;
                 }
 
-                float finalPercentage = percentageA * 20 / 100 + percentageH * 80 / 100; // Height amounts to 80% of the final score
-
-                onLogSlicedScore.Invoke(percentageH, percentageA, finalPercentage);
+                return percentageA;
             }
         }
     }

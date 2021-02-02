@@ -7,6 +7,13 @@ namespace FiestaTime
 {
     namespace CC
     {
+        /// <summary>
+        /// GAME LOOP:
+        ///          Start
+        /// ---------> |  ----->
+        /// Countdown   
+        /// </summary>
+
         public class GameManager : FiestaGameManager<GameManager, int>
         {
             protected override void InitializeGameManagerDependantObjects()
@@ -17,6 +24,7 @@ namespace FiestaTime
             protected override void InStart()
             {
                 GameBegan = false;
+                InitializePlayers();
             }
 
             public override void Init()

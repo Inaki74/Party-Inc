@@ -115,7 +115,7 @@ namespace FiestaTime
 
             Vector3 tNormal = ((Vector3)(logT.localToWorldMatrix.transpose * normal)).normalized;
 
-            Vector3 tStart = logT.InverseTransformPoint(start);
+            Vector3 tStart = logT.InverseTransformPoint(startHp);
 
             ret.SetNormalAndPosition(tNormal, tStart);
 
@@ -158,82 +158,72 @@ namespace FiestaTime
 
                 while (newPos != pos)
                 {
+                    bool cond1 = false;
+                    bool cond2 = false;
                     RaycastHit hit;
                     if (CheckForHit(newPos, out hit))
                     {
-                        if (i == posCount - 1 && newPos == lastPos)
+                        Vector3 originalNewPos = newPos;
+                        cond1 = i == posCount - 1 && originalNewPos == lastPos;
+                        if (cond1)
                         {
+                            //Debug.Log("Last point within");
                             pos = lrPositions[i];
                             lastPos = lrPositions[i - 1];
 
                             RaycastHit hit2;
                             newPos = pos;
 
-                            pos = pos - (lastPos - pos) * Time.deltaTime;
+                            Vector3 go = pos - (lastPos - pos) * Time.deltaTime;
 
-                            while (CheckForHitTwo(pos, out hit2))
+                            while (CheckForHitTwo(go, out hit2))
                             {
-                                MakeRayhitSliceInfo(hit2, pos);
-                                pos = pos - (lastPos - pos) * Time.deltaTime;
+                                MakeRayhitSliceInfo(hit2, go);
+                                go = go - (lastPos - pos) * Time.deltaTime;
                             }
                         }
-                        else if (i == 1 && newPos == lastPos)
+
+                        pos = lrPositions[i - 1];
+                        lastPos = lrPositions[i];
+                        cond2 = i == 1 && originalNewPos == lastPos;
+                        if (cond2)
                         {
-                            bool loop = false;
-                            int j = 0;
-
-                            pos = lrPositions[i - 1];
-                            lastPos = lrPositions[i];
-
+                            //Debug.Log("First point within");
                             RaycastHit hit2;
                             newPos = pos;
 
-                            mark1.transform.position = lastPos;
-                            mark2.transform.position = pos;
-                            pos = pos - (lastPos - pos) * Time.deltaTime;
-                            mark3.transform.position = pos;
+                            Vector3 go = pos - (lastPos - pos) * Time.deltaTime;
 
-                            while (CheckForHitTwo(pos, out hit2) && !loop)
+                            while (CheckForHitTwo(go, out hit2))
                             {
-                                MakeRayhitSliceInfo(hit2, pos);
-                                pos = pos - (lastPos - pos) * Time.deltaTime;
-                                j++;
-                                if (j > 10000)
-                                {
-                                    loop = true;
-                                    Debug.Log("loop");
-                                }
+                                MakeRayhitSliceInfo(hit2, go);
+                                go = go - (lastPos - pos) * Time.deltaTime;
                             }
                         }
-                        else
+
+                        if (!cond1 && !cond2)
                         {
                             MakeRayhitSliceInfo(hit, newPos);
                         }
-
-                        //if (i == 1 && newPos == lastPos)
-                        //{
-                        //    pos = pos + (lastPos - pos) * 15;
-                        //}
-
-                        //if (i == posCount - 1 && i == 1 && newPos == lastPos)
-                        //{
-                        //    newPos = pos + (lastPos - pos) * 15;
-                        //    pos = pos - (lastPos - pos) * 15;
-                        //    Debug.Log(lastPos);
-                        //    Debug.Log("POS1" + pos);
-                        //    pos = pos + (lastPos - pos) * 15;
-                        //    Debug.Log("POS2" + pos);
-                        //}
-
-                        
                     }
                     else if (_hits.Count > 1)
                     {
                         // At the very least, i need 2 hits
                         SliceThisRound = true;
+                        CanSlice = false;
                     }
 
-                    newPos = Vector3.MoveTowards(newPos, pos, Time.deltaTime);
+                    if((cond1 || cond2) && _hits.Count > 1)
+                    {
+                        // At the very least, i need 2 hits
+                        SliceThisRound = true;
+                        CanSlice = false;
+                    }
+
+                    if (pos != newPos)
+                    {
+                        newPos = Vector3.MoveTowards(newPos, pos, Time.deltaTime);
+                    } 
                 }
             }
         }
@@ -241,15 +231,15 @@ namespace FiestaTime
         private bool CheckForHitTwo(Vector3 startPosition, out RaycastHit hit)
         {
             Ray r = new Ray(startPosition, Camera.main.transform.TransformDirection(Vector3.forward) * 100f);
-            if(Physics.Raycast(r, out hit, 100f, _whatWeAreCuttingLayerMask))
+            if (Physics.Raycast(r, out hit, 100f, _whatWeAreCuttingLayerMask))
             {
-                
+
                 Debug.DrawRay(startPosition, Camera.main.transform.TransformDirection(Vector3.forward) * hit.distance, Color.blue, 10f);
                 return true;
             }
             else
             {
-                
+
                 Debug.DrawRay(startPosition, Camera.main.transform.TransformDirection(Vector3.forward) * 100f, Color.cyan, 10f);
                 return false;
             }
@@ -401,6 +391,9 @@ namespace FiestaTime
                 throw new System.Exception("No points given to slice!");
             }
 
+            //RayhitSliceInfo minXInfo = theHits.First();
+            //RayhitSliceInfo maxXInfo = theHits.Last();
+
             // We get the first hitPoint and the last hitPoint
             float minx = theHits.Min(info => info.rayHit.point.x);
             float maxx = theHits.Max(info => info.rayHit.point.x);
@@ -409,6 +402,14 @@ namespace FiestaTime
 
             Vector3 sHPoint = minXInfo.rayHit.point;
             Vector3 fHPoint = maxXInfo.rayHit.point;
+
+            if(sHPoint == fHPoint)
+            {
+                fHPoint = theHits.Last(info => info.rayHit.point != fHPoint).rayHit.point;
+            }
+
+            mark1.transform.position = sHPoint;
+            mark2.transform.position = fHPoint;
 
             // The start point is the average of the camera points
             // The camera points are the points straight from the hit points to the screen plane

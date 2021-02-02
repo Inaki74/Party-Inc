@@ -27,7 +27,7 @@ namespace FiestaTime
 
             private void DisplayScore(float height, float angle, float total)
             {
-                _heightText.text = "H: " + height.ToString("0.00") + "%";
+                _heightText.text = "P: " + height.ToString("0.00") + "%";
                 _angleText.text = "A: " + angle.ToString("0.00") + "%";
                 _totalText.text = "TOTAL: " + total.ToString("0.00") + "%";
             }

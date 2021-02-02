@@ -10,6 +10,18 @@ namespace FiestaTime
         [RequireComponent(typeof(Rigidbody))]
         public class FallingLog : MonoBehaviour
         {
+            public enum LogClass
+            {
+                Large,
+                Medium,
+                Small_Horizontal,
+                VerySmall_Horizontal,
+                Small_Vertical,
+                VerySmall_Vertical
+            }
+
+            [SerializeField] private LogClass _logType;
+
             [SerializeField] private GameObject _empty;
             [SerializeField] private GameObject _hitPoint;
 
@@ -17,17 +29,34 @@ namespace FiestaTime
 
             [SerializeField] private GameObject _mark;
 
+            [SerializeField] private bool _setMarkEditor;
+
             [SerializeField] private float _angle; // Lets make it from -25.00 deg to 25.00 deg
             [SerializeField] private float _startHeight;
+            [SerializeField] private float _startWidth;
+
             public static float MaximumMarkHeight = 1f;
             public static float MinimumMarkHeight = -1f;
+            public static float MaximumMarkWidth = 0.45f;
+            public static float MinimumMarkWidth = -0.45f;
             public static float MaximumMarkAngle = 20f;
             public static float MinimumMarkAngle = -20f;
 
             private GameObject _nextEmpty;
 
-            public bool IsMine { get; set; }
-            public float LogLength { get; set; }
+            public LogClass LogType
+            {
+                get
+                {
+                    return _logType;
+                }
+                private set
+                {
+                    _logType = value;
+                }
+            }
+            public bool IsMine { get; private set; }
+            public float LogLength { get; private set; }
 
             // Start is called before the first frame update
             void Start()
@@ -42,7 +71,7 @@ namespace FiestaTime
 
             private void Update()
             {
-                //SetMark();
+                if(_setMarkEditor) SetMark();
             }
 
             private void OnDisable()
@@ -57,7 +86,20 @@ namespace FiestaTime
                 Transform mark = _mark.transform;
 
                 mark.eulerAngles = transform.eulerAngles + new Vector3(0f, 0f, _angle);
-                mark.position = transform.position + new Vector3(0f, _startHeight, 0f);
+
+                if(LogType == LogClass.Large ||
+                   LogType == LogClass.Medium ||
+                   LogType == LogClass.Small_Horizontal ||
+                   LogType == LogClass.VerySmall_Horizontal)
+                {
+                    mark.position = transform.position + new Vector3(0f, _startHeight, 0f);
+                }
+
+                if (LogType == LogClass.Small_Vertical ||
+                    LogType == LogClass.VerySmall_Vertical)
+                {
+                    mark.position = transform.position + new Vector3(_startWidth, 0f, 0f);
+                }
             }
 
             public void CreateEmpty()
@@ -87,6 +129,11 @@ namespace FiestaTime
             public float GetAngle()
             {
                 return _angle;
+            }
+
+            public float GetWidth()
+            {
+                return _mark.transform.localPosition.x;
             }
         }
     }
