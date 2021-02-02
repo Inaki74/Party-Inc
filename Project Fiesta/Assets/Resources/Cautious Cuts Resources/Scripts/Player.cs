@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Photon.Pun;
 using System.Linq;
 
 namespace FiestaTime
@@ -8,10 +9,14 @@ namespace FiestaTime
     namespace CC
     {
 
-        public class Player : MonoBehaviour
+        public class Player : MonoBehaviourPun
         {
-            public delegate void ActionSliceLog(float h, float a, float t);
+            public delegate void ActionSliceLog(float p, float a, float t);
             public static event ActionSliceLog onLogSlicedScore;
+
+            [SerializeField] private MeshRenderer _mr;
+            [SerializeField] private Material _mineMaterial;
+            [SerializeField] private GameObject _slashingParticles;
 
             [SerializeField] private TouchSlicer _touchSlicer;
 
@@ -24,6 +29,16 @@ namespace FiestaTime
                 if (_touchSlicer == null)
                 {
                     _touchSlicer = GetComponent<TouchSlicer>();
+                }
+
+                if (_mr == null)
+                {
+                    _mr = GetComponent<MeshRenderer>();
+                }
+
+                if (photonView.IsMine || !PhotonNetwork.IsConnected)
+                {
+                    _mr.material = _mineMaterial;
                 }
             }
 
@@ -40,35 +55,54 @@ namespace FiestaTime
 
             private void ProcessSlice()
             {
+                Debug.Log("PROCESS SLICE 1");
                 RayhitSliceInfo start = _logHits.First();
+                RayhitSliceInfo last = _logHits.Last();
                 FallingLog theLog = start.objTransform.gameObject.GetComponent<FallingLog>();
 
-                CalculateSliceScore(start, theLog);
+                Debug.Log(theLog.photonView.IsMine);
+                if (!theLog.photonView.IsMine && PhotonNetwork.IsConnected)
+                {
+                    // Cleanup
+                    _touchSlicer.ClearHits();
+                    _logHits.Clear();
+                    _touchSlicer.WaitForSliceTimeout();
+                    return;
+                }
 
+                Debug.Log("PROCESS SLICE 2");
+
+                // Calculates the score
+                Vector3 slashPos = CalculateSliceScore(start, theLog);
+
+                // Cuts the game object and creates the slices
                 GameObject[] slices = _touchSlicer.Slice(start.objTransform.gameObject, _logHits, false);
 
-                CreatePosNegSlices(slices);
+                SpawnSlashingParticles(theLog, start.rayHit.point, last.rayHit.point, slashPos);
 
+                // Cleanup
                 _touchSlicer.ClearHits();
                 _logHits.Clear();
-
                 _touchSlicer.WaitForSliceTimeout();
             }
 
-            private void CreatePosNegSlices(GameObject[] slices)
+            private void SpawnSlashingParticles(FallingLog theLog, Vector3 start, Vector3 end, Vector3 slashPos)
             {
-                // Positive slice
-                DeactivateAfterFalling d1 = slices[0].AddComponent<DeactivateAfterFalling>();
-                d1.SetToDestroy(true);
-                d1.SetDistanceToDeactivate(-45f);
+                Vector3 direction = end - start;
 
-                // Negative slice
-                DeactivateAfterFalling d2 = slices[1].AddComponent<DeactivateAfterFalling>();
-                d2.SetToDestroy(true);
-                d2.SetDistanceToDeactivate(-45f);
+                float angle = Vector3.SignedAngle(new Vector3(-1f, 0f, direction.z), direction, Vector3.back);
+
+                if (angle < 0f)
+                {
+                    PhotonNetwork.Instantiate(_slashingParticles.name, theLog.transform.localToWorldMatrix.MultiplyPoint(slashPos), Quaternion.Euler(angle + 90f, 90f, -90f));
+                }
+                else
+                {
+                    PhotonNetwork.Instantiate(_slashingParticles.name, theLog.transform.localToWorldMatrix.MultiplyPoint(slashPos), Quaternion.Euler(angle - 90f, 90f, -90f));
+                }
             }
 
-            private void CalculateSliceScore(RayhitSliceInfo start, FallingLog theLog)
+            private Vector3 CalculateSliceScore(RayhitSliceInfo start, FallingLog theLog)
             {
                 int i = 0;
                 Vector3 vAverage = Vector3.zero;
@@ -97,9 +131,9 @@ namespace FiestaTime
                 float finalWidth = wAverage / i;
                 float finalAngle = Mathf.Atan(vAverage.normalized.y / vAverage.normalized.x) * Mathf.Rad2Deg;
 
-                Debug.Log(finalWidth);
-
                 EvaluateSlice(theLog, finalWidth, finalHeight, finalAngle);
+
+                return zero;
             }
 
             private void EvaluateSlice(FallingLog theLog, float width, float height, float angle)

@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Photon.Pun;
 
 namespace FiestaTime
 {
@@ -8,7 +9,7 @@ namespace FiestaTime
     {
         [ExecuteInEditMode]
         [RequireComponent(typeof(Rigidbody))]
-        public class FallingLog : MonoBehaviour
+        public class FallingLog : MonoBehaviourPun
         {
             public enum LogClass
             {
@@ -74,11 +75,19 @@ namespace FiestaTime
                 if(_setMarkEditor) SetMark();
             }
 
+            private void OnEnable()
+            {
+                //photonView.RPC("RPC_SetActive", RpcTarget.Others, true);
+            }
+
             private void OnDisable()
             {
+                //photonView.TransferOwnership(0);
                 transform.rotation = Quaternion.identity;
                 _rb.velocity = Vector3.zero;
                 _rb.angularVelocity = Vector3.zero;
+
+                //photonView.RPC("RPC_SetActive", RpcTarget.Others, false);
             }
 
             private void SetMark()
@@ -100,6 +109,12 @@ namespace FiestaTime
                 {
                     mark.position = transform.position + new Vector3(_startWidth, 0f, 0f);
                 }
+            }
+
+            public void SetPosition(Vector3 newPos)
+            {
+                transform.position = newPos;
+                photonView.RPC("RPC_SetPosition", RpcTarget.Others, newPos.x, newPos.y, newPos.z);
             }
 
             public void CreateEmpty()
@@ -134,6 +149,21 @@ namespace FiestaTime
             public float GetWidth()
             {
                 return _mark.transform.localPosition.x;
+            }
+
+            //// NETWORKING
+            ///
+
+            [PunRPC]
+            public void RPC_SetActive(bool act)
+            {
+                gameObject.SetActive(act);
+            }
+
+            [PunRPC]
+            public void RPC_SetPosition(float px, float py, float pz)
+            {
+                transform.position = new Vector3(px, py, pz);
             }
         }
     }

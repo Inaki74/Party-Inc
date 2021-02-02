@@ -117,6 +117,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 908fb9500589743ec982890e8a48ee27, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _mr: {fileID: 2581538135315048440}
+  _mineMaterial: {fileID: 2100000, guid: 5d6e9e265a299491ab71402bb2638d33, type: 2}
+  _slashingParticles: {fileID: 912523510633269750, guid: d6c13d824418e4518add44615492e54e,
+    type: 3}
   _touchSlicer: {fileID: 8045797731097330398}
 --- !u!120 &6239419416950368903
 LineRenderer:
@@ -238,3 +242,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 2048
   _timeForNextCut: 0.2
+  watch: []
+  mark1: {fileID: 0}
+  mark2: {fileID: 0}
+  mark3: {fileID: 0}

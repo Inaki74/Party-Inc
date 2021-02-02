@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Photon.Pun;
 using System.Linq;
 
 namespace FiestaTime
@@ -19,7 +20,7 @@ namespace FiestaTime
     /// </summary>
     ///
     [RequireComponent(typeof(LineRenderer))]
-    public class TouchSlicer : MonoBehaviour
+    public class TouchSlicer : MonoBehaviourPun
     {
         [SerializeField] private LineRenderer _lr;
 
@@ -73,6 +74,8 @@ namespace FiestaTime
         // Update is called once per frame
         void Update()
         {
+            if (!photonView.IsMine && PhotonNetwork.IsConnected) return;
+
             if (Application.isMobilePlatform)
             {
                 SliceInputMobile();
@@ -391,9 +394,6 @@ namespace FiestaTime
                 throw new System.Exception("No points given to slice!");
             }
 
-            //RayhitSliceInfo minXInfo = theHits.First();
-            //RayhitSliceInfo maxXInfo = theHits.Last();
-
             // We get the first hitPoint and the last hitPoint
             float minx = theHits.Min(info => info.rayHit.point.x);
             float maxx = theHits.Max(info => info.rayHit.point.x);
@@ -408,47 +408,16 @@ namespace FiestaTime
                 fHPoint = theHits.Last(info => info.rayHit.point != fHPoint).rayHit.point;
             }
 
-            mark1.transform.position = sHPoint;
-            mark2.transform.position = fHPoint;
+            //mark1.transform.position = sHPoint;
+            //mark2.transform.position = fHPoint;
 
             // The start point is the average of the camera points
             // The camera points are the points straight from the hit points to the screen plane
             Vector3 start = (minXInfo.rayHitCameraPoint + maxXInfo.rayHitCameraPoint) / 2;
 
-            Vector3 norm;
-            Plane cutter = DefinePlane(
-                toSlice.transform,
-                sHPoint,
-                fHPoint,
-                start,
-                out norm
-            );
+            SendLogSlice(toSlice.GetPhotonView().ViewID, sHPoint, fHPoint, start, destroy);
 
-            Rigidbody toSliceRb = toSlice.GetComponent<Rigidbody>();
-
-            GameObject[] slices = Tvtig.Slicer.Slicer.Slice(cutter, toSlice);
-
-            GeneralHelperFunctions.DrawPlane(sHPoint, norm);
-
-            TransferChildrenToNewSlices(slices, toSlice, sHPoint, norm);
-            
-            if(toSliceRb != null)
-            {
-                Rigidbody rigidbody = slices[1].GetComponent<Rigidbody>();
-                // Maintaining the velocity in which the object came
-                rigidbody.velocity = toSliceRb.velocity; 
-                slices[0].GetComponent<Rigidbody>().velocity = toSliceRb.velocity;
-                slices[1].GetComponent<Rigidbody>().velocity = toSliceRb.velocity;
-
-                // The small jump when cutting
-                Vector3 newNormal = norm + Vector3.up * _forceOnCut;
-                rigidbody.AddForce(newNormal, ForceMode.Impulse);
-            }
-
-            if (destroy) Destroy(toSlice.gameObject);
-            else toSlice.SetActive(false);
-
-            return slices;
+            return CompleteSlice(toSlice, sHPoint, fHPoint, start, destroy);
         }
 
         /// Slice an object with the internal RayhitSliceInfo
@@ -478,16 +447,32 @@ namespace FiestaTime
             Vector3 sHPoint = minXInfo.rayHit.point;
             Vector3 fHPoint = maxXInfo.rayHit.point;
 
+            if (sHPoint == fHPoint)
+            {
+                fHPoint = _hits.Last(info => info.rayHit.point != fHPoint).rayHit.point;
+            }
+
+            //mark1.transform.position = sHPoint;
+            //mark2.transform.position = fHPoint;
+
             // The start point is the average of the camera points
             // The camera points are the points straight from the hit points to the screen plane
             Vector3 start = (minXInfo.rayHitCameraPoint + maxXInfo.rayHitCameraPoint) / 2;
 
+            SendLogSlice(toSlice.GetPhotonView().ViewID, sHPoint, fHPoint, start, destroy);
+
+            return CompleteSlice(toSlice, sHPoint, fHPoint, start, destroy);
+        }
+
+        private GameObject[] CompleteSlice(GameObject toSlice, Vector3 startHitPoint, Vector3 finalHitPoint, Vector3 cameraStart, bool destroy)
+        {
+            Debug.Log("COMPLETE SLICE");
             Vector3 norm;
             Plane cutter = DefinePlane(
                 toSlice.transform,
-                minXInfo.rayHit.point,
-                maxXInfo.rayHit.point,
-                start,
+                startHitPoint,
+                finalHitPoint,
+                cameraStart,
                 out norm
             );
 
@@ -495,7 +480,9 @@ namespace FiestaTime
 
             GameObject[] slices = Tvtig.Slicer.Slicer.Slice(cutter, toSlice);
 
-            TransferChildrenToNewSlices(slices, toSlice, sHPoint, norm);
+            GeneralHelperFunctions.DrawPlane(startHitPoint, norm);
+
+            TransferChildrenToNewSlices(slices, toSlice, startHitPoint, norm);
 
             if (toSliceRb != null)
             {
@@ -512,7 +499,22 @@ namespace FiestaTime
             if (destroy) Destroy(toSlice.gameObject);
             else toSlice.SetActive(false);
 
+            CreatePosNegSlices(slices);
+
             return slices;
+        }
+
+        private void CreatePosNegSlices(GameObject[] slices)
+        {
+            // Positive slice
+            DeactivateAfterFalling d1 = slices[0].AddComponent<DeactivateAfterFalling>();
+            d1.SetToDestroy(true);
+            d1.SetDistanceToDeactivate(-45f);
+
+            // Negative slice
+            DeactivateAfterFalling d2 = slices[1].AddComponent<DeactivateAfterFalling>();
+            d2.SetToDestroy(true);
+            d2.SetDistanceToDeactivate(-45f);
         }
 
         public List<RayhitSliceInfo> GetHits()
@@ -523,6 +525,46 @@ namespace FiestaTime
             }
 
             return _hits;
+        }
+
+        ////// NETWORKING
+        ///
+
+        private void SendLogSlice(int logId, Vector3 shp, Vector3 fhp, Vector3 cs, bool destroy)
+        {
+            Debug.Log("BEFORE RPC");
+            photonView.RPC("RPC_SliceLog", RpcTarget.Others, logId,
+                                                             shp.x, shp.y, shp.z,
+                                                             fhp.x, fhp.y, fhp.z,
+                                                             cs.x, cs.y, cs.z,
+                                                             destroy);
+        }
+
+        [PunRPC]
+        public void RPC_SliceLog(int logId,
+                                 float shpx, float shpy, float shpz,
+                                 float fhpx, float fhpy, float fhpz,
+                                 float csx, float csy, float csz,
+                                 bool destroy)
+        {
+            Debug.Log("WITHIN RPC");
+            Vector3 shp = new Vector3(shpx, shpy, shpz);
+            Vector3 fhp = new Vector3(fhpx, fhpy, fhpz);
+            Vector3 cs = new Vector3(csx, csy, csz);
+
+            GameObject found = null;
+            PhotonView[] logs = FindObjectsOfType<PhotonView>();
+
+            foreach(PhotonView log in logs)
+            {
+                if(log.ViewID == logId)
+                {
+                    found = log.gameObject;
+                    break;
+                }
+            }
+            Debug.Log("COMPLETE SLICE NET");
+            CompleteSlice(found, shp, fhp, cs, destroy);
         }
     }
 }
