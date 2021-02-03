@@ -106,35 +106,6 @@ namespace FiestaTime
             }
         }
 
-        private Plane DefinePlane(Transform logT, Vector3 startHp, Vector3 finishHp, Vector3 start, out Vector3 norm)
-        {
-            Plane ret = new Plane();
-
-            // We draw a triangle from the camera and start and finish hitPoints
-            Vector3 sideOne = start - startHp;
-            Vector3 sideTwo = start - finishHp;
-
-            Vector3 normal = Vector3.Cross(sideOne, sideTwo).normalized;
-
-            Vector3 tNormal = ((Vector3)(logT.localToWorldMatrix.transpose * normal)).normalized;
-
-            Vector3 tStart = logT.InverseTransformPoint(startHp);
-
-            ret.SetNormalAndPosition(tNormal, tStart);
-
-            var direction = Vector3.Dot(Vector3.up, tNormal);
-
-            //Flip the plane so that we always know which side the positive mesh is on
-            if (direction < 0)
-            {
-                ret = ret.flipped;
-            }
-
-            norm = normal;
-
-            return ret;
-        }
-
         private void GetSliceThisRound()
         {
             int posCount = _lr.positionCount;
@@ -364,6 +335,35 @@ namespace FiestaTime
             }
         }
 
+        private Plane DefinePlane(Transform logT, Vector3 startHp, Vector3 finishHp, Vector3 start, Vector3 velocity, out Vector3 norm)
+        {
+            Plane ret = new Plane();
+
+            // We draw a triangle from the camera and start and finish hitPoints
+            Vector3 sideOne = start - startHp;
+            Vector3 sideTwo = start - finishHp;
+
+            Vector3 normal = Vector3.Cross(sideOne, sideTwo).normalized;
+
+            Vector3 tNormal = ((Vector3)(logT.localToWorldMatrix.transpose * normal)).normalized;
+
+            Vector3 tStart = logT.InverseTransformPoint(startHp + velocity);
+
+            ret.SetNormalAndPosition(tNormal, tStart);
+
+            var direction = Vector3.Dot(Vector3.up, tNormal);
+
+            //Flip the plane so that we always know which side the positive mesh is on
+            if (direction < 0)
+            {
+                ret = ret.flipped;
+            }
+
+            norm = normal;
+
+            return ret;
+        }
+
         public void WaitForSliceTimeout()
         {
             StartCoroutine(CheckForSliceTimeoutCo(_timeForNextCut));
@@ -415,9 +415,15 @@ namespace FiestaTime
             // The camera points are the points straight from the hit points to the screen plane
             Vector3 start = (minXInfo.rayHitCameraPoint + maxXInfo.rayHitCameraPoint) / 2;
 
-            SendLogSlice(toSlice.GetPhotonView().ViewID, sHPoint, fHPoint, start, destroy);
+            Vector3 velocity = Vector3.zero;
+            if (toSlice.GetComponent<Rigidbody>() != null)
+            {
+                velocity = toSlice.GetComponent<Rigidbody>().velocity;
+            }
 
-            return CompleteSlice(toSlice, sHPoint, fHPoint, start, destroy);
+            SendLogSlice(toSlice.GetPhotonView().ViewID, sHPoint, fHPoint, start, velocity, destroy);
+
+            return CompleteSlice(toSlice, sHPoint, fHPoint, start, Vector3.zero, destroy);
         }
 
         /// Slice an object with the internal RayhitSliceInfo
@@ -459,12 +465,18 @@ namespace FiestaTime
             // The camera points are the points straight from the hit points to the screen plane
             Vector3 start = (minXInfo.rayHitCameraPoint + maxXInfo.rayHitCameraPoint) / 2;
 
-            SendLogSlice(toSlice.GetPhotonView().ViewID, sHPoint, fHPoint, start, destroy);
+            Vector3 velocity = Vector3.zero;
+            if (toSlice.GetComponent<Rigidbody>() != null)
+            {
+                velocity = toSlice.GetComponent<Rigidbody>().velocity;
+            }
 
-            return CompleteSlice(toSlice, sHPoint, fHPoint, start, destroy);
+            SendLogSlice(toSlice.GetPhotonView().ViewID, sHPoint, fHPoint, start, velocity, destroy);
+
+            return CompleteSlice(toSlice, sHPoint, fHPoint, start, Vector3.zero, destroy);
         }
 
-        private GameObject[] CompleteSlice(GameObject toSlice, Vector3 startHitPoint, Vector3 finalHitPoint, Vector3 cameraStart, bool destroy)
+        private GameObject[] CompleteSlice(GameObject toSlice, Vector3 startHitPoint, Vector3 finalHitPoint, Vector3 cameraStart, Vector3 velocity, bool destroy)
         {
             Debug.Log("COMPLETE SLICE");
             Vector3 norm;
@@ -473,6 +485,7 @@ namespace FiestaTime
                 startHitPoint,
                 finalHitPoint,
                 cameraStart,
+                velocity,
                 out norm
             );
 
@@ -530,41 +543,36 @@ namespace FiestaTime
         ////// NETWORKING
         ///
 
-        private void SendLogSlice(int logId, Vector3 shp, Vector3 fhp, Vector3 cs, bool destroy)
+        private void SendLogSlice(int logId, Vector3 shp, Vector3 fhp, Vector3 cs, Vector3 velocity, bool destroy)
         {
             Debug.Log("BEFORE RPC");
-            photonView.RPC("RPC_SliceLog", RpcTarget.Others, logId,
-                                                             shp.x, shp.y, shp.z,
-                                                             fhp.x, fhp.y, fhp.z,
-                                                             cs.x, cs.y, cs.z,
-                                                             destroy);
+            object[] content = new object[] { logId, shp, fhp, cs, velocity, destroy };
+            photonView.RPC("RPC_SliceLog", RpcTarget.Others, content as object);
         }
 
         [PunRPC]
-        public void RPC_SliceLog(int logId,
-                                 float shpx, float shpy, float shpz,
-                                 float fhpx, float fhpy, float fhpz,
-                                 float csx, float csy, float csz,
-                                 bool destroy)
+        public void RPC_SliceLog(object[] content, PhotonMessageInfo info)
         {
             Debug.Log("WITHIN RPC");
-            Vector3 shp = new Vector3(shpx, shpy, shpz);
-            Vector3 fhp = new Vector3(fhpx, fhpy, fhpz);
-            Vector3 cs = new Vector3(csx, csy, csz);
+            Vector3 shp = (Vector3)content[1];
+            Vector3 fhp = (Vector3)content[2];
+            Vector3 cs = (Vector3)content[3];
+
+            float lag = Mathf.Abs((float)(PhotonNetwork.Time - info.SentServerTime));
 
             GameObject found = null;
             PhotonView[] logs = FindObjectsOfType<PhotonView>();
 
             foreach(PhotonView log in logs)
             {
-                if(log.ViewID == logId)
+                if(log.ViewID == (int)content[0])
                 {
                     found = log.gameObject;
                     break;
                 }
             }
             Debug.Log("COMPLETE SLICE NET");
-            CompleteSlice(found, shp, fhp, cs, destroy);
+            CompleteSlice(found, shp, fhp, cs, (Vector3)content[4] * lag, (bool)content[5]);
         }
     }
 }

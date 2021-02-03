@@ -111,12 +111,6 @@ namespace FiestaTime
                 }
             }
 
-            public void SetPosition(Vector3 newPos)
-            {
-                transform.position = newPos;
-                photonView.RPC("RPC_SetPosition", RpcTarget.Others, newPos.x, newPos.y, newPos.z);
-            }
-
             public void CreateEmpty()
             {
                 GameObject t = Instantiate(_empty, transform.position, Quaternion.identity);
@@ -158,12 +152,6 @@ namespace FiestaTime
             public void RPC_SetActive(bool act)
             {
                 gameObject.SetActive(act);
-            }
-
-            [PunRPC]
-            public void RPC_SetPosition(float px, float py, float pz)
-            {
-                transform.position = new Vector3(px, py, pz);
             }
         }
     }
