@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Photon.Pun;
 
 namespace FiestaTime
 {
@@ -8,7 +9,7 @@ namespace FiestaTime
     {
         [ExecuteInEditMode]
         [RequireComponent(typeof(Rigidbody))]
-        public class FallingLog : MonoBehaviour
+        public class FallingLog : MonoBehaviourPun
         {
             public enum LogClass
             {
@@ -55,6 +56,39 @@ namespace FiestaTime
                     _logType = value;
                 }
             }
+            public float StartHeight
+            {
+                get
+                {
+                    return _startHeight;
+                }
+                set
+                {
+                    _startHeight = value;
+                }
+            }
+            public float StartWidth
+            {
+                get
+                {
+                    return _startWidth;
+                }
+                set
+                {
+                    _startWidth = value;
+                }
+            }
+            public float Angle
+            {
+                get
+                {
+                    return _angle;
+                }
+                set
+                {
+                    _angle = value;
+                }
+            }
             public bool IsMine { get; private set; }
             public float LogLength { get; private set; }
 
@@ -74,11 +108,19 @@ namespace FiestaTime
                 if(_setMarkEditor) SetMark();
             }
 
+            private void OnEnable()
+            {
+                //photonView.RPC("RPC_SetActive", RpcTarget.Others, true);
+            }
+
             private void OnDisable()
             {
+                //photonView.TransferOwnership(0);
                 transform.rotation = Quaternion.identity;
                 _rb.velocity = Vector3.zero;
                 _rb.angularVelocity = Vector3.zero;
+
+                //photonView.RPC("RPC_SetActive", RpcTarget.Others, false);
             }
 
             private void SetMark()
@@ -99,6 +141,12 @@ namespace FiestaTime
                     LogType == LogClass.VerySmall_Vertical)
                 {
                     mark.position = transform.position + new Vector3(_startWidth, 0f, 0f);
+                }
+
+                if (PhotonNetwork.IsConnected)
+                {
+                    // Apply over the network
+                    photonView.RPC("RPC_SendMark", RpcTarget.Others, _startHeight, _startWidth, _angle);
                 }
             }
 
@@ -134,6 +182,24 @@ namespace FiestaTime
             public float GetWidth()
             {
                 return _mark.transform.localPosition.x;
+            }
+
+            //// NETWORKING
+            ///
+
+            [PunRPC]
+            public void RPC_SetActive(bool act)
+            {
+                gameObject.SetActive(act);
+            }
+
+            [PunRPC]
+            public void RPC_SendMark(float height, float width, float angle)
+            {
+                _startHeight = height;
+                _startWidth = width;
+                _angle = angle;
+                SetMark();
             }
         }
     }
