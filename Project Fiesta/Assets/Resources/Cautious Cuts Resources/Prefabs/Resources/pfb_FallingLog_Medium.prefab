@@ -111,6 +111,7 @@ GameObject:
   - component: {fileID: 3875345398649280917}
   - component: {fileID: 7942204731729546398}
   - component: {fileID: 6377539078021461316}
+  - component: {fileID: 4553147868048197156}
   - component: {fileID: 7257361908256557713}
   - component: {fileID: 3145992847052042322}
   - component: {fileID: -4991844851064442434}
@@ -130,9 +131,10 @@ Transform:
   m_GameObject: {fileID: 7234829335793286241}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 1.82, y: 4, z: -5}
-  m_LocalScale: {x: 0.5, y: 2, z: 0.5}
+  m_LocalScale: {x: 0.5, y: 2.25, z: 0.5}
   m_Children:
   - {fileID: 735011675812641232}
+  - {fileID: 6417827881918424694}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -208,7 +210,7 @@ Rigidbody:
   m_Mass: 1
   m_Drag: 0
   m_AngularDrag: 0.05
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_IsKinematic: 0
   m_Interpolate: 0
   m_Constraints: 8
@@ -229,12 +231,25 @@ MonoBehaviour:
   _empty: {fileID: 4002009210590905436, guid: 1f81eef5df245436b8489458b5f34b16, type: 3}
   _hitPoint: {fileID: 2092392931365569443, guid: 328437340866048018508bff46d3a2b0,
     type: 3}
-  _rb: {fileID: 7942204731729546398}
   _mark: {fileID: 6388528576476797201}
   _setMarkEditor: 0
   _angle: 30
   _startHeight: 0
   _startWidth: 0
+--- !u!114 &4553147868048197156
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7234829335793286241}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d4c31b9fe5a4644d58687280fe2fbeaa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _rb: {fileID: 7942204731729546398}
+  _feetMarker: {fileID: 8868885645575286899}
 --- !u!114 &7257361908256557713
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -288,3 +303,33 @@ MonoBehaviour:
   viewIdField: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0
+--- !u!1 &8868885645575286899
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6417827881918424694}
+  m_Layer: 12
+  m_Name: LogFeet
+  m_TagString: Untagged
+  m_Icon: {fileID: 4422084297763085224, guid: 0000000000000000d000000000000000, type: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6417827881918424694
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8868885645575286899}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: -1, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 6773030943334694445}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

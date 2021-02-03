@@ -478,7 +478,6 @@ namespace FiestaTime
 
         private GameObject[] CompleteSlice(GameObject toSlice, Vector3 startHitPoint, Vector3 finalHitPoint, Vector3 cameraStart, Vector3 velocity, bool destroy)
         {
-            Debug.Log("COMPLETE SLICE");
             Vector3 norm;
             Plane cutter = DefinePlane(
                 toSlice.transform,
@@ -545,7 +544,6 @@ namespace FiestaTime
 
         private void SendLogSlice(int logId, Vector3 shp, Vector3 fhp, Vector3 cs, Vector3 velocity, bool destroy)
         {
-            Debug.Log("BEFORE RPC");
             object[] content = new object[] { logId, shp, fhp, cs, velocity, destroy };
             photonView.RPC("RPC_SliceLog", RpcTarget.Others, content as object);
         }
@@ -553,7 +551,6 @@ namespace FiestaTime
         [PunRPC]
         public void RPC_SliceLog(object[] content, PhotonMessageInfo info)
         {
-            Debug.Log("WITHIN RPC");
             Vector3 shp = (Vector3)content[1];
             Vector3 fhp = (Vector3)content[2];
             Vector3 cs = (Vector3)content[3];
@@ -571,7 +568,6 @@ namespace FiestaTime
                     break;
                 }
             }
-            Debug.Log("COMPLETE SLICE NET");
             CompleteSlice(found, shp, fhp, cs, (Vector3)content[4] * lag, (bool)content[5]);
         }
     }

@@ -26,8 +26,6 @@ namespace FiestaTime
             [SerializeField] private GameObject _empty;
             [SerializeField] private GameObject _hitPoint;
 
-            [SerializeField] private Rigidbody _rb;
-
             [SerializeField] private GameObject _mark;
 
             [SerializeField] private bool _setMarkEditor;
@@ -36,10 +34,19 @@ namespace FiestaTime
             [SerializeField] private float _startHeight;
             [SerializeField] private float _startWidth;
 
+            public static float LargeBoundH = 2f;
+            public static float MediumBoundH = 1.5f;
+            public static float SmallBoundH = 1f;
+            public static float VerySmallBoundH = 0.5f;
+
+            public static float AngleBoundH = 25f; // -25deg - 25deg
+            public static float AngleMaxBoundV = 90f; // -70deg - 70deg
+            public static float AngleMinBoundV = 70f;
+
             public static float MaximumMarkHeight = 1f;
             public static float MinimumMarkHeight = -1f;
-            public static float MaximumMarkWidth = 0.45f;
-            public static float MinimumMarkWidth = -0.45f;
+            public static float MaximumMarkWidth = 0.5f;
+            public static float MinimumMarkWidth = -0.5f;
             public static float MaximumMarkAngle = 20f;
             public static float MinimumMarkAngle = -20f;
 
@@ -95,10 +102,6 @@ namespace FiestaTime
             // Start is called before the first frame update
             void Start()
             {
-                if(_rb == null)
-                {
-                    _rb = GetComponent<Rigidbody>();
-                }
 
                 SetMark();
             }
@@ -106,21 +109,6 @@ namespace FiestaTime
             private void Update()
             {
                 if(_setMarkEditor) SetMark();
-            }
-
-            private void OnEnable()
-            {
-                //photonView.RPC("RPC_SetActive", RpcTarget.Others, true);
-            }
-
-            private void OnDisable()
-            {
-                //photonView.TransferOwnership(0);
-                transform.rotation = Quaternion.identity;
-                _rb.velocity = Vector3.zero;
-                _rb.angularVelocity = Vector3.zero;
-
-                //photonView.RPC("RPC_SetActive", RpcTarget.Others, false);
             }
 
             private void SetMark()

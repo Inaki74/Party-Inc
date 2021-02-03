@@ -755,7 +755,7 @@ PrefabInstance:
     - target: {fileID: 979684800833632345, guid: 0caa8ae3e63bd47459dd3641afb7c4ed,
         type: 3}
       propertyPath: maxCountdownTime
-      value: 8
+      value: 20
       objectReference: {fileID: 0}
     - target: {fileID: 979684800833632346, guid: 0caa8ae3e63bd47459dd3641afb7c4ed,
         type: 3}

@@ -48,46 +48,54 @@ namespace FiestaTime
             {
                 if(eventData.Code == GameManager.SpawnLogEventCode && photonView.IsMine)
                 {
-                    string toSpawn = _largeLogPrefab.name;
-                    int random = Random.Range(4, 5);
+                    object[] data = (object[])eventData.CustomData;
 
-                    switch (random)
-                    {
-                        case 1:
-                            toSpawn = _mediumLogPrefab.name;
-                            break;
-                        case 2:
-                            toSpawn = _smallHorizLogPrefab.name;
-                            break;
-                        case 4:
-                            toSpawn = _smallVertLogPrefab.name;
-                            break;
-                        case 3:
-                            toSpawn = _vSmallHorizLogPrefab.name;
-                            break;
-                        case 5:
-                            toSpawn = _vSmallVertLogPrefab.name;
-                            break;
-                        default:
-                            break;
-                    }
+                    // Get data
+                    float waitTime = (float)data[0];
+                    float windowTime = (float)data[1];
+                    int logType = (int)data[2];
+                    float markPos = (float)data[3];
+                    float markAngle = (float)data[4];
+                    double photonSendTime = (double)data[5];
 
+                    // Generate log
+                    // Decide log type
+                    string toSpawn = DecideLogType(logType);
+
+                    // Spawn log
                     GameObject newLog = PhotonNetwork.Instantiate(toSpawn, transform.position, Quaternion.identity);
                     FallingLog log = newLog.GetComponent<FallingLog>();
-                    log.StartWidth = Random.Range(-0.2f, 0.2f);
 
-                    int side;
-                    if(Random.Range(0, 1) == 0)
-                    {
-                        side = -1;
-                    }
-                    else
-                    {
-                        side = 1;
-                    }
-                    log.Angle = Random.Range(80f, 90f) * side;
+                    // Decide mark
+                    log.StartWidth = markPos;
+                    log.StartHeight = markPos;
+                    log.Angle = markAngle;
 
+                    // Transfer ownership
                     newLog.GetComponent<PhotonView>().TransferOwnership(photonView.OwnerActorNr);
+
+                    // Apply time things
+                }
+            }
+
+            private string DecideLogType(int logType)
+            {
+                switch (logType)
+                {
+                    case 0:
+                        return _largeLogPrefab.name;
+                    case 1:
+                        return _mediumLogPrefab.name;
+                    case 2:
+                        return _smallHorizLogPrefab.name;
+                    case 3:
+                        return _smallVertLogPrefab.name;
+                    case 4:
+                        return  _vSmallHorizLogPrefab.name;
+                    case 5:
+                        return _vSmallVertLogPrefab.name;
+                    default:
+                        throw new System.Exception("FiestaTime/CC/DecideLogType: Wrong log type arrived");
                 }
             }
         }

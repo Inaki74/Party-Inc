@@ -923,6 +923,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: pfb_LogSpawner
       objectReference: {fileID: 0}
+    - target: {fileID: 8922072312386705686, guid: be859d4d5ea2f45ecbb2c446905c8a22,
+        type: 3}
+      propertyPath: viewIdField
+      value: 2
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: be859d4d5ea2f45ecbb2c446905c8a22, type: 3}
 --- !u!1001 &5325393933275476610

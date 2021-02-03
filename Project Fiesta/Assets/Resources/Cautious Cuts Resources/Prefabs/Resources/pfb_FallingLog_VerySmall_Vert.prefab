@@ -1,5 +1,35 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &3315104076690468815
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8205457990387511086}
+  m_Layer: 12
+  m_Name: LogFeet
+  m_TagString: Untagged
+  m_Icon: {fileID: 4422084297763085224, guid: 0000000000000000d000000000000000, type: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8205457990387511086
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3315104076690468815}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: -1, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 7387709210295929642}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &7387709210295929634
 GameObject:
   m_ObjectHideFlags: 0
@@ -14,6 +44,7 @@ GameObject:
   - component: {fileID: 7387709210295929641}
   - component: {fileID: 7387709210295929646}
   - component: {fileID: 7387709210295929647}
+  - component: {fileID: 1790040307656177947}
   - component: {fileID: 7387709210295929644}
   - component: {fileID: 7387709210295929645}
   - component: {fileID: -6029186681921222699}
@@ -33,9 +64,10 @@ Transform:
   m_GameObject: {fileID: 7387709210295929634}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 6.451, y: 4, z: -5}
-  m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
+  m_LocalScale: {x: 0.5, y: 0.75, z: 0.5}
   m_Children:
   - {fileID: 1998015601379948401}
+  - {fileID: 8205457990387511086}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -111,7 +143,7 @@ Rigidbody:
   m_Mass: 1
   m_Drag: 0
   m_AngularDrag: 0.05
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_IsKinematic: 0
   m_Interpolate: 0
   m_Constraints: 8
@@ -132,12 +164,25 @@ MonoBehaviour:
   _empty: {fileID: 4002009210590905436, guid: 1f81eef5df245436b8489458b5f34b16, type: 3}
   _hitPoint: {fileID: 2092392931365569443, guid: 328437340866048018508bff46d3a2b0,
     type: 3}
-  _rb: {fileID: 7387709210295929646}
   _mark: {fileID: 7538663309006234860}
   _setMarkEditor: 0
   _angle: 90
   _startHeight: 0
   _startWidth: 0
+--- !u!114 &1790040307656177947
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7387709210295929634}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d4c31b9fe5a4644d58687280fe2fbeaa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _rb: {fileID: 7387709210295929646}
+  _feetMarker: {fileID: 3315104076690468815}
 --- !u!114 &7387709210295929644
 MonoBehaviour:
   m_ObjectHideFlags: 0

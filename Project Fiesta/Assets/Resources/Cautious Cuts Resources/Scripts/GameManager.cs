@@ -8,19 +8,14 @@ namespace FiestaTime
 {
     namespace CC
     {
-        /// <summary>
-        /// GAME LOOP:
-        ///          Start
-        /// ---------> |  ----->
-        /// Countdown   
-        /// </summary>
-
         public class GameManager : FiestaGameManager<GameManager, int>
         {
             public delegate void ActionSpawnLog(float p, float a, float t);
             public static event ActionSpawnLog onLogSpawned;
 
             [SerializeField] private GameObject _logSpawner;
+
+            public GameObject test;
 
             public const byte SpawnLogEventCode = 1;
             private float _currentTime;
@@ -65,38 +60,17 @@ namespace FiestaTime
                     }
                 }
 
+                if(Input.touchCount > 0)
+                {
+                    if(Input.touches[0].phase == TouchPhase.Began)
+                    {
+                        //Instantiate(test, new Vector3(0f, -2f, -5f), Quaternion.identity);
+                    }
+                }
+
                 if (GameBegan)
                 {
                     SpawnLog();
-                }
-            }
-
-            private void SpawnLog()
-            {
-                if(PhotonNetwork.IsMasterClient || !PhotonNetwork.IsConnected)
-                {
-                    Debug.Log("AA");
-                    //EXAMPLE OF SENDING AN EVENT
-                    //object[] content = new object[] { new Vector3(10.0f, 2.0f, 5.0f), 1, 2, 5, 10 }; // Array contains the target position and the IDs of the selected units
-                    //RaiseEventOptions raiseEventOptions = new RaiseEventOptions { Receivers = ReceiverGroup.All }; // You would have to set the Receivers to All in order to receive this event on the local client as well
-                    //PhotonNetwork.RaiseEvent(SpawnLogEventCode, content, raiseEventOptions, ExitGames.Client.Photon.SendOptions.SendReliable);
-
-                    _currentTime += Time.deltaTime;
-
-                    if(_currentTime > 4f)
-                    {
-                        if (PhotonNetwork.IsConnected)
-                        {
-                            object[] content = new object[] { };
-                            RaiseEventOptions raiseEventOptions = new RaiseEventOptions { Receivers = ReceiverGroup.All };
-                            PhotonNetwork.RaiseEvent(SpawnLogEventCode, content, raiseEventOptions, ExitGames.Client.Photon.SendOptions.SendReliable);
-                            _currentTime = 0f;
-                        }
-                        else
-                        {
-
-                        }
-                    }
                 }
             }
 
@@ -126,7 +100,7 @@ namespace FiestaTime
                     if (PhotonNetwork.PlayerList[i].ActorNumber == PhotonNetwork.LocalPlayer.ActorNumber)
                     {
                         decidedPosition = playerPositions[i];
-                        decidedPosition = new Vector3(decidedPosition.x, 10f, -5f);
+                        decidedPosition = new Vector3(decidedPosition.x, -10f, -5f);
                     }
                 }
 
@@ -157,6 +131,112 @@ namespace FiestaTime
                         break;
                     default:
                         break;
+                }
+            }
+
+            private void SpawnLog()
+            {
+                if (PhotonNetwork.IsMasterClient || !PhotonNetwork.IsConnected)
+                {
+                    //logType: Randomized
+                    //waitTime: customized
+                    //window: x = -1/60 * (b - a) * t + a, a = startWindow, b = finalWindow
+
+                    _currentTime += Time.deltaTime;
+
+                    if (_currentTime > 4f)
+                    {
+                        float waitTime = 0f;
+                        float windowTime = 0f;
+
+                        int logType = Random.Range(0, 5); // 0 -> Large, 1 -> Normal, 2 -> Small H, 3 -> Small V, 4 -> VSmall H, 5 -> VSmall V
+
+                        float markAngle = DecideMarkAngle(logType);
+
+                        float markPos = DecideMarkPosition(logType, markAngle);
+
+                        if (PhotonNetwork.IsConnected)
+                        {
+                            object[] content = new object[] { waitTime, windowTime, logType, markPos, markAngle, PhotonNetwork.Time };
+                            RaiseEventOptions raiseEventOptions = new RaiseEventOptions { Receivers = ReceiverGroup.All };
+                            PhotonNetwork.RaiseEvent(SpawnLogEventCode, content, raiseEventOptions, ExitGames.Client.Photon.SendOptions.SendReliable);
+                            _currentTime = 0f;
+                        }
+                        else
+                        {
+
+                        }
+                    }
+                }
+            }
+
+            private float DecideMarkAngle(int logType)
+            {
+                float angleMax;
+                float angleMin;
+
+                if (logType == 3 || logType == 5)
+                {
+                    //Vert
+                    angleMax = FallingLog.AngleMaxBoundV;
+                    angleMin = FallingLog.AngleMinBoundV;
+                }
+                else
+                {
+                    angleMax = FallingLog.AngleBoundH;
+                    angleMin = 0f;
+                }
+
+                int side;
+                if (Random.Range(0, 1) == 0)
+                {
+                    side = -1;
+                }
+                else
+                {
+                    side = 1;
+                }
+
+                return Random.Range(angleMin, angleMax) * side;
+            }
+
+            private float DecideMarkPosition(int logType, float markAngle)
+            {
+                if (logType == 3 || logType == 5)
+                {
+                    // Vertical
+                    float maxPos = (Mathf.Abs(markAngle) - 70f) / 100;
+                    return Random.Range(-maxPos, maxPos);
+                }
+                else
+                {
+                    float maxPos;
+                    float minPos;
+                    // Horizontal
+                    if (logType == 0)
+                    {
+                        // Large
+                        maxPos = FallingLog.LargeBoundH;
+                    }
+                    else if (logType == 1)
+                    {
+                        // Normal
+                        maxPos = FallingLog.MediumBoundH;
+                    }
+                    else if (logType == 2)
+                    {
+                        // Small
+                        maxPos = FallingLog.SmallBoundH;
+                    }
+                    else
+                    {
+                        // V Small
+                        maxPos = FallingLog.VerySmallBoundH;
+                    }
+
+                    minPos = -maxPos;
+
+                    return Random.Range(minPos, maxPos);
                 }
             }
         }
