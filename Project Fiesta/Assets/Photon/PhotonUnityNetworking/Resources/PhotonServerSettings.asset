@@ -68,6 +68,8 @@ MonoBehaviour:
   - RPC_SliceLog
   - RPC_SetActive
   - RPC_SetPosition
+  - RPC_SetMark
+  - RPC_SendMark
   DisableAutoOpenWizard: 1
   ShowSettings: 0
   DevRegionSetOnce: 1
