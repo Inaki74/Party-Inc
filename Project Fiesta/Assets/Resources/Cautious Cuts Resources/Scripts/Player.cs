@@ -60,15 +60,15 @@ namespace FiestaTime
                 RayhitSliceInfo last = _logHits.Last();
                 FallingLog theLog = start.objTransform.gameObject.GetComponent<FallingLog>();
 
-                Debug.Log(theLog.photonView.IsMine);
-                if (!theLog.photonView.IsMine && PhotonNetwork.IsConnected)
-                {
-                    // Cleanup
-                    _touchSlicer.ClearHits();
-                    _logHits.Clear();
-                    _touchSlicer.WaitForSliceTimeout();
-                    return;
-                }
+                //Debug.Log(theLog.photonView.IsMine);
+                //if (!theLog.photonView.IsMine && PhotonNetwork.IsConnected)
+                //{
+                //    // Cleanup
+                //    _touchSlicer.ClearHits();
+                //    _logHits.Clear();
+                //    _touchSlicer.WaitForSliceTimeout();
+                //    return;
+                //}
 
                 Debug.Log("PROCESS SLICE 2");
 

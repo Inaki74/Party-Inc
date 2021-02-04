@@ -54,7 +54,6 @@ namespace Fiesta_windowTime
 
                 if (transform.position == _whereToGo)
                 {
-                    Debug.Log("EE");
                     StartCoroutine(Wait());
                 }
             }

@@ -23,6 +23,8 @@ namespace FiestaTime
 
             [SerializeField] private LogClass _logType;
 
+            [SerializeField] private CapsuleCollider _cc;
+
             [SerializeField] private GameObject _empty;
             [SerializeField] private GameObject _hitPoint;
 
@@ -102,8 +104,17 @@ namespace FiestaTime
             // Start is called before the first frame update
             void Start()
             {
+                if(_cc == null)
+                {
+                    _cc = GetComponent<CapsuleCollider>();
+                }
 
-                SetMark();
+                if(!photonView.IsMine && PhotonNetwork.IsConnected)
+                {
+                    _cc.enabled = false;
+                }
+
+                SetMarkNet();
             }
 
             private void Update()
@@ -130,6 +141,11 @@ namespace FiestaTime
                 {
                     mark.position = transform.position + new Vector3(_startWidth, 0f, 0f);
                 }
+            }
+
+            private void SetMarkNet()
+            {
+                SetMark();
 
                 if (PhotonNetwork.IsConnected)
                 {
