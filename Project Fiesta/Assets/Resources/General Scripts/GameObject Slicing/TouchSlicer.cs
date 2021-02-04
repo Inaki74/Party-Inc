@@ -520,22 +520,56 @@ namespace FiestaTime
             if (destroy) Destroy(toSlice.gameObject);
             else toSlice.SetActive(false);
 
-            CreatePosNegSlices(slices);
+            CreatePosNegSlices(slices, toSlice.GetComponent<Tvtig.Slicer.Sliceable>());
 
             return slices;
         }
 
-        private void CreatePosNegSlices(GameObject[] slices)
+        private void CreatePosNegSlices(GameObject[] slices, Tvtig.Slicer.Sliceable sliceableInfo)
         {
             // Positive slice
-            DeactivateAfterFalling d1 = slices[0].AddComponent<DeactivateAfterFalling>();
-            d1.SetToDestroy(true);
-            d1.SetDistanceToDeactivate(-45f);
+            GameObject pos = slices[0];
+            GameObject neg = slices[1];
 
-            // Negative slice
-            DeactivateAfterFalling d2 = slices[1].AddComponent<DeactivateAfterFalling>();
-            d2.SetToDestroy(true);
-            d2.SetDistanceToDeactivate(-45f);
+            if (sliceableInfo.DeactivateAfterTime)
+            {
+                //Time
+
+                DeactivateAfterTime d1 = pos.AddComponent<DeactivateAfterTime>();
+                d1.SetToDestroy(sliceableInfo.Destroyy);
+                d1.SetTimeToDeactivate(sliceableInfo.TimeOrDistanceToDeactivate);
+
+                // Negative slice
+                DeactivateAfterTime d2 = neg.AddComponent<DeactivateAfterTime>();
+                d2.SetToDestroy(sliceableInfo.Destroyy);
+                d2.SetTimeToDeactivate(sliceableInfo.TimeOrDistanceToDeactivate);
+            }
+            else
+            {
+                //Falling
+                DeactivateAfterFalling d1 = pos.AddComponent<DeactivateAfterFalling>();
+                d1.SetToDestroy(sliceableInfo.Destroyy);
+                d1.SetDistanceToDeactivate(sliceableInfo.TimeOrDistanceToDeactivate);
+
+                DeactivateAfterFalling d2 = neg.AddComponent<DeactivateAfterFalling>();
+                d2.SetToDestroy(sliceableInfo.Destroyy);
+                d2.SetDistanceToDeactivate(sliceableInfo.TimeOrDistanceToDeactivate);
+            }
+
+            if (!sliceableInfo.SlicesHaveColliders)
+            {
+                StartCoroutine(DisableThemCo(pos, neg));
+            }
+            
+        }
+
+        private IEnumerator DisableThemCo(GameObject pos, GameObject neg)
+        {
+            // Wait for a bit to get the physics rotations and good looking stuff
+            yield return new WaitForSeconds(0.2f);
+
+            pos.GetComponent<MeshCollider>().enabled = false;
+            neg.GetComponent<MeshCollider>().enabled = false;
         }
 
         public List<RayhitSliceInfo> GetHits()

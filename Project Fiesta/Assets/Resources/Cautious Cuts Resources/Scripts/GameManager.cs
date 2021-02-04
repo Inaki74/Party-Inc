@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
 using Photon.Realtime;
+using ExitGames.Client.Photon;
 
 namespace FiestaTime
 {
@@ -15,10 +16,28 @@ namespace FiestaTime
 
             [SerializeField] private GameObject _logSpawner;
 
+            private float _windowTime;
+
             public GameObject test;
 
             public const byte SpawnLogEventCode = 1;
+            public const byte NextLogWaveEventCode = 2;
+
             private float _currentTime;
+            private int _wave;
+
+            private List<int> _sliced = new List<int>();
+            public List<int> Sliced
+            {
+                get
+                {
+                    return _sliced;
+                }
+                set
+                {
+                    _sliced = value;
+                }
+            }
 
             protected override void InitializeGameManagerDependantObjects()
             {
@@ -29,11 +48,23 @@ namespace FiestaTime
             protected override void InStart()
             {
                 GameBegan = false;
+                _windowTime = 1f;
             }
 
             public override void Init()
             {
                 base.Init();
+
+                PhotonNetwork.NetworkingClient.EventReceived += SpawnLog;
+                PhotonNetwork.NetworkingClient.EventReceived += ClearSliced;
+                LogController.onLogDestroyed += SendSliced;
+            }
+
+            private void OnDestroy()
+            {
+                PhotonNetwork.NetworkingClient.EventReceived -= SpawnLog;
+                PhotonNetwork.NetworkingClient.EventReceived -= ClearSliced;
+                LogController.onLogDestroyed -= SendSliced;
             }
 
             // Update is called once per frame
@@ -44,6 +75,10 @@ namespace FiestaTime
                     if (_startTime != 0 && (float)(PhotonNetwork.Time - _startTime) >= gameStartCountdown + 1f)
                     {
                         GameBegan = true;
+                        // The first log spawned, run once only
+                        EventData a = new EventData();
+                        a.Code = NextLogWaveEventCode;
+                        SpawnLog(a);
                     }
                 }
                 else if (_startCountdown && !GameBegan)
@@ -60,17 +95,18 @@ namespace FiestaTime
                     }
                 }
 
-                if(Input.touchCount > 0)
-                {
-                    if(Input.touches[0].phase == TouchPhase.Began)
-                    {
-                        //Instantiate(test, new Vector3(0f, -2f, -5f), Quaternion.identity);
-                    }
-                }
-
                 if (GameBegan)
                 {
-                    SpawnLog();
+                    InGameTime += Time.deltaTime;
+
+                    if(InGameTime < 60f)
+                    {
+                        _windowTime = -1 / (60f * 4/3) * InGameTime + 1;
+                    }
+                    else
+                    {
+                        _windowTime = 0.25f;
+                    }
                 }
             }
 
@@ -134,39 +170,33 @@ namespace FiestaTime
                 }
             }
 
-            private void SpawnLog()
+            private void ClearSliced(EventData data)
             {
-                if (PhotonNetwork.IsMasterClient || !PhotonNetwork.IsConnected)
+                if (data.Code == NextLogWaveEventCode)
                 {
-                    //logType: Randomized
-                    //waitTime: customized
-                    //window: x = -1/60 * (b - a) * t + a, a = startWindow, b = finalWindow
+                    Sliced.Clear();
+                }
+            }
 
-                    _currentTime += Time.deltaTime;
+            private void SpawnLog(EventData eventData)
+            {
+                if (eventData.Code == NextLogWaveEventCode && PhotonNetwork.IsMasterClient)
+                {
+                    // Any wait time that is greater than the serverLag * 2 will mean instant spawn. Approx 100ms at most 500ms (very bad server ping (250))
+                    Debug.Log("WAVE: " + _wave + ", TIME: " + InGameTime + " , WINDOW: " + _windowTime);
+                    float waitTime = 0f;
+                    float windowTime = _windowTime;
 
-                    if (_currentTime > 4f)
-                    {
-                        float waitTime = 0f;
-                        float windowTime = 0f;
+                    int logType = Random.Range(0, 5); // 0 -> Large, 1 -> Normal, 2 -> Small H, 3 -> Small V, 4 -> VSmall H, 5 -> VSmall V
 
-                        int logType = Random.Range(0, 5); // 0 -> Large, 1 -> Normal, 2 -> Small H, 3 -> Small V, 4 -> VSmall H, 5 -> VSmall V
+                    float markAngle = DecideMarkAngle(logType);
 
-                        float markAngle = DecideMarkAngle(logType);
+                    float markPos = DecideMarkPosition(logType, markAngle);
 
-                        float markPos = DecideMarkPosition(logType, markAngle);
-
-                        if (PhotonNetwork.IsConnected)
-                        {
-                            object[] content = new object[] { waitTime, windowTime, logType, markPos, markAngle, PhotonNetwork.Time };
-                            RaiseEventOptions raiseEventOptions = new RaiseEventOptions { Receivers = ReceiverGroup.All };
-                            PhotonNetwork.RaiseEvent(SpawnLogEventCode, content, raiseEventOptions, ExitGames.Client.Photon.SendOptions.SendReliable);
-                            _currentTime = 0f;
-                        }
-                        else
-                        {
-
-                        }
-                    }
+                    object[] content = new object[] { waitTime, windowTime, logType, markPos, markAngle, PhotonNetwork.Time };
+                    RaiseEventOptions raiseEventOptions = new RaiseEventOptions { Receivers = ReceiverGroup.All };
+                    PhotonNetwork.RaiseEvent(SpawnLogEventCode, content, raiseEventOptions, SendOptions.SendReliable);
+                    _currentTime = 0f;
                 }
             }
 
@@ -238,6 +268,20 @@ namespace FiestaTime
 
                     return Random.Range(minPos, maxPos);
                 }
+            }
+
+            public void SendSliced()
+            {
+                photonView.RPC("RPC_SendSliced", RpcTarget.MasterClient);
+            }
+
+            /// NETWORKING
+            ///
+            [PunRPC]
+            public void RPC_SendSliced(PhotonMessageInfo info)
+            {
+                Debug.Log("RECEIVING SLICED");
+                Sliced.Add(info.Sender.ActorNumber);
             }
         }
     }

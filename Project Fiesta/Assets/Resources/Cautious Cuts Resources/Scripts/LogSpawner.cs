@@ -33,13 +33,13 @@ namespace FiestaTime
 
             }
 
-            private void OnEnable()
+            private void Awake()
             {
                 PhotonNetwork.NetworkingClient.EventReceived += SpawnLog;
 
             }
 
-            private void OnDisable()
+            private void OnDestroy()
             {
                 PhotonNetwork.NetworkingClient.EventReceived -= SpawnLog;
             }
@@ -57,6 +57,7 @@ namespace FiestaTime
                     float markPos = (float)data[3];
                     float markAngle = (float)data[4];
                     double photonSendTime = (double)data[5];
+                    //float lag = 0f;
 
                     // Generate log
                     // Decide log type
@@ -65,6 +66,7 @@ namespace FiestaTime
                     // Spawn log
                     GameObject newLog = PhotonNetwork.Instantiate(toSpawn, transform.position, Quaternion.identity);
                     FallingLog log = newLog.GetComponent<FallingLog>();
+                    LogController logCon = newLog.GetComponent<LogController>();
 
                     // Decide mark
                     log.StartWidth = markPos;
@@ -75,6 +77,9 @@ namespace FiestaTime
                     newLog.GetComponent<PhotonView>().TransferOwnership(photonView.OwnerActorNr);
 
                     // Apply time things
+                    logCon.WaitTime = waitTime + (float)photonSendTime + 0.4f;
+                    logCon.WindowTime = windowTime;
+                    logCon.TimeToMove = (float)photonSendTime + 1f;
                 }
             }
 

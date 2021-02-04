@@ -201,6 +201,10 @@ MonoBehaviour:
   _useGravity: 1
   _shareVertices: 0
   _smoothVertices: 0
+  _slicesHaveColliders: 0
+  _destroy: 1
+  _deactivateAfterTime: 0
+  _timeOrDistanceToDeactivate: -45
 --- !u!114 &1522381364
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -334,3 +338,7 @@ MonoBehaviour:
   _useGravity: 0
   _shareVertices: 0
   _smoothVertices: 0
+  _slicesHaveColliders: 0
+  _destroy: 0
+  _deactivateAfterTime: 0
+  _timeOrDistanceToDeactivate: 0

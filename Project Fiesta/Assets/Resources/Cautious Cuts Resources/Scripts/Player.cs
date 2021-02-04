@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
 using System.Linq;
+using ExitGames.Client.Photon;
 
 namespace FiestaTime
 {
@@ -21,7 +22,6 @@ namespace FiestaTime
             [SerializeField] private TouchSlicer _touchSlicer;
 
             private List<RayhitSliceInfo> _logHits = new List<RayhitSliceInfo>();
-
 
             // Start is called before the first frame update
             void Start()
@@ -53,16 +53,38 @@ namespace FiestaTime
                 }
             }
 
+            private IEnumerator WaitForAllSlicesCo(LogController theLogCon)
+            {
+                yield return new WaitUntil(() => GameManager.Current.Sliced.Count == GameManager.Current.playerCount);
+
+                yield return StartCoroutine(theLogCon.SendNextWaveCo(theLogCon.WaitTime));
+            }
+
             private void ProcessSlice()
             {
                 RayhitSliceInfo start = _logHits.First();
                 RayhitSliceInfo last = _logHits.Last();
                 FallingLog theLog = start.objTransform.gameObject.GetComponent<FallingLog>();
+                LogController theLogCon = start.objTransform.gameObject.GetComponent<LogController>();
 
                 // Calculates the score
                 Vector3 slashPos = CalculateSliceScore(start, theLog);
 
+                // Trigger event where next wave is spawned immediately after
+                // We send it if we are the master client and if every players log has been sliced
+                if (PhotonNetwork.IsMasterClient)
+                {
+                    GameManager.Current.SendSliced();
+                    StopCoroutine(WaitForAllSlicesCo(theLogCon));
+                    StartCoroutine(WaitForAllSlicesCo(theLogCon));
+                }
+                else
+                {
+                    GameManager.Current.SendSliced();
+                }
+
                 // Cuts the game object and creates the slices
+                // Manipulating the slices here wont affect through the network unless done specifically
                 GameObject[] slices = _touchSlicer.Slice(start.objTransform.gameObject, _logHits, false);
 
                 SpawnSlashingParticles(theLog, start.rayHit.point, last.rayHit.point, slashPos);

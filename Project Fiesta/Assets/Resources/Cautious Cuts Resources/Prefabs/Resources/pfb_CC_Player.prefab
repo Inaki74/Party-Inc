@@ -234,7 +234,7 @@ MonoBehaviour:
   _lr: {fileID: 6239419416950368903}
   _c1: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   _c2: {r: 1, g: 0, b: 0, a: 1}
-  _forceOnCut: 5
+  _forceOnCut: 10
   _whatWeAreCuttingLayerMask:
     serializedVersion: 2
     m_Bits: 4096

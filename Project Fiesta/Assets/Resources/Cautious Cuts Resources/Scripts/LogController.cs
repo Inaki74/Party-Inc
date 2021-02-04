@@ -1,13 +1,18 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Photon.Pun;
+using Photon.Realtime;
 
-namespace Fiesta_windowTime
+namespace FiestaTime
 {
     namespace CC
     {
-        public class LogController : MonoBehaviour
+        public class LogController : MonoBehaviourPun
         {
+            public delegate void ActionLogDestroyed();
+            public static event ActionLogDestroyed onLogDestroyed;
+
             [SerializeField] private Rigidbody _rb;
             [SerializeField] private GameObject _feetMarker;
 
@@ -15,6 +20,7 @@ namespace Fiesta_windowTime
             private Vector3 _whereToGo;
             private Vector3 _differenceFeetCenter;
             private float _speed;
+            private bool _runOnce;
 
             private float _windowTime;
             public float WindowTime
@@ -29,6 +35,32 @@ namespace Fiesta_windowTime
                 }
             }
 
+            private float _waitTime;
+            public float WaitTime
+            {
+                get
+                {
+                    return _waitTime;
+                }
+                set
+                {
+                    _waitTime = value;
+                }
+            }
+
+            private float _timeToMove;
+            public float TimeToMove
+            {
+                get
+                {
+                    return _timeToMove;
+                }
+                set
+                {
+                    _timeToMove = value;
+                }
+            }
+
             // Start is called before the first frame update
             void Start()
             {
@@ -37,25 +69,32 @@ namespace Fiesta_windowTime
                     _rb = GetComponent<Rigidbody>();
                 }
 
+                _runOnce = false;
                 _startPos = transform.position;
                 _speed = 40f;
                 _whereToGo = new Vector3(transform.position.x, 0.5f, transform.position.z);
                 _differenceFeetCenter = transform.position - _feetMarker.transform.position;
 
-                WindowTime = 1f;
-
                 _whereToGo += _differenceFeetCenter;
+
+                photonView.RPC("RPC_SendTimes", RpcTarget.Others, WaitTime, WindowTime, TimeToMove);
             }
 
             // Update is called once per frame
             void Update()
             {
-                transform.position = Vector3.MoveTowards(transform.position, _whereToGo, Time.deltaTime * _speed);
-
-                if (transform.position == _whereToGo)
+                if(PhotonNetwork.Time >= WaitTime)
                 {
-                    StartCoroutine(Wait());
+                    transform.position = Vector3.MoveTowards(transform.position, _whereToGo, Time.deltaTime * _speed);
+
+                    if (transform.position == _whereToGo && !_runOnce)
+                    {
+                        _runOnce = true;
+                        StartCoroutine(Wait());
+                    }
                 }
+
+                
             }
 
             private IEnumerator Wait()
@@ -66,7 +105,31 @@ namespace Fiesta_windowTime
 
                 yield return new WaitUntil(() => transform.position == _whereToGo);
 
+                // Trigger event where next wave is spawned
+                if(PhotonNetwork.IsMasterClient && photonView.IsMine)
+                {
+                    //yield return StartCoroutine(SendNextWaveCo(WaitTime));
+                    object[] content = new object[] { };
+                    RaiseEventOptions raiseEventOptions = new RaiseEventOptions { Receivers = ReceiverGroup.All };
+                    PhotonNetwork.RaiseEvent(GameManager.NextLogWaveEventCode, content, raiseEventOptions, ExitGames.Client.Photon.SendOptions.SendReliable);
+                }
+
+                if (photonView.IsMine)
+                {
+                    onLogDestroyed.Invoke();
+                }
+                
+                // Dispose of the log
+                // Later I gotta save it? Ill see.
                 Destroy(gameObject);
+            }
+
+            public IEnumerator SendNextWaveCo(float wT)
+            {
+                yield return new WaitUntil(() => (float)PhotonNetwork.Time >= wT);
+                object[] content = new object[] { };
+                RaiseEventOptions raiseEventOptions = new RaiseEventOptions { Receivers = ReceiverGroup.All };
+                PhotonNetwork.RaiseEvent(GameManager.NextLogWaveEventCode, content, raiseEventOptions, ExitGames.Client.Photon.SendOptions.SendReliable);
             }
 
             private void OnEnable()
@@ -82,6 +145,17 @@ namespace Fiesta_windowTime
                 _rb.angularVelocity = Vector3.zero;
 
                 //photonView.RPC("RPC_SetActive", RpcTarget.Others, false);
+            }
+
+
+            /// NETWORKING
+            ///
+            [PunRPC]
+            public void RPC_SendTimes(float wT, float winT, float tTM)
+            {
+                WaitTime = wT;
+                WindowTime = winT;
+                TimeToMove = tTM;
             }
         }
     }

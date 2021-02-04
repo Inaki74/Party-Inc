@@ -30,6 +30,19 @@ namespace FiestaTime
             [SerializeField]
             private bool _smoothVertices = false;
 
+            // Mine
+            [SerializeField]
+            private bool _slicesHaveColliders = false;
+
+            [SerializeField]
+            private bool _destroy = false;
+
+            [SerializeField]
+            private bool _deactivateAfterTime = false;
+
+            [SerializeField]
+            private float _timeOrDistanceToDeactivate = 0f;
+
             public bool IsSolid
             {
                 get
@@ -87,6 +100,55 @@ namespace FiestaTime
                 set
                 {
                     _smoothVertices = value;
+                }
+            }
+
+            //Mine
+            public bool SlicesHaveColliders
+            {
+                get
+                {
+                    return _slicesHaveColliders;
+                }
+                set
+                {
+                    _slicesHaveColliders = value;
+                }
+            }
+
+            public bool Destroyy
+            {
+                get
+                {
+                    return _destroy;
+                }
+                set
+                {
+                    _destroy = value;
+                }
+            }
+
+            public bool DeactivateAfterTime
+            {
+                get
+                {
+                    return _deactivateAfterTime;
+                }
+                set
+                {
+                    _deactivateAfterTime = value;
+                }
+            }
+
+            public float TimeOrDistanceToDeactivate
+            {
+                get
+                {
+                    return _timeOrDistanceToDeactivate;
+                }
+                set
+                {
+                    _timeOrDistanceToDeactivate = value;
                 }
             }
 
