@@ -137,44 +137,39 @@ namespace FiestaTime
                     RaycastHit hit;
                     if (CheckForHit(newPos, out hit))
                     {
+                        // This is needed for the very special case in which the only two points of the slicer are within the log.
                         Vector3 originalNewPos = newPos;
+                        // Cond1 = "If this is the last point of the slicer and its within the log (the Raycast hits)"
                         cond1 = i == posCount - 1 && originalNewPos == lastPos;
                         if (cond1)
                         {
-                            //Debug.Log("Last point within");
+                            // Undo the reverse process from before (I want it to start at the last hit all the way to the end of the log).
                             pos = lrPositions[i];
                             lastPos = lrPositions[i - 1];
-
-                            RaycastHit hit2;
+                            // This is so that the while loop ends afterwards.
                             newPos = pos;
 
-                            Vector3 go = pos - (lastPos - pos) * Time.deltaTime;
-
-                            while (CheckForHitTwo(go, out hit2))
-                            {
-                                MakeRayhitSliceInfo(hit2, go);
-                                go = go - (lastPos - pos) * Time.deltaTime;
-                            }
+                            // This raycasts in a direction endlessly until there is no hit on the log.
+                            // It generates all the other points we need on the log
+                            RaycastToEndOfLog(pos - (lastPos - pos) * Time.deltaTime, lastPos - pos);
                         }
 
+                        // Undo the reversal within cond1 if statement (I want to go backwards here)
                         pos = lrPositions[i - 1];
                         lastPos = lrPositions[i];
+                        // Cond2 = "If this is the first point of the slicer and its within the log (the Raycast hits)"
                         cond2 = i == 1 && originalNewPos == lastPos;
                         if (cond2)
                         {
-                            //Debug.Log("First point within");
-                            RaycastHit hit2;
+                            // This is so that the while loop ends afterwards.
                             newPos = pos;
 
-                            Vector3 go = pos - (lastPos - pos) * Time.deltaTime;
-
-                            while (CheckForHitTwo(go, out hit2))
-                            {
-                                MakeRayhitSliceInfo(hit2, go);
-                                go = go - (lastPos - pos) * Time.deltaTime;
-                            }
+                            // This raycasts in a direction endlessly until there is no hit on the log.
+                            // It generates all the other points we need on the log
+                            RaycastToEndOfLog(pos - (lastPos - pos) * Time.deltaTime, lastPos - pos);
                         }
 
+                        // If both cond1 and cond2 didn't happen, then its a normal case.
                         if (!cond1 && !cond2)
                         {
                             MakeRayhitSliceInfo(hit, newPos);
@@ -183,10 +178,12 @@ namespace FiestaTime
                     else if (_hits.Count > 1)
                     {
                         // At the very least, i need 2 hits
+                        // This ends the slicing
                         SliceThisRound = true;
                         CanSlice = false;
                     }
 
+                    // If any of both cond1 and cond2 happened and I have more than one hit, end the slice
                     if((cond1 || cond2) && _hits.Count > 1)
                     {
                         // At the very least, i need 2 hits
@@ -194,11 +191,23 @@ namespace FiestaTime
                         CanSlice = false;
                     }
 
+                    // Just in case if MoveTowards can change newPos somehow and not make it end when necessary.
                     if (pos != newPos)
                     {
                         newPos = Vector3.MoveTowards(newPos, pos, Time.deltaTime);
                     } 
                 }
+            }
+        }
+
+        private void RaycastToEndOfLog(Vector3 go, Vector3 direction)
+        {
+            RaycastHit hit2;
+
+            while (CheckForHitTwo(go, out hit2))
+            {
+                MakeRayhitSliceInfo(hit2, go);
+                go = go - direction * Time.deltaTime;
             }
         }
 

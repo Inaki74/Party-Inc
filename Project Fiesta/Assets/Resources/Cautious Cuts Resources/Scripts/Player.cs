@@ -55,22 +55,9 @@ namespace FiestaTime
 
             private void ProcessSlice()
             {
-                Debug.Log("PROCESS SLICE 1");
                 RayhitSliceInfo start = _logHits.First();
                 RayhitSliceInfo last = _logHits.Last();
                 FallingLog theLog = start.objTransform.gameObject.GetComponent<FallingLog>();
-
-                //Debug.Log(theLog.photonView.IsMine);
-                //if (!theLog.photonView.IsMine && PhotonNetwork.IsConnected)
-                //{
-                //    // Cleanup
-                //    _touchSlicer.ClearHits();
-                //    _logHits.Clear();
-                //    _touchSlicer.WaitForSliceTimeout();
-                //    return;
-                //}
-
-                Debug.Log("PROCESS SLICE 2");
 
                 // Calculates the score
                 Vector3 slashPos = CalculateSliceScore(start, theLog);
@@ -109,22 +96,18 @@ namespace FiestaTime
                 float hAverage = 0f;
                 float wAverage = 0f;
 
-                Vector3 zero = start.objTransform.InverseTransformPoint(start.rayHit.point);// - _logHits.First().objVelocity * Time.fixedDeltaTime;
+                Vector3 zero = start.objTransform.InverseTransformPoint(start.rayHit.point);
 
-                //Debug.Log("START: " + zero.x + ", " + zero.y + ", " + zero.z);
-
+                // Get averages of all hits
                 foreach (RayhitSliceInfo a in _logHits)
                 {
                     i++;
-                    Vector3 v = a.objTransform.InverseTransformPoint(a.rayHit.point);// - a.objVelocity * Time.fixedDeltaTime;
+                    Vector3 v = a.objTransform.InverseTransformPoint(a.rayHit.point);
                     Vector3 vx = v - zero;
 
                     vAverage += vx;
                     hAverage += v.y;
                     wAverage += v.x;
-
-                    //Debug.Log("HIT POSITION " + i + ": " + vx.x + ", " + vx.y + ", " + vx.z);
-                    //theLog.SetHitpoint(a.rayHit.point + a.objVelocity * Time.fixedDeltaTime - a.objTransform.position);
                 }
 
                 float finalHeight = hAverage / i;
@@ -140,7 +123,6 @@ namespace FiestaTime
             {
                 float logA = theLog.GetAngle();
                 
-
                 if (theLog.LogType == FallingLog.LogClass.Large ||
                     theLog.LogType == FallingLog.LogClass.Medium ||
                     theLog.LogType == FallingLog.LogClass.Small_Horizontal ||
@@ -149,7 +131,6 @@ namespace FiestaTime
                     // HORIZONTAL
                     float logH = theLog.GetHeight();
                     float percentageH = EvaluateHeight(logH, height);
-                    //Debug.Log("LOGHEIGHT " + logH + " : " + height + " CUTHEIGHT");
                     float percentageA = EvaluateAngle(logA, angle);
 
                     float finalPercentage = percentageA * 20 / 100 + percentageH * 80 / 100; // Height amounts to 80% of the final score
@@ -161,14 +142,11 @@ namespace FiestaTime
                     angle = Mathf.Abs(angle);
                     float logW = theLog.GetWidth();
                     float percentageW = EvaluateWidth(logW, width);
-                    //Debug.Log("LOGWIDTH " + logW + " : " + width + " CUTWIDTH");
                     float percentageA = EvaluateAngle(logA, angle);
 
                     float finalPercentage = percentageA * 80 / 100 + percentageW * 20 / 100; // Width amounts to 20% of the final score
                     onLogSlicedScore.Invoke(percentageW, percentageA, finalPercentage);
                 }
-
-                //Debug.Log("LOGANGLE " + logA + " : " + angle + " CUTANGLE");
             }
 
             private float EvaluateWidth(float logW, float width)

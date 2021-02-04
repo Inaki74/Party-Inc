@@ -228,6 +228,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _logType: 2
+  _cc: {fileID: 0}
   _empty: {fileID: 4002009210590905436, guid: 1f81eef5df245436b8489458b5f34b16, type: 3}
   _hitPoint: {fileID: 2092392931365569443, guid: 328437340866048018508bff46d3a2b0,
     type: 3}
