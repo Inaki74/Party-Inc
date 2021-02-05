@@ -513,7 +513,7 @@ namespace FiestaTime
                 slices[0].GetComponent<Rigidbody>().velocity = toSliceRb.velocity;
 
                 // The small jump when cutting
-                Vector3 newNormal = norm + Vector3.up * _forceOnCut;
+                Vector3 newNormal = norm + new Vector3(Random.Range(-0.5f, 0.5f), 1f, 0.8f) * _forceOnCut;
                 rigidbody.AddForce(newNormal, ForceMode.Impulse);
             }
 

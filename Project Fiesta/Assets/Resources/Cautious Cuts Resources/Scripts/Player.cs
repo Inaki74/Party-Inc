@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
 using System.Linq;
-using ExitGames.Client.Photon;
 
 namespace FiestaTime
 {
@@ -49,6 +48,7 @@ namespace FiestaTime
                 {
                     // We got our cut this round
                     _logHits = _touchSlicer.GetHits();
+                    if (_logHits.Count <= 1) return;
                     ProcessSlice();
                 }
             }
@@ -57,7 +57,7 @@ namespace FiestaTime
             {
                 yield return new WaitUntil(() => GameManager.Current.Sliced.Count == GameManager.Current.playerCount);
 
-                yield return StartCoroutine(theLogCon.SendNextWaveCo(theLogCon.WaitTime));
+                theLogCon.SendNextWave();
             }
 
             private void ProcessSlice()
@@ -86,6 +86,12 @@ namespace FiestaTime
                 // Cuts the game object and creates the slices
                 // Manipulating the slices here wont affect through the network unless done specifically
                 GameObject[] slices = _touchSlicer.Slice(start.objTransform.gameObject, _logHits, false);
+
+                // Add more gravity to the pieces
+                ConstantForce c1 = slices[0].AddComponent<ConstantForce>();
+                ConstantForce c2 = slices[1].AddComponent<ConstantForce>();
+                c1.force = Physics.gravity * 2;
+                c2.force = Physics.gravity * 2;
 
                 SpawnSlashingParticles(theLog, start.rayHit.point, last.rayHit.point, slashPos);
 
@@ -136,94 +142,16 @@ namespace FiestaTime
                 float finalWidth = wAverage / i;
                 float finalAngle = Mathf.Atan(vAverage.normalized.y / vAverage.normalized.x) * Mathf.Rad2Deg;
 
-                EvaluateSlice(theLog, finalWidth, finalHeight, finalAngle);
+                float posEv;
+                float angEv;
+                float finEv;
+                ScoreEvaluator.EvaluateSlice(theLog, finalWidth, finalHeight, finalAngle, out posEv, out angEv, out finEv);
+
+                onLogSlicedScore.Invoke(posEv, angEv, finEv);
 
                 return zero;
             }
 
-            private void EvaluateSlice(FallingLog theLog, float width, float height, float angle)
-            {
-                float logA = theLog.GetAngle();
-                
-                if (theLog.LogType == FallingLog.LogClass.Large ||
-                    theLog.LogType == FallingLog.LogClass.Medium ||
-                    theLog.LogType == FallingLog.LogClass.Small_Horizontal ||
-                    theLog.LogType == FallingLog.LogClass.VerySmall_Horizontal)
-                {
-                    // HORIZONTAL
-                    float logH = theLog.GetHeight();
-                    float percentageH = EvaluateHeight(logH, height);
-                    float percentageA = EvaluateAngle(logA, angle);
-
-                    float finalPercentage = percentageA * 20 / 100 + percentageH * 80 / 100; // Height amounts to 80% of the final score
-                    onLogSlicedScore.Invoke(percentageH, percentageA, finalPercentage);
-                }
-                else
-                {
-                    // VERTICAL
-                    angle = Mathf.Abs(angle);
-                    float logW = theLog.GetWidth();
-                    float percentageW = EvaluateWidth(logW, width);
-                    float percentageA = EvaluateAngle(logA, angle);
-
-                    float finalPercentage = percentageA * 80 / 100 + percentageW * 20 / 100; // Width amounts to 20% of the final score
-                    onLogSlicedScore.Invoke(percentageW, percentageA, finalPercentage);
-                }
-            }
-
-            private float EvaluateWidth(float logW, float width)
-            {
-                float dw = Mathf.Abs(logW - width);
-                float distWToLeft = Mathf.Abs(logW - FallingLog.MinimumMarkWidth);
-                float distWToRight = Mathf.Abs(logW - FallingLog.MaximumMarkWidth);
-
-                if(distWToLeft >= distWToRight)
-                {
-                    return 100.00f - dw * 100 / distWToLeft;
-                }
-                else
-                {
-                    return 100.00f - dw * 100 / distWToRight;
-                }
-            }
-
-            private float EvaluateHeight(float logH, float height)
-            {
-                float dh = Mathf.Abs(logH - height);
-                float distHToBottom = Mathf.Abs(logH - FallingLog.MinimumMarkHeight);
-                float distHToTop = Mathf.Abs(logH - FallingLog.MaximumMarkHeight);
-
-                if (distHToBottom >= distHToTop)
-                {
-                    return 100.00f - dh * 100 / distHToBottom;
-                }
-                else
-                {
-                    return 100.00f - dh * 100 / distHToTop;
-                }
-            }
-
-            private float EvaluateAngle(float logA, float angle)
-            {
-                float percentageA = 0f;
-                float rA = angle - logA;
-
-                if (rA > 0f)
-                {
-                    percentageA = 100.00f - rA * 100 / FallingLog.MaximumMarkAngle;
-                }
-                else
-                {
-                    percentageA = 100.00f - rA * 100 / FallingLog.MinimumMarkAngle;
-                }
-
-                if (percentageA < 0)
-                {
-                    percentageA = 0f;
-                }
-
-                return percentageA;
-            }
         }
     }
 }

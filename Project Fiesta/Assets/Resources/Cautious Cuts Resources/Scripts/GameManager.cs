@@ -16,7 +16,10 @@ namespace FiestaTime
 
             [SerializeField] private GameObject _logSpawner;
 
-            private float _windowTime;
+            private float _windowTime; // -t/(h/a-b) + a
+            private float h = 60f; // Time for us to reach min window time
+            private float a = 1f; // Starting window time
+            private float b = 0.5f; // Min window time
 
             public GameObject test;
 
@@ -38,6 +41,8 @@ namespace FiestaTime
                     _sliced = value;
                 }
             }
+
+            public bool Testing { get; set; }
 
             protected override void InitializeGameManagerDependantObjects()
             {
@@ -95,17 +100,18 @@ namespace FiestaTime
                     }
                 }
 
-                if (GameBegan)
+                if (GameBegan && !Testing)
                 {
                     InGameTime += Time.deltaTime;
 
-                    if(InGameTime < 60f)
+                    if(InGameTime < h)
                     {
-                        _windowTime = -1 / (60f * 4/3) * InGameTime + 1;
+                        float div = h / (a - b);
+                        _windowTime = (-InGameTime / div) + a;
                     }
                     else
                     {
-                        _windowTime = 0.25f;
+                        _windowTime = b;
                     }
                 }
             }
@@ -148,22 +154,22 @@ namespace FiestaTime
                 switch (playerCount)
                 {
                     case 1:
-                        playerPositions[0] = new Vector3(0f, 1.2f, 0f);
+                        playerPositions[0] = new Vector3(0f, 1.2f, 5f);
                         break;
                     case 2:
-                        playerPositions[0] = new Vector3(4f, 1.2f, 0f);
-                        playerPositions[1] = new Vector3(-4f, 1.2f, 0f);
+                        playerPositions[0] = new Vector3(4f, 1.2f, 5f);
+                        playerPositions[1] = new Vector3(-4f, 1.2f, 5f);
                         break;
                     case 3:
-                        playerPositions[0] = new Vector3(4f, 1.2f, 0f);
-                        playerPositions[1] = new Vector3(0f, 1.2f, 0f);
-                        playerPositions[2] = new Vector3(-4f, 1.2f, 0f);
+                        playerPositions[0] = new Vector3(4f, 1.2f, 5f);
+                        playerPositions[1] = new Vector3(0f, 1.2f, 5f);
+                        playerPositions[2] = new Vector3(-4f, 1.2f, 5f);
                         break;
                     case 4:
-                        playerPositions[0] = new Vector3(6f, 1.2f, 0f);
-                        playerPositions[1] = new Vector3(2f, 1.2f, 0f);
-                        playerPositions[2] = new Vector3(-2f, 1.2f, 0f);
-                        playerPositions[3] = new Vector3(-6f, 1.2f, 0f);
+                        playerPositions[0] = new Vector3(6f, 1.2f, 5f);
+                        playerPositions[1] = new Vector3(2f, 1.2f, 5f);
+                        playerPositions[2] = new Vector3(-2f, 1.2f, 5f);
+                        playerPositions[3] = new Vector3(-6f, 1.2f, 5f);
                         break;
                     default:
                         break;
@@ -182,8 +188,9 @@ namespace FiestaTime
             {
                 if (eventData.Code == NextLogWaveEventCode && PhotonNetwork.IsMasterClient)
                 {
+                    _wave += 1;
                     // Any wait time that is greater than the serverLag * 2 will mean instant spawn. Approx 100ms at most 500ms (very bad server ping (250))
-                    Debug.Log("WAVE: " + _wave + ", TIME: " + InGameTime + " , WINDOW: " + _windowTime);
+                    //Debug.Log("WAVE: " + _wave + ", TIME: " + InGameTime + " , WINDOW: " + _windowTime);
                     float waitTime = 0f;
                     float windowTime = _windowTime;
 
@@ -218,7 +225,7 @@ namespace FiestaTime
                 }
 
                 int side;
-                if (Random.Range(0, 1) == 0)
+                if (Random.Range(0, 2) == 0)
                 {
                     side = -1;
                 }
@@ -275,12 +282,16 @@ namespace FiestaTime
                 photonView.RPC("RPC_SendSliced", RpcTarget.MasterClient);
             }
 
+            public void TestSetWindowTime(float set)
+            {
+                _windowTime = set;
+            }
+
             /// NETWORKING
             ///
             [PunRPC]
             public void RPC_SendSliced(PhotonMessageInfo info)
             {
-                Debug.Log("RECEIVING SLICED");
                 Sliced.Add(info.Sender.ActorNumber);
             }
         }

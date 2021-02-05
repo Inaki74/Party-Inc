@@ -48,19 +48,6 @@ namespace FiestaTime
                 }
             }
 
-            private float _timeToMove;
-            public float TimeToMove
-            {
-                get
-                {
-                    return _timeToMove;
-                }
-                set
-                {
-                    _timeToMove = value;
-                }
-            }
-
             // Start is called before the first frame update
             void Start()
             {
@@ -77,7 +64,7 @@ namespace FiestaTime
 
                 _whereToGo += _differenceFeetCenter;
 
-                photonView.RPC("RPC_SendTimes", RpcTarget.Others, WaitTime, WindowTime, TimeToMove);
+                photonView.RPC("RPC_SendTimes", RpcTarget.Others, WaitTime, WindowTime);
             }
 
             // Update is called once per frame
@@ -93,8 +80,6 @@ namespace FiestaTime
                         StartCoroutine(Wait());
                     }
                 }
-
-                
             }
 
             private IEnumerator Wait()
@@ -109,9 +94,7 @@ namespace FiestaTime
                 if(PhotonNetwork.IsMasterClient && photonView.IsMine)
                 {
                     //yield return StartCoroutine(SendNextWaveCo(WaitTime));
-                    object[] content = new object[] { };
-                    RaiseEventOptions raiseEventOptions = new RaiseEventOptions { Receivers = ReceiverGroup.All };
-                    PhotonNetwork.RaiseEvent(GameManager.NextLogWaveEventCode, content, raiseEventOptions, ExitGames.Client.Photon.SendOptions.SendReliable);
+                    SendNextWave();
                 }
 
                 if (photonView.IsMine)
@@ -124,9 +107,8 @@ namespace FiestaTime
                 Destroy(gameObject);
             }
 
-            public IEnumerator SendNextWaveCo(float wT)
+            public void SendNextWave()
             {
-                yield return new WaitUntil(() => (float)PhotonNetwork.Time >= wT);
                 object[] content = new object[] { };
                 RaiseEventOptions raiseEventOptions = new RaiseEventOptions { Receivers = ReceiverGroup.All };
                 PhotonNetwork.RaiseEvent(GameManager.NextLogWaveEventCode, content, raiseEventOptions, ExitGames.Client.Photon.SendOptions.SendReliable);
@@ -151,11 +133,10 @@ namespace FiestaTime
             /// NETWORKING
             ///
             [PunRPC]
-            public void RPC_SendTimes(float wT, float winT, float tTM)
+            public void RPC_SendTimes(float wT, float winT)
             {
                 WaitTime = wT;
                 WindowTime = winT;
-                TimeToMove = tTM;
             }
         }
     }

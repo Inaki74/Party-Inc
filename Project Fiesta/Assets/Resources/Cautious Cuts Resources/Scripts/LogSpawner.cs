@@ -57,7 +57,6 @@ namespace FiestaTime
                     float markPos = (float)data[3];
                     float markAngle = (float)data[4];
                     double photonSendTime = (double)data[5];
-                    //float lag = 0f;
 
                     // Generate log
                     // Decide log type
@@ -79,7 +78,6 @@ namespace FiestaTime
                     // Apply time things
                     logCon.WaitTime = waitTime + (float)photonSendTime + 0.4f;
                     logCon.WindowTime = windowTime;
-                    logCon.TimeToMove = (float)photonSendTime + 1f;
                 }
             }
 

@@ -49,8 +49,10 @@ namespace FiestaTime
             public static float MinimumMarkHeight = -1f;
             public static float MaximumMarkWidth = 0.5f;
             public static float MinimumMarkWidth = -0.5f;
-            public static float MaximumMarkAngle = 20f;
-            public static float MinimumMarkAngle = -20f;
+            public static float MaximumMarkAngleHorizontal = 50f;
+            public static float MinimumMarkAngleHorizontal = -50f;
+            public static float MaximumMarkAngleVertical = 110f;
+            public static float MinimumMarkAngleVertical = 70f;
 
             private GameObject _nextEmpty;
 

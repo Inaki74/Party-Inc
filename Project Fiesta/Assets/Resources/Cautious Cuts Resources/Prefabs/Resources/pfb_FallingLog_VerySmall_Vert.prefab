@@ -161,13 +161,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _logType: 5
-  _cc: {fileID: 0}
+  _cc: {fileID: 7387709210295929641}
   _empty: {fileID: 4002009210590905436, guid: 1f81eef5df245436b8489458b5f34b16, type: 3}
   _hitPoint: {fileID: 2092392931365569443, guid: 328437340866048018508bff46d3a2b0,
     type: 3}
   _mark: {fileID: 7538663309006234860}
   _setMarkEditor: 0
-  _angle: 90
+  _angle: 110
   _startHeight: 0
   _startWidth: 0
 --- !u!114 &1790040307656177947
@@ -267,7 +267,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7538663309006234860}
-  m_LocalRotation: {x: -0, y: -0, z: 0.7071068, w: 0.7071068}
+  m_LocalRotation: {x: -0, y: -0, z: 0.81915206, w: 0.57357645}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 2.08, y: 0.1, z: 1}
   m_Children: []

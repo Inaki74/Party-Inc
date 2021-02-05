@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using Photon.Pun;
 
 namespace FiestaTime
 {
@@ -13,16 +14,47 @@ namespace FiestaTime
             [SerializeField] private Text _angleText;
             [SerializeField] private Text _totalText;
 
+            [SerializeField] private Text countdownText;
+
+            /// TESTING
+            [SerializeField] private GameObject _testingButtonGO;
+            [SerializeField] private Button _testingButton;
+            [SerializeField] private GameObject _testingInputWindow;
+            [SerializeField] private InputField _testingFieldWindow;
+            ///
+
+            private bool _runOnce = false;
+
             // Start is called before the first frame update
             void Start()
             {
+                if (GameManager.Current.playerCount == 1 || !PhotonNetwork.IsConnected)
+                {
+                    _testingButtonGO.SetActive(true);
+                    if (GameManager.Current.Testing) _testingButton.GetComponentInChildren<Text>().text = "Change to Normal";
+                    else _testingButton.GetComponentInChildren<Text>().text = "Change to Testing";
+                }
 
+                countdownText.enabled = true;
             }
 
             // Update is called once per frame
             void Update()
             {
+                if (GameManager.Current.PlayersConnectedAndReady && !_runOnce)
+                {
+                    _runOnce = true;
+                    StartCoroutine(UIFunctions.ShowCountdownCo(this, countdownText, GameManager.Current.gameStartCountdown));
+                }
 
+                if (GameManager.Current.Testing)
+                {
+                    _testingInputWindow.SetActive(true);
+                }
+                else
+                {
+                    _testingInputWindow.SetActive(false);
+                }
             }
 
             private void DisplayScore(float height, float angle, float total)
@@ -42,6 +74,19 @@ namespace FiestaTime
             private void OnDestroy()
             {
                 Player.onLogSlicedScore -= DisplayScore;
+            }
+
+            public void OnInputDoneWindow()
+            {
+                GameManager.Current.TestSetWindowTime(float.Parse(_testingFieldWindow.text));
+            }
+
+            public void ActivateTestingMode()
+            {
+                GameManager.Current.Testing = !GameManager.Current.Testing;
+
+                if (GameManager.Current.Testing) _testingButton.GetComponentInChildren<Text>().text = "Change to Normal";
+                else _testingButton.GetComponentInChildren<Text>().text = "Change to Testing";
             }
         }
     }
