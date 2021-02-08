@@ -560,6 +560,15 @@ namespace FiestaTime
             {
                 StartCoroutine(DisableThemCo(pos, neg));
             }
+
+            if (sliceableInfo.SlicesHaveConstantForce)
+            {
+                // Add more gravity to the pieces
+                ConstantForce c1 = pos.AddComponent<ConstantForce>();
+                ConstantForce c2 = neg.AddComponent<ConstantForce>();
+                c1.force = sliceableInfo.SlicesConstantForce;
+                c2.force = sliceableInfo.SlicesConstantForce;
+            }
             
         }
 

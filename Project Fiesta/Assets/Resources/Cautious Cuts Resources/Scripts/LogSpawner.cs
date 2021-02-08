@@ -21,22 +21,9 @@ namespace FiestaTime
             [SerializeField] private float _spawnInterval;
             private float _currentTime = 0f;
 
-            // Start is called before the first frame update
-            void Start()
-            {
-
-            }
-
-            // Update is called once per frame
-            void Update()
-            {
-
-            }
-
             private void Awake()
             {
                 PhotonNetwork.NetworkingClient.EventReceived += SpawnLog;
-
             }
 
             private void OnDestroy()
@@ -46,17 +33,16 @@ namespace FiestaTime
 
             private void SpawnLog(EventData eventData)
             {
-                if(eventData.Code == GameManager.SpawnLogEventCode && photonView.IsMine)
+                if(eventData.Code == Constants.SpawnLogEventCode && photonView.IsMine)
                 {
                     object[] data = (object[])eventData.CustomData;
 
                     // Get data
-                    float waitTime = (float)data[0];
-                    float windowTime = (float)data[1];
-                    int logType = (int)data[2];
-                    float markPos = (float)data[3];
-                    float markAngle = (float)data[4];
-                    double photonSendTime = (double)data[5];
+                    float windowTime = (float)data[0];
+                    int logType = (int)data[1];
+                    float markPos = (float)data[2];
+                    float markAngle = (float)data[3];
+                    double photonSendTime = (double)data[4];
 
                     // Generate log
                     // Decide log type
@@ -76,7 +62,7 @@ namespace FiestaTime
                     newLog.GetComponent<PhotonView>().TransferOwnership(photonView.OwnerActorNr);
 
                     // Apply time things
-                    logCon.WaitTime = waitTime + (float)photonSendTime + 0.4f;
+                    logCon.WaitTime = (float)photonSendTime + 0.4f;
                     logCon.WindowTime = windowTime;
                 }
             }

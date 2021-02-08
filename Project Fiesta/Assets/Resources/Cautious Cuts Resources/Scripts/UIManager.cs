@@ -10,6 +10,8 @@ namespace FiestaTime
     {
         public class UIManager : MonoSingleton<UIManager>
         {
+            [SerializeField] private GameObject _finishScreen;
+
             [SerializeField] private Text _heightText;
             [SerializeField] private Text _angleText;
             [SerializeField] private Text _totalText;
@@ -64,16 +66,23 @@ namespace FiestaTime
                 _totalText.text = "TOTAL: " + total.ToString("0.00") + "%";
             }
 
+            private void OnGameFinish()
+            {
+                _finishScreen.SetActive(true);
+            }
+
             public override void Init()
             {
                 base.Init();
 
                 Player.onLogSlicedScore += DisplayScore;
+                GameManager.onGameFinish += OnGameFinish;
             }
 
             private void OnDestroy()
             {
                 Player.onLogSlicedScore -= DisplayScore;
+                GameManager.onGameFinish -= OnGameFinish;
             }
 
             public void OnInputDoneWindow()

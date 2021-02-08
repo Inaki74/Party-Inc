@@ -43,6 +43,12 @@ namespace FiestaTime
             [SerializeField]
             private float _timeOrDistanceToDeactivate = 0f;
 
+            [SerializeField]
+            private bool _slicesHaveConstantForce = false;
+
+            [SerializeField]
+            private Vector3 _slicesConstantForce = Vector3.zero;
+
             public bool IsSolid
             {
                 get
@@ -149,6 +155,30 @@ namespace FiestaTime
                 set
                 {
                     _timeOrDistanceToDeactivate = value;
+                }
+            }
+
+            public bool SlicesHaveConstantForce
+            {
+                get
+                {
+                    return _slicesHaveConstantForce;
+                }
+                set
+                {
+                    _slicesHaveConstantForce = value;
+                }
+            }
+
+            public Vector3 SlicesConstantForce
+            {
+                get
+                {
+                    return _slicesConstantForce;
+                }
+                set
+                {
+                    _slicesConstantForce = value;
                 }
             }
 

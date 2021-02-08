@@ -110,6 +110,11 @@ namespace FiestaTime
             return string.Format("{0:00}", minutes) + ":" + string.Format("{0:00}", seconds) + "." + string.Format("{0:00}", miliseconds);
         }
 
+        public static string ShowInPercentage(float per)
+        {
+            return per.ToString("0.00") + "%";
+        }
+
         public static bool CheckForLoop(int f)
         {
             // 3 Conditions

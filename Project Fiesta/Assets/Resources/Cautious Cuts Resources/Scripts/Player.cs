@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
 using System.Linq;
+using Photon.Realtime;
+using ExitGames.Client.Photon;
 
 namespace FiestaTime
 {
     namespace CC
     {
-
         public class Player : MonoBehaviourPun
         {
             public delegate void ActionSliceLog(float p, float a, float t);
@@ -21,6 +22,8 @@ namespace FiestaTime
             [SerializeField] private TouchSlicer _touchSlicer;
 
             private List<RayhitSliceInfo> _logHits = new List<RayhitSliceInfo>();
+
+            private float _myTotalScore;
 
             // Start is called before the first frame update
             void Start()
@@ -51,6 +54,16 @@ namespace FiestaTime
                     if (_logHits.Count <= 1) return;
                     ProcessSlice();
                 }
+            }
+
+            private void Awake()
+            {
+                PhotonNetwork.NetworkingClient.EventReceived += SendMyResults;
+            }
+
+            private void OnDestroy()
+            {
+                PhotonNetwork.NetworkingClient.EventReceived -= SendMyResults;
             }
 
             private IEnumerator WaitForAllSlicesCo(LogController theLogCon)
@@ -86,12 +99,6 @@ namespace FiestaTime
                 // Cuts the game object and creates the slices
                 // Manipulating the slices here wont affect through the network unless done specifically
                 GameObject[] slices = _touchSlicer.Slice(start.objTransform.gameObject, _logHits, false);
-
-                // Add more gravity to the pieces
-                ConstantForce c1 = slices[0].AddComponent<ConstantForce>();
-                ConstantForce c2 = slices[1].AddComponent<ConstantForce>();
-                c1.force = Physics.gravity * 2;
-                c2.force = Physics.gravity * 2;
 
                 SpawnSlashingParticles(theLog, start.rayHit.point, last.rayHit.point, slashPos);
 
@@ -149,9 +156,29 @@ namespace FiestaTime
 
                 onLogSlicedScore.Invoke(posEv, angEv, finEv);
 
+                _myTotalScore += finEv;
+
                 return zero;
             }
 
+            /// NETWORKING
+            ///
+            private void SendMyResults(EventData eventData)
+            {
+                if (eventData.Code == Constants.GivePlayerResultEventCode && photonView.IsMine)
+                {
+                    float finalScore = _myTotalScore / Constants.AMOUNT_OF_LOGS_PER_MATCH;
+                    if (finalScore > PlayerPrefs.GetFloat(FiestaTime.Constants.CC_KEY_HISCORE))
+                    {
+                        GameManager.Current.IsHighScore = true;
+                        PlayerPrefs.SetFloat(FiestaTime.Constants.CC_KEY_HISCORE, finalScore);
+                    }
+
+                    object[] content = new object[] { PhotonNetwork.LocalPlayer.ActorNumber, finalScore };
+                    RaiseEventOptions raiseEventOptions = new RaiseEventOptions { Receivers = ReceiverGroup.All };
+                    PhotonNetwork.RaiseEvent(Constants.GetPlayerResultsEventCode, content, raiseEventOptions, SendOptions.SendReliable);
+                }
+            }
         }
     }
 }

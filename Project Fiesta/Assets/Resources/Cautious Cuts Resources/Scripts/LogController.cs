@@ -93,7 +93,6 @@ namespace FiestaTime
                 // Trigger event where next wave is spawned
                 if(PhotonNetwork.IsMasterClient && photonView.IsMine)
                 {
-                    //yield return StartCoroutine(SendNextWaveCo(WaitTime));
                     SendNextWave();
                 }
 
@@ -101,32 +100,24 @@ namespace FiestaTime
                 {
                     onLogDestroyed.Invoke();
                 }
-                
+
                 // Dispose of the log
                 // Later I gotta save it? Ill see.
-                Destroy(gameObject);
+                gameObject.SetActive(false);
             }
 
             public void SendNextWave()
             {
                 object[] content = new object[] { };
                 RaiseEventOptions raiseEventOptions = new RaiseEventOptions { Receivers = ReceiverGroup.All };
-                PhotonNetwork.RaiseEvent(GameManager.NextLogWaveEventCode, content, raiseEventOptions, ExitGames.Client.Photon.SendOptions.SendReliable);
-            }
-
-            private void OnEnable()
-            {
-                //photonView.RPC("RPC_SetActive", RpcTarget.Others, true);
+                PhotonNetwork.RaiseEvent(Constants.NextLogWaveEventCode, content, raiseEventOptions, ExitGames.Client.Photon.SendOptions.SendReliable);
             }
 
             private void OnDisable()
             {
-                //photonView.TransferOwnership(0);
                 transform.rotation = Quaternion.identity;
                 _rb.velocity = Vector3.zero;
                 _rb.angularVelocity = Vector3.zero;
-
-                //photonView.RPC("RPC_SetActive", RpcTarget.Others, false);
             }
 
 

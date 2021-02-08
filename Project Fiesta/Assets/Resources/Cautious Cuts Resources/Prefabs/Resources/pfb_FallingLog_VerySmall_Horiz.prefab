@@ -175,6 +175,8 @@ MonoBehaviour:
   _destroy: 1
   _deactivateAfterTime: 0
   _timeOrDistanceToDeactivate: -45
+  _slicesHaveConstantForce: 1
+  _slicesConstantForce: {x: 0, y: -29.43, z: 0}
 --- !u!114 &193653406293084743
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -342,3 +344,5 @@ MonoBehaviour:
   _destroy: 0
   _deactivateAfterTime: 0
   _timeOrDistanceToDeactivate: 0
+  _slicesHaveConstantForce: 0
+  _slicesConstantForce: {x: 0, y: 0, z: 0}
