@@ -9,8 +9,6 @@ namespace FiestaTime
 {
     public class NetworkGameRoomController : MonoBehaviourPunCallbacks
     {
-        [SerializeField] private GameObject gameManager;
-
         public bool playersAreReady;
 
         Hashtable playersReady = new Hashtable();

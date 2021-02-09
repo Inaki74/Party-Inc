@@ -77,7 +77,7 @@ namespace FiestaTime
 
         public ExitGames.Client.Photon.Hashtable CustomProps { get; protected set; }
 
-        public bool IsHighScore { get; protected set; }
+        public bool IsHighScore { get; set; }
         public int WinnerId { get; protected set; }
         public bool GameBegan { get; protected set; }
         public float InGameTime { get; protected set; }

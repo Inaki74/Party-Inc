@@ -64,6 +64,14 @@ MonoBehaviour:
   - Bro
   - RPC_SendBegin
   - RPC_SendInGameTime
+  - RPC_SendDifficulties
+  - RPC_SliceLog
+  - RPC_SetActive
+  - RPC_SetPosition
+  - RPC_SetMark
+  - RPC_SendMark
+  - RPC_SendTimes
+  - RPC_SendSliced
   DisableAutoOpenWizard: 1
   ShowSettings: 0
   DevRegionSetOnce: 1

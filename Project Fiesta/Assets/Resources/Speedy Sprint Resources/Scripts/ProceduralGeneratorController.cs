@@ -453,6 +453,9 @@ namespace FiestaTime
 
                 // EE EM EM MM MH MH HH
                 }
+
+                // Update the new difficulties to the rest of players
+                photonView.RPC("RPC_SendDifficulties", RpcTarget.Others, _easyThisRound, _mediumThisRound, _hardThisRound);
             }
 
             /// <summary>
@@ -517,6 +520,14 @@ namespace FiestaTime
             public void RPC_SendSection(int[] section)
             {
                 PlaceSection(section);
+            }
+
+            [PunRPC]
+            public void RPC_SendDifficulties(int easy, int med, int hard)
+            {
+                _easyThisRound = easy;
+                _mediumThisRound = med;
+                _hardThisRound = hard;
             }
         }
     }

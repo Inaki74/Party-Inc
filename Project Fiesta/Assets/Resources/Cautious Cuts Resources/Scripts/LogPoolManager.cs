@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Photon.Pun;
 
 namespace FiestaTime
 {
@@ -33,7 +34,12 @@ namespace FiestaTime
             // Start is called before the first frame update
             void Start()
             {
+                if (!PhotonNetwork.IsMasterClient && PhotonNetwork.IsConnected) return;
 
+                for(int i = 0; i < 10; i++)
+                {
+                    GenerateLog();
+                }
             }
 
             /// <summary>
@@ -42,7 +48,8 @@ namespace FiestaTime
             /// <param name="subsection"></param>
             private void GenerateLog()
             {
-                GameObject newLog = Instantiate(_logPrefab);
+                GameObject newLog = PhotonNetwork.Instantiate(_logPrefab.name, new Vector3(20f, 20f, 0f), Quaternion.identity);
+                //newLog.GetComponent<PhotonView>().TransferOwnership(0);
                 newLog.transform.parent = _logHolder.transform;
                 newLog.SetActive(false);
                 _logs.Add(newLog);
