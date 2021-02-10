@@ -2,6 +2,8 @@
 using UnityEngine;
 using Photon.Pun;
 using System.Linq;
+using Photon.Realtime;
+using ExitGames.Client.Photon;
 
 namespace FiestaTime
 {
@@ -101,7 +103,7 @@ namespace FiestaTime
             {
                 base.Init();
 
-                RopeControllerM.onLoopComplete += OnRoundCompleted;
+                PhotonNetwork.NetworkingClient.EventReceived += OnRoundCompleted;
                 Player.onPlayerDied += OnPlayerFinished;
             }
 
@@ -110,7 +112,7 @@ namespace FiestaTime
             #region Unity Callbacks
             private void OnDestroy()
             {
-                RopeControllerM.onLoopComplete -= OnRoundCompleted;
+                PhotonNetwork.NetworkingClient.EventReceived -= OnRoundCompleted;
                 Player.onPlayerDied -= OnPlayerFinished;
             }
 
@@ -275,17 +277,6 @@ namespace FiestaTime
                         }
                     }
 
-                    string difficulty = "EASY";
-                    if(currentJump >= 25 && currentJump < 50)
-                    {
-                        difficulty = "MEDIUM";
-                    }
-                    else if(currentJump >= 50)
-                    {
-                        difficulty = "HARD";
-                    }
-
-                    Debug.Log("DOING " + difficulty + " INVERSION AT: " + whereToInverse + " DEGREES");
                     // Inverse
                     rope.InvertRope(whereToInverse * Mathf.Deg2Rad);
                 }
@@ -314,25 +305,25 @@ namespace FiestaTime
                         {
                             //Increase
                             decreaseBurstPossibility += 0.1f;
-                            howMuchBurst = 2f;
+                            howMuchBurst = 1f;
                         }
                         else
                         {
                             //Decrease
                             decreaseBurstPossibility -= 0.1f;
-                            howMuchBurst = -2f;
+                            howMuchBurst = -1f;
                         }
                     }else if (rope.rotationSpeed < 0f)
                     {
                         if (a > decreaseBurstPossibility)
                         {
                             decreaseBurstPossibility += 0.1f;
-                            howMuchBurst = 2f;
+                            howMuchBurst = 1f;
                         }
                         else
                         {
                             decreaseBurstPossibility -= 0.1f;
-                            howMuchBurst = -2f;
+                            howMuchBurst = -1f;
                         }
                     }
 
@@ -430,20 +421,27 @@ namespace FiestaTime
                 nextToInsert--;
                 playersAlive--;
 
-                if (playerId == PhotonNetwork.LocalPlayer.ActorNumber) isHighScore = GeneralHelperFunctions.DetermineHighScoreInt(Constants.RR_KEY_HISCORE, thisPlayerResult.scoring, true);
+                if (playerId == PhotonNetwork.LocalPlayer.ActorNumber) isHighScore = GeneralHelperFunctions.DetermineHighScoreInt(FiestaTime.Constants.RR_KEY_HISCORE, thisPlayerResult.scoring, true);
             }
 
             #endregion
 
             #region Event Functions
 
-            private void OnRoundCompleted()
+            private void OnRoundCompleted(EventData eventData)
             {
-                currentJump += 1;
+                if(eventData.Code == Constants.OnLoopEventCode && playersAlive > 0)
+                {
+                    currentJump += 1;
 
-                Debug.Log("CURRENT JUMP: " + currentJump + ", CURRENT SPEED: " + rope.rotationSpeed + ", AT TIME: " + InGameTime);
+                    UIManager.Current.OnRoundCompleted();
 
-                CheckCheckpoints();
+                    Debug.Log("CURRENT JUMP: " + currentJump + ", CURRENT SPEED: " + rope.rotationSpeed + ", AT TIME: " + InGameTime);
+
+                    if (!PhotonNetwork.IsMasterClient) return;
+
+                    CheckCheckpoints();
+                }
             }
 
             private void OnPlayerFinished(int playerId, int score)
@@ -466,6 +464,7 @@ namespace FiestaTime
                         rope.rotationSpeed += speedIncreasePerMoves * Mathf.Sign(rope.rotationSpeed);
                     }
                 }
+
 
                 if (randomInverse != 0)
                 {
@@ -500,7 +499,7 @@ namespace FiestaTime
                 if (currentJump == thresholdPeak)
                 {
                     chkpnt_Peak = true;
-                    rope.rotationSpeed += 2f;
+                    rope.rotationSpeed += 0.5f * Mathf.Sign(rope.rotationSpeed);
                 }
 
                 if (currentJump == thresholdInverseH)
@@ -515,7 +514,7 @@ namespace FiestaTime
 
                 if (currentJump == thresholdDeath)
                 {
-                    rope.rotationSpeed += 4f;
+                    rope.rotationSpeed += 0.5f * Mathf.Sign(rope.rotationSpeed);
                 }
             }
 

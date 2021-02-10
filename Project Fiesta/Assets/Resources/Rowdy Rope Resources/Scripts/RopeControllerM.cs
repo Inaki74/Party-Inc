@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
+using Photon.Realtime;
+using ExitGames.Client.Photon;
 
 namespace FiestaTime
 {
@@ -10,7 +12,7 @@ namespace FiestaTime
         /// <summary>
         /// A rope thats managed mathematically in opposition to physics.
         /// </summary>
-        public class RopeControllerM : MonoBehaviourPun, IPunObservable
+        public class RopeControllerM : MonoBehaviourPun
         {
             public delegate void ActionLoopCompleted();
             public static event ActionLoopCompleted onLoopComplete;
@@ -30,17 +32,22 @@ namespace FiestaTime
             private bool firstRun;
             public bool loopCompleted = true;
 
-
+            
 
             public float angle;
             public float rotationSpeed = 1f;
-            public float lastRotationSign;
 
             #region Unity Callbacks
 
             // Update is called once per frame
             void Update()
             {
+                if (!PhotonNetwork.IsMasterClient && PhotonNetwork.IsConnected)
+                {
+
+                    return;
+                }
+
                 if (gameStarted)
                 {
                     if (firstRun)
@@ -49,13 +56,11 @@ namespace FiestaTime
                         firstRun = false;
                     }
 
-                    Debug.DrawRay(transform.position, transform.TransformDirection(new Vector3(Mathf.Cos(angle), Mathf.Sin(angle), 0f) * 5f), Color.red);
-                    angle += Time.deltaTime * rotationSpeed;
-
                     if (angle > Mathf.PI * 2)
                     {
                         loopCompleted = false;
-                        angle = 0f;
+                        float angleDiff = angle - Mathf.PI * 2;
+                        angle = angleDiff;
                     }
 
                     if (angle < Mathf.PI && angle > 175f * Mathf.Deg2Rad && rotationSpeed < 0f)
@@ -66,19 +71,27 @@ namespace FiestaTime
                     if (angle < 0f)
                     {
                         loopCompleted = false;
-                        angle = Mathf.PI * 2;
+                        float angleDiff = Mathf.Abs(angle);
+                        angle = Mathf.PI * 2 - angleDiff;
                     }
 
                     if (rotationSpeed < 0f && angle < Mathf.PI / 4 && !loopCompleted)
                     {
                         loopCompleted = true;
-                        onLoopComplete?.Invoke();
+                        object[] content = new object[] { };
+                        RaiseEventOptions raiseEventOptions = new RaiseEventOptions { Receivers = ReceiverGroup.All };
+                        PhotonNetwork.RaiseEvent(Constants.OnLoopEventCode, content, raiseEventOptions, SendOptions.SendReliable);
                     }
                     if (rotationSpeed > 0f && angle > 3 * Mathf.PI / 4 && !loopCompleted)
                     {
                         loopCompleted = true;
-                        onLoopComplete?.Invoke();
+                        object[] content = new object[] { };
+                        RaiseEventOptions raiseEventOptions = new RaiseEventOptions { Receivers = ReceiverGroup.All };
+                        PhotonNetwork.RaiseEvent(Constants.OnLoopEventCode, content, raiseEventOptions, SendOptions.SendReliable);
                     }
+
+                    Debug.DrawRay(transform.position, transform.TransformDirection(new Vector3(Mathf.Cos(angle), Mathf.Sin(angle), 0f) * 5f), Color.red);
+                    angle += Time.deltaTime * rotationSpeed;
                 }
 
             }
@@ -159,7 +172,6 @@ namespace FiestaTime
 
                 rotationSpeed *= -1;
                 loopCompleted = true;
-                photonView.RPC("RPC_SendInversion", RpcTarget.Others);
             }
 
             /// <summary>
@@ -184,7 +196,6 @@ namespace FiestaTime
                     yield return new WaitUntil(() => angle < 80f * Mathf.Deg2Rad && angle > 80f * Mathf.Deg2Rad - 10f * Mathf.Deg2Rad);
 
                 rotationSpeed += amount * Mathf.Sign(rotationSpeed);
-                photonView.RPC("RPC_SendBurst", RpcTarget.Others, amount);
             }
 
             #endregion
@@ -201,37 +212,6 @@ namespace FiestaTime
                 gameStarted = false;
                 //loopCompleted = true;
                 rotationSpeed = 0f;
-            }
-
-            #endregion
-
-            #region Photon Sync
-
-            [PunRPC]
-            public void RPC_SendInversion()
-            {
-                rotationSpeed *= -1;
-                loopCompleted = true;
-            }
-
-            [PunRPC]
-            public void RPC_SendBurst(float amount)
-            {
-                rotationSpeed += amount * Mathf.Sign(rotationSpeed);
-            }
-
-            public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
-            {
-                if (stream.IsWriting)
-                {
-                    if(gameStarted && GameManager.Current.MyPlayerHasLost())
-                        stream.SendNext(rotationSpeed);
-                }
-                else
-                {
-                    if (gameStarted && GameManager.Current.MyPlayerHasLost())
-                        rotationSpeed = (float)stream.ReceiveNext();
-                }
             }
 
             #endregion

@@ -99,7 +99,7 @@ namespace FiestaTime
                 }
                 else
                 {
-                    cheatInput = Input.GetKey(KeyCode.Space);
+                    cheatInput = true;
 
                     jumpInput = Input.GetKey(KeyCode.UpArrow) || Input.GetKey(KeyCode.W);
                 }

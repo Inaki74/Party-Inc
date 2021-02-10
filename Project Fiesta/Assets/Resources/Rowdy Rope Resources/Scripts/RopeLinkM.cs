@@ -85,6 +85,8 @@ namespace FiestaTime
             /// </summary>
             private void MoveLink()
             {
+                currentAngle = ropeController.angle;
+
                 Vector3 nextPos = new Vector3(Mathf.Cos(currentAngle) * radius,
                                               Mathf.Sin(currentAngle) * radius,
                                               transform.localPosition.z);
@@ -123,18 +125,6 @@ namespace FiestaTime
                     }
 
                 }
-
-                if (currentAngle > Mathf.PI * 2)
-                {
-                    currentAngle = 0f;
-                }
-
-                if (currentAngle < 0)
-                {
-                    currentAngle = Mathf.PI * 2;
-                }
-
-                currentAngle += Time.deltaTime * ropeController.rotationSpeed;
             }
         }
     }

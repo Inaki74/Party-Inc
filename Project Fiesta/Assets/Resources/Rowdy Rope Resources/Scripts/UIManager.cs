@@ -7,7 +7,7 @@ namespace FiestaTime
 {
     namespace RR
     {
-        public class UIManager : MonoBehaviour
+        public class UIManager : MonoSingleton<UIManager>
         {
             [SerializeField] private GameObject finishScreen;
             [SerializeField] private Text finishText;
@@ -23,12 +23,12 @@ namespace FiestaTime
                 scoreText.text = "00";
             }
 
-            private void Awake()
+            public override void Init()
             {
+                base.Init();
                 RopeControllerM.onLoopComplete += OnRoundCompleted;
                 GameManager.onGameFinish += OnGameFinish;
             }
-
             private void OnDestroy()
             {
                 RopeControllerM.onLoopComplete -= OnRoundCompleted;
@@ -48,7 +48,7 @@ namespace FiestaTime
                 StartCoroutine("ActivateFinishScreenCo");
             }
 
-            private void OnRoundCompleted()
+            public void OnRoundCompleted()
             {
                 scoreText.text = string.Format("{0:0}", GameManager.Current.currentJump);
             }
