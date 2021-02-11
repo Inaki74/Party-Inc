@@ -18,7 +18,7 @@ namespace FiestaTime
     {
         private bool _infoReceived;
 
-        private double _interpolationBackTime = (1 / PhotonNetwork.SendRate) + 0.05; //0.15 = 150ms
+        private double _interpolationBackTime; //0.15 = 150ms
         private double _extrapolationLimit = 0.5;
 
         protected struct State
@@ -29,6 +29,11 @@ namespace FiestaTime
 
         private State[] _bufferedState = new State[PhotonNetwork.SendRate * 2];
         private int _timestampCount;
+
+        private void Awake()
+        {
+            _interpolationBackTime = (1d / PhotonNetwork.SendRate) + 0.015;
+        }
 
         // Update is called once per frame
         void Update()

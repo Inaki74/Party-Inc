@@ -103,8 +103,8 @@ namespace FiestaTime
             {
                 base.Init();
 
-                PhotonNetwork.SendRate = 12;
-                PhotonNetwork.SerializationRate = 12;
+                PhotonNetwork.SendRate = 15;
+                PhotonNetwork.SerializationRate = 15;
 
                 PhotonNetwork.NetworkingClient.EventReceived += OnRoundCompleted;
                 Player.onPlayerDied += OnPlayerFinished;
