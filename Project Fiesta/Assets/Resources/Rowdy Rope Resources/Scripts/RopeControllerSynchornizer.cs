@@ -7,26 +7,17 @@ namespace FiestaTime
 {
     namespace RR
     {
+        public struct AngleSync
+        {
+            public float angle;
+            public float rotationSpeed;
+        }
+
         [RequireComponent(typeof(RopeControllerM))]
-        public class RopeControllerSynchornizer : MonoBehaviourPun, IPunObservable
+        public class RopeControllerSynchornizer : SnapshotInterpolator<AngleSync>
         {
             [SerializeField]
             private RopeControllerM _ropeController;
-
-            private bool _infoReceived;
-
-            private double _interpolationBackTime = 0.15; //0.15 = 150ms
-            private double _extrapolationLimit = 0.5;
-
-            private State[] _bufferedState = new State[20];
-            private int _timestampCount;
-
-            private struct State
-            {
-                public double timestamp;
-                public float angle;
-                public float rotationSpeed;
-            }
 
             private void Start()
             {
@@ -36,125 +27,67 @@ namespace FiestaTime
                 }
             }
 
-            // Update is called once per frame
-            void Update()
+            protected override void Interpolate(State rhs, State lhs, float t)
             {
-                if (PhotonNetwork.IsMasterClient)
+                Debug.Log("Interpolating " + this.GetType().ToString());
+
+                AngleSync rhsInfo = rhs.info;
+                AngleSync lhsInfo = lhs.info;
+
+                _ropeController.angle = Mathf.LerpAngle(lhsInfo.angle * Mathf.Rad2Deg, rhsInfo.angle * Mathf.Rad2Deg, t) * Mathf.Deg2Rad;
+                _ropeController.rotationSpeed = rhsInfo.rotationSpeed;
+
+                if (_ropeController.angle > Mathf.PI * 2)
                 {
-                    return;
+                    float angleDiff = _ropeController.angle - Mathf.PI * 2;
+                    _ropeController.angle = angleDiff;
                 }
 
-                if (_infoReceived)
+                if (_ropeController.angle < 0f)
                 {
-                    double interpTime = PhotonNetwork.Time - _interpolationBackTime;
-
-                    if(interpTime < _bufferedState[0].timestamp)
-                    {
-                        // INTERPOLATE
-                        for(int i = 0; i < _timestampCount; i++)
-                        {
-                            if(_bufferedState[i].timestamp <= interpTime || i == _timestampCount - 1)
-                            {
-                                // The state one slot newer (<100ms) than the best playback state
-                                State rhs = _bufferedState[Mathf.Max(i - 1, 0)];
-                                // The best playback state (closest to 100 ms old (default time))
-                                State lhs = _bufferedState[i];
-
-                                // Use the time between the two slots to determine if interpolation is necessary
-                                double length = rhs.timestamp - lhs.timestamp;
-                                float t = 0.0f;
-                                // As the time difference gets closer to 100 ms t gets closer to 1 in
-                                // which case rhs is only used
-                                if (length > 0.0001)
-                                {
-                                    t = (float)((interpTime - lhs.timestamp) / length);
-                                }
-                                // if t=0 => lhs is used directly
-                                _ropeController.angle = Mathf.LerpAngle(lhs.angle * Mathf.Rad2Deg, rhs.angle * Mathf.Rad2Deg, t) * Mathf.Deg2Rad;
-                                _ropeController.rotationSpeed = rhs.rotationSpeed;
-
-                                if (_ropeController.angle > Mathf.PI * 2)
-                                {
-                                    float angleDiff = _ropeController.angle - Mathf.PI * 2;
-                                    _ropeController.angle = angleDiff;
-                                }
-
-                                if (_ropeController.angle < 0f)
-                                {
-                                    float angleDiff = Mathf.Abs(_ropeController.angle);
-                                    _ropeController.angle = Mathf.PI * 2 - angleDiff;
-                                }
-
-                                return;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        // EXTRAPOLATE
-                        State newest = _bufferedState[0];
-
-                        float extrapTime = (float)(interpTime - newest.timestamp);
-
-                        if(extrapTime < _extrapolationLimit)
-                        {
-                            _ropeController.rotationSpeed = newest.rotationSpeed;
-                            _ropeController.angle = newest.angle + extrapTime * _ropeController.rotationSpeed;
-
-                            if (_ropeController.angle > Mathf.PI * 2)
-                            {
-                                float angleDiff = _ropeController.angle - Mathf.PI * 2;
-                                _ropeController.angle = angleDiff;
-                            }
-
-                            if (_ropeController.angle < 0f)
-                            {
-                                float angleDiff = Mathf.Abs(_ropeController.angle);
-                                _ropeController.angle = Mathf.PI * 2 - angleDiff;
-                            }
-                        }
-                    }
+                    float angleDiff = Mathf.Abs(_ropeController.angle);
+                    _ropeController.angle = Mathf.PI * 2 - angleDiff;
                 }
             }
 
-            public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+            protected override void Extrapolate(State newest, float extrapTime)
             {
-                if (stream.IsWriting && PhotonNetwork.IsMasterClient)
+                Debug.Log("Extrapolating " + this.GetType().ToString());
+
+                AngleSync newestInfo = newest.info;
+
+                _ropeController.rotationSpeed = newestInfo.rotationSpeed;
+                _ropeController.angle = newestInfo.angle + extrapTime * _ropeController.rotationSpeed;
+
+                if (_ropeController.angle > Mathf.PI * 2)
                 {
-                    Debug.Log("Sending");
-                    stream.SendNext(_ropeController.angle);
-                    stream.SendNext(_ropeController.rotationSpeed);
+                    float angleDiff = _ropeController.angle - Mathf.PI * 2;
+                    _ropeController.angle = angleDiff;
                 }
-                else
+
+                if (_ropeController.angle < 0f)
                 {
-                    _infoReceived = true;
-
-                    float netAngle = (float)stream.ReceiveNext();
-                    float netRotSpeed = (float)stream.ReceiveNext();
-
-                    // Shift state and delete state 20
-                    for (int i = _bufferedState.Length - 1; i >= 1; i--)
-                    {
-                        _bufferedState[i] = _bufferedState[i - 1];
-                    }
-
-                    State stt;
-                    stt.angle = netAngle;
-                    stt.timestamp = info.SentServerTime;
-                    stt.rotationSpeed = netRotSpeed;
-                    _bufferedState[0] = stt;
-
-                    _timestampCount = Mathf.Min(_timestampCount + 1, _bufferedState.Length);
-
-                    for(int i = 0; i < _timestampCount - 1; i++)
-                    {
-                        if(_bufferedState[i].timestamp < _bufferedState[i + 1].timestamp)
-                        {
-                            // State inconsistent
-                            Debug.Log("INCONSISTENT STATE!");
-                        }
-                    }
+                    float angleDiff = Mathf.Abs(_ropeController.angle);
+                    _ropeController.angle = Mathf.PI * 2 - angleDiff;
                 }
+            }
+
+            protected override void SendInformation(PhotonStream stream, PhotonMessageInfo info)
+            {
+                stream.SendNext(_ropeController.angle);
+                stream.SendNext(_ropeController.rotationSpeed);
+            }
+
+            protected override AngleSync ReceiveInformation(PhotonStream stream, PhotonMessageInfo info)
+            {
+                float netAngle = (float)stream.ReceiveNext();
+                float netRotSpeed = (float)stream.ReceiveNext();
+
+                AngleSync ret;
+                ret.angle = netAngle;
+                ret.rotationSpeed = netRotSpeed;
+
+                return ret;
             }
         }
     }

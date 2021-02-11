@@ -103,6 +103,9 @@ namespace FiestaTime
             {
                 base.Init();
 
+                PhotonNetwork.SendRate = 12;
+                PhotonNetwork.SerializationRate = 12;
+
                 PhotonNetwork.NetworkingClient.EventReceived += OnRoundCompleted;
                 Player.onPlayerDied += OnPlayerFinished;
             }
@@ -112,6 +115,9 @@ namespace FiestaTime
             #region Unity Callbacks
             private void OnDestroy()
             {
+                PhotonNetwork.SendRate = 10;
+                PhotonNetwork.SerializationRate = 10;
+
                 PhotonNetwork.NetworkingClient.EventReceived -= OnRoundCompleted;
                 Player.onPlayerDied -= OnPlayerFinished;
             }
