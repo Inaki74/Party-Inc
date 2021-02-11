@@ -301,30 +301,32 @@ namespace FiestaTime
 
                     if(rope.rotationSpeed > 0f)
                     {
-                        if(a > decreaseBurstPossibility)
-                        {
-                            //Increase
-                            decreaseBurstPossibility += 0.1f;
-                            howMuchBurst = 1f;
-                        }
-                        else
-                        {
-                            //Decrease
-                            decreaseBurstPossibility -= 0.1f;
-                            howMuchBurst = -1f;
-                        }
+                        howMuchBurst = 1f;
+                        //if (a > decreaseBurstPossibility)
+                        //{
+                        //    //Increase
+                        //    decreaseBurstPossibility += 0.1f;
+                        //    howMuchBurst = 1f;
+                        //}
+                        //else
+                        //{
+                        //    //Decrease
+                        //    decreaseBurstPossibility -= 0.1f;
+                        //    howMuchBurst = -1f;
+                        //}
                     }else if (rope.rotationSpeed < 0f)
                     {
-                        if (a > decreaseBurstPossibility)
-                        {
-                            decreaseBurstPossibility += 0.1f;
-                            howMuchBurst = 1f;
-                        }
-                        else
-                        {
-                            decreaseBurstPossibility -= 0.1f;
-                            howMuchBurst = -1f;
-                        }
+                        howMuchBurst = -1f;
+                        //if (a > decreaseBurstPossibility)
+                        //{
+                        //    decreaseBurstPossibility += 0.1f;
+                        //    howMuchBurst = 1f;
+                        //}
+                        //else
+                        //{
+                        //    decreaseBurstPossibility -= 0.1f;
+                        //    howMuchBurst = -1f;
+                        //}
                     }
 
                     rope.BurstRope(howMuchBurst);
