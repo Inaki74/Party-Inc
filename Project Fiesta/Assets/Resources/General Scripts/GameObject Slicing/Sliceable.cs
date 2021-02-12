@@ -32,6 +32,9 @@ namespace FiestaTime
 
             // Mine
             [SerializeField]
+            private Vector3 _velocity;
+
+            [SerializeField]
             private bool _slicesHaveColliders = false;
 
             [SerializeField]
@@ -110,6 +113,19 @@ namespace FiestaTime
             }
 
             //Mine
+
+            public Vector3 Velocity
+            {
+                get
+                {
+                    return _velocity;
+                }
+                set
+                {
+                    _velocity = value;
+                }
+            }
+
             public bool SlicesHaveColliders
             {
                 get

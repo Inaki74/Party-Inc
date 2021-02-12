@@ -56,8 +56,6 @@ MonoBehaviour:
     type: 3}
   _vSmallVertLogPrefab: {fileID: 7387709210295929634, guid: ac4e5b59be0394ac3a39e3b5af4dc15c,
     type: 3}
-  _mDecoyPrefab: {fileID: 4670083676965658627, guid: fa14aab8c78ae498ba6f6a10c23fdad4,
-    type: 3}
   _spawnInterval: 4
 --- !u!114 &8922072312386705686
 MonoBehaviour:

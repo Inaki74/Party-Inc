@@ -424,15 +424,11 @@ namespace FiestaTime
             // The camera points are the points straight from the hit points to the screen plane
             Vector3 start = (minXInfo.rayHitCameraPoint + maxXInfo.rayHitCameraPoint) / 2;
 
-            Vector3 velocity = Vector3.zero;
-            if (toSlice.GetComponent<Rigidbody>() != null)
-            {
-                velocity = toSlice.GetComponent<Rigidbody>().velocity;
-            }
+            Vector3 velocity = toSlice.GetComponent<Tvtig.Slicer.Sliceable>().Velocity;
 
             SendLogSlice(toSlice.GetPhotonView().ViewID, sHPoint, fHPoint, start, velocity, destroy);
 
-            return CompleteSlice(toSlice, sHPoint, fHPoint, start, Vector3.zero, destroy);
+            return CompleteSlice(toSlice, sHPoint, fHPoint, start, velocity, destroy);
         }
 
         /// Slice an object with the internal RayhitSliceInfo
@@ -474,15 +470,11 @@ namespace FiestaTime
             // The camera points are the points straight from the hit points to the screen plane
             Vector3 start = (minXInfo.rayHitCameraPoint + maxXInfo.rayHitCameraPoint) / 2;
 
-            Vector3 velocity = Vector3.zero;
-            if (toSlice.GetComponent<Rigidbody>() != null)
-            {
-                velocity = toSlice.GetComponent<Rigidbody>().velocity;
-            }
+            Vector3 velocity = toSlice.GetComponent<Tvtig.Slicer.Sliceable>().Velocity;
 
             SendLogSlice(toSlice.GetPhotonView().ViewID, sHPoint, fHPoint, start, velocity, destroy);
 
-            return CompleteSlice(toSlice, sHPoint, fHPoint, start, Vector3.zero, destroy);
+            return CompleteSlice(toSlice, sHPoint, fHPoint, start, velocity, destroy);
         }
 
         private GameObject[] CompleteSlice(GameObject toSlice, Vector3 startHitPoint, Vector3 finalHitPoint, Vector3 cameraStart, Vector3 velocity, bool destroy)

@@ -9,41 +9,64 @@ namespace FiestaTime
     {
         public struct PlayerSync
         {
-
+            public Vector3 position;
+            public Vector3 velocity;
+            public bool duck;
         }
 
+        [RequireComponent(typeof(Player))]
         public class PlayerSynchronizer : SnapshotInterpolator<PlayerSync>
         {
+            [SerializeField]
+            private Player _player;
+
             protected override void Extrapolate(State newest, float extrapTime)
             {
-                throw new System.NotImplementedException();
+                PlayerSync newInfo = newest.info;
+
+                transform.position = newInfo.position + newInfo.velocity * extrapTime;
+
+                _player.UpperBody.SetActive(newInfo.duck);
             }
 
             protected override void Interpolate(State rhs, State lhs, float t)
             {
-                throw new System.NotImplementedException();
+                PlayerSync rhsInfo = rhs.info;
+                PlayerSync lhsInfo = lhs.info;
+
+                transform.position = Vector3.Lerp(lhsInfo.position, rhsInfo.position, t);
+
+                _player.UpperBody.SetActive(rhsInfo.duck);
             }
 
             protected override PlayerSync ReceiveInformation(PhotonStream stream, PhotonMessageInfo info)
             {
-                throw new System.NotImplementedException();
+                Vector3 _netPos = (Vector3)stream.ReceiveNext();
+                Vector3 _netVel = (Vector3)stream.ReceiveNext();
+                bool _netDuck = (bool)stream.ReceiveNext();
+                
+                PlayerSync ret;
+                ret.position = _netPos;
+                ret.velocity = _netVel;
+                ret.duck = _netDuck;
+
+                return ret;
             }
 
             protected override void SendInformation(PhotonStream stream, PhotonMessageInfo info)
             {
-                throw new System.NotImplementedException();
+                stream.SendNext(transform.position);
+                stream.SendNext(_player.Direction);
+                stream.SendNext(_player.UpperBody.activeInHierarchy);
             }
 
             // Start is called before the first frame update
-            void Start()
+            private void Awake()
             {
-
-            }
-
-            // Update is called once per frame
-            void Update()
-            {
-
+                if(_player == null)
+                {
+                    _player = GetComponent<Player>();
+                }
             }
         }
     }

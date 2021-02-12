@@ -154,6 +154,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _rb: {fileID: 5133910555110323851}
   _feetMarker: {fileID: 6246606111332425171}
+  _sliceable: {fileID: 0}
 --- !u!114 &5598085769442193540
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -171,6 +172,7 @@ MonoBehaviour:
   _useGravity: 1
   _shareVertices: 0
   _smoothVertices: 0
+  _velocity: {x: 0, y: 0, z: 0}
   _slicesHaveColliders: 0
   _destroy: 1
   _deactivateAfterTime: 0
@@ -340,6 +342,7 @@ MonoBehaviour:
   _useGravity: 0
   _shareVertices: 0
   _smoothVertices: 0
+  _velocity: {x: 0, y: 0, z: 0}
   _slicesHaveColliders: 0
   _destroy: 0
   _deactivateAfterTime: 0

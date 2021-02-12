@@ -15,12 +15,15 @@ namespace FiestaTime
 
             [SerializeField] private Rigidbody _rb;
             [SerializeField] private GameObject _feetMarker;
+            [SerializeField] private Tvtig.Slicer.Sliceable _sliceable;
 
             private Vector3 _startPos;
             private Vector3 _whereToGo;
             private Vector3 _differenceFeetCenter;
             private float _speed;
             private bool _runOnce;
+
+            private Vector3 _lastPosition;
 
             private float _windowTime;
             public float WindowTime
@@ -56,6 +59,11 @@ namespace FiestaTime
                     _rb = GetComponent<Rigidbody>();
                 }
 
+                if (_sliceable == null)
+                {
+                    _sliceable = GetComponent<Tvtig.Slicer.Sliceable>();
+                }
+
                 _runOnce = false;
                 _startPos = transform.position;
                 _speed = 40f;
@@ -72,6 +80,8 @@ namespace FiestaTime
             {
                 if(PhotonNetwork.Time >= WaitTime)
                 {
+                    _lastPosition = transform.position;
+                    
                     transform.position = Vector3.MoveTowards(transform.position, _whereToGo, Time.deltaTime * _speed);
 
                     if (transform.position == _whereToGo && !_runOnce)
@@ -79,6 +89,8 @@ namespace FiestaTime
                         _runOnce = true;
                         StartCoroutine(Wait());
                     }
+
+                    _sliceable.Velocity = transform.position - _lastPosition;
                 }
             }
 

@@ -10,13 +10,12 @@ namespace FiestaTime
         /// <summary>
         /// State machine would be overkill, since theres only 4 states.
         /// </summary>
-        [RequireComponent(typeof(Rigidbody))]
-        public class Player : MonoBehaviourPun, IPunObservable
+        [RequireComponent(typeof(PlayerInputManager))]
+        public class Player : MonoBehaviourPun
         {
             // Components
-            private Rigidbody _rb;
             private CapsuleCollider _cc;
-            private PlayerInputManager _inputManager;
+            [SerializeField] private PlayerInputManager _inputManager;
 
             // Mesh variables
             [SerializeField] private MeshRenderer _ubmr;
@@ -27,6 +26,17 @@ namespace FiestaTime
             [SerializeField] private GameObject _deathParticles;
 
             // The body parts of our player, useful when ducking.
+            public GameObject UpperBody
+            {
+                get
+                {
+                    return _upperBody;
+                }
+                private set
+                {
+                    _upperBody = value;
+                }
+            }
             [SerializeField] private GameObject _upperBody;
             [SerializeField] private GameObject _lowerBody;
 
@@ -48,6 +58,17 @@ namespace FiestaTime
             [SerializeField] GameObject _below;
 
             // Gravity related variables
+            public bool IsGrounded
+            {
+                get
+                {
+                    return _isGrounded;
+                }
+                private set
+                {
+                    _isGrounded = value;
+                }
+            }
             private bool _isGrounded;
             private bool _gravity = true;
             [SerializeField] private LayerMask _whatIsGround;
@@ -79,25 +100,12 @@ namespace FiestaTime
             private float _middleRailX;
             private float _rightRailX;
 
-            // Network variables
-            private Queue<string> inputsToDo = new Queue<string>();
-
-            private bool _infoReceived;
-            private Vector3 _netPos;
-            private Vector3 _lastPos;
-            private bool _netDuck;
-            private float _time;
-            private double _lastSendTime;
-            private double _currentSendTime;
-            [SerializeField] private float _networkTeleportDistance;
+            public Vector3 Direction { get; private set; }
+            private Vector3 _lastPosition;
 
             // Start is called before the first frame update
             void Start()
             {
-                if(_rb == null)
-                {
-                    _rb = GetComponent<Rigidbody>();
-                }
                 if (_cc == null)
                 {
                     _cc = GetComponent<CapsuleCollider>();
@@ -126,22 +134,13 @@ namespace FiestaTime
             // Update is called once per frame
             void Update()
             {
+                if (!photonView.IsMine) return;
+
+                _lastPosition = transform.position; // t = 1, l = 1
+                
+
                 // Check if we are grounded
                 _isGrounded = CheckIfGrounded(transform.position);
-
-                if (!photonView.IsMine && PhotonNetwork.IsConnected && _infoReceived)
-                {
-                    // Code that runs on other clients.
-                    double timeToSend = _currentSendTime - _lastSendTime;
-
-                    _time += Time.deltaTime;
-
-                    PositionPrediction(timeToSend);
-
-                    _upperBody.SetActive(_netDuck);
-
-                    return;
-                }
 
                 // Jump speed scaling
                 _jumpSpeed = GameManager.Current.Gravity * -1 / 1.25f;
@@ -153,7 +152,7 @@ namespace FiestaTime
                 StateChangeLogic();
 
                 // Move forward
-                transform.position += Vector3.forward * GameManager.Current.MovingSpeed * Time.deltaTime;
+                transform.position += Vector3.forward * GameManager.Current.MovingSpeed * Time.deltaTime; // t = 2, l = 1;
 
                 // Act per new states
                 StateActionLogic();
@@ -174,6 +173,8 @@ namespace FiestaTime
 
                 // Check if we fell through the ground
                 CheckIfPassedGround(_below.transform);
+
+                Direction = transform.position - _lastPosition; // t = 2, l = 1 ; 
             }
 
             /// <summary>
@@ -288,15 +289,12 @@ namespace FiestaTime
                     // Move
                     if (_runOnce)
                     {
-                        globalCount++;
-                        Debug.Log(globalCount + ") start Moving");
                         _runOnce = false;
                         StartCoroutine(MoveToCo(_laneSwitchSpeed));
                     }
                 }
             }
 
-            private int globalCount;
 
             /// <summary>
             /// Coroutine Function that moves our player to another lane. It moves statically from a lane to another (discretely). It also acts on its input buffer.
@@ -308,11 +306,9 @@ namespace FiestaTime
                 // Go through our input buffer
                 for (int i = 0; i < _movementBuffer.Length; i++)
                 {
-                    Debug.Log("We are Moving"); 
                     // If its a movement
                     if (_movementBuffer[i] != 0)
                     {
-                        Debug.Log("Its a movement");
                         // Initial state of movement
                         float decidedX = _middleRailX;
                         float currentX = transform.position.x;
@@ -326,8 +322,6 @@ namespace FiestaTime
                                 decidedX = _leftRailX;
                             }
                         }
-
-                        
 
                         if (currentX > _middleRailX - myEpsilon && currentX < _middleRailX + myEpsilon)
                         {
@@ -350,13 +344,9 @@ namespace FiestaTime
                             }
                         }
                         // end decision
-
-                        Debug.Log("Decided X: " + decidedX);
-                        Debug.Log("Current X: " + currentX);
                         // Move
                         while (transform.position.x != decidedX)
                         {
-                            Debug.Log("MOOVE");
                             Vector3 decidedVector = new Vector3(decidedX, transform.position.y, transform.position.z);
                             transform.position = Vector3.MoveTowards(transform.position, decidedVector, velocity * Time.deltaTime);
                             yield return new WaitForEndOfFrame();
@@ -377,7 +367,7 @@ namespace FiestaTime
             /// <param name="velocity"></param>
             /// <param name="direction"></param>
             /// <returns></returns>
-            private IEnumerator MoveToNetCo(float velocity, int direction)
+            public IEnumerator MoveToNetCo(int direction)
             {
                 if (direction != 0)
                 {
@@ -417,7 +407,7 @@ namespace FiestaTime
                     {
                         //Debug.Log("A1");
                         Vector3 decidedVector = new Vector3(decidedX, transform.position.y, transform.position.z);
-                        transform.position = Vector3.MoveTowards(transform.position, decidedVector, velocity * Time.deltaTime);
+                        transform.position = Vector3.MoveTowards(transform.position, decidedVector, _laneSwitchSpeed * Time.deltaTime);
                         yield return new WaitForEndOfFrame();
                     }
                 }
@@ -445,6 +435,40 @@ namespace FiestaTime
                     //Debug.Log("A3");
                     transform.position = Vector3.MoveTowards(transform.position, decidedVector, velocity * Time.deltaTime);
                     reachedHeight = transform.position.y > startingY + height - 0.2;
+                    yield return new WaitForEndOfFrame();
+                }
+
+                float timeFloating = _timeFloating;
+
+                // Float for a certain time
+                while (timeFloating > 0f)
+                {
+                    timeFloating -= Time.deltaTime;
+                    yield return new WaitForEndOfFrame();
+                };
+                _gravity = true;
+            }
+
+            /// <summary>
+            /// Public Coroutine Function to jump. Read last func.
+            /// </summary>
+            /// <param name="startingY"></param>
+            /// <param name="height"></param>
+            /// <param name="velocity"></param>
+            /// <returns></returns>
+            public IEnumerator JumpCo(float startingY)
+            {
+                // We deactivate gravity so it doesn't affect the jump
+                _gravity = false;
+                bool reachedHeight = false;
+
+                // Jump
+                while (!reachedHeight && !_inputManager.DuckInput)
+                {
+                    Vector3 decidedVector = new Vector3(transform.position.x, startingY + _jumpHeight, transform.position.z);
+                    //Debug.Log("A3");
+                    transform.position = Vector3.MoveTowards(transform.position, decidedVector, _jumpSpeed * Time.deltaTime);
+                    reachedHeight = transform.position.y > startingY + _jumpHeight - 0.2;
                     yield return new WaitForEndOfFrame();
                 }
 
@@ -595,54 +619,6 @@ namespace FiestaTime
 
             /////////// NETWORK //////////////
 
-            /// <summary>
-            /// Predicts the position through the network.
-            /// </summary>
-            /// <param name="timeToSend"></param>
-            private void PositionPrediction(double timeToSend)
-            {
-                // Lerp with the network position
-                if(Vector3.Distance(_lastPos, _netPos) > 5f)
-                {
-                    transform.position = _netPos;
-                }
-                else
-                {
-                    transform.position = Vector3.Lerp(_lastPos, _netPos, (float)(_time / timeToSend));
-                }
-
-                // Recreate any inputs sent.
-                StartCoroutine("RecreateInputsCo");
-            }
-
-            /// <summary>
-            /// Coroutine Function that recreates the inputs given by the player through the network.
-            /// </summary>
-            /// <returns></returns>
-            private IEnumerator RecreateInputsCo()
-            {
-                while(inputsToDo.Count != 0)
-                {
-                    string input = inputsToDo.Dequeue();
-
-                    if(input == "MoveRight")
-                    {
-                        yield return StartCoroutine(MoveToNetCo(_laneSwitchSpeed, 1));
-                    }
-                    if(input == "MoveLeft")
-                    {
-                        yield return StartCoroutine(MoveToNetCo(_laneSwitchSpeed, -1));
-                    }
-                    if(input == "Jump")
-                    {
-                        while (!_isGrounded)
-                        {
-                            yield return new WaitForEndOfFrame();
-                        }
-                        yield return StartCoroutine(JumpCo(transform.position.y, _jumpHeight, _jumpSpeed));
-                    }
-                }
-            }
 
             [PunRPC]
             public void RPC_PlayerDied()
@@ -658,62 +634,7 @@ namespace FiestaTime
                 _hasLost = true;
             }
 
-            public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
-            {
-                if (!GameManager.Current.PlayersConnectedAndReady || _inputManager == null) return;
-
-                if (stream.IsWriting)
-                {
-                    SendInputs(stream, _inputManager.currentInputs);
-
-                    stream.SendNext(transform.position);
-                    stream.SendNext(_upperBody.activeInHierarchy);
-                }
-                else
-                {
-                    ReceiveInputs(stream);
-
-                    _netPos = (Vector3)stream.ReceiveNext();
-                    _netDuck = (bool)stream.ReceiveNext();
-
-                    _time = 0f;
-                    _lastSendTime = _currentSendTime;
-                    _currentSendTime = info.SentServerTime;
-                    _lastPos = transform.position;
-
-                    _infoReceived = true;
-                }
-            }
-
-            /// <summary>
-            /// Sends input from the queue through the network.
-            /// </summary>
-            /// <param name="stream"></param>
-            /// <param name="q"></param>
-            private void SendInputs(PhotonStream stream, Queue<string> q)
-            {
-                stream.SendNext(q.Count);
-
-                for (int i = 0; i < q.Count; i++)
-                {
-                    stream.SendNext(q.Dequeue());
-                }
-            }
-
-            /// <summary>
-            /// Receives inputs from the network and places them into the inputs queue.
-            /// </summary>
-            /// <param name="stream"></param>
-            private void ReceiveInputs(PhotonStream stream)
-            {
-                int length = (int)stream.ReceiveNext();
-
-                for (int i = 0; i < length; i++)
-                {
-                    string parcel = (string)stream.ReceiveNext();
-                    inputsToDo.Enqueue(parcel);
-                }
-            }
+            
         }
     }
 }

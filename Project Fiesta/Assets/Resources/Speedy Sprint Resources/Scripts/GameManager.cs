@@ -106,7 +106,7 @@ namespace FiestaTime
 
                     if (PhotonNetwork.IsConnectedAndReady && _startCountdown)
                     {
-                        if (_startTime != 0 && (float)(PhotonNetwork.Time - _startTime) >= gameStartCountdown + 0.5f)
+                        if (_startTime != 0 && (float)(PhotonNetwork.Time - _startTime) >= gameStartCountdown + 1f)
                         {
                             GameBegan = true;
                             _gameBeginTime = PhotonNetwork.Time;

@@ -18,8 +18,8 @@ namespace FiestaTime
     {
         private bool _infoReceived;
 
-        private double _interpolationBackTime; //0.15 = 150ms
-        private double _extrapolationLimit = 0.5;
+        private double _interpolationBackTime = (3d / PhotonNetwork.SendRate) + 0.05d; //0.15 = 150ms
+        private double _extrapolationLimit = 0.5d;
 
         protected struct State
         {
@@ -30,9 +30,18 @@ namespace FiestaTime
         private State[] _bufferedState = new State[PhotonNetwork.SendRate * 2];
         private int _timestampCount;
 
-        private void Awake()
+        private int _debugEx;
+        private int _debugIn;
+
+        private void OnDestroy()
         {
-            _interpolationBackTime = (1d / PhotonNetwork.SendRate) + 0.05;
+
+            if (photonView.IsMine)
+            {
+                return;
+            }
+            Debug.Log("Interpolations: " + _debugIn + " Extrapolations: " + _debugEx);
+            Debug.Log("A percentage of: " + (_debugEx * 100 / (_debugEx + _debugIn)) + " extrapolations.");
         }
 
         // Update is called once per frame
@@ -46,6 +55,11 @@ namespace FiestaTime
             if (_infoReceived)
             {
                 double interpTime = PhotonNetwork.Time - _interpolationBackTime;
+
+                //Debug.Log("ASDASDASD -1 " + _interpolationBackTime);
+                //Debug.Log("ASDASDASD 0 " + PhotonNetwork.Time);
+                //Debug.Log("ASDASDASD 1 " + _bufferedState[0].timestamp);
+                //Debug.Log("ASDASDASD 2 " + interpTime);
 
                 if (_bufferedState[0].timestamp > interpTime)
                 {
@@ -70,6 +84,7 @@ namespace FiestaTime
                             }
                             // if t=0 => lhs is used directly
                             Interpolate(rhs, lhs, t);
+                            _debugIn++;
 
                             return;
                         }
@@ -85,6 +100,7 @@ namespace FiestaTime
                     if (extrapTime < _extrapolationLimit)
                     {
                         Extrapolate(newest, extrapTime);
+                        _debugEx++;
                     }
                 }
             }
@@ -112,6 +128,9 @@ namespace FiestaTime
                 stt.timestamp = info.SentServerTime;
                 stt.info = rInfo;
                 _bufferedState[0] = stt;
+
+                //Debug.Log("New 0: " + stt.timestamp);
+                //Debug.Log("LAG: " + (PhotonNetwork.Time - stt.timestamp));
 
                 _timestampCount = Mathf.Min(_timestampCount + 1, _bufferedState.Length);
 
