@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 5012751787509046956}
   - component: {fileID: 5012751787509046959}
   - component: {fileID: 8127426380091600335}
+  - component: {fileID: 1989615151094996988}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -50,15 +51,9 @@ MonoBehaviour:
     type: 3}
   playerCount: 0
   gameStartCountdown: 3
-  stagePrefab: {fileID: 870366748381054825, guid: 3e23945da74334e1f80c2a6ebd8de172,
-    type: 3}
+  rope: {fileID: 0}
   startingSpeed: -3
   startingAngle: 0
-  movesForSpeedIncrease: 2
-  thresholdInverse: 10
-  thresholdBurst: 20
-  thresholdPeak: 30
-  thresholdDeath: 100
   isHighScore: 0
   winnerId: 0
   currentJump: 0
@@ -84,3 +79,27 @@ MonoBehaviour:
   viewIdField: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0
+--- !u!114 &1989615151094996988
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5012751787509046958}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d06466c03d263624786afa88b52928b6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  statsWindowOn: 1
+  statsOn: 1
+  healthStatsVisible: 0
+  trafficStatsOn: 1
+  buttonsOn: 0
+  statsRect:
+    serializedVersion: 2
+    x: 0
+    y: 100
+    width: 200
+    height: 50
+  WindowId: 100

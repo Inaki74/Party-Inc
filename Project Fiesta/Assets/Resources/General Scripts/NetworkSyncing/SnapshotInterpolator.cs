@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
-
+using System.Linq;
 
 namespace FiestaTime
 {
@@ -32,13 +32,13 @@ namespace FiestaTime
 
         private void Awake()
         {
-            _interpolationBackTime = (1d / PhotonNetwork.SendRate) + 0.015;
+            _interpolationBackTime = (1d / PhotonNetwork.SendRate) + 0.05;
         }
 
         // Update is called once per frame
         void Update()
         {
-            if (PhotonNetwork.IsMasterClient)
+            if (photonView.IsMine)
             {
                 return;
             }
@@ -92,11 +92,11 @@ namespace FiestaTime
 
         public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
         {
-            if (stream.IsWriting && PhotonNetwork.IsMasterClient)
+            if (stream.IsWriting)
             {
                 SendInformation(stream, info);
             }
-            else if (stream.IsReading)
+            else 
             {
                 _infoReceived = true;
 
@@ -121,6 +121,8 @@ namespace FiestaTime
                     {
                         // State inconsistent
                         Debug.Log("INCONSISTENT STATE!");
+                        var ordered = _bufferedState.OrderByDescending(state => state.timestamp);
+                        _bufferedState = ordered.ToArray();
                     }
                 }
             }

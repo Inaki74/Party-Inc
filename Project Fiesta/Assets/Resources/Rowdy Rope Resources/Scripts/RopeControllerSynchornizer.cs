@@ -29,8 +29,6 @@ namespace FiestaTime
 
             protected override void Interpolate(State rhs, State lhs, float t)
             {
-                Debug.Log("Interpolating " + this.GetType().ToString());
-
                 AngleSync rhsInfo = rhs.info;
                 AngleSync lhsInfo = lhs.info;
 
@@ -52,8 +50,6 @@ namespace FiestaTime
 
             protected override void Extrapolate(State newest, float extrapTime)
             {
-                Debug.Log("Extrapolating " + this.GetType().ToString());
-
                 AngleSync newestInfo = newest.info;
 
                 _ropeController.rotationSpeed = newestInfo.rotationSpeed;
