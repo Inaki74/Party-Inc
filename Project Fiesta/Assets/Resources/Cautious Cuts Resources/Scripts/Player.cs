@@ -67,7 +67,7 @@ namespace FiestaTime
 
             private IEnumerator WaitForAllSlicesCo(LogController theLogCon)
             {
-                yield return new WaitUntil(() => GameManager.Current.Sliced.Count == GameManager.Current.playerCount);
+                yield return new WaitUntil(() => GameManager.Current.Sliced.Count >= GameManager.Current.playerCount);
 
                 theLogCon.SendNextWave();
             }

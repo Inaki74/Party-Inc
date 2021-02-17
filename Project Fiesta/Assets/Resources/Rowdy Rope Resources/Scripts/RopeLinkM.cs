@@ -42,7 +42,7 @@ namespace FiestaTime
                 transform.localPosition = new Vector3(0f, radius, z);
                 positionInArray = pos;
 
-                distanceToGrounded = 6 * Cc.bounds.extents.y;
+                distanceToGrounded = 3 * Cc.bounds.extents.y;
 
                 distanceToPlane = Vector3.Distance(ropeController.gameObject.transform.position, groundPlane.transform.position);
 

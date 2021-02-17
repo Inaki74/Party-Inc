@@ -21,7 +21,7 @@ namespace FiestaTime
             [SerializeField] private GameObject startPoint;
             [SerializeField] private GameObject endPoint;
 
-            [SerializeField] private float separation = 1.4f;
+            [SerializeField] private float separation;
 
             private RopeLinkM[] ropeLinks;
 
