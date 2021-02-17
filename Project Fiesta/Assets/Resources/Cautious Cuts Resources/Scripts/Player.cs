@@ -17,8 +17,7 @@ namespace FiestaTime
 
             [SerializeField] private MeshRenderer _mr;
             [SerializeField] private Material _mineMaterial;
-            [SerializeField] private GameObject _slashingParticles;
-
+            
             [SerializeField] private TouchSlicer _touchSlicer;
 
             private List<RayhitSliceInfo> _logHits = new List<RayhitSliceInfo>();
@@ -76,12 +75,11 @@ namespace FiestaTime
             private void ProcessSlice()
             {
                 RayhitSliceInfo start = _logHits.First();
-                RayhitSliceInfo last = _logHits.Last();
                 FallingLog theLog = start.objTransform.gameObject.GetComponent<FallingLog>();
                 LogController theLogCon = start.objTransform.gameObject.GetComponent<LogController>();
 
                 // Calculates the score
-                Vector3 slashPos = CalculateSliceScore(start, theLog);
+                CalculateSliceScore(start, theLog);
 
                 // Trigger event where next wave is spawned immediately after
                 // We send it if we are the master client and if every players log has been sliced
@@ -98,9 +96,7 @@ namespace FiestaTime
 
                 // Cuts the game object and creates the slices
                 // Manipulating the slices here wont affect through the network
-                GameObject[] slices = _touchSlicer.Slice(start.objTransform.gameObject, _logHits, false);
-
-                SpawnSlashingParticles(theLog, start.rayHit.point, last.rayHit.point, slashPos);
+                _touchSlicer.Slice(start.objTransform.gameObject, _logHits, false);
 
                 // Cleanup
                 _touchSlicer.ClearHits();
@@ -108,23 +104,9 @@ namespace FiestaTime
                 _touchSlicer.WaitForSliceTimeout();
             }
 
-            private void SpawnSlashingParticles(FallingLog theLog, Vector3 start, Vector3 end, Vector3 slashPos)
-            {
-                Vector3 direction = end - start;
+            
 
-                float angle = Vector3.SignedAngle(new Vector3(-1f, 0f, direction.z), direction, Vector3.back);
-
-                if (angle < 0f)
-                {
-                    PhotonNetwork.Instantiate(_slashingParticles.name, theLog.transform.localToWorldMatrix.MultiplyPoint(slashPos), Quaternion.Euler(angle + 90f, 90f, -90f));
-                }
-                else
-                {
-                    PhotonNetwork.Instantiate(_slashingParticles.name, theLog.transform.localToWorldMatrix.MultiplyPoint(slashPos), Quaternion.Euler(angle - 90f, 90f, -90f));
-                }
-            }
-
-            private Vector3 CalculateSliceScore(RayhitSliceInfo start, FallingLog theLog)
+            private void CalculateSliceScore(RayhitSliceInfo start, FallingLog theLog)
             {
                 int i = 0;
                 Vector3 vAverage = Vector3.zero;
@@ -157,8 +139,6 @@ namespace FiestaTime
                 onLogSlicedScore.Invoke(posEv, angEv, finEv);
 
                 _myTotalScore += finEv;
-
-                return zero;
             }
 
             /// NETWORKING
