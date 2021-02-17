@@ -468,9 +468,9 @@ namespace FiestaTime
 
             Vector3 velocity = toSlice.GetComponent<Tvtig.Slicer.Sliceable>().Velocity / Time.deltaTime; // dt * spd
 
-            SendLogSlice(toSlice.GetPhotonView().ViewID, sHPoint, fHPoint, start, destroy);
+            SendObjectSlice(toSlice.GetPhotonView().ViewID, sHPoint, fHPoint, start, destroy);
 
-            return CompleteSlice(toSlice, sHPoint, fHPoint, start, velocity, destroy, Time.deltaTime);
+            return CompleteSlice(toSlice, sHPoint, fHPoint, start, velocity, destroy, 0f);
         }
 
         /// Slice an object with the internal RayhitSliceInfo
@@ -506,7 +506,7 @@ namespace FiestaTime
 
             if (toSliceRb != null)
             {
-                //Rigidbody rigidbody = slices[1].GetComponent<Rigidbody>();
+                Rigidbody rigidbody = slices[1].GetComponent<Rigidbody>();
                 //// Maintaining the velocity in which the object came
                 //rigidbody.velocity = velocity;
                 //slices[0].GetComponent<Rigidbody>().velocity = velocity;
@@ -520,6 +520,8 @@ namespace FiestaTime
             else toSlice.SetActive(false);
 
             CreatePosNegSlices(slices, toSlice.GetComponent<Tvtig.Slicer.Sliceable>());
+
+            Debug.Break();
 
             return slices;
         }
@@ -593,14 +595,14 @@ namespace FiestaTime
         ////// NETWORKING
         ///
 
-        private void SendLogSlice(int logId, Vector3 shp, Vector3 fhp, Vector3 cs, bool destroy)
+        private void SendObjectSlice(int logId, Vector3 shp, Vector3 fhp, Vector3 cs, bool destroy)
         {
             object[] content = new object[] { logId, shp, fhp, cs, destroy };
-            photonView.RPC("RPC_SliceLog", RpcTarget.Others, content as object);
+            photonView.RPC("RPC_SliceObject", RpcTarget.Others, content as object);
         }
 
         [PunRPC]
-        public void RPC_SliceLog(object[] content, PhotonMessageInfo info)
+        public void RPC_SliceObject(object[] content, PhotonMessageInfo info)
         {
             Vector3 shp = (Vector3)content[1];
             Vector3 fhp = (Vector3)content[2];
@@ -609,17 +611,23 @@ namespace FiestaTime
             float lag = Mathf.Abs((float)(PhotonNetwork.Time - info.SentServerTime));
 
             GameObject found = null;
-            PhotonView[] logs = FindObjectsOfType<PhotonView>();
+            PhotonView[] objects = FindObjectsOfType<PhotonView>();
 
-            foreach(PhotonView log in logs)
+            foreach(PhotonView obj in objects)
             {
-                if(log.ViewID == (int)content[0])
+                if(obj.ViewID == (int)content[0])
                 {
-                    found = log.gameObject;
+                    found = obj.gameObject;
                     break;
                 }
             }
-            CompleteSlice(found, shp, fhp, cs, found.GetComponent<Tvtig.Slicer.Sliceable>().Velocity/Time.deltaTime, (bool)content[4], lag);
+
+            if(found == null)
+            {
+                Debug.LogError("FiestaTime/TouchSlicer: COULDNT FIND OBJECT. (DID YOU DESTROY IT?)");
+            }
+
+            CompleteSlice(found, shp, fhp, cs, found.GetComponent<Tvtig.Slicer.Sliceable>().Velocity/Time.deltaTime, (bool)content[4], lag + Time.deltaTime);
             Debug.Log("VELOCITY " + (found.GetComponent<Tvtig.Slicer.Sliceable>().Velocity/Time.deltaTime) + " LAG " + lag);
             Debug.Break();
         }

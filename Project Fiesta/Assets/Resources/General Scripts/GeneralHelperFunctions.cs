@@ -161,13 +161,13 @@ namespace FiestaTime
             var corner1 = position + v3;
             var corner3 = position - v3;
 
-            Debug.DrawLine(corner0, corner2, Color.green, 100f);
-            Debug.DrawLine(corner1, corner3, Color.green, 100f);
-            Debug.DrawLine(corner0, corner1, Color.green, 100f);
-            Debug.DrawLine(corner1, corner2, Color.green, 100f);
-            Debug.DrawLine(corner2, corner3, Color.green, 100f);
-            Debug.DrawLine(corner3, corner0, Color.green, 100f);
-            Debug.DrawRay(position, normal, Color.red, 100f);
+            Debug.DrawLine(corner0, corner2, Color.green, 5f);
+            Debug.DrawLine(corner1, corner3, Color.green, 5f);
+            Debug.DrawLine(corner0, corner1, Color.green, 5f);
+            Debug.DrawLine(corner1, corner2, Color.green, 5f);
+            Debug.DrawLine(corner2, corner3, Color.green, 5f);
+            Debug.DrawLine(corner3, corner0, Color.green, 5f);
+            Debug.DrawRay(position, normal, Color.red, 5f);
         }
     }
 }
