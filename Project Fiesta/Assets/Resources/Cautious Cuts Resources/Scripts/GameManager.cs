@@ -108,7 +108,7 @@ namespace FiestaTime
             protected override void InStart()
             {
                 GameBegan = false;
-                _windowTime = 0.6f;
+                _windowTime = 0.7f;
             }
 
             public override void Init()

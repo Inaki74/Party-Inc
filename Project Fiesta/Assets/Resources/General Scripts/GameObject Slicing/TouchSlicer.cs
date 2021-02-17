@@ -8,10 +8,30 @@ namespace FiestaTime
 {
     public struct RayhitSliceInfo
     {
+        public int id;
         public Vector3 objVelocity;
         public RaycastHit rayHit;
         public Transform objTransform;
         public Vector3 rayHitCameraPoint;
+
+        public override bool Equals(object obj)
+        {
+            RayhitSliceInfo other = (RayhitSliceInfo)obj;
+
+            return rayHit.point.Equals(other.rayHit.point);
+        }
+
+        public override int GetHashCode()
+        {
+            return id;
+        }
+
+        public override string ToString()
+        {
+            return "RayhitSliceInfo, ID: " + id +
+                    ", Point: (" + rayHit.point.x + ", " + rayHit.point.y + ", " + rayHit.point.z + ")" +
+                    ", object Velocity: (" + objVelocity.x + ", " + objVelocity.y + ", " + objVelocity.z + ")";
+        }
     }
 
     /// <summary>
@@ -49,6 +69,8 @@ namespace FiestaTime
         private List<RayhitSliceInfo> _hits = new List<RayhitSliceInfo>();
 
         public List<Vector3> watch = new List<Vector3>();
+
+        private int _idCount;
 
         public GameObject mark1;
         public GameObject mark2;
@@ -132,6 +154,10 @@ namespace FiestaTime
 
                 while (newPos != pos)
                 {
+                    // Remove repeated items
+                    var distinct = _hits.Distinct();
+                    _hits = distinct.ToList();
+
                     bool cond1 = false;
                     bool cond2 = false;
                     RaycastHit hit;
@@ -177,7 +203,7 @@ namespace FiestaTime
                     }
                     else if (_hits.Count > 1)
                     {
-                        // At the very least, i need 2 hits
+                        // At the very least, i need 2 different hits
                         // This ends the slicing
                         SliceThisRound = true;
                         CanSlice = false;
@@ -186,7 +212,7 @@ namespace FiestaTime
                     // If any of both cond1 and cond2 happened and I have more than one hit, end the slice
                     if((cond1 || cond2) && _hits.Count > 1)
                     {
-                        // At the very least, i need 2 hits
+                        // At the very least, i need 2 different hits
                         SliceThisRound = true;
                         CanSlice = false;
                     }
@@ -195,7 +221,8 @@ namespace FiestaTime
                     if (pos != newPos)
                     {
                         newPos = Vector3.MoveTowards(newPos, pos, Time.deltaTime);
-                    } 
+                    }
+
                 }
             }
         }
@@ -268,6 +295,8 @@ namespace FiestaTime
             info.objVelocity = hit.transform.gameObject.GetComponent<Rigidbody>().velocity;
             info.rayHit = hit;
             info.objTransform = hit.transform;
+            info.id = _idCount;
+            _idCount++;
             
             _hits.Add(info);
         }
@@ -348,6 +377,10 @@ namespace FiestaTime
         {
             Plane ret = new Plane();
 
+            startHp = startHp + velocity;
+            finishHp = finishHp + velocity;
+            start = start + velocity;
+
             // We draw a triangle from the camera and start and finish hitPoints
             Vector3 sideOne = start - startHp;
             Vector3 sideTwo = start - finishHp;
@@ -356,7 +389,7 @@ namespace FiestaTime
 
             Vector3 tNormal = ((Vector3)(logT.localToWorldMatrix.transpose * normal)).normalized;
 
-            Vector3 tStart = logT.InverseTransformPoint(startHp + velocity);
+            Vector3 tStart = logT.InverseTransformPoint(startHp);
 
             ret.SetNormalAndPosition(tNormal, tStart);
 
@@ -414,7 +447,16 @@ namespace FiestaTime
 
             if(sHPoint == fHPoint)
             {
-                fHPoint = theHits.Last(info => info.rayHit.point != fHPoint).rayHit.point;
+                try
+                {
+                    fHPoint = theHits.Last(info => info.rayHit.point != fHPoint).rayHit.point;
+                }
+
+                catch(System.InvalidOperationException e)
+                {
+                    Debug.LogError("FiestaTime/TouchSlicer: The points that we have are all the same, cant find a different point.");
+                    LogExtensions.PrintList(_hits);
+                }
             }
 
             //mark1.transform.position = sHPoint;
@@ -424,11 +466,11 @@ namespace FiestaTime
             // The camera points are the points straight from the hit points to the screen plane
             Vector3 start = (minXInfo.rayHitCameraPoint + maxXInfo.rayHitCameraPoint) / 2;
 
-            Vector3 velocity = toSlice.GetComponent<Tvtig.Slicer.Sliceable>().Velocity;
+            Vector3 velocity = toSlice.GetComponent<Tvtig.Slicer.Sliceable>().Velocity / Time.deltaTime; // dt * spd
 
-            SendLogSlice(toSlice.GetPhotonView().ViewID, sHPoint, fHPoint, start, velocity, destroy);
+            SendLogSlice(toSlice.GetPhotonView().ViewID, sHPoint, fHPoint, start, destroy);
 
-            return CompleteSlice(toSlice, sHPoint, fHPoint, start, velocity, destroy);
+            return CompleteSlice(toSlice, sHPoint, fHPoint, start, velocity, destroy, Time.deltaTime);
         }
 
         /// Slice an object with the internal RayhitSliceInfo
@@ -439,45 +481,10 @@ namespace FiestaTime
         /// <returns></returns>
         public GameObject[] Slice(GameObject toSlice, bool destroy)
         {
-            if(!SliceThisRound)
-            {
-                throw new System.Exception("No points given to slice! SliceThisRound is false!");
-            }
-
-            if(toSlice == null)
-            {
-                throw new System.Exception("No gameobject given to slice!");
-            }
-
-            // We get the first hitPoint and the last hitPoint
-            float minx = _hits.Min(info => info.rayHit.point.x);
-            float maxx = _hits.Max(info => info.rayHit.point.x);
-            RayhitSliceInfo minXInfo = _hits.First(info => info.rayHit.point.x == minx);
-            RayhitSliceInfo maxXInfo = _hits.First(info => info.rayHit.point.x == maxx);
-
-            Vector3 sHPoint = minXInfo.rayHit.point;
-            Vector3 fHPoint = maxXInfo.rayHit.point;
-
-            if (sHPoint == fHPoint)
-            {
-                fHPoint = _hits.Last(info => info.rayHit.point != fHPoint).rayHit.point;
-            }
-
-            //mark1.transform.position = sHPoint;
-            //mark2.transform.position = fHPoint;
-
-            // The start point is the average of the camera points
-            // The camera points are the points straight from the hit points to the screen plane
-            Vector3 start = (minXInfo.rayHitCameraPoint + maxXInfo.rayHitCameraPoint) / 2;
-
-            Vector3 velocity = toSlice.GetComponent<Tvtig.Slicer.Sliceable>().Velocity;
-
-            SendLogSlice(toSlice.GetPhotonView().ViewID, sHPoint, fHPoint, start, velocity, destroy);
-
-            return CompleteSlice(toSlice, sHPoint, fHPoint, start, velocity, destroy);
+            return Slice(toSlice, _hits, destroy);
         }
 
-        private GameObject[] CompleteSlice(GameObject toSlice, Vector3 startHitPoint, Vector3 finalHitPoint, Vector3 cameraStart, Vector3 velocity, bool destroy)
+        private GameObject[] CompleteSlice(GameObject toSlice, Vector3 startHitPoint, Vector3 finalHitPoint, Vector3 cameraStart, Vector3 velocity, bool destroy, float time)
         {
             Vector3 norm;
             Plane cutter = DefinePlane(
@@ -485,7 +492,7 @@ namespace FiestaTime
                 startHitPoint,
                 finalHitPoint,
                 cameraStart,
-                velocity,
+                velocity * time,
                 out norm
             );
 
@@ -493,16 +500,16 @@ namespace FiestaTime
 
             GameObject[] slices = Tvtig.Slicer.Slicer.Slice(cutter, toSlice);
 
-            GeneralHelperFunctions.DrawPlane(startHitPoint, norm);
+            GeneralHelperFunctions.DrawPlane(startHitPoint + velocity * time, norm);
 
             TransferChildrenToNewSlices(slices, toSlice, startHitPoint, norm);
 
             if (toSliceRb != null)
             {
-                Rigidbody rigidbody = slices[1].GetComponent<Rigidbody>();
-                // Maintaining the velocity in which the object came
-                rigidbody.velocity = toSliceRb.velocity;
-                slices[0].GetComponent<Rigidbody>().velocity = toSliceRb.velocity;
+                //Rigidbody rigidbody = slices[1].GetComponent<Rigidbody>();
+                //// Maintaining the velocity in which the object came
+                //rigidbody.velocity = velocity;
+                //slices[0].GetComponent<Rigidbody>().velocity = velocity;
 
                 // The small jump when cutting
                 Vector3 newNormal = norm + new Vector3(Random.Range(-0.5f, 0.5f), 1f, 0.8f) * _forceOnCut;
@@ -586,9 +593,9 @@ namespace FiestaTime
         ////// NETWORKING
         ///
 
-        private void SendLogSlice(int logId, Vector3 shp, Vector3 fhp, Vector3 cs, Vector3 velocity, bool destroy)
+        private void SendLogSlice(int logId, Vector3 shp, Vector3 fhp, Vector3 cs, bool destroy)
         {
-            object[] content = new object[] { logId, shp, fhp, cs, velocity, destroy };
+            object[] content = new object[] { logId, shp, fhp, cs, destroy };
             photonView.RPC("RPC_SliceLog", RpcTarget.Others, content as object);
         }
 
@@ -612,7 +619,9 @@ namespace FiestaTime
                     break;
                 }
             }
-            CompleteSlice(found, shp, fhp, cs, (Vector3)content[4] * lag, (bool)content[5]);
+            CompleteSlice(found, shp, fhp, cs, found.GetComponent<Tvtig.Slicer.Sliceable>().Velocity/Time.deltaTime, (bool)content[4], lag);
+            Debug.Log("VELOCITY " + (found.GetComponent<Tvtig.Slicer.Sliceable>().Velocity/Time.deltaTime) + " LAG " + lag);
+            Debug.Break();
         }
     }
 }

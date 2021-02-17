@@ -97,7 +97,7 @@ namespace FiestaTime
                 }
 
                 // Cuts the game object and creates the slices
-                // Manipulating the slices here wont affect through the network unless done specifically
+                // Manipulating the slices here wont affect through the network
                 GameObject[] slices = _touchSlicer.Slice(start.objTransform.gameObject, _logHits, false);
 
                 SpawnSlashingParticles(theLog, start.rayHit.point, last.rayHit.point, slashPos);

@@ -25,6 +25,8 @@ namespace FiestaTime
 
             private Vector3 _lastPosition;
 
+            private bool _dying;
+
             private float _windowTime;
             public float WindowTime
             {
@@ -78,7 +80,7 @@ namespace FiestaTime
             // Update is called once per frame
             void Update()
             {
-                if(PhotonNetwork.Time >= WaitTime)
+                if(PhotonNetwork.Time >= WaitTime && !_dying)
                 {
                     _lastPosition = transform.position;
                     
@@ -107,14 +109,24 @@ namespace FiestaTime
                 {
                     SendNextWave();
                 }
-
-                if (photonView.IsMine)
+                else if (photonView.IsMine)
                 {
                     onLogDestroyed.Invoke();
                 }
 
+
+
                 // Dispose of the log
                 // Later I gotta save it? Ill see.
+                StartCoroutine("DisableAfterAWhile");
+            }
+
+            private IEnumerator DisableAfterAWhile()
+            {
+                _dying = true;
+                transform.position = _startPos + new Vector3(0f, 0f, 2f);
+                yield return new WaitForSeconds(0.5f);
+                _dying = false;
                 gameObject.SetActive(false);
             }
 
