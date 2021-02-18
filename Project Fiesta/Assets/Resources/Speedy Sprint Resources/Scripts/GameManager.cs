@@ -106,7 +106,7 @@ namespace FiestaTime
 
                     if (PhotonNetwork.IsConnectedAndReady && _startCountdown)
                     {
-                        if (_startTime != 0 && (float)(PhotonNetwork.Time - _startTime) >= gameStartCountdown + 0.5f)
+                        if (_startTime != 0 && (float)(PhotonNetwork.Time - _startTime) >= gameStartCountdown + 1f)
                         {
                             GameBegan = true;
                             _gameBeginTime = PhotonNetwork.Time;
@@ -193,10 +193,10 @@ namespace FiestaTime
                         playerPositions[2] = new Vector3(12f, 1f, -10f);
                         break;
                     case 4:
-                        playerPositions[0] = new Vector3(-18f, 1f, -10f);
+                        playerPositions[0] = new Vector3(-16f, 1f, -10f);
                         playerPositions[1] = new Vector3(-6f, 1f, -10f);
-                        playerPositions[2] = new Vector3(6f, 1f, -10f);
-                        playerPositions[3] = new Vector3(18f, 1f, -10f);
+                        playerPositions[2] = new Vector3(4f, 1f, -10f);
+                        playerPositions[3] = new Vector3(14f, 1f, -10f);
                         break;
                     default:
                         break;

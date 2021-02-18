@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 7148825856369984724}
   - component: {fileID: 5847497079470382956}
   - component: {fileID: 2323844867759036271}
+  - component: {fileID: 3761207392593246112}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -83,6 +84,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 30a6de8add0644b5383933765f534555, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _inputManager: {fileID: 5847497079470382956}
   _ubmr: {fileID: 7618177824563905125}
   _lbmr: {fileID: 3414058950951398272}
   mine: {fileID: 2100000, guid: c68f5fe1d1a62459a993177a3dee8696, type: 2}
@@ -105,7 +107,6 @@ MonoBehaviour:
   _duckCooldown: 0.2
   _droppingForce: 20
   _laneSwitchSpeed: 25
-  _networkTeleportDistance: 2
 --- !u!114 &5847497079470382956
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -138,10 +139,23 @@ MonoBehaviour:
   Synchronization: 3
   OwnershipTransfer: 0
   ObservedComponents:
-  - {fileID: 7148825856369984724}
+  - {fileID: 3761207392593246112}
   viewIdField: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0
+--- !u!114 &3761207392593246112
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1766456455375161628}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 545128892849444d8846bd79e4a0e906, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _player: {fileID: 7148825856369984724}
 --- !u!1 &3449018657795489723
 GameObject:
   m_ObjectHideFlags: 0

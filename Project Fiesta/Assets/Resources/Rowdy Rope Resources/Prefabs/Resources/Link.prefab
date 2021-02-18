@@ -30,7 +30,7 @@ Transform:
   m_GameObject: {fileID: 3772575759793036545}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.1, y: 0.1, z: 0.3}
+  m_LocalScale: {x: 0.2, y: 0.2, z: 0.2}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
@@ -61,7 +61,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: fe14a3863a7b04d8e85571321b4297bd, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -96,7 +96,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   groundPlane: {fileID: 1725556111600110868, guid: fee07fba20d9a4e8fa225d3b37191e12,
     type: 3}
-  Sc: {fileID: 0}
+  Cc: {fileID: 0}
 --- !u!54 &-2808559238481990482
 Rigidbody:
   m_ObjectHideFlags: 0

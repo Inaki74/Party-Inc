@@ -2,6 +2,8 @@
 using UnityEngine;
 using Photon.Pun;
 using System.Linq;
+using Photon.Realtime;
+using ExitGames.Client.Photon;
 
 namespace FiestaTime
 {
@@ -101,7 +103,10 @@ namespace FiestaTime
             {
                 base.Init();
 
-                RopeControllerM.onLoopComplete += OnRoundCompleted;
+                PhotonNetwork.SendRate = 15;
+                PhotonNetwork.SerializationRate = 15;
+
+                PhotonNetwork.NetworkingClient.EventReceived += OnRoundCompleted;
                 Player.onPlayerDied += OnPlayerFinished;
             }
 
@@ -110,7 +115,10 @@ namespace FiestaTime
             #region Unity Callbacks
             private void OnDestroy()
             {
-                RopeControllerM.onLoopComplete -= OnRoundCompleted;
+                PhotonNetwork.SendRate = 10;
+                PhotonNetwork.SerializationRate = 10;
+
+                PhotonNetwork.NetworkingClient.EventReceived -= OnRoundCompleted;
                 Player.onPlayerDied -= OnPlayerFinished;
             }
 
@@ -207,22 +215,22 @@ namespace FiestaTime
                 switch (playerCount)
                 {
                     case 1:
-                        playerPositions[0] = new Vector3(1f, 1f, 10f);
+                        playerPositions[0] = new Vector3(0f, 1f, 10f);
                         break;
                     case 2:
-                        playerPositions[0] = new Vector3(1f, 1f, 8f);
-                        playerPositions[1] = new Vector3(1f, 1f, 12f);
+                        playerPositions[0] = new Vector3(0f, 1f, 8f);
+                        playerPositions[1] = new Vector3(0f, 1f, 12f);
                         break;
                     case 3:
-                        playerPositions[0] = new Vector3(1f, 1f, 7f);
-                        playerPositions[1] = new Vector3(1f, 1f, 10f);
-                        playerPositions[2] = new Vector3(1f, 1f, 13f);
+                        playerPositions[0] = new Vector3(0f, 1f, 7f);
+                        playerPositions[1] = new Vector3(0f, 1f, 10f);
+                        playerPositions[2] = new Vector3(0f, 1f, 13f);
                         break;
                     case 4:
-                        playerPositions[0] = new Vector3(1f, 1f, 7f);
-                        playerPositions[1] = new Vector3(1f, 1f, 9f);
-                        playerPositions[2] = new Vector3(1f, 1f, 11f);
-                        playerPositions[3] = new Vector3(1f, 1f, 13f);
+                        playerPositions[0] = new Vector3(0f, 1f, 7f);
+                        playerPositions[1] = new Vector3(0f, 1f, 9f);
+                        playerPositions[2] = new Vector3(0f, 1f, 11f);
+                        playerPositions[3] = new Vector3(0f, 1f, 13f);
                         break;
                     default:
                         break;
@@ -275,17 +283,6 @@ namespace FiestaTime
                         }
                     }
 
-                    string difficulty = "EASY";
-                    if(currentJump >= 25 && currentJump < 50)
-                    {
-                        difficulty = "MEDIUM";
-                    }
-                    else if(currentJump >= 50)
-                    {
-                        difficulty = "HARD";
-                    }
-
-                    Debug.Log("DOING " + difficulty + " INVERSION AT: " + whereToInverse + " DEGREES");
                     // Inverse
                     rope.InvertRope(whereToInverse * Mathf.Deg2Rad);
                 }
@@ -310,30 +307,32 @@ namespace FiestaTime
 
                     if(rope.rotationSpeed > 0f)
                     {
-                        if(a > decreaseBurstPossibility)
-                        {
-                            //Increase
-                            decreaseBurstPossibility += 0.1f;
-                            howMuchBurst = 2f;
-                        }
-                        else
-                        {
-                            //Decrease
-                            decreaseBurstPossibility -= 0.1f;
-                            howMuchBurst = -2f;
-                        }
+                        howMuchBurst = 1f;
+                        //if (a > decreaseBurstPossibility)
+                        //{
+                        //    //Increase
+                        //    decreaseBurstPossibility += 0.1f;
+                        //    howMuchBurst = 1f;
+                        //}
+                        //else
+                        //{
+                        //    //Decrease
+                        //    decreaseBurstPossibility -= 0.1f;
+                        //    howMuchBurst = -1f;
+                        //}
                     }else if (rope.rotationSpeed < 0f)
                     {
-                        if (a > decreaseBurstPossibility)
-                        {
-                            decreaseBurstPossibility += 0.1f;
-                            howMuchBurst = 2f;
-                        }
-                        else
-                        {
-                            decreaseBurstPossibility -= 0.1f;
-                            howMuchBurst = -2f;
-                        }
+                        howMuchBurst = -1f;
+                        //if (a > decreaseBurstPossibility)
+                        //{
+                        //    decreaseBurstPossibility += 0.1f;
+                        //    howMuchBurst = 1f;
+                        //}
+                        //else
+                        //{
+                        //    decreaseBurstPossibility -= 0.1f;
+                        //    howMuchBurst = -1f;
+                        //}
                     }
 
                     rope.BurstRope(howMuchBurst);
@@ -430,20 +429,27 @@ namespace FiestaTime
                 nextToInsert--;
                 playersAlive--;
 
-                if (playerId == PhotonNetwork.LocalPlayer.ActorNumber) isHighScore = GeneralHelperFunctions.DetermineHighScoreInt(Constants.RR_KEY_HISCORE, thisPlayerResult.scoring, true);
+                if (playerId == PhotonNetwork.LocalPlayer.ActorNumber) isHighScore = GeneralHelperFunctions.DetermineHighScoreInt(FiestaTime.Constants.RR_KEY_HISCORE, thisPlayerResult.scoring, true);
             }
 
             #endregion
 
             #region Event Functions
 
-            private void OnRoundCompleted()
+            private void OnRoundCompleted(EventData eventData)
             {
-                currentJump += 1;
+                if(eventData.Code == Constants.OnLoopEventCode && playersAlive > 0)
+                {
+                    currentJump += 1;
 
-                Debug.Log("CURRENT JUMP: " + currentJump + ", CURRENT SPEED: " + rope.rotationSpeed + ", AT TIME: " + InGameTime);
+                    UIManager.Current.OnRoundCompleted();
 
-                CheckCheckpoints();
+                    Debug.Log("CURRENT JUMP: " + currentJump + ", CURRENT SPEED: " + rope.rotationSpeed + ", AT TIME: " + InGameTime);
+
+                    if (!PhotonNetwork.IsMasterClient) return;
+
+                    CheckCheckpoints();
+                }
             }
 
             private void OnPlayerFinished(int playerId, int score)
@@ -466,6 +472,7 @@ namespace FiestaTime
                         rope.rotationSpeed += speedIncreasePerMoves * Mathf.Sign(rope.rotationSpeed);
                     }
                 }
+
 
                 if (randomInverse != 0)
                 {
@@ -500,7 +507,7 @@ namespace FiestaTime
                 if (currentJump == thresholdPeak)
                 {
                     chkpnt_Peak = true;
-                    rope.rotationSpeed += 2f;
+                    rope.rotationSpeed += 0.5f * Mathf.Sign(rope.rotationSpeed);
                 }
 
                 if (currentJump == thresholdInverseH)
@@ -515,7 +522,7 @@ namespace FiestaTime
 
                 if (currentJump == thresholdDeath)
                 {
-                    rope.rotationSpeed += 4f;
+                    rope.rotationSpeed += 0.5f * Mathf.Sign(rope.rotationSpeed);
                 }
             }
 

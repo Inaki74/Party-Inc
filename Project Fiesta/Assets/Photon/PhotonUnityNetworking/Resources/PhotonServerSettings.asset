@@ -72,6 +72,7 @@ MonoBehaviour:
   - RPC_SendMark
   - RPC_SendTimes
   - RPC_SendSliced
+  - RPC_SliceObject
   DisableAutoOpenWizard: 1
-  ShowSettings: 0
+  ShowSettings: 1
   DevRegionSetOnce: 1

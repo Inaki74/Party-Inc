@@ -145,10 +145,10 @@ namespace FiestaTime
                         _laneFourSpawner.SetActive(false);
                         break;
                     case 4:
-                        _laneOneSpawner.transform.position = new Vector3(-18f, _laneOneSpawner.transform.position.y, _laneOneSpawner.transform.position.z);
+                        _laneOneSpawner.transform.position = new Vector3(-16f, _laneOneSpawner.transform.position.y, _laneOneSpawner.transform.position.z);
                         _laneTwoSpawner.transform.position = new Vector3(-6f, _laneTwoSpawner.transform.position.y, _laneTwoSpawner.transform.position.z);
-                        _laneThreeSpawner.transform.position = new Vector3(6f, _laneThreeSpawner.transform.position.y, _laneThreeSpawner.transform.position.z);
-                        _laneFourSpawner.transform.position = new Vector3(18f, _laneFourSpawner.transform.position.y, _laneFourSpawner.transform.position.z);
+                        _laneThreeSpawner.transform.position = new Vector3(4f, _laneThreeSpawner.transform.position.y, _laneThreeSpawner.transform.position.z);
+                        _laneFourSpawner.transform.position = new Vector3(14f, _laneFourSpawner.transform.position.y, _laneFourSpawner.transform.position.z);
                         break;
                     default:
                         break;
@@ -292,7 +292,7 @@ namespace FiestaTime
             /// <returns></returns>
             private int PlaceSectionInLane(GameObject spawner, string diff, int subsec)
             {
-                GameObject toPlace = SubsecPoolManager.Current.RequestSubsection(diff, subsec);
+                GameObject toPlace = SubSectionSpawner.Current.RequestSubsection(diff, subsec);
                 
                 toPlace.transform.position = new Vector3(spawner.transform.position.x, 0.1f, _currentZ);
 

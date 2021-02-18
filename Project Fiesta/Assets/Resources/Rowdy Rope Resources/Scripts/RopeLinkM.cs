@@ -42,7 +42,7 @@ namespace FiestaTime
                 transform.localPosition = new Vector3(0f, radius, z);
                 positionInArray = pos;
 
-                distanceToGrounded = 6 * Cc.bounds.extents.y;
+                distanceToGrounded = 3 * Cc.bounds.extents.y;
 
                 distanceToPlane = Vector3.Distance(ropeController.gameObject.transform.position, groundPlane.transform.position);
 
@@ -85,6 +85,8 @@ namespace FiestaTime
             /// </summary>
             private void MoveLink()
             {
+                currentAngle = ropeController.angle;
+
                 Vector3 nextPos = new Vector3(Mathf.Cos(currentAngle) * radius,
                                               Mathf.Sin(currentAngle) * radius,
                                               transform.localPosition.z);
@@ -123,18 +125,6 @@ namespace FiestaTime
                     }
 
                 }
-
-                if (currentAngle > Mathf.PI * 2)
-                {
-                    currentAngle = 0f;
-                }
-
-                if (currentAngle < 0)
-                {
-                    currentAngle = Mathf.PI * 2;
-                }
-
-                currentAngle += Time.deltaTime * ropeController.rotationSpeed;
             }
         }
     }

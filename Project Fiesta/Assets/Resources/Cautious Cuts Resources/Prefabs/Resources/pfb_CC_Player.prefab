@@ -119,8 +119,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _mr: {fileID: 2581538135315048440}
   _mineMaterial: {fileID: 2100000, guid: 5d6e9e265a299491ab71402bb2638d33, type: 2}
-  _slashingParticles: {fileID: 912523510633269750, guid: d6c13d824418e4518add44615492e54e,
-    type: 3}
   _touchSlicer: {fileID: 8045797731097330398}
 --- !u!120 &6239419416950368903
 LineRenderer:
@@ -235,6 +233,8 @@ MonoBehaviour:
   _c1: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   _c2: {r: 1, g: 0, b: 0, a: 1}
   _forceOnCut: 10
+  _slashingParticles: {fileID: 912523510633269750, guid: d6c13d824418e4518add44615492e54e,
+    type: 3}
   _whatWeAreCuttingLayerMask:
     serializedVersion: 2
     m_Bits: 4096

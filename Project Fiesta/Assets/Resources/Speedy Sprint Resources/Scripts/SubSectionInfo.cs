@@ -18,11 +18,13 @@ namespace FiestaTime
 
             private int _subsectionCount = 3;
 
+            private void Start()
+            {
+                PositionTiles();
+            }
 
             private void Update()
             {
-                PositionTiles();
-
                 if(_terribleWorkaroundTime < 0)
                 {
                     _terribleWorkaround = false;
@@ -40,24 +42,16 @@ namespace FiestaTime
                 var children = _ground.GetComponentsInChildren<Tile>();
 
                 AmountOfTiles = children.Length;
-            }
 
-            private void OnDestroy()
-            {
-                InvisibleTrolleyController.onPassedSection -= OnPassedSection;
-            }
-
-            private void OnEnable()
-            {
                 _subsectionCount = 3;
 
                 _terribleWorkaround = true;
                 _terribleWorkaroundTime = 2f;
             }
 
-            private void OnDisable()
+            private void OnDestroy()
             {
-                _subsectionCount = 3;
+                InvisibleTrolleyController.onPassedSection -= OnPassedSection;
             }
 
             private void OnPassedSection()
@@ -68,8 +62,7 @@ namespace FiestaTime
 
                 if (_subsectionCount == 0)
                 {
-                    transform.parent = SubsecPoolManager.Current.SubsectionHolder.transform;
-                    gameObject.SetActive(false);
+                    Destroy(gameObject);
                 }
             }
 

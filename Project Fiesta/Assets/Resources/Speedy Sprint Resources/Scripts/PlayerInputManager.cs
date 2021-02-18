@@ -19,8 +19,6 @@ namespace FiestaTime
             public bool MoveInput { get; private set; }
             public int MoveDirection { get; private set; }
 
-            public Queue<string> currentInputs = new Queue<string>();
-
             // Update is called once per frame
             void Update()
             {
@@ -69,30 +67,6 @@ namespace FiestaTime
                     {
                         foundInput = true;
                         DetermineInput(startPoint, endPoint);
-
-                        if (JumpInput)
-                        {
-                            //Debug.Log("JUMP");
-                            currentInputs.Enqueue("Jump");
-                        }
-                        if (MoveInput)
-                        {
-                            if(MoveDirection == 1)
-                            {
-                                //Debug.Log("RIGHT");
-                                currentInputs.Enqueue("MoveRight");
-                            }
-                            else
-                            {
-                                //Debug.Log("LEFT");
-                                currentInputs.Enqueue("MoveLeft");
-                            }
-                        }
-
-                        if (DuckInput)
-                        {
-                            //Debug.Log("DUCK");
-                        }
                     }
 
                     yield return new WaitForEndOfFrame();
@@ -220,22 +194,6 @@ namespace FiestaTime
                 JumpInput = Input.GetKeyDown(KeyCode.UpArrow);
 
                 DuckInput = Input.GetKeyDown(KeyCode.DownArrow);
-
-                if (JumpInput)
-                {
-                    currentInputs.Enqueue("Jump");
-                }
-                if (MoveInput)
-                {
-                    if (MoveDirection == 1)
-                    {
-                        currentInputs.Enqueue("MoveRight");
-                    }
-                    else
-                    {
-                        currentInputs.Enqueue("MoveLeft");
-                    }
-                }
             }
         }
     }

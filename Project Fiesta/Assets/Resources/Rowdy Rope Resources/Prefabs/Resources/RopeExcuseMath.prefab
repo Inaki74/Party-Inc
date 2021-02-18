@@ -10,6 +10,8 @@ GameObject:
   m_Component:
   - component: {fileID: 1398582739777196351}
   - component: {fileID: 1398582739777196350}
+  - component: {fileID: 8758119357210293749}
+  - component: {fileID: 3940364207050322121}
   m_Layer: 0
   m_Name: RopeExcuseMath
   m_TagString: Untagged
@@ -50,8 +52,46 @@ MonoBehaviour:
   startPoint: {fileID: 1398582740581494376}
   endPoint: {fileID: 1398582740245686279}
   separation: 0.3
+  loopCompleted: 1
   angle: 0
   rotationSpeed: 1
+--- !u!114 &8758119357210293749
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1398582739777196348}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 514bed5c4e04245d8bb8546d85122b8d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _ropeController: {fileID: 0}
+--- !u!114 &3940364207050322121
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1398582739777196348}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d06466c03d263624786afa88b52928b6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  statsWindowOn: 1
+  statsOn: 1
+  healthStatsVisible: 0
+  trafficStatsOn: 1
+  buttonsOn: 0
+  statsRect:
+    serializedVersion: 2
+    x: 0
+    y: 100
+    width: 200
+    height: 50
+  WindowId: 100
 --- !u!1 &1398582740245686279
 GameObject:
   m_ObjectHideFlags: 0
