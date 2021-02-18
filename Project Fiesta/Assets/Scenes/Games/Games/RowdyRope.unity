@@ -751,11 +751,21 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 870366747388103558, guid: 3e23945da74334e1f80c2a6ebd8de172,
+        type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: f357c18a293d04d15846777e4de11c82, type: 2}
     - target: {fileID: 870366747388103672, guid: 3e23945da74334e1f80c2a6ebd8de172,
         type: 3}
       propertyPath: m_StaticEditorFlags
       value: 4294967295
       objectReference: {fileID: 0}
+    - target: {fileID: 870366747672558605, guid: 3e23945da74334e1f80c2a6ebd8de172,
+        type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: f357c18a293d04d15846777e4de11c82, type: 2}
     - target: {fileID: 870366747672558607, guid: 3e23945da74334e1f80c2a6ebd8de172,
         type: 3}
       propertyPath: m_StaticEditorFlags
@@ -831,6 +841,16 @@ PrefabInstance:
       propertyPath: m_StaticEditorFlags
       value: 4294967295
       objectReference: {fileID: 0}
+    - target: {fileID: 870366749020609015, guid: 3e23945da74334e1f80c2a6ebd8de172,
+        type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: f357c18a293d04d15846777e4de11c82, type: 2}
+    - target: {fileID: 870366749309297009, guid: 3e23945da74334e1f80c2a6ebd8de172,
+        type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: f357c18a293d04d15846777e4de11c82, type: 2}
     - target: {fileID: 870366749309297011, guid: 3e23945da74334e1f80c2a6ebd8de172,
         type: 3}
       propertyPath: m_StaticEditorFlags
@@ -1069,7 +1089,7 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
-      objectReference: {fileID: 2100000, guid: bd26e3d2d0f56b54d95b8f3b244d407f, type: 2}
+      objectReference: {fileID: 2100000, guid: c9c9b9ac5dbd34b87bc2ce43e6813fc1, type: 2}
     - target: {fileID: 1725556111600110866, guid: fee07fba20d9a4e8fa225d3b37191e12,
         type: 3}
       propertyPath: m_Enabled
