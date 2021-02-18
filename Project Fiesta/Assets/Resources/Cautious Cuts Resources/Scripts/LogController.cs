@@ -107,8 +107,11 @@ namespace FiestaTime
                 StartCoroutine("DisableAfterAWhile");
             }
 
+
             private IEnumerator DisableAfterAWhile()
             {
+                // Disable it after a while to not lose references over the network.
+
                 _dying = true;
                 transform.position = _startPos + new Vector3(0f, 0f, 2f);
                 yield return new WaitForSeconds(0.5f);
