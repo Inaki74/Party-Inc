@@ -27,7 +27,7 @@ namespace PlayInc
             #endregion
 
             // Path to the Egg Maps directory, relative to the resources folder //TODO: Check if this is consistent with other devices.
-            private static string Path = "Easter Resources/Egg Grabbing Games/Egg Grabbing Game B Resources/EggMaps/";
+            private static string Path = "2_Games/1_Egg/_EggMaps/";
 
             #region General Game Settings
             [Header("General Game Settings")]
