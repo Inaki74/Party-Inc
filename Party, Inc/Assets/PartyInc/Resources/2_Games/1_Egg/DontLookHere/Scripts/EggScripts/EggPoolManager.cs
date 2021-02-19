@@ -5,7 +5,7 @@ using UnityEngine;
 /// <summary>
 /// Manages the Object Pooling of all of the eggs with a list of each kind respectively.
 /// </summary>
-public class EggPoolManager : MonoBehaviour
+public class Mng_EggPoolManager_EGG : MonoBehaviour
 {
     private int amountOfEggs = 2;
 
@@ -32,10 +32,10 @@ public class EggPoolManager : MonoBehaviour
     {
         for(int i = 0; i < n; i++)
         {
-            GameObject newEasterEgg = Instantiate(easterEggPrefab);
-            newEasterEgg.transform.parent = eggHolder.transform;
-            newEasterEgg.SetActive(false);
-            easterEggs.Add(newEasterEgg);
+            GameObject newMono_Egg_EGG = Instantiate(easterEggPrefab);
+            newMono_Egg_EGG.transform.parent = eggHolder.transform;
+            newMono_Egg_EGG.SetActive(false);
+            easterEggs.Add(newMono_Egg_EGG);
 
             GameObject newRottenEgg = Instantiate(rottenEggPrefab);
             newRottenEgg.transform.parent = eggHolder.transform;
@@ -58,10 +58,10 @@ public class EggPoolManager : MonoBehaviour
         switch (type)
         {
             case 0:
-                GameObject newEasterEgg = Instantiate(easterEggPrefab);
-                newEasterEgg.transform.parent = eggHolder.transform;
-                newEasterEgg.SetActive(false);
-                easterEggs.Add(newEasterEgg);
+                GameObject newMono_Egg_EGG = Instantiate(easterEggPrefab);
+                newMono_Egg_EGG.transform.parent = eggHolder.transform;
+                newMono_Egg_EGG.SetActive(false);
+                easterEggs.Add(newMono_Egg_EGG);
                 break;
             case 1:
                 GameObject newRottenEgg = Instantiate(rottenEggPrefab);

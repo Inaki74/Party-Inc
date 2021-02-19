@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GoldenEgg : EasterEgg
+public class GoldenEgg : Mono_Egg_EGG
 {
     protected override void Start()
     {

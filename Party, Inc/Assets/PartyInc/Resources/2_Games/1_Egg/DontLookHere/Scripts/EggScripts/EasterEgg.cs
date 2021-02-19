@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class EasterEgg : MonoBehaviour
+public class Mono_Egg_EGG : MonoBehaviour
 {
     public LayerMask whatIsGround;
 

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class RottenEgg : EasterEgg
+public class RottenEgg : Mono_Egg_EGG
 {
     protected override void Start()
     {

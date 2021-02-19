@@ -5,7 +5,7 @@ using UnityEngine;
 /// <summary>
 /// Manages the spawning of the eggs and its random factors like speed of spawning, which to spawn, where and in which direction.
 /// </summary>
-public class EggSpawnerManager : MonoBehaviour
+public class Mng_Mono_EggSpawner_EGGManager_EGG : MonoBehaviour
 {
     public float startTimeInterval;
     public float deltaTimeIncrease;
@@ -22,7 +22,7 @@ public class EggSpawnerManager : MonoBehaviour
     [Range(0f, 100f)]
     public float rottenEggRate;
 
-    private EggPoolManager pool;
+    private Mng_EggPoolManager_EGG pool;
     private Camera mainCamera;
     private float cameraWidth;
     private Vector3 spawningHeight = new Vector3(1f, 17f, 0f);
@@ -31,7 +31,7 @@ public class EggSpawnerManager : MonoBehaviour
     {
         mainCamera = Camera.main;
         cameraWidth = mainCamera.scaledPixelWidth;
-        pool = GetComponent<EggPoolManager>();
+        pool = GetComponent<Mng_EggPoolManager_EGG>();
         lastSpawnedTime = Time.time;
     }
 
@@ -61,7 +61,7 @@ public class EggSpawnerManager : MonoBehaviour
         spawningHeight.Set(p, spawningHeight.y, spawningHeight.z);
         egg.transform.position = spawningHeight;
         //Launch it in direction d
-        egg.GetComponent<EasterEgg>().SetDirectionVector(d);
+        egg.GetComponent<Mono_Egg_EGG>().SetDirectionVector(d);
     }
 
     /// <summary>
