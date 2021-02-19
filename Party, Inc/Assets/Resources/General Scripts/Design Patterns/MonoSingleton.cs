@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
 
-namespace FiestaTime
+namespace PlayInc
 {
     /// <summary>
     /// The monobehaviourPun singleton.

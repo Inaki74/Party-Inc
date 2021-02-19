@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 
-namespace FiestaTime
+namespace PlayInc
 {
     namespace SS
     {
@@ -82,7 +82,7 @@ namespace FiestaTime
                         newSubsec = Instantiate(_subsecPrefabsHard[number - 1]);
                         break;
                     default:
-                        Debug.LogError("FiestaTime/SS/SubSectionSpawner: Wrong difficulty arrived");
+                        Debug.LogError("PlayInc/SS/SubSectionSpawner: Wrong difficulty arrived");
                         break;
                 }
 

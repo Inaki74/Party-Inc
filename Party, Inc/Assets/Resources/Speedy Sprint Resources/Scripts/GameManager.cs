@@ -2,7 +2,7 @@
 using System.Linq;
 using Photon.Pun;
 
-namespace FiestaTime
+namespace PlayInc
 {
     namespace SS
     {

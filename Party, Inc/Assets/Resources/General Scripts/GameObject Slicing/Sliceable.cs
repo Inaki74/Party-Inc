@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Security.AccessControl;
 using UnityEngine;
 
-namespace FiestaTime
+namespace PlayInc
 {
     namespace Tvtig.Slicer
     {

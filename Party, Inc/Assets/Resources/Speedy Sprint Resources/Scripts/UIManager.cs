@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using Photon.Pun;
 
-namespace FiestaTime
+namespace PlayInc
 {
     namespace SS
     {

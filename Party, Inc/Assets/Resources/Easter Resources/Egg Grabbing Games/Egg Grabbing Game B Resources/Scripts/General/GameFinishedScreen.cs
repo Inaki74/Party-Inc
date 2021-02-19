@@ -6,7 +6,7 @@ using Photon.Pun;
 using UnityEngine.UI;
 using System.Linq;
 
-namespace FiestaTime
+namespace PlayInc
 {
     namespace EGG
     {
@@ -38,7 +38,7 @@ namespace FiestaTime
                 if (GameManager.Current.playerCount == 1)
                 {
                     highScores.SetActive(true);
-                    highScore.text = PlayerPrefs.GetInt(FiestaTime.Constants.EGG_KEY_HISCORE).ToString();
+                    highScore.text = PlayerPrefs.GetInt(PlayInc.Constants.EGG_KEY_HISCORE).ToString();
 
                     playerNames[0].text = PhotonNetwork.LocalPlayer.NickName;
                     playerPlacings[0].enabled = false;

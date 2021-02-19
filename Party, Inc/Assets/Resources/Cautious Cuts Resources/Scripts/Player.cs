@@ -6,7 +6,7 @@ using System.Linq;
 using Photon.Realtime;
 using ExitGames.Client.Photon;
 
-namespace FiestaTime
+namespace PlayInc
 {
     namespace CC
     {
@@ -148,10 +148,10 @@ namespace FiestaTime
                 if (eventData.Code == Constants.GivePlayerResultEventCode && photonView.IsMine)
                 {
                     float finalScore = _myTotalScore / Constants.AMOUNT_OF_LOGS_PER_MATCH;
-                    if (finalScore > PlayerPrefs.GetFloat(FiestaTime.Constants.CC_KEY_HISCORE))
+                    if (finalScore > PlayerPrefs.GetFloat(PlayInc.Constants.CC_KEY_HISCORE))
                     {
                         GameManager.Current.IsHighScore = true;
-                        PlayerPrefs.SetFloat(FiestaTime.Constants.CC_KEY_HISCORE, finalScore);
+                        PlayerPrefs.SetFloat(PlayInc.Constants.CC_KEY_HISCORE, finalScore);
                     }
 
                     object[] content = new object[] { PhotonNetwork.LocalPlayer.ActorNumber, finalScore };

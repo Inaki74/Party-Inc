@@ -8,7 +8,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
-namespace FiestaTime
+namespace PlayInc
 {
     /// <summary>
     /// Its the class in charge of the game selection.

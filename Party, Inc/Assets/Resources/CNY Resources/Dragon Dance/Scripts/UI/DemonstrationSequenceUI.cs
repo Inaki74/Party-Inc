@@ -6,7 +6,7 @@ using Photon.Pun;
 
 using UnityEngine.UI;
 
-namespace FiestaTime
+namespace PlayInc
 {
     namespace DD
     {

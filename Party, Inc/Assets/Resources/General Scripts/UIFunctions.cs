@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace FiestaTime
+namespace PlayInc
 {
     public static class UIFunctions
     {

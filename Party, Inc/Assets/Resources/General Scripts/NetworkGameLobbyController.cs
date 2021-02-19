@@ -8,7 +8,7 @@ using Photon.Pun;
 using Photon.Realtime;
 
 
-namespace FiestaTime
+namespace PlayInc
 {
     /// <summary>
     /// Its the class that controls all game lobbies.

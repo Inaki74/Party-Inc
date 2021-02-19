@@ -4,7 +4,7 @@ using UnityEngine;
 
 using UnityEngine.UI;
 
-namespace FiestaTime
+namespace PlayInc
 {
     namespace TT
     {

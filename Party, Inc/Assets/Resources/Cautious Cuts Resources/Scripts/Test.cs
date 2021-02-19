@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace FiestaTime
+namespace PlayInc
 {
     public class Test : MonoBehaviour
     {

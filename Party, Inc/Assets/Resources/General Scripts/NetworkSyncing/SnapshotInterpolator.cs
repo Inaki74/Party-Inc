@@ -4,7 +4,7 @@ using UnityEngine;
 using Photon.Pun;
 using System.Linq;
 
-namespace FiestaTime
+namespace PlayInc
 {
     /// <summary>
     /// A class that represents the interpolator/extrapolator through the network.

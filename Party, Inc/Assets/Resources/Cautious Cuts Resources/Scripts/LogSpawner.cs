@@ -5,7 +5,7 @@ using Photon.Pun;
 using Photon.Realtime;
 using ExitGames.Client.Photon;
 
-namespace FiestaTime
+namespace PlayInc
 {
     namespace CC
     {
@@ -84,7 +84,7 @@ namespace FiestaTime
                     case 5:
                         return _vSmallVertLogPrefab.name;
                     default:
-                        throw new System.Exception("FiestaTime/CC/DecideLogType: Wrong log type arrived");
+                        throw new System.Exception("PlayInc/CC/DecideLogType: Wrong log type arrived");
                 }
             }
         }

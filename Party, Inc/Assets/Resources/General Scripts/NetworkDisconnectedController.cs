@@ -8,7 +8,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
-namespace FiestaTime
+namespace PlayInc
 {
     /// <summary>
     /// Script in charge of the disconnected scene.

@@ -6,7 +6,7 @@ using UnityEngine.UI;
 using Photon.Pun;
 using System.Linq;
 
-namespace FiestaTime
+namespace PlayInc
 {
     namespace CC
     {
@@ -37,7 +37,7 @@ namespace FiestaTime
                 if (GameManager.Current.playerCount == 1)
                 {
                     highScores.SetActive(true);
-                    highScore.text = GeneralHelperFunctions.ShowInPercentage(PlayerPrefs.GetFloat(FiestaTime.Constants.CC_KEY_HISCORE));
+                    highScore.text = GeneralHelperFunctions.ShowInPercentage(PlayerPrefs.GetFloat(PlayInc.Constants.CC_KEY_HISCORE));
 
                     playerNames[0].text = PhotonNetwork.LocalPlayer.NickName;
                     playerPlacings[0].enabled = false;

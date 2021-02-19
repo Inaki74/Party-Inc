@@ -4,7 +4,7 @@ using UnityEngine;
 
 using Photon.Pun;
 
-namespace FiestaTime
+namespace PlayInc
 {
     namespace EGG
     {
@@ -193,7 +193,7 @@ namespace FiestaTime
 
             public void OnGameFinish()
             {
-                if (photonView.IsMine) GameManager.Current.isHighScore = GeneralHelperFunctions.DetermineHighScoreInt(FiestaTime.Constants.EGG_KEY_HISCORE, MyResults.scoring, true);
+                if (photonView.IsMine) GameManager.Current.isHighScore = GeneralHelperFunctions.DetermineHighScoreInt(PlayInc.Constants.EGG_KEY_HISCORE, MyResults.scoring, true);
 
                 StopAllCoroutines();
             }

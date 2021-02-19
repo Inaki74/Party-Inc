@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-namespace FiestaTime
+namespace PlayInc
 {
     /// <summary>
     /// Physics based rope controller, too unstable.

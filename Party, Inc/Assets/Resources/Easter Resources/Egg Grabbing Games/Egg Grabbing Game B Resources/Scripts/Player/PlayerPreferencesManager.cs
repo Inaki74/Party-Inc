@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 using Photon.Pun;
 
-namespace FiestaTime
+namespace PlayInc
 {
     namespace EGG
     {
@@ -25,8 +25,8 @@ namespace FiestaTime
             {
                 if (photonView.IsMine)
                 {
-                    decidedCharacter = PlayerPrefs.GetString(FiestaTime.Constants.CHRCTR_KEY_NETWRK);
-                    playerName = PlayerPrefs.GetString(FiestaTime.Constants.NAME_KEY_NETWRK);
+                    decidedCharacter = PlayerPrefs.GetString(PlayInc.Constants.CHRCTR_KEY_NETWRK);
+                    playerName = PlayerPrefs.GetString(PlayInc.Constants.NAME_KEY_NETWRK);
                 }
                 else
                 {
@@ -39,10 +39,10 @@ namespace FiestaTime
 
                 switch (decidedCharacter)
                 {
-                    case FiestaTime.Constants.BUNNY_NAME_CHRCTR:
+                    case PlayInc.Constants.BUNNY_NAME_CHRCTR:
                         //Put on Easter Bunny animations and sprites
                         break;
-                    case FiestaTime.Constants.SANTA_NAME_CHRCTR:
+                    case PlayInc.Constants.SANTA_NAME_CHRCTR:
                         //Put on Santa Claus animations and sprites
                         break;
                 }
