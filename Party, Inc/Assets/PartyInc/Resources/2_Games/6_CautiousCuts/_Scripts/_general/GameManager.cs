@@ -59,7 +59,7 @@ namespace PlayInc
                     }
                 }
 
-                PhotonNetwork.Instantiate(playerPrefab.name, decidedPosition, Quaternion.identity);
+                PhotonNetwork.Instantiate("_player/" + playerPrefab.name, decidedPosition, Quaternion.identity);
             }
 
             private void InitializeSpawners()
@@ -75,7 +75,7 @@ namespace PlayInc
                     }
                 }
 
-                PhotonNetwork.Instantiate(_logSpawner.name, decidedPosition, Quaternion.identity);
+                PhotonNetwork.Instantiate("_logs/" + _logSpawner.name, decidedPosition, Quaternion.identity);
             }
 
             private void SetPlayerPositions()

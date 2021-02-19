@@ -54,7 +54,7 @@ namespace PlayInc
 
             private float _realGameStartCountdown;
 
-            public static string SubsectionsPath = "Speedy Sprint Resources/Prefabs/Resources/Sub-Sections/";
+            public static string SubsectionsPath = "2_Games/5_SpeedySprint/_Subsections/";
 
             protected override void InitializeGameManagerDependantObjects()
             {
@@ -220,7 +220,7 @@ namespace PlayInc
                     }
                 }
 
-                PhotonNetwork.Instantiate(playerPrefab.name, decidedPosition, Quaternion.identity);
+                PhotonNetwork.Instantiate("_player/" + playerPrefab.name, decidedPosition, Quaternion.identity);
             }
 
             /// <summary>

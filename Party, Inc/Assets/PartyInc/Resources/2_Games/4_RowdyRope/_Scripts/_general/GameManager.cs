@@ -196,7 +196,7 @@ namespace PlayInc
                     }
                 }
 
-                PhotonNetwork.Instantiate(playerPrefab.name, decidedPosition, Quaternion.identity);
+                PhotonNetwork.Instantiate("_player/" + playerPrefab.name, decidedPosition, Quaternion.identity);
             }
 
             private void InitializeStage()

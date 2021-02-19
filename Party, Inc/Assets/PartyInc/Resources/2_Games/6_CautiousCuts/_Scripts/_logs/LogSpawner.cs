@@ -49,7 +49,7 @@ namespace PlayInc
                     string toSpawn = DecideLogType(logType);
 
                     // Spawn log
-                    GameObject newLog = PhotonNetwork.Instantiate(toSpawn, transform.position, Quaternion.identity);
+                    GameObject newLog = PhotonNetwork.Instantiate("_logs/" + toSpawn, transform.position, Quaternion.identity);
                     FallingLog log = newLog.GetComponent<FallingLog>();
                     LogController logCon = newLog.GetComponent<LogController>();
 
@@ -80,7 +80,7 @@ namespace PlayInc
                     case 3:
                         return _smallVertLogPrefab.name;
                     case 4:
-                        return  _vSmallHorizLogPrefab.name;
+                        return _vSmallHorizLogPrefab.name;
                     case 5:
                         return _vSmallVertLogPrefab.name;
                     default:

@@ -250,7 +250,7 @@ namespace PlayInc
                     }
                 }
                 Debug.Log(playerPrefab.name);
-                PhotonNetwork.Instantiate(playerPrefab.name, decidedVec, Quaternion.identity);
+                PhotonNetwork.Instantiate("_player/" + playerPrefab.name, decidedVec, Quaternion.identity);
             }
 
             /// <summary>

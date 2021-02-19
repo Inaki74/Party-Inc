@@ -153,8 +153,10 @@ namespace PlayInc
                     }
                 }
 
-                PhotonNetwork.Instantiate(playerAssetsPrefab.name, decidedVector, Quaternion.identity);
-                PhotonNetwork.Instantiate(playerPrefab.name, decidedVector + new Vector3(0f, 0.7f, 0f), Quaternion.identity);
+                Debug.Log(playerAssetsPrefab.name);
+
+                PhotonNetwork.Instantiate("_player/" + playerAssetsPrefab.name, decidedVector, Quaternion.identity);
+                PhotonNetwork.Instantiate("_player/" + playerPrefab.name, decidedVector + new Vector3(0f, 0.7f, 0f), Quaternion.identity);
             }
 
             private void FinishGame()
