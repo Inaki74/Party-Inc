@@ -3,7 +3,7 @@ using UnityEngine;
 
 using Photon.Pun;
 
-namespace PlayInc
+namespace PartyInc
 {
     namespace EGG
     {

@@ -1,4 +1,4 @@
-﻿namespace PlayInc
+﻿namespace PartyInc
 {
     namespace CC
     {

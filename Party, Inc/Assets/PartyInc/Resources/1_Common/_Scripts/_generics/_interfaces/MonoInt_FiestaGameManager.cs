@@ -3,10 +3,10 @@ using System.Collections;
 using UnityEngine;
 using Photon.Pun;
 
-namespace PlayInc
+namespace PartyInc
 {
     /// <summary>
-    /// This class defines a PlayInc GameManager, and posseses everything every GameManager probably has.
+    /// This class defines a PartyInc GameManager, and posseses everything every GameManager probably has.
     /// One should be very careful when changing this piece of code, since it ties to all the games.
     /// I know this is bad design, but its a sacrifice im willing to make, since its a great to be able to introduce all the basic things
     /// I need every time I make a new game.
@@ -139,7 +139,7 @@ namespace PlayInc
 
         public override void OnRoomPropertiesUpdate(ExitGames.Client.Photon.Hashtable propertiesThatChanged)
         {
-            Debug.Log("PlayInc/GameManager: Custom Properties changed.");
+            Debug.Log("PartyInc/GameManager: Custom Properties changed.");
             base.OnRoomPropertiesUpdate(propertiesThatChanged);
             _receivedProperties = true;
             CustomProps = propertiesThatChanged;

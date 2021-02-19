@@ -7,7 +7,7 @@ using UnityEngine.SceneManagement;
 using Photon.Pun;
 using Photon.Realtime;
 
-namespace PlayInc
+namespace PartyInc
 {
     /// <summary>
     /// Script in charge of the title screen as well as connecting to the server.

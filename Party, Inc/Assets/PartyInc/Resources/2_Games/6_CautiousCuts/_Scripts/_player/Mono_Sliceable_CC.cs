@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Security.AccessControl;
 using UnityEngine;
 
-namespace PlayInc
+namespace PartyInc
 {
     namespace Tvtig.Slicer
     {

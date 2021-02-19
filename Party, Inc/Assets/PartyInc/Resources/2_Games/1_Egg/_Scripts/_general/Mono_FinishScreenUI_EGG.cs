@@ -6,7 +6,7 @@ using Photon.Pun;
 using UnityEngine.UI;
 using System.Linq;
 
-namespace PlayInc
+namespace PartyInc
 {
     namespace EGG
     {
@@ -38,7 +38,7 @@ namespace PlayInc
                 if (Mng_GameManager_EGG.Current.playerCount == 1)
                 {
                     highScores.SetActive(true);
-                    highScore.text = PlayerPrefs.GetInt(PlayInc.Constants.EGG_KEY_HISCORE).ToString();
+                    highScore.text = PlayerPrefs.GetInt(PartyInc.Constants.EGG_KEY_HISCORE).ToString();
 
                     playerNames[0].text = PhotonNetwork.LocalPlayer.NickName;
                     playerPlacings[0].enabled = false;

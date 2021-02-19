@@ -8,7 +8,7 @@ using System.Linq;
 using Photon.Pun;
 using Photon.Realtime;
 
-namespace PlayInc
+namespace PartyInc
 {
     // TODO: Rework this broken ass code and game.
     // Its so spaghetti it hurts my pride and eyes.

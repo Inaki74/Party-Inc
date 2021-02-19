@@ -4,7 +4,7 @@ using UnityEngine;
 using Photon.Pun;
 using System.Linq;
 
-namespace PlayInc
+namespace PartyInc
 {
     /// <summary>
     /// A class that represents the interpolator/extrapolator through the network.

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 
-namespace PlayInc
+namespace PartyInc
 {
     namespace SS
     {

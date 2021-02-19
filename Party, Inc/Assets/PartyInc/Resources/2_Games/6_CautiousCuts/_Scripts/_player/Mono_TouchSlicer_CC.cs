@@ -4,7 +4,7 @@ using UnityEngine;
 using Photon.Pun;
 using System.Linq;
 
-namespace PlayInc
+namespace PartyInc
 {
     public struct RayhitSliceInfo
     {
@@ -457,7 +457,7 @@ namespace PlayInc
 
                 catch(System.InvalidOperationException e)
                 {
-                    Debug.LogError("PlayInc/TouchSlicer: The points that we have are all the same, cant find a different point.");
+                    Debug.LogError("PartyInc/TouchSlicer: The points that we have are all the same, cant find a different point.");
                     DebugExtensions.PrintList(_hits);
                 }
             }
@@ -645,7 +645,7 @@ namespace PlayInc
 
             if(found == null)
             {
-                Debug.LogError("PlayInc/TouchSlicer: COULDNT FIND OBJECT. (DID YOU DESTROY IT?)");
+                Debug.LogError("PartyInc/TouchSlicer: COULDNT FIND OBJECT. (DID YOU DESTROY IT?)");
             }
 
             Vector3 p = found.transform.position;

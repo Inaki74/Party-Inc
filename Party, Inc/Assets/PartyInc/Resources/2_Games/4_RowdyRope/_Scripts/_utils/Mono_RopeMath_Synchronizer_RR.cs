@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
 
-namespace PlayInc
+namespace PartyInc
 {
     namespace RR
     {

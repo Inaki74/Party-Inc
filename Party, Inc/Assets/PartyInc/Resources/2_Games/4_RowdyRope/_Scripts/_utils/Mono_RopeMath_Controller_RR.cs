@@ -5,7 +5,7 @@ using Photon.Pun;
 using Photon.Realtime;
 using ExitGames.Client.Photon;
 
-namespace PlayInc
+namespace PartyInc
 {
     namespace RR
     {

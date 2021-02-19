@@ -6,7 +6,7 @@ using UnityEngine.SceneManagement;
 
 using UnityEngine.UI;
 
-namespace PlayInc
+namespace PartyInc
 {
     /// <summary>
     /// The personal pause menu where you can choose to go back to main menu (dc). Its also the game over screen for some games.
