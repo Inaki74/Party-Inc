@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 4883443917830921254}
   - component: {fileID: 8922072312386705686}
   m_Layer: 0
-  m_Name: pfb_LogSpawner
+  m_Name: Pfb_LogSpawner_CC
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

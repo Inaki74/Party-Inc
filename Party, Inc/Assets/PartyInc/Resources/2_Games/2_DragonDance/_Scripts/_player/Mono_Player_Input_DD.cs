@@ -7,7 +7,7 @@ namespace PlayInc
 {
     namespace DD
     {
-        public class InputManager : MonoBehaviourPun
+        public class Mono_Player_Input_DD : MonoBehaviourPun
         {
             public delegate void ActionTakeMove(int numberMove);
             public static event ActionTakeMove onMoveMade;

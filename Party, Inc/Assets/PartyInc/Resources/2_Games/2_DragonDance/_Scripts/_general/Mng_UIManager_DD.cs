@@ -43,13 +43,13 @@ namespace PlayInc
             private void Awake()
             {
                 Mng_GameManager_DD.onNextPhase += OnPhaseTransit;
-                InputManager.onMoveMade += OnInputTaken;
+                Mono_Player_Input_DD.onMoveMade += OnInputTaken;
             }
 
             private void OnDestroy()
             {
                 Mng_GameManager_DD.onNextPhase -= OnPhaseTransit;
-                InputManager.onMoveMade -= OnInputTaken;
+                Mono_Player_Input_DD.onMoveMade -= OnInputTaken;
             }
             #endregion
 

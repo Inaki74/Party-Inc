@@ -31,7 +31,7 @@ namespace PlayInc
 
             #region Serialized Components
 
-            [SerializeField] private InputManager inputManager;
+            [SerializeField] private Mono_Player_Input_DD inputManager;
             [SerializeField] private MeshRenderer Mr;
             [SerializeField] private Animator anim;
 
@@ -47,7 +47,7 @@ namespace PlayInc
             // Start is called before the first frame update
             void Start()
             {
-                if (inputManager == null) inputManager = GetComponent<InputManager>();
+                if (inputManager == null) inputManager = GetComponent<Mono_Player_Input_DD>();
                 if (anim == null) anim = GetComponent<Animator>();
                 if (Mr == null) Mr = GetComponent<MeshRenderer>();
 
