@@ -6,7 +6,7 @@ using Photon.Realtime;
 using ExitGames.Client.Photon;
 using System.Linq;
 
-namespace PlayInc
+namespace PartyInc
 {
     namespace CC
     {

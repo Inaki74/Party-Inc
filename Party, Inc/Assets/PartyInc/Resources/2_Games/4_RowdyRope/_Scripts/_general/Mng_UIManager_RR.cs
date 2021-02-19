@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace PlayInc
+namespace PartyInc
 {
     namespace RR
     {

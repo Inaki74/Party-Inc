@@ -5,7 +5,7 @@ using System.Linq;
 using Photon.Realtime;
 using ExitGames.Client.Photon;
 
-namespace PlayInc
+namespace PartyInc
 {
     namespace RR
     {
@@ -428,7 +428,7 @@ namespace PlayInc
                 nextToInsert--;
                 playersAlive--;
 
-                if (playerId == PhotonNetwork.LocalPlayer.ActorNumber) isHighScore = HighScoreHelpers.DetermineHighScoreInt(PlayInc.Constants.RR_KEY_HISCORE, thisPlayerResult.scoring, true);
+                if (playerId == PhotonNetwork.LocalPlayer.ActorNumber) isHighScore = HighScoreHelpers.DetermineHighScoreInt(PartyInc.Constants.RR_KEY_HISCORE, thisPlayerResult.scoring, true);
             }
 
             #endregion

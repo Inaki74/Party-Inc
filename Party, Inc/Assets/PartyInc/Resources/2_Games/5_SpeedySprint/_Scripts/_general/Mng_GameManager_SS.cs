@@ -2,7 +2,7 @@
 using System.Linq;
 using Photon.Pun;
 
-namespace PlayInc
+namespace PartyInc
 {
     namespace SS
     {

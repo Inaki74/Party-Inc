@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace PlayInc
+namespace PartyInc
 {
     namespace SS
     {

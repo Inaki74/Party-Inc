@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-namespace PlayInc
+namespace PartyInc
 {
     /// <summary>
     /// Physics based rope controller, too unstable.

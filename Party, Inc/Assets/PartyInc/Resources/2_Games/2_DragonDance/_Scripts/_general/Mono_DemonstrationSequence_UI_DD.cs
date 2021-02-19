@@ -6,7 +6,7 @@ using Photon.Pun;
 
 using UnityEngine.UI;
 
-namespace PlayInc
+namespace PartyInc
 {
     namespace DD
     {

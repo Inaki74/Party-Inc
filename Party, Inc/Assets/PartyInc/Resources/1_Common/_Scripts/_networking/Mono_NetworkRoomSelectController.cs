@@ -8,7 +8,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
-namespace PlayInc
+namespace PartyInc
 {
     /// <summary>
     /// Its the class in charge of the game selection.

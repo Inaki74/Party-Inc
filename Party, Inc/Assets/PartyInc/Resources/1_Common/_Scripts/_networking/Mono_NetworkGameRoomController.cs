@@ -5,7 +5,7 @@ using UnityEngine;
 using Photon.Pun;
 using Photon.Realtime;
 
-namespace PlayInc
+namespace PartyInc
 {
     public class Mono_NetworkGameRoomController : MonoBehaviourPunCallbacks
     {

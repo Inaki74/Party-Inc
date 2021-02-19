@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
 
-namespace PlayInc
+namespace PartyInc
 {
     /// <summary>
     /// Helper script that removes components that cant and shant be shared across network users.

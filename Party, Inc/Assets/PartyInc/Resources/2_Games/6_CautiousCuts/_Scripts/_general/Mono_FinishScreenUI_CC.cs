@@ -6,7 +6,7 @@ using UnityEngine.UI;
 using Photon.Pun;
 using System.Linq;
 
-namespace PlayInc
+namespace PartyInc
 {
     namespace CC
     {
@@ -37,7 +37,7 @@ namespace PlayInc
                 if (Mng_GameManager_CC.Current.playerCount == 1)
                 {
                     highScores.SetActive(true);
-                    highScore.text = UIHelper.ShowInPercentage(PlayerPrefs.GetFloat(PlayInc.Constants.CC_KEY_HISCORE));
+                    highScore.text = UIHelper.ShowInPercentage(PlayerPrefs.GetFloat(PartyInc.Constants.CC_KEY_HISCORE));
 
                     playerNames[0].text = PhotonNetwork.LocalPlayer.NickName;
                     playerPlacings[0].enabled = false;

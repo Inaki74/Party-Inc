@@ -4,7 +4,7 @@ using UnityEngine;
 using Photon.Pun;
 using Photon.Realtime;
 
-namespace PlayInc
+namespace PartyInc
 {
     namespace CC
     {

@@ -6,7 +6,7 @@ using System.Linq;
 using Photon.Realtime;
 using ExitGames.Client.Photon;
 
-namespace PlayInc
+namespace PartyInc
 {
     namespace CC
     {
@@ -148,10 +148,10 @@ namespace PlayInc
                 if (eventData.Code == Constants.GivePlayerResultEventCode && photonView.IsMine)
                 {
                     float finalScore = _myTotalScore / Constants.AMOUNT_OF_LOGS_PER_MATCH;
-                    if (finalScore > PlayerPrefs.GetFloat(PlayInc.Constants.CC_KEY_HISCORE))
+                    if (finalScore > PlayerPrefs.GetFloat(PartyInc.Constants.CC_KEY_HISCORE))
                     {
                         Mng_GameManager_CC.Current.IsHighScore = true;
-                        PlayerPrefs.SetFloat(PlayInc.Constants.CC_KEY_HISCORE, finalScore);
+                        PlayerPrefs.SetFloat(PartyInc.Constants.CC_KEY_HISCORE, finalScore);
                     }
 
                     object[] content = new object[] { PhotonNetwork.LocalPlayer.ActorNumber, finalScore };
