@@ -12,51 +12,51 @@ EditorBuildSettings:
     path: 
     guid: 00000000000000000000000000000000
   - enabled: 1
-    path: Assets/Scenes/LauncherScene.unity
+    path: Assets/PartyInc/Scenes/2_Hub/LauncherScene.unity
     guid: 5130e088a7a0a4f6bb7fa9e44681d584
   - enabled: 1
-    path: Assets/Scenes/ChooseGameScene.unity
+    path: Assets/PartyInc/Scenes/2_Hub/ChooseGameScene.unity
     guid: eb977b07e0b594397bd9f124f483a362
   - enabled: 1
-    path: Assets/Scenes/DisconnectedScene.unity
+    path: Assets/PartyInc/Scenes/2_Hub/DisconnectedScene.unity
     guid: befd8d85c31a1431eb1c08baef49200d
   - enabled: 1
-    path: Assets/Scenes/Games/Lobbies/EGG_GameLobby.unity
+    path: Assets/PartyInc/Scenes/2_Hub/_Lobbies/EGG_GameLobby.unity
     guid: 307a71cc20749490a931c8f14d971de9
   - enabled: 1
-    path: Assets/Scenes/Games/Games/EggGrabbingGameB.unity
+    path: Assets/PartyInc/Scenes/1_Games/EggGrabbingGameB.unity
     guid: 5a6ea711aae66443b8ea80d003f95edd
   - enabled: 1
-    path: Assets/Scenes/Games/Lobbies/DD_GameLobby.unity
+    path: Assets/PartyInc/Scenes/2_Hub/_Lobbies/DD_GameLobby.unity
     guid: d04b12d9c1ba94e079795c14b2e9edf0
   - enabled: 1
-    path: Assets/Scenes/Games/Games/DragonDance.unity
+    path: Assets/PartyInc/Scenes/1_Games/DragonDance.unity
     guid: de95697e910184a3092f61bd24ddd60e
   - enabled: 1
-    path: Assets/Scenes/Games/Lobbies/TT_GameLobby.unity
+    path: Assets/PartyInc/Scenes/2_Hub/_Lobbies/TT_GameLobby.unity
     guid: cadc8a9ec91454d49aac9f9c6a0f7782
   - enabled: 1
-    path: Assets/Scenes/Games/Games/TumultousTap.unity
+    path: Assets/PartyInc/Scenes/1_Games/TumultousTap.unity
     guid: 12c358b85aa2f46a8ad6ab219b2ce452
   - enabled: 1
-    path: Assets/Scenes/Games/Lobbies/RR_GameLobby.unity
+    path: Assets/PartyInc/Scenes/2_Hub/_Lobbies/RR_GameLobby.unity
     guid: c793665a22dd1464aa9e3dfe96816b49
   - enabled: 1
-    path: Assets/Scenes/Games/Games/RowdyRope.unity
+    path: Assets/PartyInc/Scenes/1_Games/RowdyRope.unity
     guid: 2337a39dd43a5490f9512fb979620ea1
   - enabled: 1
-    path: Assets/Scenes/Games/Lobbies/SS_GameLobby.unity
+    path: Assets/PartyInc/Scenes/2_Hub/_Lobbies/SS_GameLobby.unity
     guid: 1ac24b05e60f7444b96d551794ce382f
   - enabled: 1
-    path: Assets/Scenes/Games/Games/SpeedySprint.unity
+    path: Assets/PartyInc/Scenes/1_Games/SpeedySprint.unity
     guid: 95737879909544ddf96374ba2a72617d
   - enabled: 1
-    path: Assets/Scenes/Games/Lobbies/CC_GameLobby.unity
+    path: Assets/PartyInc/Scenes/2_Hub/_Lobbies/CC_GameLobby.unity
     guid: ea2817233e68a4830bf6f2e3723f40b1
   - enabled: 1
-    path: Assets/Scenes/Games/Games/CautiousCuts.unity
+    path: Assets/PartyInc/Scenes/1_Games/CautiousCuts.unity
     guid: 5d47b545da891465aab4db5b7244e15a
   - enabled: 1
-    path: Assets/Scenes/Games/Games/CautiousCuts_FreeRoam.unity
+    path: Assets/PartyInc/Scenes/1_Games/CautiousCuts_FreeRoam.unity
     guid: 9c55fcf74ca904ccebb0ba9725d7fcfe
   m_configObjects: {}
