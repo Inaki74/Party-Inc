@@ -21,6 +21,7 @@ namespace PartyInc
         private const int maxRrPlayers = 4;
         private const int maxSsPlayers = 4;
         private const int maxCcPlayers = 4;
+        private const int maxLlPlayers = 4;
 
         private List<RoomInfo> currentRoomList;
 
@@ -100,6 +101,12 @@ namespace PartyInc
         {
             if (gameToJoin == "")
                 JoinARoom("CC_", maxCcPlayers);
+        }
+
+        public void JoinLL()
+        {
+            if (gameToJoin == "")
+                JoinARoom("LL_", maxLlPlayers);
         }
 
         public void JoinARoom(string gameJoining, int maxPlayersAllowed)

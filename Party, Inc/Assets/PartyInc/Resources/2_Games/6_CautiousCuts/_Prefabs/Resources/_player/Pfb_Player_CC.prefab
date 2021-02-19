@@ -118,7 +118,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _mr: {fileID: 2581538135315048440}
-  _mineMaterial: {fileID: 2100000, guid: 5d6e9e265a299491ab71402bb2638d33, type: 2}
+  _mineMaterial: {fileID: 2100000, guid: d53ea8f57893840e8900f343d495a4ce, type: 2}
   _touchSlicer: {fileID: 8045797731097330398}
 --- !u!120 &6239419416950368903
 LineRenderer:

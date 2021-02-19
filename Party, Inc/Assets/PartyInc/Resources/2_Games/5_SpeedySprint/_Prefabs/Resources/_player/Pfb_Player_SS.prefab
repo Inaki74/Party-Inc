@@ -87,7 +87,7 @@ MonoBehaviour:
   _inputManager: {fileID: 5847497079470382956}
   _ubmr: {fileID: 7618177824563905125}
   _lbmr: {fileID: 3414058950951398272}
-  mine: {fileID: 2100000, guid: c68f5fe1d1a62459a993177a3dee8696, type: 2}
+  mine: {fileID: 2100000, guid: d53ea8f57893840e8900f343d495a4ce, type: 2}
   _deathParticles: {fileID: 774553179679105737, guid: 74acde857b50b450eb8aadb7b11604b0,
     type: 3}
   _upperBody: {fileID: 5654617725190007099}
