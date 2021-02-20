@@ -16,6 +16,8 @@ namespace PartyInc
             // Update is called once per frame
             void Update()
             {
+                if (!Mng_GameManager_LL.Current.GameBegan) return;
+
                 if (Application.isMobilePlatform)
                 {
                     MobileInput();
