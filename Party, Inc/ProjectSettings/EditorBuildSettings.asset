@@ -59,4 +59,10 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/PartyInc/Scenes/1_Games/CautiousCuts_FreeRoam.unity
     guid: 9c55fcf74ca904ccebb0ba9725d7fcfe
+  - enabled: 1
+    path: Assets/PartyInc/Scenes/1_Games/LunarLanding.unity
+    guid: 8ed60e913350d4a6e97891efa81db1f7
+  - enabled: 1
+    path: Assets/PartyInc/Scenes/2_Hub/_Lobbies/LL_GameLobby.unity
+    guid: 3fc3c0d693ff94185a7cb05b323a5ad8
   m_configObjects: {}
