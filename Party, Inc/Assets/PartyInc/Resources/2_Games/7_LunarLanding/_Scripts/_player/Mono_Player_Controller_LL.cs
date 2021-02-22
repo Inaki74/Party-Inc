@@ -32,8 +32,6 @@ namespace PartyInc
 
             [SerializeField] private float _sprayStrength;
 
-            private bool _touchingObstacle;
-
             private void Start()
             {
                 if(_rb == null)
@@ -65,7 +63,7 @@ namespace PartyInc
             {
                 if (!photonView.IsMine) return;
 
-                if(!_touchingObstacle) transform.position += Vector3.right * Mng_GameManager_LL.Current.MovementSpeed * Time.deltaTime;
+                transform.position += Vector3.right * Mng_GameManager_LL.Current.MovementSpeed * Time.deltaTime;
 
                 if(_rb.velocity.x != 0)
                 {
@@ -122,27 +120,11 @@ namespace PartyInc
                 Destroy(gameObject);
             }
 
-            private void OnTriggerEnter(Collider other)
-            {
-                if(other.gameObject.tag == "DeathPlane" && photonView.IsMine)
-                {
-                    Die();
-                }
-            }
-
             private void OnCollisionEnter(Collision collision)
-            {
-                if(collision.gameObject.tag == "Obstacle" && photonView.IsMine)
-                {
-                    _touchingObstacle = true;
-                }
-            }
-
-            private void OnCollisionExit(Collision collision)
             {
                 if (collision.gameObject.tag == "Obstacle" && photonView.IsMine)
                 {
-                    _touchingObstacle = false;
+                    Die();
                 }
             }
         }

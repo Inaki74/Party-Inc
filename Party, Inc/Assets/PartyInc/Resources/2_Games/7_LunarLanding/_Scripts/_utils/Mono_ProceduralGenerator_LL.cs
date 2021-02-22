@@ -43,7 +43,7 @@ namespace PartyInc
 
                 for (int i = 0; i < 6f; i++)
                 {
-                    SpawnObstacleBase(i + 5);
+                    SpawnObstacleBase(i + 6);
                 }
             }
 

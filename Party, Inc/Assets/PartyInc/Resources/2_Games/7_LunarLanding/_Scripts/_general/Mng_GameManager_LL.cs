@@ -108,22 +108,22 @@ namespace PartyInc
                 switch (playerCount)
                 {
                     case 1:
-                        playerPositions[0] = new Vector3(-8f, -1.5f, 0f);
+                        playerPositions[0] = new Vector3(-5f, -1.5f, 0f);
                         break;
                     case 2:
-                        playerPositions[0] = new Vector3(-8f, 0, 0f);
-                        playerPositions[1] = new Vector3(-8f, -3f, 2f);
+                        playerPositions[0] = new Vector3(-5f, 0, 0f);
+                        playerPositions[1] = new Vector3(-5f, -3f, 2f);
                         break;
                     case 3:
-                        playerPositions[0] = new Vector3(-8f, 2f, 0f);
-                        playerPositions[1] = new Vector3(-8f, -1f, 2f);
-                        playerPositions[2] = new Vector3(-8f, -4f, 4f);
+                        playerPositions[0] = new Vector3(-5f, 2f, 0f);
+                        playerPositions[1] = new Vector3(-5f, -1f, 2f);
+                        playerPositions[2] = new Vector3(-5f, -4f, 4f);
                         break;
                     case 4:
-                        playerPositions[0] = new Vector3(-8f, 3.5f, 0f);
-                        playerPositions[1] = new Vector3(-8f, 0.5f, 2f);
-                        playerPositions[2] = new Vector3(-8f, -2.5f, 4f);
-                        playerPositions[3] = new Vector3(-8f, -5.5f, 6f);
+                        playerPositions[0] = new Vector3(-5f, 3.5f, 0f);
+                        playerPositions[1] = new Vector3(-5f, 0.5f, 2f);
+                        playerPositions[2] = new Vector3(-5f, -2.5f, 4f);
+                        playerPositions[3] = new Vector3(-5f, -5.5f, 6f);
                         break;
                     default:
                         break;
