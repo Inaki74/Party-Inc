@@ -17,10 +17,7 @@ namespace PartyInc
             // Start is called before the first frame update
             void Start()
             {
-                for(int i = 0; i < 6f; i++)
-                {
-                    SpawnObstacleBase(i + 5);
-                }
+                StartCoroutine(ObstaclesBaseCase());
             }
 
             public override void Init()
@@ -40,10 +37,20 @@ namespace PartyInc
                 _newest.GetComponent<Mono_ObstacleDeathCount_LL>().CurrentDeathCount = deathCount;
             }
 
+            private IEnumerator ObstaclesBaseCase()
+            {
+                yield return new WaitUntil(() => Mng_GameManager_LL.Current.MyPlayerZ != -1);
+
+                for (int i = 0; i < 6f; i++)
+                {
+                    SpawnObstacleBase(i + 5);
+                }
+            }
+
             private void SpawnObstacle()
             {
                 float y = Random.Range(-3f, 4f);
-                _newest = Instantiate(_obstacle, new Vector3(_x, y, 0f), Quaternion.identity);
+                _newest = Instantiate(_obstacle, new Vector3(_x, y, Mng_GameManager_LL.Current.MyPlayerZ), Quaternion.identity);
                 _x += 7f;
             }
         }

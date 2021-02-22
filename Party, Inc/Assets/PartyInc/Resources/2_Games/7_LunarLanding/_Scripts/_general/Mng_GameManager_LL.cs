@@ -14,9 +14,13 @@ namespace PartyInc
         {
             private List<PlayerResults<int>> _deadPlayers = new List<PlayerResults<int>>();
 
+            public float MyPlayerZ { get; private set; }
+
             private float _startingSpeed = 4f;
             private float _finalSpeed = 15f;
             private float _timeToReachFinalSpeedInSeconds = 80f;
+
+            private double _gameBeginTime;
 
             [SerializeField] private float _movementSpeed;
             public float MovementSpeed
@@ -48,7 +52,14 @@ namespace PartyInc
 
             protected override void InStart()
             {
-                
+                if(PhotonNetwork.IsMasterClient && PhotonNetwork.IsConnected)
+                {
+                    int seed = System.Environment.TickCount;
+
+                    Random.InitState(seed);
+
+                    photonView.RPC("SendSeed_RPC", RpcTarget.Others, seed);
+                }
             }
 
             protected override void InitializeGameManagerDependantObjects()
@@ -64,6 +75,8 @@ namespace PartyInc
 
                 Mono_ObstaclePassCheck_LL.onPlayerPassed += OnPlayerPassedGate;
                 PhotonNetwork.NetworkingClient.EventReceived += OnPlayerDied;
+
+                MyPlayerZ = -1f;
             }
 
             private void OnDestroy()
@@ -83,6 +96,7 @@ namespace PartyInc
                     if (PhotonNetwork.PlayerList[i].ActorNumber == PhotonNetwork.LocalPlayer.ActorNumber)
                     {
                         decidedPosition = playerPositions[i];
+                        MyPlayerZ = playerPositions[i].z;
                     }
                 }
 
@@ -116,8 +130,6 @@ namespace PartyInc
                 }
             }
 
-            
-
             private void Update()
             {
                 if (PhotonNetwork.IsConnectedAndReady && _startCountdown && !GameBegan)
@@ -125,12 +137,15 @@ namespace PartyInc
                     if (_startTime != 0 && (float)(PhotonNetwork.Time - _startTime) >= gameStartCountdown + 1f)
                     {
                         GameBegan = true;
+                        _gameBeginTime = PhotonNetwork.Time;
+                        if (PhotonNetwork.IsConnectedAndReady) photonView.RPC("RPC_SendBegin", RpcTarget.Others, _gameBeginTime);
                     }
                 }
 
                 if (GameBegan)
                 {
-                    InGameTime += Time.deltaTime;
+                    if (PhotonNetwork.IsConnectedAndReady) InGameTime = (float)(PhotonNetwork.Time - _gameBeginTime);
+                    else InGameTime += Time.deltaTime;
 
                     if (MovementSpeed <= _finalSpeed)
                     {
@@ -177,6 +192,18 @@ namespace PartyInc
 
             //// NETWORKING
             ///
+
+            [PunRPC]
+            public void SendSeed_RPC(int seed)
+            {
+                Random.InitState(seed);
+            }
+
+            [PunRPC]
+            public void RPC_SendBegin(double startT)
+            {
+                _gameBeginTime = startT;
+            }
 
             private void OnPlayerDied(EventData eventData)
             {
