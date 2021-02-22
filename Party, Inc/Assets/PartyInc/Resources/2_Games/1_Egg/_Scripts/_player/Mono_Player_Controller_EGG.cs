@@ -193,7 +193,7 @@ namespace PartyInc
 
             public void OnGameFinish()
             {
-                if (photonView.IsMine) Mng_GameManager_EGG.Current.IsHighScore = HighScoreHelpers.DetermineHighScoreInt(PartyInc.Constants.EGG_KEY_HISCORE, MyResults.scoring, true);
+                if (photonView.IsMine) Mng_GameManager_EGG.Current.isHighScore = HighScoreHelpers.DetermineHighScoreInt(PartyInc.Constants.EGG_KEY_HISCORE, MyResults.scoring, true);
 
                 StopAllCoroutines();
             }

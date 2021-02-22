@@ -41,7 +41,7 @@ namespace PartyInc
                     playerPlacings[0].enabled = false;
                     playerScores[0].text = Mng_GameManager_RR.Current.playerResults[0].scoring.ToString();
 
-                    if (Mng_GameManager_RR.Current.IsHighScore)
+                    if (Mng_GameManager_RR.Current.isHighScore)
                     {
                         flavourTitle.text = "CONGRATULATIONS! New high score!";
                         highScore.color = Color.yellow;
@@ -57,13 +57,13 @@ namespace PartyInc
                     SetPositionsList();
 
                     // Set flavour text
-                    if (Mng_GameManager_RR.Current.WinnerId == -1)
+                    if (Mng_GameManager_RR.Current.winnerId == -1)
                     {
                         flavourTitle.text = "Unbelievable! Its a draw!";
                     }
                     else
                     {
-                        if (Mng_GameManager_RR.Current.WinnerId == PhotonNetwork.LocalPlayer.ActorNumber)
+                        if (Mng_GameManager_RR.Current.winnerId == PhotonNetwork.LocalPlayer.ActorNumber)
                         {
                             flavourTitle.text = "CONGRATULATIONS! You win!";
                         }

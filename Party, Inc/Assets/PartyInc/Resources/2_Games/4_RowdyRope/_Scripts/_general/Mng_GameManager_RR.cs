@@ -43,6 +43,8 @@ namespace PartyInc
 
             private int nextToInsert;
 
+            public bool isHighScore;
+            public int winnerId;
 
             public int currentJump;
 
@@ -171,7 +173,7 @@ namespace PartyInc
                 {
                     Debug.Log("Game should end");
                     gameEnded = true;
-                    WinnerId = FindWinner();
+                    winnerId = FindWinner();
                     OnGameFinishInvoke();
                 }
             }
@@ -426,7 +428,7 @@ namespace PartyInc
                 nextToInsert--;
                 playersAlive--;
 
-                if (playerId == PhotonNetwork.LocalPlayer.ActorNumber) IsHighScore = HighScoreHelpers.DetermineHighScoreInt(PartyInc.Constants.RR_KEY_HISCORE, thisPlayerResult.scoring, true);
+                if (playerId == PhotonNetwork.LocalPlayer.ActorNumber) isHighScore = HighScoreHelpers.DetermineHighScoreInt(PartyInc.Constants.RR_KEY_HISCORE, thisPlayerResult.scoring, true);
             }
 
             #endregion

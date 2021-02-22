@@ -75,8 +75,6 @@ GameObject:
   - component: {fileID: 2411606033698287729}
   - component: {fileID: 5049706239924628158}
   - component: {fileID: 7299060948341627436}
-  - component: {fileID: 3254318861431264631}
-  - component: {fileID: 3949985066031653253}
   m_Layer: 13
   m_Name: Pfb_Player_LL
   m_TagString: Player
@@ -126,7 +124,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 99f0d2f42a2504d08ab4552eefdcef96, type: 2}
+  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -191,8 +189,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _rb: {fileID: 7299060948341627435}
   _input: {fileID: 7299060948341627436}
-  _mr: {fileID: 2411606033698287734}
-  _mineMaterial: {fileID: 2100000, guid: d53ea8f57893840e8900f343d495a4ce, type: 2}
   _top: {fileID: 115988022}
   _bottom: {fileID: 936647721}
   _spray: {fileID: 4723364038821378064, guid: 4d5c6137965ca421c9a855d54812dbb1, type: 3}
@@ -209,39 +205,3 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 93368767e00c34a1d8ec0a1c94045920, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &3254318861431264631
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2411606033698287728}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bd1b58b23925d45f0b118e2be3efb005, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _player: {fileID: 5049706239924628158}
---- !u!114 &3949985066031653253
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2411606033698287728}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ObservedComponentsFoldoutOpen: 1
-  Group: 0
-  prefixField: -1
-  observableSearch: 2
-  Synchronization: 3
-  OwnershipTransfer: 0
-  ObservedComponents:
-  - {fileID: 3254318861431264631}
-  viewIdField: 0
-  InstantiationId: 0
-  isRuntimeInstantiated: 0

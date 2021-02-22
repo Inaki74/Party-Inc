@@ -14,6 +14,8 @@ namespace PartyInc
             public static Vector3 forwardVector = new Vector3(0f, Mathf.Cos(45f), Mathf.Cos(45f));
             public static float maxDistance = 13f;
             public static float hazardMinimumVelocity = 9f;
+            public bool isHighScore;
+            public int winnerId;
             private int nextToInsert = 0;
 
             private int playersPlaying;
@@ -93,7 +95,7 @@ namespace PartyInc
                 // Order list
                 OrderResults();
                 // Decide winner
-                WinnerId = DecideWinner();
+                winnerId = DecideWinner();
 
                 // then invoke on finish
                 OnGameFinishInvoke();
@@ -235,7 +237,7 @@ namespace PartyInc
 
                 Debug.Log("Player won: " + playerId + " , time: " + InGameTime + " , playersLeft: " + playersPlaying);
 
-                if (playerId == PhotonNetwork.LocalPlayer.ActorNumber) IsHighScore = HighScoreHelpers.DetermineHighScoreFloat(Constants.TT_KEY_HISCORE, thisPlayerResult.scoring, false);
+                if (playerId == PhotonNetwork.LocalPlayer.ActorNumber) isHighScore = HighScoreHelpers.DetermineHighScoreFloat(Constants.TT_KEY_HISCORE, thisPlayerResult.scoring, false);
                 // Give the result to the other players
                 photonView.RPC("RPC_SendPlayerResult", RpcTarget.Others, thisPlayerResult.playerId, thisPlayerResult.scoring, thisPlayerResult.reachedEnd);
             }
@@ -251,7 +253,7 @@ namespace PartyInc
                 nextToInsert++;
                 playersPlaying--;
 
-                if (playerId == PhotonNetwork.LocalPlayer.ActorNumber) IsHighScore = false;
+                if (playerId == PhotonNetwork.LocalPlayer.ActorNumber) isHighScore = false;
 
                 // Give the result to the other players
                 photonView.RPC("RPC_SendPlayerResult", RpcTarget.Others, thisPlayerResult.playerId, thisPlayerResult.scoring, thisPlayerResult.reachedEnd);

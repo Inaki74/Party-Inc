@@ -118,7 +118,7 @@ namespace PartyInc
                 {
                     // Game finished
                     inputManager.enabled = false;
-                    if(photonView.IsMine) Mng_GameManager_DD.Current.IsHighScore = HighScoreHelpers.DetermineHighScoreInt(Constants.DD_KEY_HISCORE, myResults.scoring, true);
+                    if(photonView.IsMine) Mng_GameManager_DD.Current.isHighScore = HighScoreHelpers.DetermineHighScoreInt(Constants.DD_KEY_HISCORE, myResults.scoring, true);
                 }
             }
 
