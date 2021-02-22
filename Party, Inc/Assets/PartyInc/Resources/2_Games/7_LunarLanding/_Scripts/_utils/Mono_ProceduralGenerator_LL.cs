@@ -19,7 +19,7 @@ namespace PartyInc
             {
                 for(int i = 0; i < 6f; i++)
                 {
-                    SpawnObstacleBase(i + 3);
+                    SpawnObstacleBase(i + 5);
                 }
             }
 
