@@ -3,57 +3,51 @@
     "m_SelectedPackage": {
         "deviceId": "LDG4C18508000010",
         "name": "com.FiestaStudios.ProjectFiesta",
-        "processId": 19294,
+        "processId": 2929,
         "exited": false
     },
     "m_SelectedPriority": 0,
     "m_KnownPackagesForSerialization": [
         {
             "deviceId": "LDG4C18508000010",
-            "name": "com.huawei.android.launcher",
-            "processId": 1819,
+            "name": "com.FiestaStudios.ProjectFiesta",
+            "processId": 26205,
             "exited": false
         },
         {
             "deviceId": "LDG4C18508000010",
             "name": "com.FiestaStudios.ProjectFiesta",
-            "processId": 22575,
-            "exited": true
-        },
-        {
-            "deviceId": "LDG4C18508000010",
-            "name": "com.FiestaStudios.ProjectFiesta",
-            "processId": 29124,
+            "processId": 27123,
             "exited": false
         },
         {
             "deviceId": "LDG4C18508000010",
             "name": "com.FiestaStudios.ProjectFiesta",
-            "processId": 31929,
+            "processId": 28442,
             "exited": false
         },
         {
             "deviceId": "LDG4C18508000010",
             "name": "com.FiestaStudios.ProjectFiesta",
-            "processId": 7494,
+            "processId": 30989,
             "exited": false
         },
         {
             "deviceId": "LDG4C18508000010",
             "name": "com.FiestaStudios.ProjectFiesta",
-            "processId": 12824,
+            "processId": 431,
             "exited": false
         },
         {
             "deviceId": "LDG4C18508000010",
             "name": "com.FiestaStudios.ProjectFiesta",
-            "processId": 16284,
+            "processId": 2271,
             "exited": false
         },
         {
             "deviceId": "LDG4C18508000010",
             "name": "com.FiestaStudios.ProjectFiesta",
-            "processId": 19294,
+            "processId": 2929,
             "exited": false
         }
     ],
