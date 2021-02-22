@@ -55,7 +55,7 @@ namespace PartyInc
                 else
                 {
                     Color col = _mr.material.color;
-                    col.a = 0.4f;
+                    col.a = 0.5f;
                     _mr.material.color = col;
                 }
             }
