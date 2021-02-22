@@ -17,7 +17,7 @@ namespace PartyInc
         }
 
         [RequireComponent(typeof(Player))]
-        public class Mono_Player_Synchronizer_RR : SnapshotInterpolator<PlayerSync>
+        public class Mono_Player_Synchronizer_RR : MonoInt_SnapshotInterpolator<PlayerSync>
         {
             [SerializeField]
             private Mono_Player_Controller_RR _player;

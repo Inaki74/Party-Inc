@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
+using Photon.Realtime;
 
 namespace PartyInc
 {
@@ -9,6 +10,17 @@ namespace PartyInc
     {
         public class Mono_Player_Controller_LL : MonoBehaviourPun
         {
+            public Rigidbody Rb
+            {
+                get
+                {
+                    return _rb;
+                }
+                private set
+                {
+                    _rb = value;
+                }
+            }
             [SerializeField] private Rigidbody _rb;
             [SerializeField] private Mono_Player_Input_LL _input;
             [SerializeField] private MeshRenderer _mr;
@@ -40,11 +52,19 @@ namespace PartyInc
                 }
 
                 if (photonView.IsMine) _mr.material = _mineMaterial;
+                else
+                {
+                    Color col = _mr.material.color;
+                    col.a = 0.5f;
+                    _mr.material.color = col;
+                }
             }
 
             // Update is called once per frame
             void Update()
             {
+                if (!photonView.IsMine) return;
+
                 if(!_touchingObstacle) transform.position += Vector3.right * Mng_GameManager_LL.Current.MovementSpeed * Time.deltaTime;
 
                 if(_rb.velocity.x != 0)
@@ -91,17 +111,28 @@ namespace PartyInc
                 pSys.Play();
             }
 
+            private void Die()
+            {
+                Mng_GameManager_LL.Current.IsHighScore = HighScoreHelpers.DetermineHighScoreInt(PartyInc.Constants.LL_KEY_HISCORE, Mng_GameManager_LL.Current.CurrentGate, true);
+
+                object[] content = new object[] { Mng_GameManager_LL.Current.CurrentGate, PhotonNetwork.LocalPlayer.ActorNumber };
+                RaiseEventOptions raiseEventOptions = new RaiseEventOptions { Receivers = ReceiverGroup.MasterClient };
+                PhotonNetwork.RaiseEvent(Constants.PlayerDiedEventCode, content, raiseEventOptions, ExitGames.Client.Photon.SendOptions.SendReliable);
+
+                Destroy(gameObject);
+            }
+
             private void OnTriggerEnter(Collider other)
             {
-                if(other.gameObject.tag == "DeathPlane")
+                if(other.gameObject.tag == "DeathPlane" && photonView.IsMine)
                 {
-                    Destroy(gameObject);
+                    Die();
                 }
             }
 
             private void OnCollisionEnter(Collision collision)
             {
-                if(collision.gameObject.tag == "Obstacle")
+                if(collision.gameObject.tag == "Obstacle" && photonView.IsMine)
                 {
                     _touchingObstacle = true;
                 }
@@ -109,7 +140,7 @@ namespace PartyInc
 
             private void OnCollisionExit(Collision collision)
             {
-                if (collision.gameObject.tag == "Obstacle")
+                if (collision.gameObject.tag == "Obstacle" && photonView.IsMine)
                 {
                     _touchingObstacle = false;
                 }

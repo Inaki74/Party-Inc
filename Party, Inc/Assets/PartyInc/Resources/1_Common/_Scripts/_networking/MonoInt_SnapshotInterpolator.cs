@@ -14,7 +14,7 @@ namespace PartyInc
     /// You then implement each of the functions (Interpolate, Extrapolate, SendInfo and ReceiveInfo) according to your needs
     /// </summary>
     /// <typeparam name="T">Values you want to sync across the network.</typeparam>
-    public abstract class SnapshotInterpolator<T> : MonoBehaviourPun, IPunObservable
+    public abstract class MonoInt_SnapshotInterpolator<T> : MonoBehaviourPun, IPunObservable
     {
         private bool _infoReceived;
 

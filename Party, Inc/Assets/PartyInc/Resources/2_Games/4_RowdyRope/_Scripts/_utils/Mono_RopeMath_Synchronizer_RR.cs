@@ -14,7 +14,7 @@ namespace PartyInc
         }
 
         [RequireComponent(typeof(Mono_RopeMath_Controller_RR))]
-        public class Mono_RopeMath_Synchornizer_RR : SnapshotInterpolator<AngleSync>
+        public class Mono_RopeMath_Synchornizer_RR : MonoInt_SnapshotInterpolator<AngleSync>
         {
             [SerializeField]
             private Mono_RopeMath_Controller_RR _ropeController;

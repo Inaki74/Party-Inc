@@ -1,19 +1,16 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.SceneManagement;
-using Photon.Pun;
 using UnityEngine.UI;
+using Photon.Pun;
 using System.Linq;
+using UnityEngine.SceneManagement;
 
 namespace PartyInc
 {
-    namespace EGG
+    namespace LL
     {
-        /// <summary>
-        /// Class in charge of the game over screen.
-        /// </summary>
-        public class Mono_FinishScreenUI_EGG : MonoBehaviour
+        public class Mono_FinishScreenUI_LL : MonoBehaviour
         {
             [Header("Players in the list, in order")]
             [SerializeField] private GameObject[] players;
@@ -30,21 +27,21 @@ namespace PartyInc
             private void OnEnable()
             {
                 // Set active for the amount of players playing.
-                for (int i = 0; i < Mng_GameManager_EGG.Current.playerCount; i++)
+                for (int i = 0; i < Mng_GameManager_LL.Current.playerCount; i++)
                 {
                     players[i].SetActive(true);
                 }
 
-                if (Mng_GameManager_EGG.Current.playerCount == 1)
+                if ( Mng_GameManager_LL.Current.playerCount == 1)
                 {
                     highScores.SetActive(true);
-                    highScore.text = PlayerPrefs.GetInt(PartyInc.Constants.EGG_KEY_HISCORE).ToString();
+                    highScore.text = PlayerPrefs.GetInt(PartyInc.Constants.LL_KEY_HISCORE).ToString();
 
                     playerNames[0].text = PhotonNetwork.LocalPlayer.NickName;
                     playerPlacings[0].enabled = false;
-                    playerScores[0].text = Mng_GameManager_EGG.Current.playerResults[0].scoring.ToString();
+                    playerScores[0].text = Mng_GameManager_LL.Current.playerResults[0].scoring.ToString();
 
-                    if (Mng_GameManager_EGG.Current.IsHighScore)
+                    if ( Mng_GameManager_LL.Current.IsHighScore)
                     {
                         flavourTitle.text = "CONGRATULATIONS! New high score!";
                         highScore.color = Color.yellow;
@@ -60,13 +57,13 @@ namespace PartyInc
                     SetPositionsList();
 
                     // Set flavour text
-                    if (Mng_GameManager_EGG.Current.WinnerId == -1)
+                    if ( Mng_GameManager_LL.Current.WinnerId == -1)
                     {
                         flavourTitle.text = "Unbelievable! Its a draw!";
                     }
                     else
                     {
-                        if (Mng_GameManager_EGG.Current.WinnerId == PhotonNetwork.LocalPlayer.ActorNumber)
+                        if ( Mng_GameManager_LL.Current.WinnerId == PhotonNetwork.LocalPlayer.ActorNumber)
                         {
                             flavourTitle.text = "CONGRATULATIONS! You win!";
                         }
@@ -82,7 +79,7 @@ namespace PartyInc
 
             private void SetPositionsList()
             {
-                var aux = Mng_GameManager_EGG.Current.playerResults.OrderByDescending(r => r.scoring);
+                var aux = Mng_GameManager_LL.Current.playerResults.OrderByDescending(r => r.scoring);
                 PlayerResults<int>[] res = aux.ToArray();
                 int place = 0;
                 int lastScore = -1;

@@ -15,9 +15,6 @@ namespace PartyInc
             public int amountOfMovesThisRound = 4;
             public float countdownGameStart;
 
-            public int winnerId;
-            public bool isHighScore;
-
             // Difficulty scaling factors
             public float timeForInput = 15f;
             public float timeToSeeMove = 1f;
@@ -177,11 +174,11 @@ namespace PartyInc
                 if (playerCount > 1) DecideWinner();
                 else
                 {
-                    winnerId = PhotonNetwork.LocalPlayer.ActorNumber;
+                    WinnerId = PhotonNetwork.LocalPlayer.ActorNumber;
                     playerResults = GetPlayerResults();
                 } 
 
-                Debug.Log("Invoking Phase 4, winnerId: " + winnerId);
+                Debug.Log("Invoking Phase 4, WinnerId: " + WinnerId);
                 onNextPhase?.Invoke(4);
 
                 //Register results in the system, yada yada, profit
@@ -201,7 +198,7 @@ namespace PartyInc
                     if(playerResults[i].scoring > max)
                     {
                         max = playerResults[i].scoring;
-                        winnerId = playerResults[i].playerId;
+                        WinnerId = playerResults[i].playerId;
                     }
                 }
 
@@ -216,7 +213,7 @@ namespace PartyInc
                 if(hap > 1)
                 {
                     //Draw
-                    winnerId = -1;
+                    WinnerId = -1;
                 }
             }
 

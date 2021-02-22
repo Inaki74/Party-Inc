@@ -43,7 +43,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3f1e1393d310b4edd846ae8ebb181513, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerPrefab: {fileID: 0}
+  playerPrefab: {fileID: 2411606033698287728, guid: 9f78394fe28474178a09eebc3948b05f,
+    type: 3}
   UIPrefab: {fileID: 0}
   playerCount: 0
   gameStartCountdown: 3

@@ -40,8 +40,6 @@ namespace PartyInc
             private bool runOnce = false;
             private int startingEggCount = 0;
             public bool isGameFinished;
-            public bool isHighScore;
-            public int winnerId;
 
             [SerializeField] private GameObject playerAssetsPrefab;
             [SerializeField] private GameObject spawnerManagerPrefab;
@@ -177,7 +175,7 @@ namespace PartyInc
                     if (playerResults[i].scoring > max)
                     {
                         max = playerResults[i].scoring;
-                        winnerId = playerResults[i].playerId;
+                        WinnerId = playerResults[i].playerId;
                     }
                 }
 
@@ -192,7 +190,7 @@ namespace PartyInc
                 if (hap > 1)
                 {
                     //Draw
-                    winnerId = -1;
+                    WinnerId = -1;
                 }
             }
 

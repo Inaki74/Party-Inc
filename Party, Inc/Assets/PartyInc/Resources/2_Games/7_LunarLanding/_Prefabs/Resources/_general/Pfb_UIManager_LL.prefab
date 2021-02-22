@@ -932,7 +932,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 8294397177749597049}
+      - m_Target: {fileID: 0}
         m_MethodName: BtnExitToMainMenu
         m_Mode: 1
         m_Arguments:
@@ -2099,7 +2099,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7354562060511873074}
-  - component: {fileID: 8294397177749597049}
+  - component: {fileID: 6506511118315591266}
   m_Layer: 5
   m_Name: FinishScreen
   m_TagString: Untagged
@@ -2130,7 +2130,7 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &8294397177749597049
+--- !u!114 &6506511118315591266
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -2139,7 +2139,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 8499460316890023459}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 28ebab99b3c1a41eea2d19700c1db270, type: 3}
+  m_Script: {fileID: 11500000, guid: d3782cee1bd4e4467a2d2d6847e26fd6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   players:
