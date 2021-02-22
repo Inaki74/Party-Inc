@@ -8,36 +8,18 @@ namespace PartyInc
     {
         public class Mono_ObstaclePassCheck_LL : MonoBehaviour
         {
-            public delegate void ActionGates();
-            public static event ActionGates onPlayerPassed;
-            public static event ActionGates onGateRendered;
-
-            [SerializeField] private Renderer _renderer;
+            public delegate void ActionPlayerPassed();
+            public static event ActionPlayerPassed onPlayerPassed;
 
             [SerializeField] private GameObject _raycastMark;
 
             [SerializeField] private LayerMask _whatIsPlayer;
 
             private bool _runOnce;
-            private bool _seenOnce;
-
-            private void Start()
-            {
-                if(_renderer == null)
-                {
-                    _renderer = GetComponent<MeshRenderer>();
-                }
-            }
 
             // Update is called once per frame
             void Update()
             {
-                if (!_seenOnce)
-                {
-                    CheckIfVisible();
-                }
-                
-
                 if(HitsPlayer() && !_runOnce)
                 {
                     _runOnce = true;
@@ -60,15 +42,6 @@ namespace PartyInc
                 {
                     Debug.DrawRay(ray.origin, ray.direction * dist, Color.green);
                     return false;
-                }
-            }
-
-            private void CheckIfVisible()
-            {
-                if (_renderer.IsVisibleFrom(Camera.main))
-                {
-                    _seenOnce = true;
-                    onGateRendered.Invoke();
                 }
             }
         }

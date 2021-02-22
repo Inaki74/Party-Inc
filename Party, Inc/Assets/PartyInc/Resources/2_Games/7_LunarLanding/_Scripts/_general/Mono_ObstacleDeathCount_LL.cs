@@ -34,17 +34,17 @@ namespace PartyInc
 
             private void Awake()
             {
-                Mono_ObstaclePassCheck_LL.onGateRendered += GateRendered;
+                Mono_ObstaclePassCheck_LL.onPlayerPassed += PlayerPassed;
 
                 _currentDeathCount = 6;
             }
 
             private void OnDestroy()
             {
-                Mono_ObstaclePassCheck_LL.onGateRendered -= GateRendered;
+                Mono_ObstaclePassCheck_LL.onPlayerPassed -= PlayerPassed;
             }
 
-            private void GateRendered()
+            private void PlayerPassed()
             {
                 _currentDeathCount--;
 

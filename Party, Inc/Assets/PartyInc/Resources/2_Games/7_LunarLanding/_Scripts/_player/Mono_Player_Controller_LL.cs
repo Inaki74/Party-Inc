@@ -1,18 +1,15 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Photon.Pun;
 
 namespace PartyInc
 {
     namespace LL
     {
-        public class Mono_Player_Controller_LL : MonoBehaviourPun
+        public class Mono_Player_Controller_LL : MonoBehaviour
         {
             [SerializeField] private Rigidbody _rb;
             [SerializeField] private Mono_Player_Input_LL _input;
-            [SerializeField] private MeshRenderer _mr;
-            [SerializeField] private Material _mineMaterial;
 
             [SerializeField] private GameObject _top;
             [SerializeField] private GameObject _bottom;
@@ -21,26 +18,6 @@ namespace PartyInc
             [SerializeField] private float _sprayStrength;
 
             private bool _touchingObstacle;
-
-            private void Start()
-            {
-                if(_rb == null)
-                {
-                    _rb = GetComponent<Rigidbody>();
-                }
-
-                if (_input == null)
-                {
-                    _input = GetComponent<Mono_Player_Input_LL>();
-                }
-
-                if (_mr == null)
-                {
-                    _mr = GetComponent<MeshRenderer>();
-                }
-
-                if (photonView.IsMine) _mr.material = _mineMaterial;
-            }
 
             // Update is called once per frame
             void Update()
@@ -89,14 +66,6 @@ namespace PartyInc
                 main.duration = Time.deltaTime;
 
                 pSys.Play();
-            }
-
-            private void OnTriggerEnter(Collider other)
-            {
-                if(other.gameObject.tag == "DeathPlane")
-                {
-                    Destroy(gameObject);
-                }
             }
 
             private void OnCollisionEnter(Collision collision)
