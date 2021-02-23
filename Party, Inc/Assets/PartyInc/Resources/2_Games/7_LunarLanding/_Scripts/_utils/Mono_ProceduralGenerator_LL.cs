@@ -12,11 +12,16 @@ namespace PartyInc
 
             private GameObject _newest;
 
-            private float _x = 7f;
+            public float NextObstacleY { get; private set; }
+
+            private float _x = 14f;
+            public const float XDifference = 7f;
+            public int BoosterCount { get; private set; } = 3;
 
             // Start is called before the first frame update
             void Start()
             {
+                NextObstacleY = Random.Range(-3f, 3f);
                 StartCoroutine(ObstaclesBaseCase());
             }
 
@@ -43,15 +48,21 @@ namespace PartyInc
 
                 for (int i = 0; i < 6f; i++)
                 {
-                    SpawnObstacleBase(i + 5);
+                    SpawnObstacleBase(i + 6);
                 }
             }
 
             private void SpawnObstacle()
             {
-                float y = Random.Range(-3f, 4f);
+                BoosterCount--;
+                float y = NextObstacleY;
+                NextObstacleY = Random.Range(-3f, 3f);
                 _newest = Instantiate(_obstacle, new Vector3(_x, y, Mng_GameManager_LL.Current.MyPlayerZ), Quaternion.identity);
-                _x += 7f;
+                _x += XDifference;
+                if(BoosterCount == 0)
+                {
+                    BoosterCount = 3;
+                }
             }
         }
     }

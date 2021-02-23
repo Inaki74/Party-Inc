@@ -70,11 +70,15 @@ namespace PartyInc
 
             if (PhotonNetwork.IsMasterClient || !PhotonNetwork.IsConnected)
             {
-                CustomProps = new ExitGames.Client.Photon.Hashtable();
-                _startTime = PhotonNetwork.Time;
                 _startCountdown = true;
-                CustomProps.Add("StartTime", _startTime);
-                PhotonNetwork.CurrentRoom.SetCustomProperties(CustomProps);
+
+                if (PhotonNetwork.IsConnected)
+                {
+                    CustomProps = new ExitGames.Client.Photon.Hashtable();
+                    _startTime = PhotonNetwork.Time;
+                    CustomProps.Add("StartTime", _startTime);
+                    PhotonNetwork.CurrentRoom.SetCustomProperties(CustomProps);
+                }
             }
             else
             {

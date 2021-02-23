@@ -1,12 +1,13 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Photon.Pun;
 
 namespace PartyInc
 {
     namespace LL
     {
-        public class Mono_Player_Input_LL : MonoBehaviour
+        public class Mono_Player_Input_LL : MonoBehaviourPun
         {
             private static float ScreenHeight = Screen.height / 2;
 
@@ -16,7 +17,7 @@ namespace PartyInc
             // Update is called once per frame
             void Update()
             {
-                if (!Mng_GameManager_LL.Current.GameBegan) return;
+                if (!Mng_GameManager_LL.Current.GameBegan || (PhotonNetwork.IsConnected && !photonView.IsMine)) return;
 
                 if (Application.isMobilePlatform)
                 {

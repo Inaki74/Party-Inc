@@ -65,6 +65,11 @@ namespace PartyInc
             protected override void InitializeGameManagerDependantObjects()
             {
                 InitializePlayers();
+
+                if (!PhotonNetwork.IsConnected)
+                {
+                    MyPlayerZ = 0;
+                }
             }
 
             public override void Init()
@@ -108,22 +113,22 @@ namespace PartyInc
                 switch (playerCount)
                 {
                     case 1:
-                        playerPositions[0] = new Vector3(-8f, -1.5f, 0f);
+                        playerPositions[0] = new Vector3(-11f, -1.5f, 0f);
                         break;
                     case 2:
-                        playerPositions[0] = new Vector3(-8f, 0, 0f);
-                        playerPositions[1] = new Vector3(-8f, -3f, 2f);
+                        playerPositions[0] = new Vector3(-11f, 0, 0f);
+                        playerPositions[1] = new Vector3(-11f, -3f, 2f);
                         break;
                     case 3:
-                        playerPositions[0] = new Vector3(-8f, 2f, 0f);
-                        playerPositions[1] = new Vector3(-8f, -1f, 2f);
-                        playerPositions[2] = new Vector3(-8f, -4f, 4f);
+                        playerPositions[0] = new Vector3(-11f, 2f, 0f);
+                        playerPositions[1] = new Vector3(-11f, -1f, 2f);
+                        playerPositions[2] = new Vector3(-11f, -4f, 4f);
                         break;
                     case 4:
-                        playerPositions[0] = new Vector3(-8f, 3.5f, 0f);
-                        playerPositions[1] = new Vector3(-8f, 0.5f, 2f);
-                        playerPositions[2] = new Vector3(-8f, -2.5f, 4f);
-                        playerPositions[3] = new Vector3(-8f, -5.5f, 6f);
+                        playerPositions[0] = new Vector3(-11f, 3.5f, 0f);
+                        playerPositions[1] = new Vector3(-11f, 0.5f, 2f);
+                        playerPositions[2] = new Vector3(-11f, -2.5f, 4f);
+                        playerPositions[3] = new Vector3(-11f, -5.5f, 6f);
                         break;
                     default:
                         break;
@@ -140,6 +145,9 @@ namespace PartyInc
                         _gameBeginTime = PhotonNetwork.Time;
                         if (PhotonNetwork.IsConnectedAndReady) photonView.RPC("RPC_SendBegin", RpcTarget.Others, _gameBeginTime);
                     }
+                }else if (_startCountdown && !GameBegan)
+                {
+                    GameBegan = true;
                 }
 
                 if (GameBegan)
@@ -152,7 +160,7 @@ namespace PartyInc
                         MovementSpeed = _startingSpeed + InGameTime * ((_finalSpeed - _startingSpeed) / _timeToReachFinalSpeedInSeconds);
                     }
 
-                    if(_deadPlayers.Count == playerCount)
+                    if(_deadPlayers.Count >= playerCount && PhotonNetwork.IsConnected)
                     {
                         FinishGame();
                     }

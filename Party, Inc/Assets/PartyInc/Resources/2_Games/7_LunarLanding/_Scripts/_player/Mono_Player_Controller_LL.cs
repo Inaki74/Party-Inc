@@ -10,6 +10,8 @@ namespace PartyInc
     {
         public class Mono_Player_Controller_LL : MonoBehaviourPun
         {
+            [SerializeField] private Mono_CameraTrolley_LL _trolley;
+
             public Rigidbody Rb
             {
                 get
@@ -30,7 +32,13 @@ namespace PartyInc
             [SerializeField] private GameObject _bottom;
             [SerializeField] private GameObject _spray;
 
+            [SerializeField] private GameObject _markOne;
+            [SerializeField] private GameObject _markTwo;
+
             [SerializeField] private float _sprayStrength;
+
+            private float _maxX = 13f;
+            private float _startingXRelativeToPlayer;
 
             private bool _touchingObstacle;
 
@@ -51,28 +59,53 @@ namespace PartyInc
                     _mr = GetComponent<MeshRenderer>();
                 }
 
-                if (photonView.IsMine) _mr.material = _mineMaterial;
-                else
+                _startingXRelativeToPlayer = transform.position.x;
+
+                if (PhotonNetwork.IsConnected)
                 {
-                    Color col = _mr.material.color;
-                    col.a = 0.4f;
-                    _mr.material.color = col;
+                    if (photonView.IsMine) _mr.material = _mineMaterial;
+                    else
+                    {
+                        Color col = _mr.material.color;
+                        col.a = 0.4f;
+                        _mr.material.color = col;
+                    }
                 }
             }
 
             // Update is called once per frame
             void Update()
             {
-                if (!photonView.IsMine) return;
+                if (!photonView.IsMine && PhotonNetwork.IsConnected) return;
 
-                if(!_touchingObstacle) transform.position += Vector3.right * Mng_GameManager_LL.Current.MovementSpeed * Time.deltaTime;
+                _startingXRelativeToPlayer += Mng_GameManager_LL.Current.MovementSpeed * Time.deltaTime;
 
-                if(_rb.velocity.x != 0)
+                if (!_touchingObstacle)
                 {
-                    _rb.velocity = new Vector3(0f,_rb.velocity.y, 0f);
+                    transform.position += Vector3.right * Mng_GameManager_LL.Current.MovementSpeed * Time.deltaTime;
+                }
+                else
+                {
+                    _rb.velocity = new Vector3(0f, _rb.velocity.y, 0f);
+                }
+
+                if(Mathf.Abs(transform.position.x - _startingXRelativeToPlayer) >= _maxX)
+                {
+                    // We are getting through the max distance
+                    _trolley._extra = _rb.velocity.x;
+                    _trolley.photonView.TransferOwnership(PhotonNetwork.LocalPlayer.ActorNumber);
+                }
+
+                if(_rb.velocity.x <= 0)
+                {
+                    _rb.velocity = new Vector3(0f, _rb.velocity.y, 0f);
+                    _trolley._extra = _rb.velocity.x;
                 }
 
                 ProcessInput();
+
+                _markOne.transform.position = new Vector3(_startingXRelativeToPlayer, 0f, 0f);
+                _markTwo.transform.position = new Vector3(_startingXRelativeToPlayer + _maxX, 0f, 0f);
             }
 
             private void ProcessInput()
@@ -88,7 +121,6 @@ namespace PartyInc
                     _rb.AddForce(Vector3.up * _sprayStrength, ForceMode.Force);
                     SprayAnimation(false);
                 }
-
             }
 
             private void SprayAnimation(bool topSide)
@@ -124,7 +156,7 @@ namespace PartyInc
 
             private void OnTriggerEnter(Collider other)
             {
-                if(other.gameObject.tag == "DeathPlane" && photonView.IsMine)
+                if(other.gameObject.tag == "DeathPlane" && (photonView.IsMine || !PhotonNetwork.IsConnected))
                 {
                     Die();
                 }
@@ -132,7 +164,15 @@ namespace PartyInc
 
             private void OnCollisionEnter(Collision collision)
             {
-                if(collision.gameObject.tag == "Obstacle" && photonView.IsMine)
+                if(collision.gameObject.tag == "Obstacle" && (photonView.IsMine || !PhotonNetwork.IsConnected))
+                {
+                    _touchingObstacle = true;
+                }
+            }
+
+            private void OnCollisionStay(Collision collision)
+            {
+                if (collision.gameObject.tag == "Obstacle" && (photonView.IsMine || !PhotonNetwork.IsConnected))
                 {
                     _touchingObstacle = true;
                 }
@@ -140,8 +180,9 @@ namespace PartyInc
 
             private void OnCollisionExit(Collision collision)
             {
-                if (collision.gameObject.tag == "Obstacle" && photonView.IsMine)
+                if (collision.gameObject.tag == "Obstacle" && (photonView.IsMine || !PhotonNetwork.IsConnected))
                 {
+                    Debug.Log("DUDE");
                     _touchingObstacle = false;
                 }
             }
