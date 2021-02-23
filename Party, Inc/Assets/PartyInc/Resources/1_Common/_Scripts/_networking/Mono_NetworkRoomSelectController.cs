@@ -15,13 +15,7 @@ namespace PartyInc
     /// </summary>
     public class Mono_NetworkRoomSelectController : MonoBehaviourPunCallbacks
     {
-        private const int maxEggPlayers = 4;
-        private const int maxDdPlayers = 4;
-        private const int maxTtPlayers = 4;
-        private const int maxRrPlayers = 4;
-        private const int maxSsPlayers = 4;
-        private const int maxCcPlayers = 4;
-        private const int maxLlPlayers = 4;
+        private const int maxPlayers = 4;
 
         private List<RoomInfo> currentRoomList;
 
@@ -70,43 +64,49 @@ namespace PartyInc
         public void JoinEGG()
         {
             if (gameToJoin == "")
-                JoinARoom("EGG_", maxEggPlayers);
+                JoinARoom("EGG_", maxPlayers);
         }
 
         public void JoinDD()
         {
             if (gameToJoin == "")
-                JoinARoom("DD_", maxDdPlayers);
+                JoinARoom("DD_", maxPlayers);
         }
 
         public void JoinTT()
         {
             if (gameToJoin == "")
-                JoinARoom("TT_", maxTtPlayers);
+                JoinARoom("TT_", maxPlayers);
         }
 
         public void JoinRR()
         {
             if (gameToJoin == "")
-                JoinARoom("RR_", maxRrPlayers);
+                JoinARoom("RR_", maxPlayers);
         }
 
         public void JoinSS()
         {
             if (gameToJoin == "")
-                JoinARoom("SS_", maxSsPlayers);
+                JoinARoom("SS_", maxPlayers);
         }
 
         public void JoinCC()
         {
             if (gameToJoin == "")
-                JoinARoom("CC_", maxCcPlayers);
+                JoinARoom("CC_", maxPlayers);
         }
 
         public void JoinLL()
         {
             if (gameToJoin == "")
-                JoinARoom("LL_", maxLlPlayers);
+                JoinARoom("LL_", maxPlayers);
+        }
+
+        public void JoinKK()
+        {
+            if (gameToJoin == "")
+                JoinARoom("KK_", maxPlayers);
         }
 
         public void JoinARoom(string gameJoining, int maxPlayersAllowed)
@@ -158,7 +158,7 @@ namespace PartyInc
         {
             Debug.Log("Fiesta Time/ RoomController: Room creation failed, reason: " + message + " error code: " + returnCode + ". Trying again...");
 
-            PhotonNetwork.CreateRoom(gameToJoin + Random.Range(0, 10000), new RoomOptions { MaxPlayers = maxEggPlayers });
+            PhotonNetwork.CreateRoom(gameToJoin + Random.Range(0, 10000), new RoomOptions { MaxPlayers = maxPlayers });
         }
 
         public override void OnJoinedRoom()
