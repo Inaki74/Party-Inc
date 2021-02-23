@@ -59,6 +59,8 @@ namespace PartyInc
                     _mr = GetComponent<MeshRenderer>();
                 }
 
+                _trolley = FindObjectOfType<Mono_CameraTrolley_LL>();
+
                 _startingXRelativeToPlayer = transform.position.x;
 
                 if (PhotonNetwork.IsConnected)
@@ -78,8 +80,6 @@ namespace PartyInc
             {
                 if (!photonView.IsMine && PhotonNetwork.IsConnected) return;
 
-                _startingXRelativeToPlayer += Mng_GameManager_LL.Current.MovementSpeed * Time.deltaTime;
-
                 if (!_touchingObstacle)
                 {
                     transform.position += Vector3.right * Mng_GameManager_LL.Current.MovementSpeed * Time.deltaTime;
@@ -93,19 +93,22 @@ namespace PartyInc
                 {
                     // We are getting through the max distance
                     _trolley._extra = _rb.velocity.x;
-                    _trolley.photonView.TransferOwnership(PhotonNetwork.LocalPlayer.ActorNumber);
+                    if(_trolley.photonView.OwnerActorNr != PhotonNetwork.LocalPlayer.ActorNumber) _trolley.photonView.TransferOwnership(PhotonNetwork.LocalPlayer.ActorNumber);
+                }
+                else if(_trolley.photonView.OwnerActorNr == PhotonNetwork.LocalPlayer.ActorNumber)
+                {
+                    _trolley._extra = 0f;
+                    _trolley.photonView.TransferOwnership(0);
                 }
 
                 if(_rb.velocity.x <= 0)
                 {
                     _rb.velocity = new Vector3(0f, _rb.velocity.y, 0f);
-                    _trolley._extra = _rb.velocity.x;
                 }
 
                 ProcessInput();
 
-                _markOne.transform.position = new Vector3(_startingXRelativeToPlayer, 0f, 0f);
-                _markTwo.transform.position = new Vector3(_startingXRelativeToPlayer + _maxX, 0f, 0f);
+                _startingXRelativeToPlayer += (Mng_GameManager_LL.Current.MovementSpeed + _trolley._extra) * Time.deltaTime;
             }
 
             private void ProcessInput()

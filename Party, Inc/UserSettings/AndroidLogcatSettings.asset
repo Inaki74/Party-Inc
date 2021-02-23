@@ -3,7 +3,7 @@
     "m_SelectedPackage": {
         "deviceId": "LDG4C18508000010",
         "name": "com.FiestaStudios.ProjectFiesta",
-        "processId": 32438,
+        "processId": 15224,
         "exited": false
     },
     "m_SelectedPriority": 0,
@@ -11,91 +11,79 @@
         {
             "deviceId": "LDG4C18508000010",
             "name": "com.FiestaStudios.ProjectFiesta",
-            "processId": 26205,
-            "exited": false
-        },
-        {
-            "deviceId": "LDG4C18508000010",
-            "name": "com.FiestaStudios.ProjectFiesta",
-            "processId": 27123,
-            "exited": false
-        },
-        {
-            "deviceId": "LDG4C18508000010",
-            "name": "com.FiestaStudios.ProjectFiesta",
-            "processId": 28442,
-            "exited": false
-        },
-        {
-            "deviceId": "LDG4C18508000010",
-            "name": "com.FiestaStudios.ProjectFiesta",
-            "processId": 30989,
-            "exited": false
-        },
-        {
-            "deviceId": "LDG4C18508000010",
-            "name": "com.FiestaStudios.ProjectFiesta",
-            "processId": 431,
-            "exited": false
-        },
-        {
-            "deviceId": "LDG4C18508000010",
-            "name": "com.FiestaStudios.ProjectFiesta",
-            "processId": 2271,
-            "exited": false
-        },
-        {
-            "deviceId": "LDG4C18508000010",
-            "name": "com.FiestaStudios.ProjectFiesta",
-            "processId": 2929,
-            "exited": false
-        },
-        {
-            "deviceId": "LDG4C18508000010",
-            "name": "com.FiestaStudios.ProjectFiesta",
-            "processId": 6344,
-            "exited": false
-        },
-        {
-            "deviceId": "LDG4C18508000010",
-            "name": "com.FiestaStudios.ProjectFiesta",
-            "processId": 7772,
-            "exited": false
-        },
-        {
-            "deviceId": "LDG4C18508000010",
-            "name": "com.FiestaStudios.ProjectFiesta",
-            "processId": 9535,
-            "exited": false
-        },
-        {
-            "deviceId": "LDG4C18508000010",
-            "name": "com.FiestaStudios.ProjectFiesta",
-            "processId": 10867,
-            "exited": false
-        },
-        {
-            "deviceId": "LDG4C18508000010",
-            "name": "com.FiestaStudios.ProjectFiesta",
-            "processId": 12844,
-            "exited": false
-        },
-        {
-            "deviceId": "LDG4C18508000010",
-            "name": "com.FiestaStudios.ProjectFiesta",
-            "processId": 14612,
-            "exited": false
-        },
-        {
-            "deviceId": "LDG4C18508000010",
-            "name": "com.FiestaStudios.ProjectFiesta",
-            "processId": 15686,
-            "exited": false
-        },
-        {
-            "deviceId": "LDG4C18508000010",
-            "name": "com.FiestaStudios.ProjectFiesta",
             "processId": 32438,
+            "exited": true
+        },
+        {
+            "deviceId": "LDG4C18508000010",
+            "name": "com.FiestaStudios.ProjectFiesta",
+            "processId": 4394,
+            "exited": true
+        },
+        {
+            "deviceId": "LDG4C18508000010",
+            "name": "com.FiestaStudios.ProjectFiesta",
+            "processId": 6620,
+            "exited": true
+        },
+        {
+            "deviceId": "LDG4C18508000010",
+            "name": "com.FiestaStudios.ProjectFiesta",
+            "processId": 7548,
+            "exited": true
+        },
+        {
+            "deviceId": "LDG4C18508000010",
+            "name": "com.FiestaStudios.ProjectFiesta",
+            "processId": 8434,
+            "exited": true
+        },
+        {
+            "deviceId": "LDG4C18508000010",
+            "name": "com.FiestaStudios.ProjectFiesta",
+            "processId": 9695,
+            "exited": false
+        },
+        {
+            "deviceId": "LDG4C18508000010",
+            "name": "com.FiestaStudios.ProjectFiesta",
+            "processId": 10261,
+            "exited": false
+        },
+        {
+            "deviceId": "LDG4C18508000010",
+            "name": "com.FiestaStudios.ProjectFiesta",
+            "processId": 10979,
+            "exited": false
+        },
+        {
+            "deviceId": "LDG4C18508000010",
+            "name": "com.FiestaStudios.ProjectFiesta",
+            "processId": 11588,
+            "exited": false
+        },
+        {
+            "deviceId": "LDG4C18508000010",
+            "name": "com.FiestaStudios.ProjectFiesta",
+            "processId": 13294,
+            "exited": false
+        },
+        {
+            "deviceId": "LDG4C18508000010",
+            "name": "com.FiestaStudios.ProjectFiesta",
+            "processId": 14357,
+            "exited": false
+        },
+        {
+            "deviceId": "LDG4C18508000010",
+            "name": "com.FiestaStudios.ProjectFiesta",
+            "processId": 14871,
+            "exited": false
+        },
+        {
+            "deviceId": "LDG4C18508000010",
+            "name": "com.FiestaStudios.ProjectFiesta",
+            "processId": 15224,
             "exited": false
         }
     ],
@@ -132,7 +120,7 @@
         ]
     },
     "m_MemoryViewerState": {
-        "MemoryWindowHeight": 255.0,
+        "MemoryWindowHeight": 300.0,
         "MemoryWindowWidth": 170.0,
         "MemoryTypeEnabled": [
             true,
@@ -146,8 +134,8 @@
             true,
             true
         ],
-        "MemoryGroup": 1,
-        "Behavior": 1
+        "MemoryGroup": 2,
+        "Behavior": 0
     },
     "m_Filter": "",
     "m_FilterIsRegularExpression": false,

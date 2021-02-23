@@ -23,9 +23,9 @@ namespace PartyInc
 
             private float _fpY;
 
-            private void Awake()
+            public void PlaceBooster(float boosterCount)
             {
-                if(Mono_ProceduralGenerator_LL.Current.BoosterCount == 0)
+                if(boosterCount == 0)
                 {
                     _booster = Instantiate(_boosterPrefab, Vector3.zero, Quaternion.identity);
                     _booster.transform.parent = transform;

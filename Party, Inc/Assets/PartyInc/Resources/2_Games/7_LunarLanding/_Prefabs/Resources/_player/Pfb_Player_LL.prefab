@@ -189,6 +189,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9f70eb77107ac4f85ba6f6dcc2dab8b8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _trolley: {fileID: 0}
   _rb: {fileID: 7299060948341627435}
   _input: {fileID: 7299060948341627436}
   _mr: {fileID: 2411606033698287734}
@@ -196,6 +197,8 @@ MonoBehaviour:
   _top: {fileID: 115988022}
   _bottom: {fileID: 936647721}
   _spray: {fileID: 4723364038821378064, guid: 4d5c6137965ca421c9a855d54812dbb1, type: 3}
+  _markOne: {fileID: 0}
+  _markTwo: {fileID: 0}
   _sprayStrength: 90
 --- !u!114 &7299060948341627436
 MonoBehaviour:

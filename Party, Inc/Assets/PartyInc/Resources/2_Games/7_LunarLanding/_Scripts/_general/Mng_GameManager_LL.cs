@@ -16,6 +16,8 @@ namespace PartyInc
 
             public float MyPlayerZ { get; private set; }
 
+            public bool GotSeed { get; private set; }
+
             private float _startingSpeed = 4f;
             private float _finalSpeed = 15f;
             private float _timeToReachFinalSpeedInSeconds = 80f;
@@ -52,12 +54,13 @@ namespace PartyInc
 
             protected override void InStart()
             {
-                if(PhotonNetwork.IsMasterClient && PhotonNetwork.IsConnected)
+                if (PhotonNetwork.IsMasterClient && PhotonNetwork.IsConnected)
                 {
                     int seed = System.Environment.TickCount;
 
                     Random.InitState(seed);
 
+                    GotSeed = true;
                     photonView.RPC("SendSeed_RPC", RpcTarget.Others, seed);
                 }
             }
@@ -204,6 +207,7 @@ namespace PartyInc
             [PunRPC]
             public void SendSeed_RPC(int seed)
             {
+                GotSeed = true;
                 Random.InitState(seed);
             }
 
