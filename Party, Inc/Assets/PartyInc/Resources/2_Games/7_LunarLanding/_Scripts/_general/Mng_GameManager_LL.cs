@@ -76,6 +76,14 @@ namespace PartyInc
                     GotSeed = true;
                     photonView.RPC("SendSeed_RPC", RpcTarget.Others, seed);
                 }
+                else if (!PhotonNetwork.IsConnected)
+                {
+                    int seed = System.Environment.TickCount;
+
+                    Random.InitState(seed);
+
+                    GotSeed = true;
+                }
             }
 
             protected override void InitializeGameManagerDependantObjects()

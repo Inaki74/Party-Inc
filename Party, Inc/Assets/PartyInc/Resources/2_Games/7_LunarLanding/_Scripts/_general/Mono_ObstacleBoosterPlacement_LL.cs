@@ -35,9 +35,6 @@ namespace PartyInc
 
             private Vector3 DecideBoosterPosition()
             {
-                Debug.Log(transform.position.y);
-                Debug.Log(Mono_ProceduralGenerator_LL.Current.NextObstacleY);
-
                 if (transform.position.y > Mono_ProceduralGenerator_LL.Current.NextObstacleY)
                 {
                     _lXY.transform.localPosition = new Vector3(1.3f, -2f, 0f);
@@ -88,13 +85,11 @@ namespace PartyInc
 
                 if (up)
                 {
-                    Debug.Log("UP");
                     Physics.Raycast(_uXY.position, _uXY.TransformDirection(Vector3.up), out hit, 10f, _whatIsInvisWall);
                     return transform.InverseTransformPoint(hit.point);
                 }
                 else
                 {
-                    Debug.Log("DOWN");
                     Physics.Raycast(_lXY.position, _lXY.TransformDirection(Vector3.down), out hit, 10f, _whatIsInvisWall);
                     return transform.InverseTransformPoint(hit.point);
                 }

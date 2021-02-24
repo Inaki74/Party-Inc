@@ -33,21 +33,26 @@ namespace PartyInc
         private int _debugEx;
         private int _debugIn;
 
+        protected bool _isSharedObject = false;
+
         private void OnDestroy()
         {
-
             if (photonView.IsMine)
             {
                 return;
             }
-            Debug.Log("Interpolations: " + _debugIn + " Extrapolations: " + _debugEx);
-            Debug.Log("A percentage of: " + (_debugEx * 100 / (_debugEx + _debugIn)) + " extrapolations.");
+
+            if(_debugEx + _debugIn != 0)
+            {
+                Debug.Log("Interpolations: " + _debugIn + " Extrapolations: " + _debugEx);
+                Debug.Log("A percentage of: " + (_debugEx * 100 / (_debugEx + _debugIn)) + " extrapolations.");
+            }
         }
 
         // Update is called once per frame
         void Update()
         {
-            if (photonView.IsMine)
+            if (photonView.IsMine && !_isSharedObject)
             {
                 return;
             }

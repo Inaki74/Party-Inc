@@ -10,7 +10,9 @@ namespace PartyInc
     {
         public class Mono_Player_Controller_LL : MonoBehaviourPun
         {
-            [SerializeField] private Mono_CameraTrolley_LL _trolley;
+            [SerializeField] private Mono_Camera_Synchronizer_LL _trolleySync;
+            private Cinemachine.CinemachineVirtualCamera _camera;
+            private Mono_FakePlayer_LL _fakePlayer;
 
             public Rigidbody Rb
             {
@@ -37,8 +39,7 @@ namespace PartyInc
 
             [SerializeField] private float _sprayStrength;
 
-            private float _maxX = 13f;
-            private float _startingXRelativeToPlayer;
+            private float _maxX = 14f;
 
             private bool _touchingObstacle;
             private bool _boosted;
@@ -71,9 +72,9 @@ namespace PartyInc
                     _mr = GetComponent<MeshRenderer>();
                 }
 
-                _trolley = FindObjectOfType<Mono_CameraTrolley_LL>();
-
-                _startingXRelativeToPlayer = transform.position.x;
+                _trolleySync = FindObjectOfType<Mono_Camera_Synchronizer_LL>();
+                _camera = FindObjectOfType<Cinemachine.CinemachineVirtualCamera>();
+                _fakePlayer = FindObjectOfType<Mono_FakePlayer_LL>();
 
                 if (PhotonNetwork.IsConnected)
                 {
@@ -87,12 +88,8 @@ namespace PartyInc
                 }
             }
 
-            // Update is called once per frame
-            void Update()
+            private void FixedUpdate()
             {
-                if (!photonView.IsMine && PhotonNetwork.IsConnected) return;
-
-
                 if (!_boosted)
                 {
                     _rb.velocity = new Vector3(Mng_GameManager_LL.Current.MovementSpeed, _rb.velocity.y, 0f);
@@ -106,27 +103,31 @@ namespace PartyInc
                 {
                     _rb.velocity = new Vector3(0f, _rb.velocity.y, 0f);
                 }
+            }
 
-                if(Mathf.Abs(transform.position.x - _startingXRelativeToPlayer) >= _maxX)
+            // Update is called once per frame
+            void Update()
+            {
+                if (!photonView.IsMine && PhotonNetwork.IsConnected) return;
+
+                if (Mathf.Abs(transform.position.x) - Mathf.Abs(_trolleySync.IrrelevantPointTwo.position.x) >= _maxX)
                 {
                     // We are getting through the max distance
-                    _trolley._extra = _rb.velocity.x;
-                    if(_trolley.photonView.OwnerActorNr != PhotonNetwork.LocalPlayer.ActorNumber) _trolley.photonView.TransferOwnership(PhotonNetwork.LocalPlayer.ActorNumber);
+                    if(_trolleySync.photonView.OwnerActorNr != PhotonNetwork.LocalPlayer.ActorNumber)
+                    {
+                        Debug.Log("Got camera!");
+                        _trolleySync.photonView.TransferOwnership(PhotonNetwork.LocalPlayer.ActorNumber);
+                        _camera.Follow = transform;
+                        _fakePlayer.LoseCamera(transform);
+                    }
                 }
-                else if(_trolley.photonView.OwnerActorNr == PhotonNetwork.LocalPlayer.ActorNumber)
+                else if(_trolleySync.photonView.OwnerActorNr == PhotonNetwork.LocalPlayer.ActorNumber && !_trolleySync.ChangingOwner)
                 {
-                    _trolley._extra = 0f;
-                    _trolley.photonView.TransferOwnership(0);
-                }
-
-                if(_rb.velocity.x <= 0)
-                {
-                    _rb.velocity = new Vector3(0f, _rb.velocity.y, 0f);
+                    Debug.Log("Lost Camera...");
+                    _fakePlayer.RegainCamera();
                 }
 
                 ProcessInput();
-
-                _startingXRelativeToPlayer += (_rb.velocity.x + _trolley._extra) * Time.deltaTime;
             }
 
             private void ProcessInput()

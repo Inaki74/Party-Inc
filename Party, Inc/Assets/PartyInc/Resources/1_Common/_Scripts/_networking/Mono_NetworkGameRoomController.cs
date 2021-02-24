@@ -17,6 +17,7 @@ namespace PartyInc
 
         void Start()
         {
+            PhotonNetwork.NetworkingClient.LoadBalancingPeer.DisconnectTimeout = 100000;
             SetPlayerReady(PhotonNetwork.LocalPlayer.ActorNumber);
 
             if (PhotonNetwork.IsMasterClient) StartCoroutine(StartGameCo());

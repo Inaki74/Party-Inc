@@ -60,6 +60,66 @@ Transform:
   m_Father: {fileID: 2411606033698287732}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1249041165
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1249041166}
+  m_Layer: 0
+  m_Name: Mark1
+  m_TagString: Untagged
+  m_Icon: {fileID: 4422084297763085224, guid: 0000000000000000d000000000000000, type: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1249041166
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1249041165}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 8.27, y: 2.35, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 2411606033698287732}
+  m_RootOrder: 2
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1986631939
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1986631940}
+  m_Layer: 0
+  m_Name: Mark2
+  m_TagString: Untagged
+  m_Icon: {fileID: 3443629218296621865, guid: 0000000000000000d000000000000000, type: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1986631940
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1986631939}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 8.27, y: 2.35, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 2411606033698287732}
+  m_RootOrder: 3
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2411606033698287728
 GameObject:
   m_ObjectHideFlags: 0
@@ -97,6 +157,8 @@ Transform:
   m_Children:
   - {fileID: 115988023}
   - {fileID: 936647722}
+  - {fileID: 1249041166}
+  - {fileID: 1986631940}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -189,7 +251,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9f70eb77107ac4f85ba6f6dcc2dab8b8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _trolley: {fileID: 0}
+  _trolleySync: {fileID: 0}
   _rb: {fileID: 7299060948341627435}
   _input: {fileID: 7299060948341627436}
   _mr: {fileID: 2411606033698287734}
@@ -197,8 +259,8 @@ MonoBehaviour:
   _top: {fileID: 115988022}
   _bottom: {fileID: 936647721}
   _spray: {fileID: 4723364038821378064, guid: 4d5c6137965ca421c9a855d54812dbb1, type: 3}
-  _markOne: {fileID: 0}
-  _markTwo: {fileID: 0}
+  _markOne: {fileID: 1249041165}
+  _markTwo: {fileID: 1986631939}
   _sprayStrength: 90
 --- !u!114 &7299060948341627436
 MonoBehaviour:
