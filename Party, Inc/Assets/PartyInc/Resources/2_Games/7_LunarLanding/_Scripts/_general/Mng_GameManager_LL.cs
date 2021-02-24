@@ -37,6 +37,19 @@ namespace PartyInc
                 }
             }
 
+            [SerializeField] private float _lastRecordedMovementSpeed;
+            public float LastRecordedMovementSpeed
+            {
+                get
+                {
+                    return _lastRecordedMovementSpeed;
+                }
+                set
+                {
+                    _lastRecordedMovementSpeed = value;
+                }
+            }
+
             [SerializeField] private float _gravity;
 
             private int _currentGate;
@@ -157,6 +170,8 @@ namespace PartyInc
                 {
                     if (PhotonNetwork.IsConnectedAndReady) InGameTime = (float)(PhotonNetwork.Time - _gameBeginTime);
                     else InGameTime += Time.deltaTime;
+
+                    _lastRecordedMovementSpeed = _movementSpeed;
 
                     if (MovementSpeed <= _finalSpeed)
                     {

@@ -41,6 +41,18 @@ namespace PartyInc
             private float _startingXRelativeToPlayer;
 
             private bool _touchingObstacle;
+            private bool _boosted;
+            public bool Boosted
+            {
+                get
+                {
+                    return _boosted;
+                }
+                set
+                {
+                    _boosted = value;
+                }
+            }
 
             private void Start()
             {
@@ -80,11 +92,17 @@ namespace PartyInc
             {
                 if (!photonView.IsMine && PhotonNetwork.IsConnected) return;
 
-                if (!_touchingObstacle)
+
+                if (!_boosted)
                 {
-                    transform.position += Vector3.right * Mng_GameManager_LL.Current.MovementSpeed * Time.deltaTime;
+                    _rb.velocity = new Vector3(Mng_GameManager_LL.Current.MovementSpeed, _rb.velocity.y, 0f);
                 }
                 else
+                {
+                    _rb.velocity += Vector3.right * (Mng_GameManager_LL.Current.MovementSpeed - Mng_GameManager_LL.Current.LastRecordedMovementSpeed);
+                }
+
+                if (_touchingObstacle)
                 {
                     _rb.velocity = new Vector3(0f, _rb.velocity.y, 0f);
                 }
@@ -108,7 +126,7 @@ namespace PartyInc
 
                 ProcessInput();
 
-                _startingXRelativeToPlayer += (Mng_GameManager_LL.Current.MovementSpeed + _trolley._extra) * Time.deltaTime;
+                _startingXRelativeToPlayer += (_rb.velocity.x + _trolley._extra) * Time.deltaTime;
             }
 
             private void ProcessInput()
