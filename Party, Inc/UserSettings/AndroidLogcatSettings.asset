@@ -3,7 +3,7 @@
     "m_SelectedPackage": {
         "deviceId": "LDG4C18508000010",
         "name": "com.FiestaStudios.ProjectFiesta",
-        "processId": 29832,
+        "processId": 15170,
         "exited": false
     },
     "m_SelectedPriority": 0,
@@ -11,121 +11,43 @@
         {
             "deviceId": "LDG4C18508000010",
             "name": "com.FiestaStudios.ProjectFiesta",
-            "processId": 5097,
-            "exited": true
-        },
-        {
-            "deviceId": "LDG4C18508000010",
-            "name": "com.FiestaStudios.ProjectFiesta",
-            "processId": 5882,
-            "exited": true
-        },
-        {
-            "deviceId": "LDG4C18508000010",
-            "name": "com.FiestaStudios.ProjectFiesta",
-            "processId": 6857,
-            "exited": true
-        },
-        {
-            "deviceId": "LDG4C18508000010",
-            "name": "com.FiestaStudios.ProjectFiesta",
-            "processId": 13149,
-            "exited": true
-        },
-        {
-            "deviceId": "LDG4C18508000010",
-            "name": "com.FiestaStudios.ProjectFiesta",
-            "processId": 14093,
-            "exited": true
-        },
-        {
-            "deviceId": "LDG4C18508000010",
-            "name": "com.FiestaStudios.ProjectFiesta",
-            "processId": 15657,
-            "exited": false
-        },
-        {
-            "deviceId": "LDG4C18508000010",
-            "name": "com.FiestaStudios.ProjectFiesta",
-            "processId": 16000,
-            "exited": false
-        },
-        {
-            "deviceId": "LDG4C18508000010",
-            "name": "com.FiestaStudios.ProjectFiesta",
-            "processId": 18267,
-            "exited": false
-        },
-        {
-            "deviceId": "LDG4C18508000010",
-            "name": "com.FiestaStudios.ProjectFiesta",
-            "processId": 19197,
-            "exited": false
-        },
-        {
-            "deviceId": "LDG4C18508000010",
-            "name": "com.FiestaStudios.ProjectFiesta",
-            "processId": 19721,
-            "exited": false
-        },
-        {
-            "deviceId": "LDG4C18508000010",
-            "name": "com.FiestaStudios.ProjectFiesta",
-            "processId": 20012,
-            "exited": false
-        },
-        {
-            "deviceId": "LDG4C18508000010",
-            "name": "com.FiestaStudios.ProjectFiesta",
-            "processId": 20737,
-            "exited": false
-        },
-        {
-            "deviceId": "LDG4C18508000010",
-            "name": "com.FiestaStudios.ProjectFiesta",
-            "processId": 25736,
-            "exited": false
-        },
-        {
-            "deviceId": "LDG4C18508000010",
-            "name": "com.FiestaStudios.ProjectFiesta",
-            "processId": 30929,
-            "exited": false
-        },
-        {
-            "deviceId": "LDG4C18508000010",
-            "name": "com.FiestaStudios.ProjectFiesta",
-            "processId": 26792,
-            "exited": false
-        },
-        {
-            "deviceId": "LDG4C18508000010",
-            "name": "com.FiestaStudios.ProjectFiesta",
             "processId": 27364,
-            "exited": false
+            "exited": true
         },
         {
             "deviceId": "LDG4C18508000010",
             "name": "com.FiestaStudios.ProjectFiesta",
             "processId": 28140,
-            "exited": false
+            "exited": true
         },
         {
             "deviceId": "LDG4C18508000010",
             "name": "com.FiestaStudios.ProjectFiesta",
             "processId": 28808,
-            "exited": false
+            "exited": true
         },
         {
             "deviceId": "LDG4C18508000010",
             "name": "com.FiestaStudios.ProjectFiesta",
             "processId": 29284,
-            "exited": false
+            "exited": true
         },
         {
             "deviceId": "LDG4C18508000010",
             "name": "com.FiestaStudios.ProjectFiesta",
             "processId": 29832,
+            "exited": true
+        },
+        {
+            "deviceId": "LDG4C18508000010",
+            "name": "com.FiestaStudios.ProjectFiesta",
+            "processId": 11739,
+            "exited": false
+        },
+        {
+            "deviceId": "LDG4C18508000010",
+            "name": "com.FiestaStudios.ProjectFiesta",
+            "processId": 15170,
             "exited": false
         }
     ],

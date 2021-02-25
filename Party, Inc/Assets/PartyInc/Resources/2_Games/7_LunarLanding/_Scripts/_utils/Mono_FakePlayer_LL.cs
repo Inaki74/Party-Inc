@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using Photon.Pun;
 using UnityEngine;
-
+using Photon.Realtime;
+using ExitGames.Client.Photon;
+using System.Linq;
 
 namespace PartyInc
 {
@@ -10,34 +12,62 @@ namespace PartyInc
     {
         public struct FPSync
         {
-            public Vector3 position;
-            public Vector3 rbVelocity;
+            public int playerId;
+            public double timeSent;
+
+            public FPSync(int id, double time)
+            {
+                playerId = id;
+                timeSent = time;
+            }
+
+            public override bool Equals(object obj)
+            {
+                FPSync aux = (FPSync)obj;
+                return aux.playerId == playerId;
+            }
+
+            public override int GetHashCode()
+            {
+                return (int)(playerId * (float)timeSent);
+            }
         }
 
-        public class Mono_FakePlayer_LL : MonoInt_SnapshotInterpolator<FPSync>
+        public class Mono_FakePlayer_LL : MonoBehaviourPun
         {
             [SerializeField] private Rigidbody _rb;
             [SerializeField] private Mono_Camera_Synchronizer_LL _trolleySync;
             [SerializeField] private Cinemachine.CinemachineVirtualCamera _camera;
 
-            private Mono_Player_Controller_LL[] _allPlayerControllers;
+            private Mono_Player_Controller_LL[] _allPlayerControllers = new Mono_Player_Controller_LL[4];
 
             private Transform _playerThatHasCamera;
             private float _originalX;
-            private bool _lostCamera;
+            private bool _lostCamera = false;
 
-            private void Start()
+            private void Awake()
             {
-                _allPlayerControllers = FindObjectsOfType<Mono_Player_Controller_LL>();
+                PhotonNetwork.NetworkingClient.EventReceived += OnPlayerEnteredThreshold;
+                PhotonNetwork.NetworkingClient.EventReceived += OnPlayerLeftThreshold;
+            }
 
-                if (PhotonNetwork.IsMasterClient) photonView.TransferOwnership(PhotonNetwork.LocalPlayer.ActorNumber);
+            private void OnDestroy()
+            {
+                PhotonNetwork.NetworkingClient.EventReceived -= OnPlayerEnteredThreshold;
+                PhotonNetwork.NetworkingClient.EventReceived -= OnPlayerLeftThreshold;
+            }
+
+            private void Update()
+            {
+                if(_allPlayerControllers.Count() != Mng_GameManager_LL.Current.playerCount)
+                {
+                    _allPlayerControllers = FindObjectsOfType<Mono_Player_Controller_LL>();
+                }
             }
 
             // Update is called once per frame
             void FixedUpdate()
             {
-                if (!photonView.IsMine) return;
-
                 _originalX = _trolleySync.IrrelevantPoint.position.x;
                 if (_lostCamera)
                 {
@@ -48,22 +78,6 @@ namespace PartyInc
                     _rb.velocity = new Vector3(Mng_GameManager_LL.Current.MovementSpeed, 0f, 0f);
                 }
             }
-
-            //public void LoseCamera(Transform player)
-            //{
-            //    _playerThatHasCamera = player;
-            //    _lostCamera = true;
-            //    photonView.TransferOwnership(PhotonNetwork.LocalPlayer.ActorNumber);
-            //}
-
-            //public void RegainCamera()
-            //{
-            //    //_camera.Follow = transform;
-            //    _playerThatHasCamera = null;
-            //    _lostCamera = false;
-            //    transform.position = Vector3.right * _originalX;//Vector3.Lerp(transform.position, Vector3.right * _originalX, Time.deltaTime * 10f);
-            //    //_trolleySync.ChangingOwner = true;
-            //}
 
             private void GiveCamera(int playerId)
             {
@@ -76,89 +90,105 @@ namespace PartyInc
                 }
 
                 _lostCamera = true;
-                photonView.TransferOwnership(playerId);
             }
 
-            private Queue<int> _controlQueue = new Queue<int>();
-
-            private void OnPlayerEnteredThreshold(int playerId)
+            private void RegainCamera()
             {
-                if(_controlQueue.Count == 0)
-                {
-                    // Give camera control to this player
-
-                }
-
-                _controlQueue.Enqueue(playerId);
+                _playerThatHasCamera = null;
+                _lostCamera = false;
+                transform.position = Vector3.right * _originalX;//Vector3.Lerp(transform.position, Vector3.right * _originalX, Time.deltaTime * 10f);
             }
 
-            private void OnPlayerLeftThreshold(int playerId)
-            {
-                if(playerId == _controlQueue.Peek())
-                {
-                    _controlQueue.Dequeue();
+            private Queue<FPSync> _controlQueue = new Queue<FPSync>();
+            [SerializeField] private List<int> _watchQueue = new List<int>();
 
-                    // Give camera control to the next player in the queue
+            private void OnPlayerEnteredThreshold(EventData evData)
+            {
+                if(evData.Code == Constants.PlayerEnteredThresholdEventCode)
+                {
+                    object[] data = (object[])evData.CustomData;
+                    int playerId = (int)data[0];
+                    double time = (double)data[1];
+
+                    FPSync sync = new FPSync(playerId, time);
+                    Queue<int> aux = Stt_TADHelpers.ToQueue(_watchQueue); // do toqueue
+
                     if (_controlQueue.Count == 0)
                     {
-                        // No players left in the queue, last player keeps Ownership, but loses control of camera to the "scene"
+                        // Give camera control to this player
+                        GiveCamera(playerId);
 
+                        _controlQueue.Enqueue(sync);
+
+                        // Elements could have come out of order through the network.
+                        var aux2 = Stt_TADHelpers.Order(_controlQueue);
+                        aux.Clear();
+                        foreach(FPSync s in _controlQueue)
+                        {
+                            aux.Enqueue(s.playerId);
+                        }
                     }
                     else
                     {
+                        _controlQueue.Enqueue(sync);
 
+                        // Elements could have come out of order through the network.
+                        var aux2 = Stt_TADHelpers.Order(_controlQueue);
+                        aux.Clear();
+                        foreach (FPSync s in _controlQueue)
+                        {
+                            aux.Enqueue(s.playerId);
+                        }
+
+                        if (_controlQueue.Peek().playerId == playerId)
+                        {
+                            GiveCamera(playerId);
+                        }
                     }
+
+                    _watchQueue = aux.ToList();
                 }
-                else
+            }
+
+            private void OnPlayerLeftThreshold(EventData evData)
+            {
+                if (evData.Code == Constants.PlayerLeftThresholdEventCode)
                 {
-                    // Look for player id in the queue and remove it
+                    object[] data = (object[])evData.CustomData;
+                    int playerId = (int)data[0];
+                    double time = (double)data[1];
+
+                    FPSync sync = new FPSync(playerId, time);
+                    Queue<int> aux = Stt_TADHelpers.ToQueue(_watchQueue);
+
+                    if (sync.Equals(_controlQueue.Peek()))
+                    {
+                        _controlQueue.Dequeue();
+                        aux.Dequeue();
+
+                        // Give camera control to the next player in the queue
+                        if (_controlQueue.Count == 0)
+                        {
+                            // No players left in the queue, loses control of camera to the "scene"
+                            RegainCamera();
+                        }
+                        else
+                        {
+                            GiveCamera(_controlQueue.Peek().playerId);
+                        }
+                    }
+                    else
+                    {
+                        // Look for player id in the queue and remove it
+                        _controlQueue = Stt_TADHelpers.Remove(_controlQueue, sync);
+                        foreach (FPSync s in _controlQueue)
+                        {
+                            aux.Enqueue(s.playerId);
+                        }
+                    }
+
+                    _watchQueue = aux.ToList();
                 }
-
-            }
-
-
-
-
-
-
-
-
-
-
-            /// SYNC MOVEMENTS///////
-            /// 
-            protected override void Interpolate(State rhs, State lhs, float t)
-            {
-                FPSync rhsInfo = rhs.info;
-                FPSync lhsInfo = lhs.info;
-
-                transform.position = Vector3.Lerp(lhsInfo.position, rhsInfo.position, t);
-                _rb.velocity = Vector3.Lerp(lhsInfo.rbVelocity, rhsInfo.rbVelocity, t);
-            }
-
-            protected override void Extrapolate(State newest, float extrapTime)
-            {
-                FPSync newestInfo = newest.info;
-
-                transform.position = newestInfo.position + newestInfo.rbVelocity * extrapTime;
-            }
-
-            protected override void SendInformation(PhotonStream stream, PhotonMessageInfo info)
-            {
-                stream.SendNext(transform.position);
-                stream.SendNext(_rb.velocity);
-            }
-
-            protected override FPSync ReceiveInformation(PhotonStream stream, PhotonMessageInfo info)
-            {
-                Vector3 netPos = (Vector3)stream.ReceiveNext();
-                Vector3 netVel = (Vector3)stream.ReceiveNext();
-
-                FPSync fpInfo;
-                fpInfo.position = netPos;
-                fpInfo.rbVelocity = netVel;
-
-                return fpInfo;
             }
         }
     }

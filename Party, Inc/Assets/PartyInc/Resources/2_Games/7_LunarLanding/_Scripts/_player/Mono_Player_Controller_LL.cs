@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
 using Photon.Realtime;
+using ExitGames.Client.Photon;
 
 namespace PartyInc
 {
@@ -41,7 +42,7 @@ namespace PartyInc
 
             private float _maxX;
 
-            private float _startingMaxX = 13f; // -> 4/13 = r1, where 4 = starting game speed
+            private float _startingMaxX = 12.6f; // -> 4/13 = r1, where 4 = starting game speed
             private float _finalMaxX = 15.1f; // -> 15/15.1 = r2, where 15 = final game speed
             private float _timeToReachFinalMaxXInSeconds = 80f; // Same as GameManager function
 
@@ -59,7 +60,7 @@ namespace PartyInc
                 }
             }
 
-            private bool _runOnce;
+            private bool _runOnce = false;
 
             private void Start()
             {
@@ -121,44 +122,31 @@ namespace PartyInc
                     _maxX = _startingMaxX + Mng_GameManager_LL.Current.InGameTime * ((_finalMaxX - _startingMaxX) / _timeToReachFinalMaxXInSeconds);
                 }
 
-
                 if (Mathf.Abs(transform.position.x) - Mathf.Abs(_trolleySync.IrrelevantPointTwo.position.x) >= _maxX && !_runOnce)
                 {
+                    Debug.Log("Got through threshold");
                     // Got through threshold
                     // OnPlayerEnteredThreshold event
-                    // _runOnce = true;
+                    object[] content = new object[] { PhotonNetwork.LocalPlayer.ActorNumber, PhotonNetwork.Time };
+                    RaiseEventOptions raiseEventOptions = new RaiseEventOptions { Receivers = ReceiverGroup.All };
+                    PhotonNetwork.RaiseEvent(Constants.PlayerEnteredThresholdEventCode, content, raiseEventOptions, SendOptions.SendReliable);
+
+                    _runOnce = true;
                 }
                 else if (Mathf.Abs(transform.position.x) - Mathf.Abs(_trolleySync.IrrelevantPointTwo.position.x) < _maxX && _runOnce)
                 {
+                    Debug.Log("Left threshold");
                     // Got away of the threshold
                     // If I had the camera, I lose it
                     // To who? It doesnt matter, all that it matters is that you lost it.
                     // Fake player decides who gets the camera next.
                     // OnPlayerLeftThreshold event
-                    // _runOnce = false;
-                }
+                    object[] content = new object[] { PhotonNetwork.LocalPlayer.ActorNumber, 0d };
+                    RaiseEventOptions raiseEventOptions = new RaiseEventOptions { Receivers = ReceiverGroup.All };
+                    PhotonNetwork.RaiseEvent(Constants.PlayerLeftThresholdEventCode, content, raiseEventOptions, SendOptions.SendReliable);
 
-                //if (Mathf.Abs(transform.position.x) - Mathf.Abs(_trolleySync.IrrelevantPointTwo.position.x) >= _maxX && !_runOnce)
-                //{
-                //    // We are getting through the max distance
-                //    //if(_trolleySync.photonView.OwnerActorNr != PhotonNetwork.LocalPlayer.ActorNumber)
-                //    //{
-                //    //    Debug.Log("Got camera!");
-                //    //    //_trolleySync.photonView.TransferOwnership(PhotonNetwork.LocalPlayer.ActorNumber);
-                //    //    //_camera.Follow = transform;
-                //    //    _fakePlayer.LoseCamera(transform);
-                //    //}
-                //    _runOnce = true;
-                //    Debug.Log("Got camera!");
-                //    _fakePlayer.LoseCamera(transform);
-                //}
-                //else if(Mathf.Abs(transform.position.x) - Mathf.Abs(_trolleySync.IrrelevantPointTwo.position.x) < _maxX && _runOnce &&
-                //    _fakePlayer.photonView.IsMine)//if(_trolleySync.photonView.OwnerActorNr == PhotonNetwork.LocalPlayer.ActorNumber)// && !_trolleySync.ChangingOwner)
-                //{
-                //    Debug.Log("Lost Camera...");
-                //    _runOnce = false;
-                //    _fakePlayer.RegainCamera();
-                //}
+                    _runOnce = false;
+                }
 
                 ProcessInput();
             }
