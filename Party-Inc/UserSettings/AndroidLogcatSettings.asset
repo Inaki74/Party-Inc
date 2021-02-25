@@ -3,7 +3,7 @@
     "m_SelectedPackage": {
         "deviceId": "LDG4C18508000010",
         "name": "com.FiestaStudios.ProjectFiesta",
-        "processId": 15170,
+        "processId": 19734,
         "exited": false
     },
     "m_SelectedPriority": 0,
@@ -48,6 +48,18 @@
             "deviceId": "LDG4C18508000010",
             "name": "com.FiestaStudios.ProjectFiesta",
             "processId": 15170,
+            "exited": false
+        },
+        {
+            "deviceId": "LDG4C18508000010",
+            "name": "com.FiestaStudios.ProjectFiesta",
+            "processId": 16717,
+            "exited": false
+        },
+        {
+            "deviceId": "LDG4C18508000010",
+            "name": "com.FiestaStudios.ProjectFiesta",
+            "processId": 19734,
             "exited": false
         }
     ],

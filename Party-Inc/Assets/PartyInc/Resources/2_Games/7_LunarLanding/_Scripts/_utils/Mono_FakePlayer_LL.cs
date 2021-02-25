@@ -111,7 +111,7 @@ namespace PartyInc
                     double time = (double)data[1];
 
                     FPSync sync = new FPSync(playerId, time);
-                    Queue<int> aux = Stt_TADHelpers.ToQueue(_watchQueue); // do toqueue
+                    Queue<int> aux = Stt_TADHelpers.ToQueue(_watchQueue);
 
                     if (_controlQueue.Count == 0)
                     {
@@ -119,21 +119,14 @@ namespace PartyInc
                         GiveCamera(playerId);
 
                         _controlQueue.Enqueue(sync);
-
-                        // Elements could have come out of order through the network.
-                        var aux2 = Stt_TADHelpers.Order(_controlQueue);
-                        aux.Clear();
-                        foreach(FPSync s in _controlQueue)
-                        {
-                            aux.Enqueue(s.playerId);
-                        }
+                        aux.Enqueue(sync.playerId);
                     }
                     else
                     {
                         _controlQueue.Enqueue(sync);
 
                         // Elements could have come out of order through the network.
-                        var aux2 = Stt_TADHelpers.Order(_controlQueue);
+                        _controlQueue = Stt_TADHelpers.Order(_controlQueue);
                         aux.Clear();
                         foreach (FPSync s in _controlQueue)
                         {
@@ -147,6 +140,8 @@ namespace PartyInc
                     }
 
                     _watchQueue = aux.ToList();
+
+                    Debug.Log("Is watch queue the same as control queue? :" + TestWatchQueue(_watchQueue, _controlQueue));
                 }
             }
 
@@ -188,7 +183,25 @@ namespace PartyInc
                     }
 
                     _watchQueue = aux.ToList();
+
+                    Debug.Log("Is watch queue the same as control queue? :" + TestWatchQueue(_watchQueue, _controlQueue));
                 }
+            }
+
+            private bool TestWatchQueue(List<int> wQ, Queue<FPSync> q)
+            {
+                FPSync[] auxQ = q.ToArray();
+                int[] auxWQ = wQ.ToArray();
+
+                for(int i = 0; i < 4; i++)
+                {
+                    if(auxQ[i].playerId != auxWQ[i])
+                    {
+                        return false;
+                    }
+                }
+
+                return true;
             }
         }
     }

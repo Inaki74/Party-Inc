@@ -97,6 +97,8 @@ namespace PartyInc
 
             private void FixedUpdate()
             {
+                if (!photonView.IsMine && PhotonNetwork.IsConnected) return;
+
                 if (!_boosted)
                 {
                     _rb.velocity = new Vector3(Mng_GameManager_LL.Current.MovementSpeed, _rb.velocity.y, 0f);
