@@ -37,6 +37,23 @@ namespace PartyInc
                 }
             }
 
+            private float _startingMaxX = 12.6f; // -> 4/13 = r1, where 4 = starting game speed
+            private float _finalMaxX = 15.1f; // -> 15/15.1 = r2, where 15 = final game speed
+            private float _timeToReachFinalMaxXInSeconds = 80f; // Same as GameManager function
+
+            [SerializeField] private float _maxX = 11.9f;
+            public float MaxX
+            {
+                get
+                {
+                    return _maxX;
+                }
+                set
+                {
+                    _maxX = value;
+                }
+            }
+
             [SerializeField] private float _lastRecordedMovementSpeed;
             public float LastRecordedMovementSpeed
             {

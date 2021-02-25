@@ -50,6 +50,8 @@ MonoBehaviour:
   playerCount: 0
   gameStartCountdown: 3
   _movementSpeed: 0
+  _maxX: 11.9
+  _lastRecordedMovementSpeed: 0
   _gravity: 0
 --- !u!114 &2602364143078556658
 MonoBehaviour:

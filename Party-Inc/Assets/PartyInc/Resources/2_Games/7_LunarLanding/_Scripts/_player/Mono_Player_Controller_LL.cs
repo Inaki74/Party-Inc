@@ -40,12 +40,6 @@ namespace PartyInc
 
             [SerializeField] private float _sprayStrength;
 
-            private float _maxX;
-
-            private float _startingMaxX = 12.6f; // -> 4/13 = r1, where 4 = starting game speed
-            private float _finalMaxX = 15.1f; // -> 15/15.1 = r2, where 15 = final game speed
-            private float _timeToReachFinalMaxXInSeconds = 80f; // Same as GameManager function
-
             private bool _touchingObstacle;
             private bool _boosted;
             public bool Boosted
@@ -101,14 +95,18 @@ namespace PartyInc
 
                 if (!_boosted)
                 {
-                    _rb.velocity = new Vector3(Mng_GameManager_LL.Current.MovementSpeed, _rb.velocity.y, 0f);
+                    //_rb.velocity = new Vector3(Mng_GameManager_LL.Current.MovementSpeed, _rb.velocity.y, 0f);
                 }
                 else
                 {
-                    _rb.velocity += Vector3.right * (Mng_GameManager_LL.Current.MovementSpeed - Mng_GameManager_LL.Current.LastRecordedMovementSpeed);
+                    //_rb.velocity += Vector3.right * (Mng_GameManager_LL.Current.MovementSpeed - Mng_GameManager_LL.Current.LastRecordedMovementSpeed);
                 }
 
                 if (_touchingObstacle)
+                {
+                    _rb.velocity = new Vector3(-Mng_GameManager_LL.Current.MovementSpeed, _rb.velocity.y, 0f);
+                }
+                else if(!_boosted)
                 {
                     _rb.velocity = new Vector3(0f, _rb.velocity.y, 0f);
                 }
@@ -119,12 +117,12 @@ namespace PartyInc
             {
                 if (!photonView.IsMine && PhotonNetwork.IsConnected) return;
 
-                if (_maxX <= _finalMaxX)
-                {
-                    _maxX = _startingMaxX + Mng_GameManager_LL.Current.InGameTime * ((_finalMaxX - _startingMaxX) / _timeToReachFinalMaxXInSeconds);
-                }
+                //if (Mng_GameManager_LL.Current.MaxX <= _finalMaxX)
+                //{
+                //    //_maxX = _startingMaxX + Mng_GameManager_LL.Current.InGameTime * ((_finalMaxX - _startingMaxX) / _timeToReachFinalMaxXInSeconds);
+                //}
 
-                if (Mathf.Abs(transform.position.x) - Mathf.Abs(_trolleySync.IrrelevantPointTwo.position.x) >= _maxX && !_runOnce)
+                if (Mathf.Abs(transform.position.x - _trolleySync.IrrelevantPointTwo.position.x) >= Mng_GameManager_LL.Current.MaxX && !_runOnce)
                 {
                     Debug.Log("Got through threshold");
                     // Got through threshold
@@ -135,7 +133,7 @@ namespace PartyInc
 
                     _runOnce = true;
                 }
-                else if (Mathf.Abs(transform.position.x) - Mathf.Abs(_trolleySync.IrrelevantPointTwo.position.x) < _maxX && _runOnce)
+                else if (Mathf.Abs(transform.position.x - _trolleySync.IrrelevantPointTwo.position.x) < Mng_GameManager_LL.Current.MaxX && _runOnce)
                 {
                     Debug.Log("Left threshold");
                     // Got away of the threshold

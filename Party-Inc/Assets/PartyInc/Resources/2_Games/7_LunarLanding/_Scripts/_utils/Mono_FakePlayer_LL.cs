@@ -75,7 +75,7 @@ namespace PartyInc
                 }
                 else
                 {
-                    _rb.velocity = new Vector3(Mng_GameManager_LL.Current.MovementSpeed, 0f, 0f);
+                    //_rb.velocity = new Vector3(Mng_GameManager_LL.Current.MovementSpeed, 0f, 0f);
                 }
             }
 
@@ -193,7 +193,7 @@ namespace PartyInc
                 FPSync[] auxQ = q.ToArray();
                 int[] auxWQ = wQ.ToArray();
 
-                for(int i = 0; i < Mng_GameManager_LL.Current.playerCount; i++)
+                for(int i = 0; i < auxQ.Length; i++)
                 {
                     if(auxQ[i].playerId != auxWQ[i])
                     {

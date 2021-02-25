@@ -8,6 +8,7 @@ namespace PartyInc
     {
         public class Mono_ProceduralGenerator_LL : MonoSingleton<Mono_ProceduralGenerator_LL>
         {
+            [SerializeField] private Mono_Camera_Synchronizer_LL _sync;
             [SerializeField] private GameObject _obstacle;
 
             private GameObject _newest;
@@ -37,7 +38,16 @@ namespace PartyInc
 
             private void SpawnObstacleBase(int deathCount)
             {
-                SpawnObstacle();
+                _boosterCount--;
+                float y = NextObstacleY;
+                NextObstacleY = 0;// Random.Range(-3f, 3f);
+                _newest = Instantiate(_obstacle, new Vector3(_x, y, Mng_GameManager_LL.Current.MyPlayerZ), Quaternion.identity);
+                _newest.GetComponent<Mono_ObstacleBoosterPlacement_LL>().PlaceBooster(_boosterCount);
+                _x += XDifference;
+                if (_boosterCount == 0)
+                {
+                    _boosterCount = 3;
+                }
                 _newest.GetComponent<Mono_ObstacleDeathCount_LL>().CurrentDeathCount = deathCount;
             }
 
@@ -47,9 +57,9 @@ namespace PartyInc
 
                 for (int i = 0; i < 6f; i++)
                 {
-                    Debug.Log(i);
                     SpawnObstacleBase(i + 6);
                 }
+                //_x = 16.969f;
             }
 
             private void SpawnObstacle()
@@ -57,9 +67,8 @@ namespace PartyInc
                 _boosterCount--;
                 float y = NextObstacleY;
                 NextObstacleY = 0;// Random.Range(-3f, 3f);
-                _newest = Instantiate(_obstacle, new Vector3(_x, y, Mng_GameManager_LL.Current.MyPlayerZ), Quaternion.identity);
+                _newest = Instantiate(_obstacle, new Vector3(_sync.SpawningPoint.transform.position.x, y, Mng_GameManager_LL.Current.MyPlayerZ), Quaternion.identity);
                 _newest.GetComponent<Mono_ObstacleBoosterPlacement_LL>().PlaceBooster(_boosterCount);
-                _x += XDifference;
                 if(_boosterCount == 0)
                 {
                     _boosterCount = 3;
