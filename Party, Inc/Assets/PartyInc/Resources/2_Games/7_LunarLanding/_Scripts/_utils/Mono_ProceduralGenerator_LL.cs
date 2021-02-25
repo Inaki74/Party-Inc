@@ -56,7 +56,7 @@ namespace PartyInc
             {
                 _boosterCount--;
                 float y = NextObstacleY;
-                NextObstacleY = Random.Range(-3f, 3f);
+                NextObstacleY = 0;// Random.Range(-3f, 3f);
                 _newest = Instantiate(_obstacle, new Vector3(_x, y, Mng_GameManager_LL.Current.MyPlayerZ), Quaternion.identity);
                 _newest.GetComponent<Mono_ObstacleBoosterPlacement_LL>().PlaceBooster(_boosterCount);
                 _x += XDifference;
@@ -70,7 +70,7 @@ namespace PartyInc
             {
                 yield return new WaitUntil(() => Mng_GameManager_LL.Current.GotSeed);
 
-                NextObstacleY = Random.Range(-3f, 3f);
+                NextObstacleY = 0;// Random.Range(-3f, 3f);
                 StartCoroutine(ObstaclesBaseCase());
             }
         }

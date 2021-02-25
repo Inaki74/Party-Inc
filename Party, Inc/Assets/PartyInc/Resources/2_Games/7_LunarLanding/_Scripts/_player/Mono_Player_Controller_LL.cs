@@ -39,7 +39,11 @@ namespace PartyInc
 
             [SerializeField] private float _sprayStrength;
 
-            private float _maxX = 14f;
+            private float _maxX;
+
+            private float _startingMaxX = 13f; // -> 4/13 = r1, where 4 = starting game speed
+            private float _finalMaxX = 15.1f; // -> 15/15.1 = r2, where 15 = final game speed
+            private float _timeToReachFinalMaxXInSeconds = 80f; // Same as GameManager function
 
             private bool _touchingObstacle;
             private bool _boosted;
@@ -54,6 +58,8 @@ namespace PartyInc
                     _boosted = value;
                 }
             }
+
+            private bool _runOnce;
 
             private void Start()
             {
@@ -110,22 +116,49 @@ namespace PartyInc
             {
                 if (!photonView.IsMine && PhotonNetwork.IsConnected) return;
 
-                if (Mathf.Abs(transform.position.x) - Mathf.Abs(_trolleySync.IrrelevantPointTwo.position.x) >= _maxX)
+                if (_maxX <= _finalMaxX)
                 {
-                    // We are getting through the max distance
-                    if(_trolleySync.photonView.OwnerActorNr != PhotonNetwork.LocalPlayer.ActorNumber)
-                    {
-                        Debug.Log("Got camera!");
-                        _trolleySync.photonView.TransferOwnership(PhotonNetwork.LocalPlayer.ActorNumber);
-                        _camera.Follow = transform;
-                        _fakePlayer.LoseCamera(transform);
-                    }
+                    _maxX = _startingMaxX + Mng_GameManager_LL.Current.InGameTime * ((_finalMaxX - _startingMaxX) / _timeToReachFinalMaxXInSeconds);
                 }
-                else if(_trolleySync.photonView.OwnerActorNr == PhotonNetwork.LocalPlayer.ActorNumber && !_trolleySync.ChangingOwner)
+
+
+                if (Mathf.Abs(transform.position.x) - Mathf.Abs(_trolleySync.IrrelevantPointTwo.position.x) >= _maxX && !_runOnce)
                 {
-                    Debug.Log("Lost Camera...");
-                    _fakePlayer.RegainCamera();
+                    // Got through threshold
+                    // OnPlayerEnteredThreshold event
+                    // _runOnce = true;
                 }
+                else if (Mathf.Abs(transform.position.x) - Mathf.Abs(_trolleySync.IrrelevantPointTwo.position.x) < _maxX && _runOnce)
+                {
+                    // Got away of the threshold
+                    // If I had the camera, I lose it
+                    // To who? It doesnt matter, all that it matters is that you lost it.
+                    // Fake player decides who gets the camera next.
+                    // OnPlayerLeftThreshold event
+                    // _runOnce = false;
+                }
+
+                //if (Mathf.Abs(transform.position.x) - Mathf.Abs(_trolleySync.IrrelevantPointTwo.position.x) >= _maxX && !_runOnce)
+                //{
+                //    // We are getting through the max distance
+                //    //if(_trolleySync.photonView.OwnerActorNr != PhotonNetwork.LocalPlayer.ActorNumber)
+                //    //{
+                //    //    Debug.Log("Got camera!");
+                //    //    //_trolleySync.photonView.TransferOwnership(PhotonNetwork.LocalPlayer.ActorNumber);
+                //    //    //_camera.Follow = transform;
+                //    //    _fakePlayer.LoseCamera(transform);
+                //    //}
+                //    _runOnce = true;
+                //    Debug.Log("Got camera!");
+                //    _fakePlayer.LoseCamera(transform);
+                //}
+                //else if(Mathf.Abs(transform.position.x) - Mathf.Abs(_trolleySync.IrrelevantPointTwo.position.x) < _maxX && _runOnce &&
+                //    _fakePlayer.photonView.IsMine)//if(_trolleySync.photonView.OwnerActorNr == PhotonNetwork.LocalPlayer.ActorNumber)// && !_trolleySync.ChangingOwner)
+                //{
+                //    Debug.Log("Lost Camera...");
+                //    _runOnce = false;
+                //    _fakePlayer.RegainCamera();
+                //}
 
                 ProcessInput();
             }
@@ -163,6 +196,19 @@ namespace PartyInc
                 main.duration = Time.deltaTime;
 
                 pSys.Play();
+            }
+
+            public void ResetBoost(float duration, float speed)
+            {
+                StartCoroutine(ResetBoostCo(duration, speed));
+            }
+
+            private IEnumerator ResetBoostCo(float duration, float speed)
+            {
+                yield return new WaitForSeconds(duration);
+
+                _rb.velocity = _rb.velocity - Vector3.right * speed;
+                Boosted = false;
             }
 
             private void Die()
@@ -204,7 +250,6 @@ namespace PartyInc
             {
                 if (collision.gameObject.tag == "Obstacle" && (photonView.IsMine || !PhotonNetwork.IsConnected))
                 {
-                    Debug.Log("DUDE");
                     _touchingObstacle = false;
                 }
             }
