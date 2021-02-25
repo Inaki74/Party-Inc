@@ -18,7 +18,7 @@ namespace PartyInc
     {
         private bool _infoReceived;
 
-        private double _interpolationBackTime = (3d / PhotonNetwork.SendRate) + 0.05d; //0.15 = 150ms
+        protected double _interpolationBackTime = (3d / PhotonNetwork.SendRate) + 0.05d; //0.15 = 150ms
         private double _extrapolationLimit = 0.5d;
 
         protected struct State

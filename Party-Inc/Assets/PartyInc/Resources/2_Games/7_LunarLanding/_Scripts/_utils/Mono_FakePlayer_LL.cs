@@ -193,7 +193,7 @@ namespace PartyInc
                 FPSync[] auxQ = q.ToArray();
                 int[] auxWQ = wQ.ToArray();
 
-                for(int i = 0; i < 4; i++)
+                for(int i = 0; i < Mng_GameManager_LL.Current.playerCount; i++)
                 {
                     if(auxQ[i].playerId != auxWQ[i])
                     {

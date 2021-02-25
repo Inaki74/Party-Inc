@@ -135,8 +135,9 @@ GameObject:
   - component: {fileID: 2411606033698287729}
   - component: {fileID: 5049706239924628158}
   - component: {fileID: 7299060948341627436}
-  - component: {fileID: 3254318861431264631}
   - component: {fileID: 3949985066031653253}
+  - component: {fileID: -5508176947256881313}
+  - component: {fileID: 2814714867496080574}
   m_Layer: 13
   m_Name: Pfb_Player_LL
   m_TagString: Player
@@ -274,19 +275,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 93368767e00c34a1d8ec0a1c94045920, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &3254318861431264631
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2411606033698287728}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bd1b58b23925d45f0b118e2be3efb005, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _player: {fileID: 5049706239924628158}
 --- !u!114 &3949985066031653253
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -306,7 +294,37 @@ MonoBehaviour:
   Synchronization: 3
   OwnershipTransfer: 0
   ObservedComponents:
-  - {fileID: 3254318861431264631}
+  - {fileID: -5508176947256881313}
+  - {fileID: 2814714867496080574}
   viewIdField: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0
+--- !u!114 &-5508176947256881313
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2411606033698287728}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bd1b58b23925d45f0b118e2be3efb005, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _player: {fileID: 5049706239924628158}
+--- !u!114 &2814714867496080574
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2411606033698287728}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 64179f3720bbfe947b7724caa67b7c1d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_SynchronizeVelocity: 1
+  m_SynchronizeAngularVelocity: 0
+  m_TeleportEnabled: 0
+  m_TeleportIfDistanceGreaterThan: 3
