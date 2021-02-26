@@ -1,13 +1,13 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using Photon.Pun;
 
 namespace PartyInc
 {
     namespace LL
     {
-        public class Mono_ObstacleDeathCount_LL : MonoBehaviour
+        public class Mono_ObstacleDeathCount_LL : MonoBehaviourPun, IPunInstantiateMagicCallback
         {
             public delegate void ActionObstacleDeath();
             public static event ActionObstacleDeath onObstacleDied;
@@ -15,28 +15,10 @@ namespace PartyInc
             private int _currentDeathCount;
 
             [SerializeField] private int _deathCount;
-            public int CurrentDeathCount
-            {
-                get
-                {
-                    return _currentDeathCount;
-                }
-                set
-                {
-                    _currentDeathCount = value;
-                }
-            }
-
-            private void Start()
-            {
-               
-            }
 
             private void Awake()
             {
                 Mono_ObstaclePassCheck_LL.onGateRendered += GateRendered;
-
-                _currentDeathCount = 6;
             }
 
             private void OnDestroy()
@@ -51,8 +33,20 @@ namespace PartyInc
                 if(_currentDeathCount <= 0f)
                 {
                     onObstacleDied.Invoke();
-                    Destroy(gameObject);
+                    PhotonNetwork.Destroy(gameObject);
                 }
+            }
+
+            public void OnPhotonInstantiate(PhotonMessageInfo info)
+            {
+                StartCoroutine(WaitForDeathCount(info));
+            }
+
+            private IEnumerator WaitForDeathCount(PhotonMessageInfo info)
+            {
+                yield return new WaitUntil(() => info.Sender.CustomProperties.ContainsKey("DeathCount"));
+
+                _currentDeathCount = (int)info.Sender.CustomProperties["DeathCount"];
             }
         }
     }

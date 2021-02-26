@@ -85,6 +85,8 @@ namespace PartyInc
                         Color col = _mr.material.color;
                         col.a = 0.4f;
                         _mr.material.color = col;
+
+                        GetComponent<CapsuleCollider>().enabled = false;
                     }
                 }
             }
@@ -207,12 +209,12 @@ namespace PartyInc
                 RaiseEventOptions raiseEventOptions = new RaiseEventOptions { Receivers = ReceiverGroup.MasterClient };
                 PhotonNetwork.RaiseEvent(Constants.PlayerDiedEventCode, content, raiseEventOptions, ExitGames.Client.Photon.SendOptions.SendReliable);
 
-                Destroy(gameObject);
+                PhotonNetwork.Destroy(gameObject);
             }
 
             private void OnTriggerEnter(Collider other)
             {
-                if(other.gameObject.tag == "DeathPlane" && (photonView.IsMine || !PhotonNetwork.IsConnected))
+                if(other.gameObject.tag == "DeathPlane")
                 {
                     Die();
                 }

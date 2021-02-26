@@ -1,16 +1,16 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Photon.Pun;
 
 namespace PartyInc
 {
     namespace LL
     {
-        public class Mono_ObstacleBoosterPlacement_LL : MonoBehaviour
+        public class Mono_ObstacleBoosterPlacement_LL : MonoBehaviourPun
         {
             [SerializeField] private GameObject _boosterPrefab;
 
-            [SerializeField] private GameObject _booster;
             [SerializeField] private LayerMask _whatIsInvisWall;
             [SerializeField] private Transform _uXY;
             [SerializeField] private Transform _lXY;
@@ -27,9 +27,17 @@ namespace PartyInc
             {
                 if(boosterCount == 0)
                 {
-                    _booster = Instantiate(_boosterPrefab, Vector3.zero, Quaternion.identity);
-                    _booster.transform.parent = transform;
-                    _booster.transform.localPosition = DecideBoosterPosition();
+                    Vector3 toSpawn = DecideBoosterPosition();
+
+                    ExitGames.Client.Photon.Hashtable props = new ExitGames.Client.Photon.Hashtable();
+                    props.Add("BoosterPosition", toSpawn);
+                    props.Add("TubeViewId", photonView.ViewID);
+                    PhotonNetwork.SetPlayerCustomProperties(props);
+
+                    GameObject booster = PhotonNetwork.InstantiateRoomObject("_utils/" + _boosterPrefab.name, Vector3.zero, Quaternion.identity);
+
+                    booster.transform.parent = transform;
+                    booster.transform.localPosition = toSpawn;
                 }
             }
 

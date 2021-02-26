@@ -102,6 +102,7 @@ GameObject:
   - component: {fileID: 8056652589170500190}
   - component: {fileID: -7000760866294044253}
   - component: {fileID: 7801124443990409363}
+  - component: {fileID: -2079752070244345704}
   m_Layer: 0
   m_Name: Pfb_Tube_Obstacle_LL
   m_TagString: Untagged
@@ -170,13 +171,35 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _boosterPrefab: {fileID: 3960368321518676753, guid: 45ec3fb2770e84ac6a8b6b5cfa846de2,
     type: 3}
-  _booster: {fileID: 0}
   _whatIsInvisWall:
     serializedVersion: 2
     m_Bits: 256
   _uXY: {fileID: 2084184017}
   _lXY: {fileID: 1331707350}
   _fpXY: {fileID: 8564280024502084295}
+--- !u!114 &-2079752070244345704
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1321850463287933260}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ObservedComponentsFoldoutOpen: 1
+  Group: 0
+  prefixField: -1
+  observableSearch: 2
+  Synchronization: 3
+  OwnershipTransfer: 0
+  ObservedComponents:
+  - {fileID: -7000760866294044253}
+  viewIdField: 0
+  InstantiationId: 0
+  isRuntimeInstantiated: 0
 --- !u!1 &4694684611080734288
 GameObject:
   m_ObjectHideFlags: 0

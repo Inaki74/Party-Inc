@@ -18,6 +18,25 @@ namespace PartyInc
         {
             [SerializeField] private Mono_Player_Controller_LL _player;
 
+            private void Start()
+            {
+                //_interpolationBackTime = 0.35f;
+            }
+
+            protected override void UpdateOv()
+            {
+                base.UpdateOv();
+
+                Debug.Log(PhotonNetwork.SendRate);
+                Debug.Log(_interpolationBackTime);
+                Debug.Log((3d / PhotonNetwork.SendRate) + 0.05d);
+            }
+
+            protected override void OnDestroyOv()
+            {
+                Debug.Log("Mono_Player_Synchronizer_LL");
+            }
+
             protected override void Extrapolate(State newest, float extrapTime)
             {
                 PlayerInfo newestInfo = newest.info;
@@ -51,6 +70,8 @@ namespace PartyInc
                 stream.SendNext(transform.position);
                 stream.SendNext(_player.Rb.velocity);
             }
+
+
         }
     }
 }

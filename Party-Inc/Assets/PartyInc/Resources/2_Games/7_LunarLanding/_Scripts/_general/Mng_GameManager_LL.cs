@@ -14,9 +14,7 @@ namespace PartyInc
         {
             private List<PlayerResults<int>> _deadPlayers = new List<PlayerResults<int>>();
 
-            public float MyPlayerZ { get; private set; }
-
-            public bool GotSeed { get; private set; }
+            //public bool GotSeed { get; private set; }
 
             private float _startingSpeed = 4f;
             private float _finalSpeed = 15f;
@@ -86,31 +84,26 @@ namespace PartyInc
             {
                 if (PhotonNetwork.IsMasterClient && PhotonNetwork.IsConnected)
                 {
-                    int seed = System.Environment.TickCount;
+                    //int seed = System.Environment.TickCount;
 
-                    Random.InitState(seed);
+                    //Random.InitState(seed);
 
-                    GotSeed = true;
-                    photonView.RPC("SendSeed_RPC", RpcTarget.Others, seed);
+                    //GotSeed = true;
+                    ////photonView.RPC("SendSeed_RPC", RpcTarget.Others, seed);
                 }
                 else if (!PhotonNetwork.IsConnected)
                 {
-                    int seed = System.Environment.TickCount;
+                    //int seed = System.Environment.TickCount;
 
-                    Random.InitState(seed);
+                    //Random.InitState(seed);
 
-                    GotSeed = true;
+                    //GotSeed = true;
                 }
             }
 
             protected override void InitializeGameManagerDependantObjects()
             {
                 InitializePlayers();
-
-                if (!PhotonNetwork.IsConnected)
-                {
-                    MyPlayerZ = 0;
-                }
             }
 
             public override void Init()
@@ -121,8 +114,6 @@ namespace PartyInc
 
                 Mono_ObstaclePassCheck_LL.onPlayerPassed += OnPlayerPassedGate;
                 PhotonNetwork.NetworkingClient.EventReceived += OnPlayerDied;
-
-                MyPlayerZ = -1f;
             }
 
             private void OnDestroy()
@@ -142,7 +133,6 @@ namespace PartyInc
                     if (PhotonNetwork.PlayerList[i].ActorNumber == PhotonNetwork.LocalPlayer.ActorNumber)
                     {
                         decidedPosition = playerPositions[i];
-                        MyPlayerZ = playerPositions[i].z;
                     }
                 }
 
@@ -158,18 +148,18 @@ namespace PartyInc
                         break;
                     case 2:
                         playerPositions[0] = new Vector3(-11f, 0, 0f);
-                        playerPositions[1] = new Vector3(-11f, -3f, 2f);
+                        playerPositions[1] = new Vector3(-11f, -3f, 0f);
                         break;
                     case 3:
                         playerPositions[0] = new Vector3(-11f, 2f, 0f);
-                        playerPositions[1] = new Vector3(-11f, -1f, 2f);
-                        playerPositions[2] = new Vector3(-11f, -4f, 4f);
+                        playerPositions[1] = new Vector3(-11f, -1f, 0f);
+                        playerPositions[2] = new Vector3(-11f, -4f, 0f);
                         break;
                     case 4:
                         playerPositions[0] = new Vector3(-11f, 3.5f, 0f);
-                        playerPositions[1] = new Vector3(-11f, 0.5f, 2f);
-                        playerPositions[2] = new Vector3(-11f, -2.5f, 4f);
-                        playerPositions[3] = new Vector3(-11f, -5.5f, 6f);
+                        playerPositions[1] = new Vector3(-11f, 0.5f, 0f);
+                        playerPositions[2] = new Vector3(-11f, -2.5f, 0f);
+                        playerPositions[3] = new Vector3(-11f, -5.5f, 0f);
                         break;
                     default:
                         break;
@@ -214,6 +204,7 @@ namespace PartyInc
             {
                 GameBegan = false;
 
+                playerResults = _deadPlayers.ToArray();
                 WinnerId = DetermineWinner();
 
                 OnGameFinishInvoke();
@@ -247,8 +238,8 @@ namespace PartyInc
             [PunRPC]
             public void SendSeed_RPC(int seed)
             {
-                GotSeed = true;
-                Random.InitState(seed);
+                //GotSeed = true;
+                //Random.InitState(seed);
             }
 
             [PunRPC]

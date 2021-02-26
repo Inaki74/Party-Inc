@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Photon.Pun;
 
 namespace PartyInc
 {
@@ -11,6 +12,9 @@ namespace PartyInc
             public delegate void ActionGates();
             public static event ActionGates onPlayerPassed;
             public static event ActionGates onGateRendered;
+            public static event ActionGates onGateRenderedBaseCase;
+
+            private Mono_ProceduralGenerator_LL _generator;
 
             [SerializeField] private Renderer _renderer;
 
@@ -27,22 +31,25 @@ namespace PartyInc
                 {
                     _renderer = GetComponent<MeshRenderer>();
                 }
+
+                _generator = FindObjectOfType<Mono_ProceduralGenerator_LL>();
             }
 
             // Update is called once per frame
             void Update()
             {
-                if (!_seenOnce)
-                {
-                    CheckIfVisible();
-                }
-                
-
-                if(HitsPlayer() && !_runOnce)
+                if (HitsPlayer() && !_runOnce)
                 {
                     _runOnce = true;
                     // Spawn next tube
                     onPlayerPassed.Invoke();
+                }
+
+                if (!PhotonNetwork.IsMasterClient) return;
+
+                if (!_seenOnce)
+                {
+                    CheckIfVisible();
                 }
             }
 
@@ -69,6 +76,7 @@ namespace PartyInc
                 {
                     _seenOnce = true;
                     onGateRendered.Invoke();
+                    if (_generator.BaseCase) onGateRenderedBaseCase.Invoke();
                 }
             }
         }

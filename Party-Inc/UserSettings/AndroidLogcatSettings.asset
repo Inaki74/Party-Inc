@@ -3,47 +3,11 @@
     "m_SelectedPackage": {
         "deviceId": "LDG4C18508000010",
         "name": "com.LoopStudios.PartyInc",
-        "processId": 11507,
+        "processId": 20505,
         "exited": false
     },
     "m_SelectedPriority": 0,
     "m_KnownPackagesForSerialization": [
-        {
-            "deviceId": "LDG4C18508000010",
-            "name": "com.FiestaStudios.ProjectFiesta",
-            "processId": 29284,
-            "exited": true
-        },
-        {
-            "deviceId": "LDG4C18508000010",
-            "name": "com.FiestaStudios.ProjectFiesta",
-            "processId": 29832,
-            "exited": true
-        },
-        {
-            "deviceId": "LDG4C18508000010",
-            "name": "com.FiestaStudios.ProjectFiesta",
-            "processId": 11739,
-            "exited": true
-        },
-        {
-            "deviceId": "LDG4C18508000010",
-            "name": "com.FiestaStudios.ProjectFiesta",
-            "processId": 15170,
-            "exited": true
-        },
-        {
-            "deviceId": "LDG4C18508000010",
-            "name": "com.FiestaStudios.ProjectFiesta",
-            "processId": 16717,
-            "exited": true
-        },
-        {
-            "deviceId": "LDG4C18508000010",
-            "name": "com.FiestaStudios.ProjectFiesta",
-            "processId": 19734,
-            "exited": false
-        },
         {
             "deviceId": "LDG4C18508000010",
             "name": "com.whatsapp",
@@ -52,110 +16,98 @@
         },
         {
             "deviceId": "LDG4C18508000010",
-            "name": "com.LoopStudios.PartyInc",
-            "processId": 25801,
+            "name": "com.huawei.android.launcher",
+            "processId": 1819,
             "exited": false
         },
         {
             "deviceId": "LDG4C18508000010",
             "name": "com.LoopStudios.PartyInc",
-            "processId": 27049,
+            "processId": 1609,
+            "exited": true
+        },
+        {
+            "deviceId": "LDG4C18508000010",
+            "name": "com.LoopStudios.PartyInc",
+            "processId": 2274,
+            "exited": true
+        },
+        {
+            "deviceId": "LDG4C18508000010",
+            "name": "com.LoopStudios.PartyInc",
+            "processId": 3062,
+            "exited": true
+        },
+        {
+            "deviceId": "LDG4C18508000010",
+            "name": "com.LoopStudios.PartyInc",
+            "processId": 3986,
+            "exited": true
+        },
+        {
+            "deviceId": "LDG4C18508000010",
+            "name": "com.LoopStudios.PartyInc",
+            "processId": 5333,
+            "exited": true
+        },
+        {
+            "deviceId": "LDG4C18508000010",
+            "name": "com.LoopStudios.PartyInc",
+            "processId": 9263,
             "exited": false
         },
         {
             "deviceId": "LDG4C18508000010",
             "name": "com.LoopStudios.PartyInc",
-            "processId": 28348,
+            "processId": 12157,
             "exited": false
         },
         {
             "deviceId": "LDG4C18508000010",
             "name": "com.LoopStudios.PartyInc",
-            "processId": 29194,
+            "processId": 12987,
             "exited": false
         },
         {
             "deviceId": "LDG4C18508000010",
             "name": "com.LoopStudios.PartyInc",
-            "processId": 29987,
+            "processId": 13355,
             "exited": false
         },
         {
             "deviceId": "LDG4C18508000010",
             "name": "com.LoopStudios.PartyInc",
-            "processId": 30730,
+            "processId": 13957,
             "exited": false
         },
         {
             "deviceId": "LDG4C18508000010",
             "name": "com.LoopStudios.PartyInc",
-            "processId": 31497,
+            "processId": 14567,
             "exited": false
         },
         {
             "deviceId": "LDG4C18508000010",
             "name": "com.LoopStudios.PartyInc",
-            "processId": 32165,
+            "processId": 15604,
             "exited": false
         },
         {
             "deviceId": "LDG4C18508000010",
             "name": "com.LoopStudios.PartyInc",
-            "processId": 510,
+            "processId": 16622,
             "exited": false
         },
         {
             "deviceId": "LDG4C18508000010",
             "name": "com.LoopStudios.PartyInc",
-            "processId": 2046,
+            "processId": 19807,
             "exited": false
         },
         {
             "deviceId": "LDG4C18508000010",
             "name": "com.LoopStudios.PartyInc",
-            "processId": 3160,
-            "exited": false
-        },
-        {
-            "deviceId": "LDG4C18508000010",
-            "name": "com.LoopStudios.PartyInc",
-            "processId": 3656,
-            "exited": false
-        },
-        {
-            "deviceId": "LDG4C18508000010",
-            "name": "com.LoopStudios.PartyInc",
-            "processId": 4237,
-            "exited": false
-        },
-        {
-            "deviceId": "LDG4C18508000010",
-            "name": "com.LoopStudios.PartyInc",
-            "processId": 4592,
-            "exited": false
-        },
-        {
-            "deviceId": "LDG4C18508000010",
-            "name": "com.LoopStudios.PartyInc",
-            "processId": 7485,
-            "exited": false
-        },
-        {
-            "deviceId": "LDG4C18508000010",
-            "name": "com.LoopStudios.PartyInc",
-            "processId": 10088,
-            "exited": false
-        },
-        {
-            "deviceId": "LDG4C18508000010",
-            "name": "com.LoopStudios.PartyInc",
-            "processId": 11104,
-            "exited": false
-        },
-        {
-            "deviceId": "LDG4C18508000010",
-            "name": "com.LoopStudios.PartyInc",
-            "processId": 11507,
+            "processId": 20505,
             "exited": false
         }
     ],

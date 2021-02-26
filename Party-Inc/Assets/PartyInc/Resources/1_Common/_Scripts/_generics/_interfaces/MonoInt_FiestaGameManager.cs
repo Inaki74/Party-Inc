@@ -96,6 +96,12 @@ namespace PartyInc
             Debug.Log("Default GM Awake");
             playerCount = PhotonNetwork.PlayerList.Length;
             PlayersConnectedAndReady = false;
+
+            if(PhotonNetwork.SendRate != 10)
+            {
+                PhotonNetwork.SendRate = 10;
+                PhotonNetwork.SerializationRate = 10;
+            }
         }
 
         /// <summary>

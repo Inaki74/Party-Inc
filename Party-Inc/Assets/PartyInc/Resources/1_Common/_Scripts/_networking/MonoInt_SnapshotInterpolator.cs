@@ -37,6 +37,8 @@ namespace PartyInc
 
         private void OnDestroy()
         {
+            OnDestroyOv();
+
             if (photonView.IsMine)
             {
                 return;
@@ -52,6 +54,8 @@ namespace PartyInc
         // Update is called once per frame
         void Update()
         {
+            UpdateOv();
+            
             if (photonView.IsMine && !_isSharedObject)
             {
                 return;
@@ -151,6 +155,10 @@ namespace PartyInc
                 }
             }
         }
+
+        protected virtual void UpdateOv() { }
+
+        protected virtual void OnDestroyOv() { }
 
         protected abstract void Interpolate(State rhs, State lhs, float t);
 
