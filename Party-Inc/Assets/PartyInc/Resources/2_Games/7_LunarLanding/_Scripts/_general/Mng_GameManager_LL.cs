@@ -80,6 +80,8 @@ namespace PartyInc
                 }
             }
 
+            public float MyPlayerZ { get; private set; } = -1f;
+
             protected override void InStart()
             {
                 if (PhotonNetwork.IsMasterClient && PhotonNetwork.IsConnected)
@@ -133,6 +135,7 @@ namespace PartyInc
                     if (PhotonNetwork.PlayerList[i].ActorNumber == PhotonNetwork.LocalPlayer.ActorNumber)
                     {
                         decidedPosition = playerPositions[i];
+                        MyPlayerZ = playerPositions[i].z;
                     }
                 }
 
@@ -148,18 +151,18 @@ namespace PartyInc
                         break;
                     case 2:
                         playerPositions[0] = new Vector3(-11f, 0, 0f);
-                        playerPositions[1] = new Vector3(-11f, -3f, 0f);
+                        playerPositions[1] = new Vector3(-11f, -3f, 2f);
                         break;
                     case 3:
                         playerPositions[0] = new Vector3(-11f, 2f, 0f);
-                        playerPositions[1] = new Vector3(-11f, -1f, 0f);
-                        playerPositions[2] = new Vector3(-11f, -4f, 0f);
+                        playerPositions[1] = new Vector3(-11f, -1f, 2f);
+                        playerPositions[2] = new Vector3(-11f, -4f, 4f);
                         break;
                     case 4:
                         playerPositions[0] = new Vector3(-11f, 3.5f, 0f);
-                        playerPositions[1] = new Vector3(-11f, 0.5f, 0f);
-                        playerPositions[2] = new Vector3(-11f, -2.5f, 0f);
-                        playerPositions[3] = new Vector3(-11f, -5.5f, 0f);
+                        playerPositions[1] = new Vector3(-11f, 0.5f, 2f);
+                        playerPositions[2] = new Vector3(-11f, -2.5f, 4f);
+                        playerPositions[3] = new Vector3(-11f, -5.5f, 6f);
                         break;
                     default:
                         break;
@@ -236,13 +239,6 @@ namespace PartyInc
             ///
 
             [PunRPC]
-            public void SendSeed_RPC(int seed)
-            {
-                //GotSeed = true;
-                //Random.InitState(seed);
-            }
-
-            [PunRPC]
             public void RPC_SendBegin(double startT)
             {
                 _gameBeginTime = startT;
@@ -264,11 +260,3 @@ namespace PartyInc
         }
     }
 }
-
-
-// F = m*a
-// a = F/m ->
-// a = 100 / 4 -> 25 m/s*s
-// a = 100 / 6 -> 16.6 m/s*s
-// a = 90 / 4 -> 22.5 m/s*s
-

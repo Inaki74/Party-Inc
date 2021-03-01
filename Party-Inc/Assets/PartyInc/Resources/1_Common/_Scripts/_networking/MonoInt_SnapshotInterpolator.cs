@@ -30,25 +30,11 @@ namespace PartyInc
         private State[] _bufferedState = new State[PhotonNetwork.SendRate * 2];
         private int _timestampCount;
 
-        private int _debugEx;
-        private int _debugIn;
-
         protected bool _isSharedObject = false;
 
         private void OnDestroy()
         {
             OnDestroyOv();
-
-            if (photonView.IsMine)
-            {
-                return;
-            }
-
-            if(_debugEx + _debugIn != 0)
-            {
-                Debug.Log("Interpolations: " + _debugIn + " Extrapolations: " + _debugEx);
-                Debug.Log("A percentage of: " + (_debugEx * 100 / (_debugEx + _debugIn)) + " extrapolations.");
-            }
         }
 
         // Update is called once per frame
@@ -93,7 +79,8 @@ namespace PartyInc
                             }
                             // if t=0 => lhs is used directly
                             Interpolate(rhs, lhs, t);
-                            _debugIn++;
+                            Mono_SnapshotInterpolator_Analysis.Current.AmountOfInterpolations++;
+                            Mono_SnapshotInterpolator_Analysis.Current.AcumulativeInterpolatedTime += t;
 
                             return;
                         }
@@ -109,7 +96,11 @@ namespace PartyInc
                     if (extrapTime < _extrapolationLimit)
                     {
                         Extrapolate(newest, extrapTime);
-                        _debugEx++;
+                        Mono_SnapshotInterpolator_Analysis.Current.AmountOfExtrapolations++;
+                        Mono_SnapshotInterpolator_Analysis.Current.AcumulativeExtrapolatedTime += extrapTime;
+
+                        //Debug.Log("Actual Extrapolated Time: " + extrapTime);
+                        //Debug.Log("Average Extrapolated Time: " + Mono_SnapshotInterpolator_Analysis.Current.AcumulativeExtrapolatedTime / Mono_SnapshotInterpolator_Analysis.Current.AmountOfExtrapolations);
                     }
                 }
             }

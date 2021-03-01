@@ -74,6 +74,7 @@ namespace PartyInc
             {
                 if (_renderer.IsVisibleFrom(Camera.main))
                 {
+                    Debug.Log("HI");
                     _seenOnce = true;
                     onGateRendered.Invoke();
                     if (_generator.BaseCase) onGateRenderedBaseCase.Invoke();

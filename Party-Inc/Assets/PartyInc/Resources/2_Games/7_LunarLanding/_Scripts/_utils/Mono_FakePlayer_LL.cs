@@ -71,11 +71,7 @@ namespace PartyInc
                 _originalX = _trolleySync.IrrelevantPoint.position.x;
                 if (_lostCamera)
                 {
-                    transform.position = new Vector3(_playerThatHasCamera.position.x, transform.position.y, 0f);//Vector3.Lerp(transform.position, new Vector3(_playerThatHasCamera.position.x, transform.position.y, 0f), Time.deltaTime * 10f);
-                }
-                else
-                {
-                    //_rb.velocity = new Vector3(Mng_GameManager_LL.Current.MovementSpeed, 0f, 0f);
+                    transform.position = new Vector3(_playerThatHasCamera.position.x, transform.position.y, 0f);
                 }
             }
 
@@ -96,7 +92,7 @@ namespace PartyInc
             {
                 _playerThatHasCamera = null;
                 _lostCamera = false;
-                transform.position = Vector3.right * _originalX;//Vector3.Lerp(transform.position, Vector3.right * _originalX, Time.deltaTime * 10f);
+                transform.position = Vector3.right * _originalX;
             }
 
             private Queue<FPSync> _controlQueue = new Queue<FPSync>();

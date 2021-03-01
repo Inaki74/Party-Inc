@@ -75,6 +75,7 @@ MonoBehaviour:
   - RPC_SliceObject
   - SendSeed_RPC
   - RPC_SendToSpawn
+  - RPC_SendCollision
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1

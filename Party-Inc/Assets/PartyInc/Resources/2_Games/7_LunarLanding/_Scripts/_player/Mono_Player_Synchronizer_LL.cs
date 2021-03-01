@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Photon.Pun;
 using UnityEngine;
 
+
 namespace PartyInc
 {
     namespace LL
@@ -17,28 +18,18 @@ namespace PartyInc
         public class Mono_Player_Synchronizer_LL : MonoInt_SnapshotInterpolator<PlayerInfo>
         {
             [SerializeField] private Mono_Player_Controller_LL _player;
-
-            private void Start()
-            {
-                //_interpolationBackTime = 0.35f;
-            }
+            private bool _colliding;
 
             protected override void UpdateOv()
             {
                 base.UpdateOv();
-
-                Debug.Log(PhotonNetwork.SendRate);
-                Debug.Log(_interpolationBackTime);
-                Debug.Log((3d / PhotonNetwork.SendRate) + 0.05d);
-            }
-
-            protected override void OnDestroyOv()
-            {
-                Debug.Log("Mono_Player_Synchronizer_LL");
             }
 
             protected override void Extrapolate(State newest, float extrapTime)
             {
+                // IDEA: Buffer _colliding but start off with the present collision (RPC). Revisit.
+                if (_colliding) return;
+
                 PlayerInfo newestInfo = newest.info;
 
                 transform.position = newestInfo.position + newestInfo.rbVelocity * extrapTime;
@@ -46,6 +37,8 @@ namespace PartyInc
 
             protected override void Interpolate(State rhs, State lhs, float t)
             {
+                if (_colliding) return;
+
                 PlayerInfo rhsInfo = rhs.info;
                 PlayerInfo lhsInfo = lhs.info;
 
@@ -71,7 +64,16 @@ namespace PartyInc
                 stream.SendNext(_player.Rb.velocity);
             }
 
+            public void InformOfCollision(bool isColliding)
+            {
+                photonView.RPC("RPC_SendCollision", RpcTarget.Others, isColliding);
+            }
 
+            [PunRPC]
+            public void RPC_SendCollision(bool isColliding)
+            {
+                _colliding = isColliding;
+            }
         }
     }
 }

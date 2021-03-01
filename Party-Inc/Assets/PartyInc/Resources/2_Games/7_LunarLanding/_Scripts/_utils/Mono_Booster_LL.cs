@@ -43,6 +43,8 @@ namespace PartyInc
                 {
                     transform.localPosition = (Vector3)info.Sender.CustomProperties["BoosterPosition"];
                 }
+
+                transform.localPosition += new Vector3(0f, 0f, Mng_GameManager_LL.Current.MyPlayerZ);
             }
 
             private void OnTriggerEnter(Collider other)
