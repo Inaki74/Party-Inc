@@ -14,7 +14,7 @@ namespace PartyInc
         public const string SS_KEY_HISCORE = "SSHighScore";
         public const string CC_KEY_HISCORE = "CCHighScore";
         public const string LL_KEY_HISCORE = "LLHighScore";
-        public const string KK_KEY_HISCORE = "KKHighScore";
+        public const string AS_KEY_HISCORE = "ASHighScore";
         public const string CHRCTR_KEY_NETWRK = "ChosenCharacter";
 
         public const string BUNNY_NAME_CHRCTR = "EasterBunny";
