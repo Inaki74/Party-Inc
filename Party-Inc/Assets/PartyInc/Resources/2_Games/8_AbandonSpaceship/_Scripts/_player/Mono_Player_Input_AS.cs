@@ -5,9 +5,9 @@ using Photon.Pun;
 
 namespace PartyInc
 {
-    namespace LL
+    namespace AS
     {
-        public class Mono_Player_Input_LL : MonoBehaviourPun
+        public class Mono_Player_Input_AS : MonoBehaviourPun
         {
             private static float ScreenWidth = Screen.width / 2;
 
@@ -17,7 +17,7 @@ namespace PartyInc
             // Update is called once per frame
             void Update()
             {
-                if (!Mng_GameManager_LL.Current.GameBegan || (PhotonNetwork.IsConnected && !photonView.IsMine)) return;
+                if (!Mng_GameManager_AS.Current.GameBegan || (PhotonNetwork.IsConnected && !photonView.IsMine)) return;
 
                 if (Application.isMobilePlatform)
                 {
@@ -31,7 +31,7 @@ namespace PartyInc
 
             private void MobileInput()
             {
-                if(Input.touchCount > 0)
+                if (Input.touchCount > 0)
                 {
                     Touch t = Input.touches[0];
 
@@ -46,9 +46,9 @@ namespace PartyInc
                         Touch t1 = Input.touches[1];
 
                         GetTouchUp = GetTouchUp || t1.position.x > ScreenWidth;
-                        GetTouchDown =  GetTouchDown || t1.position.x <= ScreenWidth;
+                        GetTouchDown = GetTouchDown || t1.position.x <= ScreenWidth;
                     }
-                    
+
                     if (GetTouchDown)
                     {
                         SprayDownInput = true;
@@ -96,5 +96,3 @@ namespace PartyInc
         }
     }
 }
-
-

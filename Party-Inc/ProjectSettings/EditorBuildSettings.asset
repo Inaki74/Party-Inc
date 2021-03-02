@@ -66,9 +66,9 @@ EditorBuildSettings:
     path: Assets/PartyInc/Scenes/2_Hub/_Lobbies/LL_GameLobby.unity
     guid: 3fc3c0d693ff94185a7cb05b323a5ad8
   - enabled: 1
-    path: Assets/PartyInc/Scenes/2_Hub/_Lobbies/KK_GameLobby.unity
+    path: Assets/PartyInc/Scenes/2_Hub/_Lobbies/AS_GameLobby.unity
     guid: a56f9f7c000c641c88fcd85010bdf96a
   - enabled: 1
-    path: Assets/PartyInc/Scenes/1_Games/KaveKerfuffle.unity
+    path: Assets/PartyInc/Scenes/1_Games/AbandonSpaceship.unity
     guid: d5305a1d19b61493b876a932a068d67d
   m_configObjects: {}

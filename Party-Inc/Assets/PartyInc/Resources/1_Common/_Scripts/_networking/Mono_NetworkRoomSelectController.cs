@@ -103,10 +103,10 @@ namespace PartyInc
                 JoinARoom("LL_", maxPlayers);
         }
 
-        public void JoinKK()
+        public void JoinAS()
         {
             if (gameToJoin == "")
-                JoinARoom("KK_", maxPlayers);
+                JoinARoom("AS_", maxPlayers);
         }
 
         public void JoinARoom(string gameJoining, int maxPlayersAllowed)
