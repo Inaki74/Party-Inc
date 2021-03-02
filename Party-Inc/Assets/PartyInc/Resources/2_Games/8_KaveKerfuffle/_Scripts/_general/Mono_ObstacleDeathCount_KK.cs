@@ -13,6 +13,7 @@ namespace PartyInc
             public static event ActionObstacleDeath onObstacleDied;
 
             private int _currentDeathCount;
+            private bool _enabledThisFrame;
 
             [SerializeField] private int _deathCount;
             public int CurrentDeathCount
@@ -27,6 +28,8 @@ namespace PartyInc
                 }
             }
 
+            public bool IsBase { get; set; } = true;
+
             private void Start()
             {
 
@@ -35,8 +38,25 @@ namespace PartyInc
             private void Awake()
             {
                 Mono_ObstaclePassCheck_KK.onGateRendered += GateRendered;
+            }
 
+            private void Update()
+            {
+                if (_enabledThisFrame)
+                {
+                    _enabledThisFrame = false;
+                }
+            }
+
+            private void OnEnable()
+            {
                 _currentDeathCount = 6;
+                _enabledThisFrame = true;
+            }
+
+            private void OnDisable()
+            {
+                //_currentDeathCount = 6;
             }
 
             private void OnDestroy()
@@ -46,12 +66,14 @@ namespace PartyInc
 
             private void GateRendered()
             {
+                if (!gameObject.activeInHierarchy || _enabledThisFrame) return;
+
                 _currentDeathCount--;
 
                 if (_currentDeathCount <= 0f)
                 {
                     onObstacleDied.Invoke();
-                    Destroy(gameObject);
+                    gameObject.SetActive(false);
                 }
             }
         }

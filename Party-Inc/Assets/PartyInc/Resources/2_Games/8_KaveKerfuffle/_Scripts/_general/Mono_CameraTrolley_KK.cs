@@ -8,6 +8,10 @@ namespace PartyInc
     {
         public class Mono_CameraTrolley_KK : MonoBehaviour
         {
+            [SerializeField] private Cinemachine.CinemachineImpulseSource _shake;
+            [SerializeField] private float _force;
+            [SerializeField] private Vector3 _someSpeed;
+
             // Start is called before the first frame update
             void Start()
             {

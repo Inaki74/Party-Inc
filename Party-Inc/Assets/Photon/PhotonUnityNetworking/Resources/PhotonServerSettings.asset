@@ -76,6 +76,7 @@ MonoBehaviour:
   - SendSeed_RPC
   - RPC_SendToSpawn
   - RPC_SendCollision
+  - RPC_MakeVulnerable
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1

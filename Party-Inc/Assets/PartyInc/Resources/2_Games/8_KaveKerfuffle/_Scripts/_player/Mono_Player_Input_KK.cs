@@ -9,7 +9,7 @@ namespace PartyInc
     {
         public class Mono_Player_Input_KK : MonoBehaviourPun
         {
-            private static float ScreenHeight = Screen.height / 2;
+            private static float ScreenWidth = Screen.width / 2;
 
             public bool SprayUpInput { get; set; }
             public bool SprayDownInput { get; set; }
@@ -35,15 +35,18 @@ namespace PartyInc
                 {
                     Touch t = Input.touches[0];
 
-                    bool GetTouchUp = t.position.y > ScreenHeight;
-                    bool GetTouchDown = t.position.y <= ScreenHeight;
+                    bool GetTouchUp = t.position.x > ScreenWidth;
+                    bool GetTouchDown = t.position.x <= ScreenWidth;
+
+                    Debug.Log("Touch information: " + t.position.x);
+                    Debug.Log("Screen Width: " + ScreenWidth);
 
                     if (Input.touchCount > 1)
                     {
                         Touch t1 = Input.touches[1];
 
-                        GetTouchUp = GetTouchUp || t1.position.y > ScreenHeight;
-                        GetTouchDown = GetTouchDown || t1.position.y <= ScreenHeight;
+                        GetTouchUp = GetTouchUp || t1.position.x > ScreenWidth;
+                        GetTouchDown = GetTouchDown || t1.position.x <= ScreenWidth;
                     }
 
                     if (GetTouchDown)

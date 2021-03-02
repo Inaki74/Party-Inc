@@ -94,15 +94,19 @@ namespace PartyInc
 
                 Vector3 decidedPosition = Vector3.zero;
 
+                Debug.Log("Players");
+
                 for (int i = 0; i < playerCount; i++)
                 {
                     if (PhotonNetwork.PlayerList[i].ActorNumber == PhotonNetwork.LocalPlayer.ActorNumber)
                     {
+                        Debug.Log("Positions");
                         decidedPosition = playerPositions[i];
                         MyPlayerZ = playerPositions[i].z;
                     }
                 }
 
+                Debug.Log("INSTANTIATE");
                 PhotonNetwork.Instantiate("_player/" + playerPrefab.name, decidedPosition, Quaternion.identity);
             }
 
@@ -155,17 +159,20 @@ namespace PartyInc
                         MovementSpeed = _startingSpeed + InGameTime * ((_finalSpeed - _startingSpeed) / _timeToReachFinalSpeedInSeconds);
                     }
 
-                    if (_deadPlayers.Count == playerCount)
+                    if(_deadPlayers.Count >= playerCount && PhotonNetwork.IsConnected)
                     {
-                        FinishGame();
+                        StartCoroutine(FinishGame());
                     }
                 }
             }
 
-            private void FinishGame()
+            private IEnumerator FinishGame()
             {
                 GameBegan = false;
 
+                yield return new WaitForSeconds(0.5f);
+
+                playerResults = _deadPlayers.ToArray();
                 WinnerId = DetermineWinner();
 
                 OnGameFinishInvoke();
@@ -220,6 +227,8 @@ namespace PartyInc
                     res.playerId = (int)data[1];
 
                     _deadPlayers.Add(res);
+
+                    Debug.Log("PLAYER DIED: " + res.playerId);
                 }
             }
         }

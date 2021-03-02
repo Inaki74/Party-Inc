@@ -11,7 +11,6 @@ namespace PartyInc
         {
             public Vector3 position;
             public Vector3 rbVelocity;
-
         }
 
         public class Mono_Player_Synchronizer_KK : MonoInt_SnapshotInterpolator<PlayerInfo>

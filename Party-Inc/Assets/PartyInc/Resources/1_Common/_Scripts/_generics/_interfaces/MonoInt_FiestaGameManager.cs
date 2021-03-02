@@ -110,7 +110,9 @@ namespace PartyInc
         /// <returns></returns>
         private IEnumerator AllPlayersReady()
         {
+            Debug.Log("ONE");
             yield return new WaitUntil(() => networkController.playersAreReady || !PhotonNetwork.IsConnected);
+            Debug.Log("TWO");
 
             PlayersConnectedAndReady = true;
 

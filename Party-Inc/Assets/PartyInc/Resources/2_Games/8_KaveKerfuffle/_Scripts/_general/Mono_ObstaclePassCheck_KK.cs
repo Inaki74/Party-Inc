@@ -37,13 +37,24 @@ namespace PartyInc
                     CheckIfVisible();
                 }
 
-
                 if (HitsPlayer() && !_runOnce)
                 {
                     _runOnce = true;
                     // Spawn next tube
                     onPlayerPassed.Invoke();
                 }
+            }
+
+            private void OnEnable()
+            {
+                _seenOnce = false;
+                _runOnce = false;
+            }
+
+            private void OnDisable()
+            {
+                _seenOnce = false;
+                _runOnce = false;
             }
 
             private bool HitsPlayer()
@@ -67,7 +78,6 @@ namespace PartyInc
             {
                 if (_renderer.IsVisibleFrom(Camera.main))
                 {
-                    Debug.Log("AAAA");
                     _seenOnce = true;
                     onGateRendered.Invoke();
                 }

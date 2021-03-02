@@ -131,8 +131,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _rb: {fileID: 2010166015829371054}
   _input: {fileID: 6223691227016905655}
+  _sync: {fileID: 8949210133077651396}
   _mr: {fileID: 6906636152690705139}
+  _cc: {fileID: 6906636152690705140}
   _mineMaterial: {fileID: 2100000, guid: d53ea8f57893840e8900f343d495a4ce, type: 2}
+  _deathParticlesPrefab: {fileID: 5545042365561535575, guid: e1a78c2f750284d97aa71e31bb4b422f,
+    type: 3}
   _top: {fileID: 9128499670965789875}
   _bottom: {fileID: 9128499670175346348}
   _spray: {fileID: 5701755198615425071, guid: 8cb855c99482d44f4bc5200f20223187, type: 3}
@@ -184,7 +188,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8183cd1fe355a4ad488f4b75f26fa6d0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _player: {fileID: 0}
+  _player: {fileID: 4651885250398484406}
 --- !u!1 &9128499670175346348
 GameObject:
   m_ObjectHideFlags: 0
