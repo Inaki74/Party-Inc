@@ -2,6 +2,11 @@
 #
 # Get latest from https://github.com/github/gitignore/blob/master/Unity.gitignore
 #
+
+# Party Inc specific gitignore line, 3_Art stores all big files that won't be uploaded to # Unity
+[Aa]ssets/PartyInc/Resources/3_Art/
+
+# Common unity gitignore
 [Ll]ibrary/
 [Tt]emp/
 [Oo]bj/
