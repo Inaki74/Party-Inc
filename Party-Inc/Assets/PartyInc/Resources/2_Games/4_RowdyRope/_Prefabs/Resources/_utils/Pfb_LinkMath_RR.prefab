@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: -2808559238481990482}
   - component: {fileID: 6897827171161081961}
   m_Layer: 0
-  m_Name: Link
+  m_Name: Pfb_LinkMath_RR
   m_TagString: Rope
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -96,7 +96,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   groundPlane: {fileID: 1725556111600110868, guid: fee07fba20d9a4e8fa225d3b37191e12,
     type: 3}
-  Cc: {fileID: 0}
+  Cc: {fileID: 6897827171161081961}
 --- !u!54 &-2808559238481990482
 Rigidbody:
   m_ObjectHideFlags: 0
