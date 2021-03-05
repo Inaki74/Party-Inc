@@ -21,8 +21,6 @@ namespace PartyInc
             void Start()
             {
                 _seed = Time.time;
-
-                SimulateGeneration();
             }
 
             // Update is called once per frame

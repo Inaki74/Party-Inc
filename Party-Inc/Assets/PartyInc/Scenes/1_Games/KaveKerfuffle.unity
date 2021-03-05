@@ -151,7 +151,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _amplitude: 2
-  _frequency: 1
+  _frequency: 4
 --- !u!4 &5945834
 Transform:
   m_ObjectHideFlags: 0
