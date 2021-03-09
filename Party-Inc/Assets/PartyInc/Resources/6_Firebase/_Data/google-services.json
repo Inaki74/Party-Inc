@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "1081888976378",
+    "project_id": "partyinc-testing",
+    "storage_bucket": "partyinc-testing.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1081888976378:android:875f1a63eff3acd2e4c843",
+        "android_client_info": {
+          "package_name": "com.LoopStudios.PartyInc"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1081888976378-kpeamv0irqimt88s49hg1voactgqkeca.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB-ysO8KKAJnqI6RfV0speplt0hhRNLBI0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1081888976378-kpeamv0irqimt88s49hg1voactgqkeca.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "1081888976378-5aabikjdumb8erl2lvcv6edicbo94qhc.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.LoopStudios.PartyInc"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
