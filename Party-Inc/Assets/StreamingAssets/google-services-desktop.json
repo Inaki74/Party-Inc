@@ -1,0 +1,37 @@
+{
+  "client": [
+    {
+      "services": {
+        "appinvite_service": {
+          "status": 1
+        }, 
+        "analytics_service": {
+          "status": 0
+        }
+      }, 
+      "oauth_client": [
+        {
+          "client_id": "1081888976378-5aabikjdumb8erl2lvcv6edicbo94qhc.apps.googleusercontent.com"
+        }
+      ], 
+      "api_key": [
+        {
+          "current_key": "AIzaSyAUeYlZ8TyCcGPGoAERnWCdksqVsHbquTc"
+        }
+      ], 
+      "client_info": {
+        "mobilesdk_app_id": "1:1081888976378:ios:c7cf8caea9b3a6e2e4c843", 
+        "android_client_info": {
+          "package_name": "com.LoopStudios.PartyInc"
+        }
+      }
+    }
+  ], 
+  "configuration_version": "1", 
+  "project_info": {
+    "storage_bucket": "partyinc-testing.appspot.com", 
+    "project_id": "partyinc-testing", 
+    "firebase_url": "https://partyinc-testing-default-rtdb.firebaseio.com", 
+    "project_number": "1081888976378"
+  }
+}

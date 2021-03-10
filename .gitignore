@@ -5,6 +5,7 @@
 
 # Party Inc specific gitignore line, 3_Art stores all big files that won't be uploaded to # Unity
 Party-Inc/Assets/PartyInc/Resources/3_Art/
+Party-Inc/Assets/CustomPackages
 
 # Common unity gitignore
 [Ll]ibrary/
