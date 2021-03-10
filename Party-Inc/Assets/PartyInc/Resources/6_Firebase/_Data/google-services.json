@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "1081888976378",
+    "firebase_url": "https://partyinc-testing-default-rtdb.firebaseio.com",
     "project_id": "partyinc-testing",
     "storage_bucket": "partyinc-testing.appspot.com"
   },
@@ -13,6 +14,14 @@
         }
       },
       "oauth_client": [
+        {
+          "client_id": "1081888976378-54bmbom1d6npfe6di9943s8tj0n4ne5j.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.LoopStudios.PartyInc",
+            "certificate_hash": "0b7330519f4cf18606d45a4e86c1f7b7e5f18dcc"
+          }
+        },
         {
           "client_id": "1081888976378-kpeamv0irqimt88s49hg1voactgqkeca.apps.googleusercontent.com",
           "client_type": 3
