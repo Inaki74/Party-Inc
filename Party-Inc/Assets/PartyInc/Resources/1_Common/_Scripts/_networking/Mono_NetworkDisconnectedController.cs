@@ -19,9 +19,10 @@ namespace PartyInc
 
         private float timeElapsed;
 
-        // Start is called before the first frame update
-        void Start()
+        public override void OnEnable()
         {
+            base.OnEnable();
+
             PhotonNetwork.ConnectUsingSettings();
 
             timeElapsed = 0f;
@@ -51,7 +52,7 @@ namespace PartyInc
         {
             Debug.Log("Fiesta Time/ DisconnectedController: Successfully reconnected!");
             // Reloads lobby
-            SceneManager.LoadScene(1);
+            gameObject.SetActive(false);
         }
 
         #endregion

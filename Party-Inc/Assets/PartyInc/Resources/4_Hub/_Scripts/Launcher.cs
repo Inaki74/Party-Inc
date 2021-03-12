@@ -41,20 +41,8 @@ namespace PartyInc
             if (!PhotonNetwork.IsConnected)
             {
                 PhotonNetwork.ConnectUsingSettings();
-                startButton.interactable = false;
-                connectingText.enabled = true;
-            }
-            else
-            {
-                startButton.interactable = true;
-                connectingText.enabled = false;
             }
             
-            if (PlayerPrefs.HasKey(Constants.NAME_KEY_NETWRK))
-            {
-                PhotonNetwork.NickName = PlayerPrefs.GetString(Constants.NAME_KEY_NETWRK);
-                nameInput.text = PlayerPrefs.GetString(Constants.NAME_KEY_NETWRK);
-            }
         }
 
         public override void OnEnable()

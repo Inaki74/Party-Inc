@@ -124,7 +124,6 @@ namespace PartyInc
 
         public override void OnDisconnected(DisconnectCause cause)
         {
-            Debug.Log("Fiesta Time/ NetworkController: You have disconnected from the server. Cause: " + cause + " Retrying...");
             // If you disconnected abruptly we could:
             // - Keep it that way
             // - Or we could try to recover from the situation (dont know how to do it) TODO
