@@ -26,7 +26,7 @@ namespace PartyInc
         // Start is called before the first frame update
         void Start()
         {
-            nameText.text = "Welcome " + Fb_FirebaseAuthenticateManager.Current.Auth.CurrentUser.DisplayName + "!";
+            nameText.text = "Welcome " + PartyFirebase.Auth.Fb_FirebaseAuthenticateManager.Current.Auth.CurrentUser.DisplayName + "!";
 
             if (PhotonNetwork.IsConnected)
             {
@@ -181,7 +181,7 @@ namespace PartyInc
 
         public void SignOut()
         {
-            Fb_FirebaseAuthenticateManager.Current.Auth.SignOut();
+            PartyFirebase.Auth.Fb_FirebaseAuthenticateManager.Current.Auth.SignOut();
             SceneManager.LoadScene(Stt_SceneIndexes.LAUNCHER_SIGNIN);
         }
     }

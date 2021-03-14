@@ -4,8 +4,12 @@ using UnityEngine;
 
 namespace PartyInc
 {
-    public interface IFb_FirestoreMapStructure
+    namespace PartyFirebase.Firestore
     {
-        Dictionary<string, object> ToDictionary();
+        public interface IFb_FirestoreMapStructure
+        {
+            Dictionary<string, object> ToDictionary();
+        }
     }
+     
 }

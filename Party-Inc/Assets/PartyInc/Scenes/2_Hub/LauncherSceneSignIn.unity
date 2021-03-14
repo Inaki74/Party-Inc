@@ -649,6 +649,7 @@ GameObject:
   - component: {fileID: 734136225}
   - component: {fileID: 734136229}
   - component: {fileID: 734136228}
+  - component: {fileID: 734136230}
   - component: {fileID: 734136227}
   m_Layer: 0
   m_Name: FirebaseServices
@@ -721,6 +722,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _errorText: {fileID: 4712598333026311069}
+--- !u!114 &734136230
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 734136224}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fb3798a63931b47e78c68eda49c7610c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &818945575
 GameObject:
   m_ObjectHideFlags: 0
@@ -1836,7 +1849,8 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 8191744741492372257, guid: eaeb6e18e4d0b4da78adaabeec80ff22, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: eaeb6e18e4d0b4da78adaabeec80ff22, type: 3}
 --- !u!222 &4712598333026311066
 CanvasRenderer:
@@ -1879,7 +1893,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 1
+  m_RaycastTarget: 0
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:

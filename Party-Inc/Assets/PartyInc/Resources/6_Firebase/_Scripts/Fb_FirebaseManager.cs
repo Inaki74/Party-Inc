@@ -8,74 +8,79 @@ using System;
 
 namespace PartyInc
 {
-    public class Fb_FirebaseManager : MonoSingleton<Fb_FirebaseManager>
+    namespace PartyFirebase
     {
-        private FirebaseApp _app;
-        public FirebaseApp App
+        public class Fb_FirebaseManager : MonoSingleton<Fb_FirebaseManager>
         {
-            get
+            private FirebaseApp _app;
+            public FirebaseApp App
             {
-                return _app;
-            }
-            private set
-            {
-                _app = value;
-            }
-        }
-
-        private bool _connectedToFirebaseServices;
-
-        public override void Init()
-        {
-            base.Init();
-            FirebaseInit();
-        }
-
-        private void FirebaseInit()
-        {
-            // Initialize Analytics
-            FirebaseApp.CheckAndFixDependenciesAsync().ContinueWithOnMainThread(task =>
-            {
-                if (task.IsCompleted)
+                get
                 {
-                    _app = FirebaseApp.DefaultInstance;
+                    return _app;
+                }
+                private set
+                {
+                    _app = value;
+                }
+            }
 
-                    // Setup firebase services basics
-                    FirebaseAnalytics.SetAnalyticsCollectionEnabled(true);
-                    Debug.Log("Analytics set up successfully.");
+            private bool _connectedToFirebaseServices;
 
-                    _connectedToFirebaseServices = true;
+            public override void Init()
+            {
+                base.Init();
+                FirebaseInit();
+            }
+
+            private void FirebaseInit()
+            {
+                // Initialize Analytics
+                FirebaseApp.CheckAndFixDependenciesAsync().ContinueWithOnMainThread(task =>
+                {
+                    if (task.IsCompleted)
+                    {
+                        _app = FirebaseApp.DefaultInstance;
+
+                        // Setup firebase services basics
+                        FirebaseAnalytics.SetAnalyticsCollectionEnabled(true);
+                        Debug.Log("Analytics set up successfully.");
+
+                        _connectedToFirebaseServices = true;
+                    }
+                    else
+                    {
+                        // Something went wrong.
+                        Debug.LogError("ERROR: Failed to connect to Firebase.");
+                        Debug.LogError(task.Result.ToString());
+                        Debug.LogError(task.Exception.InnerException.Message);
+                    }
+                });
+            }
+
+            public void InitializeService(Action initMethod)
+            {
+                if (_connectedToFirebaseServices)
+                {
+                    initMethod();
                 }
                 else
                 {
-                    // Something went wrong.
-                    Debug.LogError("ERROR: Failed to connect to Firebase.");
-                    Debug.LogError(task.Result.ToString());
-                    Debug.LogError(task.Exception.InnerException.Message);
+                    Debug.Log("We are not connected yet to Firebase services...");
+                    Debug.Log("Awaiting connection to Firebase...");
+                    StartCoroutine(AwaitForConnection(initMethod));
                 }
-            });
-        }
+            }
 
-        public void InitializeService(Action initMethod)
-        {
-            if (_connectedToFirebaseServices)
+            private IEnumerator AwaitForConnection(Action initMethod)
             {
+                yield return new WaitUntil(() => _connectedToFirebaseServices);
                 initMethod();
             }
-            else
-            {
-                Debug.Log("We are not connected yet to Firebase services...");
-                Debug.Log("Awaiting connection to Firebase...");
-                StartCoroutine(AwaitForConnection(initMethod));
-            }
-        }
-
-        private IEnumerator AwaitForConnection(Action initMethod)
-        {
-            yield return new WaitUntil(() => _connectedToFirebaseServices);
-            initMethod();
         }
     }
+
+       
 }
 
 

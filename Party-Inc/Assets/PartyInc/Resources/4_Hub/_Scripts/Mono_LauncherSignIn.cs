@@ -22,14 +22,9 @@ namespace PartyInc
                 _signInButton.interactable = false;
                 _signUpButton.interactable = false;
 
-                Fb_FirebaseManager.Current.InitializeService(InitButtons);
+                PartyFirebase.Fb_FirebaseManager.Current.InitializeService(InitButtons);
             }
 
-            // Update is called once per frame
-            void Update()
-            {
-
-            }
 
             private void InitButtons()
             {
@@ -39,7 +34,7 @@ namespace PartyInc
 
             public void SignIn()
             {
-                Fb_FirebaseAuthenticateManager.Current.SignInEmailPassword(_emailField.text, _passwordField.text);
+                PartyFirebase.Auth.Fb_FirebaseAuthenticateManager.Current.SignInEmailPassword(_emailField.text, _passwordField.text);
             }
 
             public void SignUp()

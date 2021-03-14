@@ -59,7 +59,15 @@ namespace PartyInc
 
         public void ReturnToLobby()
         {
-            SceneManager.LoadScene(0);
+            if(PartyFirebase.Auth.Fb_FirebaseAuthenticateManager.Current.Auth.CurrentUser != null)
+            {
+                SceneManager.LoadScene(Stt_SceneIndexes.HUB);
+            }
+            else
+            {
+                SceneManager.LoadScene(Stt_SceneIndexes.LAUNCHER_SIGNIN);
+            }
+            
         }
     }
 }
