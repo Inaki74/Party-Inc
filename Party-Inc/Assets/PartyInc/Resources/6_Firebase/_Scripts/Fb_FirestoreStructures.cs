@@ -508,6 +508,36 @@ namespace PartyInc
                 }
             }
 
+            public class FSGoal
+            {
+
+            }
+
+            public class FSTeam
+            {
+
+            }
+
+            public class FSAsset
+            {
+
+            }
+
+            public class FSPlayerSocial
+            {
+
+            }
+
+            public class FSChatsGroup
+            {
+
+            }
+
+            public class FSChatsSingular
+            {
+
+            }
+
             public class TestCollection : IFb_FirestoreMapStructure
             {
                 public List<string> testList;
