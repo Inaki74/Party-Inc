@@ -410,6 +410,9 @@ namespace PartyInc
                 }
             }
 
+            /// <summary>
+            /// The class in charge of the Sessions sub-collection of the Players collection structure.
+            /// </summary>
             public class FSSessions
             {
                 public bool isRanked;
