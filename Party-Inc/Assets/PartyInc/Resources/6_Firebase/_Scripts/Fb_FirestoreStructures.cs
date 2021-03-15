@@ -26,37 +26,41 @@ namespace PartyInc
             ///
             public class FSPlayer : IFb_FirestoreMapStructure
             {
+                public CollectionReference sessions;
+                public List<string> achievements;
                 public List<string> assets;
                 public Dictionary<string, object> character;
                 public Dictionary<string, object> data;
                 public Dictionary<string, object> stats;
-                public Dictionary<string, object> tasks;
+                public Dictionary<string, object> goals;
 
                 public FSPlayer()
                 {
+                    achievements = new List<string>();
                     assets = new List<string>();
-                    character = new Dictionary<string, object>();
-                    data = new Dictionary<string, object>();
-                    stats = new Dictionary<string, object>();
-                    tasks = new Dictionary<string, object>();
+                    character = new FSCharacter().ToDictionary();
+                    data = new FSData().ToDictionary();
+                    stats = new FSStats().ToDictionary();
+                    goals = new Dictionary<string, object>();
                 }
 
-                public FSPlayer(List<string> ass, FSCharacter ch, FSData dat, FSStats st)
+                public FSPlayer(List<string> achievements, List<string> assets, FSCharacter character, FSData data, FSStats stats)
                 {
-                    assets = ass;
-                    character = ch.ToDictionary();
-                    data = dat.ToDictionary();
-                    stats = st.ToDictionary();
-                    tasks = new Dictionary<string, object>();
+                    this.achievements = achievements;
+                    this.assets = assets;
+                    this.character = character.ToDictionary();
+                    this.data = data.ToDictionary();
+                    this.stats = stats.ToDictionary();
+                    this.goals = new Dictionary<string, object>();
                 }
 
-                public void AddTask(string taskid, double progress)
+                public void AddGoal(string goalid, double progress)
                 {
-                    Dictionary<string, object> task = new Dictionary<string, object>();
+                    Dictionary<string, object> goal = new Dictionary<string, object>();
 
-                    task.Add(taskid, progress);
+                    goal.Add(goalid, progress);
 
-                    tasks.Add(Fb_Constants.FIRESTORE_KEY_PLAYER_TASKS, progress);
+                    goals.Add(Fb_Constants.FIRESTORE_KEY_PLAYER_TASKS, goal);
                 }
 
                 public Dictionary<string, object> ToDictionary()
@@ -67,7 +71,7 @@ namespace PartyInc
                     dic.Add(Fb_Constants.FIRESTORE_KEY_PLAYER_CHARACTER, character);
                     dic.Add(Fb_Constants.FIRESTORE_KEY_PLAYER_DATA, data);
                     dic.Add(Fb_Constants.FIRESTORE_KEY_PLAYER_STATS, stats);
-                    dic.Add(Fb_Constants.FIRESTORE_KEY_PLAYER_TASKS, tasks);
+                    dic.Add(Fb_Constants.FIRESTORE_KEY_PLAYER_TASKS, goals);
 
                     return dic;
                 }
@@ -81,15 +85,15 @@ namespace PartyInc
                     public FSCharacter()
                     {
                         currentoutfit = 0;
-                        face = new Dictionary<string, object>();
+                        face = new FSFace().ToDictionary();
                         outfits = new Dictionary<string, object>();
                     }
 
-                    public FSCharacter(int co, FSFace f)
+                    public FSCharacter(int currentoutfit, FSFace face)
                     {
-                        currentoutfit = co;
-                        face = f.ToDictionary();
-                        outfits = new Dictionary<string, object>();
+                        this.currentoutfit = currentoutfit;
+                        this.face = face.ToDictionary();
+                        this.outfits = new Dictionary<string, object>();
                     }
 
                     public Dictionary<string, object> ToDictionary()
@@ -138,22 +142,22 @@ namespace PartyInc
                         {
                             browcolor = null;
                             browid = null;
-                            eyesockets = new Dictionary<string, object>();
+                            eyesockets = new FSEyesockets().ToDictionary();
                             facemarkid = null;
                             makeupcolor = null;
                             makeupid = null;
-                            mouth = new Dictionary<string, object>();
+                            mouth = new FSMouth().ToDictionary();
                         }
 
-                        public FSFace(string bcol, string bid, FSEyesockets eyes, string fid, string mcol, string mid, FSMouth m)
+                        public FSFace(string browcolor, string browid, FSEyesockets eyesockets, string facemarkid, string makeupcolor, string makeupid, FSMouth mouth)
                         {
-                            browcolor = bcol;
-                            browid = bid;
-                            eyesockets = eyes.ToDictionary();
-                            facemarkid = fid;
-                            makeupcolor = mcol;
-                            makeupid = mid;
-                            mouth = m.ToDictionary();
+                            this.browcolor = browcolor;
+                            this.browid = browid;
+                            this.eyesockets = eyesockets.ToDictionary();
+                            this.facemarkid = facemarkid;
+                            this.makeupcolor = makeupcolor;
+                            this.makeupid = makeupid;
+                            this.mouth = mouth.ToDictionary();
                         }
 
                         public Dictionary<string, object> ToDictionary()
@@ -192,15 +196,15 @@ namespace PartyInc
                                 squash = 0d;
                             }
 
-                            public FSEyesockets(string eyecol, string eyei, double h, double r, double sc, double sq, double sep)
+                            public FSEyesockets(string eyecolor, string eyeid, double height, double rotation, double scale, double squash, double separation)
                             {
-                                eyecolor = eyecol;
-                                eyeid = eyei;
-                                height = h;
-                                rotation = r;
-                                scale = sc;
-                                separation = sep;
-                                squash = sq;
+                                this.eyecolor = eyecolor;
+                                this.eyeid = eyeid;
+                                this.height = height;
+                                this.rotation = rotation;
+                                this.scale = scale;
+                                this.separation = separation;
+                                this.squash = squash;
                             }
 
                             public Dictionary<string, object> ToDictionary()
@@ -236,13 +240,13 @@ namespace PartyInc
                                 scale = 0d;
                             }
 
-                            public FSMouth(double h, string mcol, string mid, double sc, double sq)
+                            public FSMouth(double height, string mouthcolor, string mouthid, double scale, double squash)
                             {
-                                mouthcolor = mcol;
-                                mouthid = mid;
-                                height = h;
-                                squash = sq;
-                                scale = sc;
+                                this.mouthcolor = mouthcolor;
+                                this.mouthid = mouthid;
+                                this.height = height;
+                                this.squash = squash;
+                                this.scale = scale;
                             }
 
                             public Dictionary<string, object> ToDictionary()
@@ -279,7 +283,7 @@ namespace PartyInc
                         birthdate = null;
                         city = null;
                         country = null;
-                        currencies = new Dictionary<string, object>();
+                        currencies = new FSCurrencies().ToDictionary();
                         language = null;
                         nickname = null;
                         picture = null;
@@ -287,17 +291,17 @@ namespace PartyInc
                         wallpaperid = null;
                     }
 
-                    public FSData(object bdate, string cit, string count, FSCurrencies curr, string lang, string nick, string pic, string wid)
+                    public FSData(object birthdate, string city, string country, FSCurrencies currency, string language, string nickname, string picture, string wallpaperid)
                     {
-                        birthdate = bdate;
-                        city = cit;
-                        country = count;
-                        currencies = curr.ToDictionary();
-                        language = lang;
-                        nickname = nick;
-                        picture = pic;
-                        regdate = FieldValue.ServerTimestamp;
-                        wallpaperid = wid;
+                        this.birthdate = birthdate;
+                        this.city = city;
+                        this.country = country;
+                        this.currencies = currency.ToDictionary();
+                        this.language = language;
+                        this.nickname = nickname;
+                        this.picture = picture;
+                        this.regdate = FieldValue.ServerTimestamp;
+                        this.wallpaperid = wallpaperid;
                     }
 
                     public Dictionary<string, object> ToDictionary()
@@ -330,11 +334,11 @@ namespace PartyInc
                             lives = 0;
                         }
 
-                        public FSCurrencies(int b, int p, int l)
+                        public FSCurrencies(int baseC, int premium, int lives)
                         {
-                            baseC = b;
-                            premium = p;
-                            lives = l;
+                            this.baseC = baseC;
+                            this.premium = premium;
+                            this.lives = lives;
                         }
 
                         public Dictionary<string, object> ToDictionary()
@@ -369,13 +373,13 @@ namespace PartyInc
                         mmr = 0;
                     }
 
-                    public FSStats(int l, int mp, int mw, int mm, int xp)
+                    public FSStats(int level, int matchesplayed, int matcheswon, int mmr, int experience)
                     {
-                        level = l;
-                        matchesplayed = mp;
-                        matcheswon = mw;
-                        mmr = mm;
-                        experience = xp;
+                        this.level = level;
+                        this.matchesplayed = matchesplayed;
+                        this.matcheswon = matcheswon;
+                        this.mmr = mmr;
+                        this.experience = experience;
                     }
 
                     public void AddGameStats(string gamename, int matchesplayed, int matcheswon, int recordscore, object recorddate)
@@ -402,6 +406,101 @@ namespace PartyInc
                         dictionary.Add(Fb_Constants.FIRESTORE_KEY_PLAYER_STATS_MMR, mmr);
 
                         return dictionary;
+                    }
+                }
+            }
+
+            public class FSSessions
+            {
+                public bool isRanked;
+                public object date;
+                public List<Dictionary<string, object>> matches;
+                public List<Dictionary<string, object>> players;
+
+                public FSSessions()
+                {
+                    this.isRanked = false;
+                    this.date = FieldValue.ServerTimestamp;
+                    this.matches = new List<Dictionary<string, object>>();//FSMatches().ToDictionary();
+                    this.players = new List<Dictionary<string, object>>();//FSSessionPlayers().ToDictionary();
+                }
+
+                public FSSessions(bool isRanked, object date, List<Dictionary<string, object>> matches, List<Dictionary<string, object>> players)
+                {
+                    this.isRanked = isRanked;
+                    this.date = date;
+                    this.matches = matches;
+                    this.players = players;
+                }
+
+                public void AddPlayer(string uid, int mmr, string name)
+                {
+                    Dictionary<string, object> plyr = new Dictionary<string, object>();
+
+                    plyr.Add(Fb_Constants.FIRESTORE_KEY_PLAYER_SESSIONS_PLAYERS_ID, uid);
+                    plyr.Add(Fb_Constants.FIRESTORE_KEY_PLAYER_SESSIONS_PLAYERS_MMR, mmr);
+                    plyr.Add(Fb_Constants.FIRESTORE_KEY_PLAYER_SESSIONS_PLAYERS_NAME, name);
+
+                    players.Add(plyr);
+                }
+
+                public void AddMatch(string gameName, List<FSSessionMatchPlayer> players)
+                {
+                    Dictionary<string, object> mtch = new Dictionary<string, object>();
+                    List<Dictionary<string, object>> plyrsDic = new List<Dictionary<string, object>>();
+
+                    foreach(FSSessionMatchPlayer p in players)
+                    {
+                        plyrsDic.Add(p.ToDictionary());
+                    }
+
+                    mtch.Add(Fb_Constants.FIRESTORE_KEY_PLAYER_SESSIONS_MATCHES_GAMENAME, gameName);
+                    mtch.Add(Fb_Constants.FIRESTORE_KEY_PLAYER_SESSIONS_MATCHES_PLAYERS, plyrsDic);
+
+                    matches.Add(mtch);
+                }
+
+                public Dictionary<string, object> ToDictionary()
+                {
+                    Dictionary<string, object> dic = new Dictionary<string, object>();
+
+                    dic.Add(Fb_Constants.FIRESTORE_KEY_PLAYER_SESSIONS_ISRANKED, isRanked);
+                    dic.Add(Fb_Constants.FIRESTORE_KEY_PLAYER_SESSIONS_DATE , date);
+                    dic.Add(Fb_Constants.FIRESTORE_KEY_PLAYER_SESSIONS_MATCHES, matches);
+                    dic.Add(Fb_Constants.FIRESTORE_KEY_PLAYER_SESSIONS_PLAYERS, players);
+
+                    return dic;
+                }
+
+                public class FSSessionMatchPlayer
+                {
+                    public string nickname;
+                    public int score;
+                    public string uid;
+
+                    public FSSessionMatchPlayer()
+                    {
+                        nickname = null;
+                        score = 0;
+                        uid = null;
+                    }
+
+                    public FSSessionMatchPlayer(string nickname, string uid, int score)
+                    {
+                        this.nickname = nickname;
+                        this.uid = uid;
+                        this.score = score;
+                    }
+
+                    public Dictionary<string, object> ToDictionary()
+                    {
+                        Dictionary<string, object> dic = new Dictionary<string, object>();
+
+                        dic.Add(Fb_Constants.FIRESTORE_KEY_PLAYER_SESSIONS_MATCHES_PLAYERS_NICKNAME, nickname);
+                        dic.Add(Fb_Constants.FIRESTORE_KEY_PLAYER_SESSIONS_MATCHES_PLAYERS_SCORE, score);
+                        dic.Add(Fb_Constants.FIRESTORE_KEY_PLAYER_SESSIONS_MATCHES_PLAYERS_UID, uid);
+
+                        return dic;
                     }
                 }
             }

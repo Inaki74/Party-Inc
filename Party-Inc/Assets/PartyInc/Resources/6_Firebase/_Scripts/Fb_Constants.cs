@@ -88,7 +88,22 @@ namespace PartyInc
             public const string FIRESTORE_KEY_PLAYER_ASSETS = "assets";
 
             // PLAYER TASKS KEY
-            public const string FIRESTORE_KEY_PLAYER_TASKS = "tasks";
+            public const string FIRESTORE_KEY_PLAYER_TASKS = "goals";
+
+            // PLAYER SESSIONS
+            public const string FIRESTORE_KEY_PLAYER_SESSIONS = "sessions";
+            public const string FIRESTORE_KEY_PLAYER_SESSIONS_DATE = "date";
+            public const string FIRESTORE_KEY_PLAYER_SESSIONS_ISRANKED = "isranked";
+            public const string FIRESTORE_KEY_PLAYER_SESSIONS_PLAYERS = "players";
+            public const string FIRESTORE_KEY_PLAYER_SESSIONS_PLAYERS_ID = "uid";
+            public const string FIRESTORE_KEY_PLAYER_SESSIONS_PLAYERS_MMR = "mmr";
+            public const string FIRESTORE_KEY_PLAYER_SESSIONS_PLAYERS_NAME = "name";
+            public const string FIRESTORE_KEY_PLAYER_SESSIONS_MATCHES = "matches";
+            public const string FIRESTORE_KEY_PLAYER_SESSIONS_MATCHES_GAMENAME = "game";
+            public const string FIRESTORE_KEY_PLAYER_SESSIONS_MATCHES_PLAYERS = "players";
+            public const string FIRESTORE_KEY_PLAYER_SESSIONS_MATCHES_PLAYERS_NICKNAME = "nickname";
+            public const string FIRESTORE_KEY_PLAYER_SESSIONS_MATCHES_PLAYERS_SCORE = "score";
+            public const string FIRESTORE_KEY_PLAYER_SESSIONS_MATCHES_PLAYERS_UID = "uid";
         }
     }
         
