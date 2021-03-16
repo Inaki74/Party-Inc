@@ -413,7 +413,7 @@ namespace PartyInc
             /// <summary>
             /// The class in charge of the Sessions sub-collection of the Players collection structure.
             /// </summary>
-            public class FSSessions
+            public class FSSessions : IFb_FirestoreMapStructure
             {
                 public bool isRanked;
                 public object date;
@@ -422,10 +422,10 @@ namespace PartyInc
 
                 public FSSessions()
                 {
-                    this.isRanked = false;
-                    this.date = FieldValue.ServerTimestamp;
-                    this.matches = new List<Dictionary<string, object>>();//FSMatches().ToDictionary();
-                    this.players = new List<Dictionary<string, object>>();//FSSessionPlayers().ToDictionary();
+                    isRanked = false;
+                    date = FieldValue.ServerTimestamp;
+                    matches = new List<Dictionary<string, object>>();//FSMatches().ToDictionary();
+                    players = new List<Dictionary<string, object>>();//FSSessionPlayers().ToDictionary();
                 }
 
                 public FSSessions(bool isRanked, object date, List<Dictionary<string, object>> matches, List<Dictionary<string, object>> players)
@@ -475,7 +475,7 @@ namespace PartyInc
                     return dic;
                 }
 
-                public class FSSessionMatchPlayer
+                public class FSSessionMatchPlayer : IFb_FirestoreMapStructure
                 {
                     public string nickname;
                     public int score;
@@ -508,34 +508,422 @@ namespace PartyInc
                 }
             }
 
-            public class FSGoal
+            /// <summary>
+            /// The class in charge of the Goals collection structure.
+            /// Might not use it much, since Goals are only added by developers.
+            /// </summary>
+            public class FSGoal : IFb_FirestoreMapStructure
             {
+                public string description;
+                public string name;
+                public int scoreneeded;
 
+                public FSGoal()
+                {
+                    description = null;
+                    name = null;
+                    scoreneeded = 0;
+                }
+
+                public FSGoal(string description, string name, int scoreneeded)
+                {
+                    this.description = description;
+                    this.name = name;
+                    this.scoreneeded = scoreneeded;
+                }
+
+                public Dictionary<string, object> ToDictionary()
+                {
+                    Dictionary<string, object> dic = new Dictionary<string, object>();
+
+                    dic.Add(Fb_Constants.FIRESTORE_KEY_GOALS_DESCRIPTION, description);
+                    dic.Add(Fb_Constants.FIRESTORE_KEY_GOALS_NAME, name);
+                    dic.Add(Fb_Constants.FIRESTORE_KEY_GOALS_SCORENEEDED, scoreneeded);
+
+                    return dic;
+                }
             }
 
-            public class FSTeam
+            /// <summary>
+            /// The class in charge of the Teams collection structure.
+            /// </summary>
+            public class FSTeam : IFb_FirestoreMapStructure
             {
+                public string name;
+                public List<Dictionary<string, object>> members;
+                public string tagline;
 
+                public FSTeam()
+                {
+                    name = null;
+                    members = new List<Dictionary<string, object>>();
+                    tagline = null;
+                }
+
+                public FSTeam(string name, List<Dictionary<string, object>> members, string tagline)
+                {
+                    this.name = name;
+                    this.members = members;
+                    this.tagline = tagline;
+                }
+
+                public void AddMember(FSTeamMembers member)
+                {
+                    members.Add(member.ToDictionary());
+                }
+
+                public Dictionary<string, object> ToDictionary()
+                {
+                    Dictionary<string, object> dic = new Dictionary<string, object>();
+
+                    dic.Add(Fb_Constants.FIRESTORE_KEY_TEAM_NAME, name);
+                    dic.Add(Fb_Constants.FIRESTORE_KEY_TEAM_MEMBERS, members);
+                    dic.Add(Fb_Constants.FIRESTORE_KEY_TEAM_TAGLINE, tagline);
+
+                    return dic;
+                }
+
+                public class FSTeamMembers : IFb_FirestoreMapStructure
+                {
+                    public string name;
+                    public string uid;
+                    public int mmr;
+                    public bool isadmin;
+
+                    public FSTeamMembers()
+                    {
+                        name = null;
+                        uid = null;
+                        mmr = 0;
+                        isadmin = false;
+                    }
+
+                    public FSTeamMembers(string name, string uid, int mmr, bool isadmin)
+                    {
+                        this.name = name;
+                        this.uid = uid;
+                        this.mmr = mmr;
+                        this.isadmin = isadmin;
+                    }
+
+                    public Dictionary<string, object> ToDictionary()
+                    {
+                        Dictionary<string, object> dic = new Dictionary<string, object>();
+
+                        dic.Add(Fb_Constants.FIRESTORE_KEY_TEAM_MEMBER_NAME, name);
+                        dic.Add(Fb_Constants.FIRESTORE_KEY_TEAM_MEMBER_UID, uid);
+                        dic.Add(Fb_Constants.FIRESTORE_KEY_TEAM_MEMBER_MMR, mmr);
+                        dic.Add(Fb_Constants.FIRESTORE_KEY_TEAM_MEMBER_ISADMIN, isadmin);
+
+                        return dic;
+                    }
+                }
             }
 
-            public class FSAsset
+            /// <summary>
+            /// The class in charge of the Asset collection structure.
+            /// Might not use it much, since Assets are only added by developers.
+            /// </summary>
+            public class FSAsset : IFb_FirestoreMapStructure
             {
+                public string achievement;
+                public int baseprice;
+                public int premiumprice;
+                public string name;
+                public int type;
 
+                public FSAsset()
+                {
+                    achievement = null;
+                    baseprice = 0;
+                    premiumprice = 0;
+                    name = null;
+                    type = 0;
+                }
+
+                public FSAsset(string achievement, int baseprice, int premiumprice, string name, int type)
+                {
+                    this.achievement = achievement;
+                    this.baseprice = baseprice;
+                    this.premiumprice = premiumprice;
+                    this.name = name;
+                    this.type = type;
+                }
+
+                public Dictionary<string, object> ToDictionary()
+                {
+                    Dictionary<string, object> dic = new Dictionary<string, object>();
+
+                    dic.Add(Fb_Constants.FIRESTORE_KEY_ASSETS_ACHIEVEMENT, achievement);
+                    dic.Add(Fb_Constants.FIRESTORE_KEY_ASSETS_BASEPRICE, baseprice);
+                    dic.Add(Fb_Constants.FIRESTORE_KEY_ASSETS_PREMIUMPRICE, premiumprice);
+                    dic.Add(Fb_Constants.FIRESTORE_KEY_ASSETS_NAME, name);
+                    dic.Add(Fb_Constants.FIRESTORE_KEY_ASSETS_TYPE, type);
+
+                    return dic;
+                }
             }
 
-            public class FSPlayerSocial
+            /// <summary>
+            /// The class in charge of the Players-Social collection structure.
+            /// </summary>
+            public class FSPlayerSocial : IFb_FirestoreMapStructure
             {
+                public List<Dictionary<string, object>> friends;
+                public List<Dictionary<string, object>> friendrequests;
+                public List<Dictionary<string, object>> teams;
+                public List<Dictionary<string, object>> teamrequests;
 
+                public FSPlayerSocial()
+                {
+                    friends = new List<Dictionary<string, object>>();
+                    friendrequests = new List<Dictionary<string, object>>();
+                    teams = new List<Dictionary<string, object>>();
+                    teamrequests = new List<Dictionary<string, object>>();
+                }
+
+                public FSPlayerSocial(List<Dictionary<string, object>> teams, List<Dictionary<string, object>> teamrequests, List<Dictionary<string, object>> friends, List<Dictionary<string, object>> friendrequests)
+                {
+                    this.friends = friends;
+                    this.friendrequests = friendrequests;
+                    this.teams = teams;
+                    this.teamrequests = teamrequests;
+                }
+
+                public Dictionary<string, object> ToDictionary()
+                {
+                    Dictionary<string, object> dictionary = new Dictionary<string, object>();
+
+                    dictionary.Add(Fb_Constants.FIRESTORE_KEY_PLAYERSOCIAL_TEAMS, teams);
+                    dictionary.Add(Fb_Constants.FIRESTORE_KEY_PLAYERSOCIAL_TEAMREQUESTS, teamrequests);
+                    dictionary.Add(Fb_Constants.FIRESTORE_KEY_PLAYERSOCIAL_FRIENDS, friends);
+                    dictionary.Add(Fb_Constants.FIRESTORE_KEY_PLAYERSOCIAL_FRIENDREQUESTS, friendrequests);
+
+                    return dictionary;
+                }
+
+                public class FSPlayerSocialTeam : IFb_FirestoreMapStructure
+                {
+                    public string name;
+                    public string teamid;
+                    public string imageid;
+
+                    public FSPlayerSocialTeam()
+                    {
+                        name = null;
+                        teamid = null;
+                        imageid = null;
+                    }
+
+                    public FSPlayerSocialTeam(string name, string teamid, string imageid)
+                    {
+                        this.name = name;
+                        this.teamid = teamid;
+                        this.imageid = imageid;
+                    }
+
+                    public Dictionary<string, object> ToDictionary()
+                    {
+                        Dictionary<string, object> dictionary = new Dictionary<string, object>();
+
+                        dictionary.Add(Fb_Constants.FIRESTORE_KEY_PLAYERSOCIAL_TEAMS_TEAMID, teamid);
+                        dictionary.Add(Fb_Constants.FIRESTORE_KEY_PLAYERSOCIAL_TEAMS_NAME, name);
+                        dictionary.Add(Fb_Constants.FIRESTORE_KEY_PLAYERSOCIAL_TEAMS_IMAGEID, imageid);
+
+                        return dictionary;
+                    }
+                }
+
+                public class FSPlayerSocialFriend : IFb_FirestoreMapStructure
+                {
+                    public string name;
+                    public string uid;
+                    public string imageid;
+
+                    public FSPlayerSocialFriend()
+                    {
+                        name = null;
+                        uid = null;
+                        imageid = null;
+                    }
+
+                    public FSPlayerSocialFriend(string name, string uid, string imageid)
+                    {
+                        this.name = name;
+                        this.uid = uid;
+                        this.imageid = imageid;
+                    }
+
+                    public Dictionary<string, object> ToDictionary()
+                    {
+                        Dictionary<string, object> dictionary = new Dictionary<string, object>();
+
+                        dictionary.Add(Fb_Constants.FIRESTORE_KEY_PLAYERSOCIAL_FRIENDS_UID, uid);
+                        dictionary.Add(Fb_Constants.FIRESTORE_KEY_PLAYERSOCIAL_FRIENDS_NAME, name);
+                        dictionary.Add(Fb_Constants.FIRESTORE_KEY_PLAYERSOCIAL_FRIENDS_IMAGEID, imageid);
+
+                        return dictionary;
+                    }
+                }
             }
 
-            public class FSChatsGroup
+            /// <summary>
+            /// The class in charge of the Group Chats sub-collection of the Players-Social collection structure.
+            /// </summary>
+            public class FSChatsGroup : IFb_FirestoreMapStructure
             {
+                public List<Dictionary<string, object>> members;
+                public List<Dictionary<string, object>> messages;
 
+                public FSChatsGroup()
+                {
+                    members = new List<Dictionary<string, object>>();
+                    messages = new List<Dictionary<string, object>>();
+                }
+
+                public FSChatsGroup(List<Dictionary<string, object>> members, List<Dictionary<string, object>> messages)
+                {
+                    this.members = members;
+                    this.messages = messages;
+                }
+
+                public Dictionary<string, object> ToDictionary()
+                {
+                    Dictionary<string, object> dictionary = new Dictionary<string, object>();
+
+                    dictionary.Add(Fb_Constants.FIRESTORE_KEY_PLAYERSOCIAL_CHATSGROUP_MEMBERS, members);
+                    dictionary.Add(Fb_Constants.FIRESTORE_KEY_PLAYERSOCIAL_CHATSGROUP_MESSAGES, messages);
+
+                    return dictionary;
+                }
+
+                public class FSChatsGroupMembers : IFb_FirestoreMapStructure
+                {
+                    public string uid;
+                    public string name;
+
+                    public FSChatsGroupMembers()
+                    {
+                        uid = null;
+                        name = null;
+                    }
+
+                    public FSChatsGroupMembers(string uid, string name)
+                    {
+                        this.uid = uid;
+                        this.name = name;
+                    }
+
+                    public Dictionary<string, object> ToDictionary()
+                    {
+                        Dictionary<string, object> dictionary = new Dictionary<string, object>();
+
+                        dictionary.Add(Fb_Constants.FIRESTORE_KEY_PLAYERSOCIAL_CHATSGROUP_MEMBERS_NAME, name);
+                        dictionary.Add(Fb_Constants.FIRESTORE_KEY_PLAYERSOCIAL_CHATSGROUP_MEMBERS_UID, uid);
+
+                        return dictionary;
+                    }
+                }
+
+                public class FSChatsGroupMessages : IFb_FirestoreMapStructure
+                {
+                    public string messageid;
+                    public string senderid;
+                    public string message;
+                    public object timestamp;
+
+                    public FSChatsGroupMessages()
+                    {
+                        messageid = null;
+                        senderid = null;
+                        message = null;
+                        timestamp = FieldValue.ServerTimestamp;
+                    }
+
+                    public FSChatsGroupMessages(string messageid, string senderid, string message)
+                    {
+                        this.messageid = messageid;
+                        this.senderid = senderid;
+                        this.message = message;
+                        this.timestamp = FieldValue.ServerTimestamp;
+                    }
+
+                    public Dictionary<string, object> ToDictionary()
+                    {
+                        Dictionary<string, object> dictionary = new Dictionary<string, object>();
+
+                        dictionary.Add(Fb_Constants.FIRESTORE_KEY_PLAYERSOCIAL_CHATSGROUP_MESSAGES_ID, messageid);
+                        dictionary.Add(Fb_Constants.FIRESTORE_KEY_PLAYERSOCIAL_CHATSGROUP_MESSAGES_MESSAGE, message);
+                        dictionary.Add(Fb_Constants.FIRESTORE_KEY_PLAYERSOCIAL_CHATSGROUP_MESSAGES_TIMESTAMP, timestamp);
+                        dictionary.Add(Fb_Constants.FIRESTORE_KEY_PLAYERSOCIAL_CHATSGROUP_MESSAGES_SENDERID, senderid);
+
+                        return dictionary;
+                    }
+                }
             }
 
-            public class FSChatsSingular
+            /// <summary>
+            /// The class in charge of the Singular Chats sub-collection of the Players-Social collection structure.
+            /// </summary>
+            public class FSChatsSingular : IFb_FirestoreMapStructure
             {
+                public List<Dictionary<string, object>> messages;
 
+                public FSChatsSingular()
+                {
+                    messages = new List<Dictionary<string, object>>();
+                }
+
+                public FSChatsSingular(List<Dictionary<string, object>> messages)
+                {
+                    this.messages = messages;
+                }
+
+                public void AddMessage(FSChatsSingularMessage message)
+                {
+                    messages.Add(message.ToDictionary());
+                }
+
+                public Dictionary<string, object> ToDictionary()
+                {
+                    Dictionary<string, object> dictionary = new Dictionary<string, object>();
+
+                    dictionary.Add(Fb_Constants.FIRESTORE_KEY_PLAYERSOCIAL_CHATSSING_MESSAGES , messages);
+
+                    return dictionary;
+                }
+
+                public class FSChatsSingularMessage : IFb_FirestoreMapStructure
+                {
+                    public string message;
+                    public object timestamp;
+                    public bool mine;
+
+                    public FSChatsSingularMessage()
+                    {
+                        message = null;
+                        timestamp = FieldValue.ServerTimestamp;
+                        mine = false;
+                    }
+
+                    public FSChatsSingularMessage(string message, bool mine)
+                    {
+                        this.message = message;
+                        timestamp = FieldValue.ServerTimestamp;
+                        this.mine = mine;
+                    }
+
+                    public Dictionary<string, object> ToDictionary()
+                    {
+                        Dictionary<string, object> dictionary = new Dictionary<string, object>();
+
+                        dictionary.Add(Fb_Constants.FIRESTORE_KEY_PLAYERSOCIAL_CHATSSING_MESSAGES_MESSAGE, message);
+                        dictionary.Add(Fb_Constants.FIRESTORE_KEY_PLAYERSOCIAL_CHATSSING_MESSAGES_TIMESTAMP, timestamp);
+                        dictionary.Add(Fb_Constants.FIRESTORE_KEY_PLAYERSOCIAL_CHATSSING_MESSAGES_MINE, mine);
+
+                        return dictionary;
+                    }
+                }
             }
 
             public class TestCollection : IFb_FirestoreMapStructure

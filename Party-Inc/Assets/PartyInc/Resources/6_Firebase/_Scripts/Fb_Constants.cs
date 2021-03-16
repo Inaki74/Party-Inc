@@ -104,6 +104,57 @@ namespace PartyInc
             public const string FIRESTORE_KEY_PLAYER_SESSIONS_MATCHES_PLAYERS_NICKNAME = "nickname";
             public const string FIRESTORE_KEY_PLAYER_SESSIONS_MATCHES_PLAYERS_SCORE = "score";
             public const string FIRESTORE_KEY_PLAYER_SESSIONS_MATCHES_PLAYERS_UID = "uid";
+
+            // ASSET KEYS
+            public const string FIRESTORE_KEY_ASSETS = "assets";
+            public const string FIRESTORE_KEY_ASSETS_ACHIEVEMENT = "achievement";
+            public const string FIRESTORE_KEY_ASSETS_BASEPRICE = "baseprice";
+            public const string FIRESTORE_KEY_ASSETS_PREMIUMPRICE = "premiumprice";
+            public const string FIRESTORE_KEY_ASSETS_NAME = "name";
+            public const string FIRESTORE_KEY_ASSETS_TYPE = "type";
+
+            // TEAM KEYS
+            public const string FIRESTORE_KEY_TEAM = "teams";
+            public const string FIRESTORE_KEY_TEAM_NAME = "name";
+            public const string FIRESTORE_KEY_TEAM_MEMBERS = "members";
+            public const string FIRESTORE_KEY_TEAM_TAGLINE = "tagline";
+            public const string FIRESTORE_KEY_TEAM_MEMBER_NAME = "name";
+            public const string FIRESTORE_KEY_TEAM_MEMBER_UID = "uid";
+            public const string FIRESTORE_KEY_TEAM_MEMBER_MMR = "mmr";
+            public const string FIRESTORE_KEY_TEAM_MEMBER_ISADMIN = "isadmin";
+
+            // GOAL KEYS
+            public const string FIRESTORE_KEY_GOALS = "goals";
+            public const string FIRESTORE_KEY_GOALS_DESCRIPTION = "description";
+            public const string FIRESTORE_KEY_GOALS_NAME = "name";
+            public const string FIRESTORE_KEY_GOALS_SCORENEEDED = "scoreneeded";
+
+            // PLAYER SOCIAL KEYS
+            public const string FIRESTORE_KEY_PLAYERSOCIAL = "players-social";
+            public const string FIRESTORE_KEY_PLAYERSOCIAL_FRIENDREQUESTS = "friendrequests";
+            public const string FIRESTORE_KEY_PLAYERSOCIAL_TEAMREQUESTS = "teamrequests";
+            public const string FIRESTORE_KEY_PLAYERSOCIAL_TEAMS = "teams";
+            public const string FIRESTORE_KEY_PLAYERSOCIAL_TEAMS_TEAMID = "teamid";
+            public const string FIRESTORE_KEY_PLAYERSOCIAL_TEAMS_NAME = "name";
+            public const string FIRESTORE_KEY_PLAYERSOCIAL_TEAMS_IMAGEID = "image";
+            public const string FIRESTORE_KEY_PLAYERSOCIAL_FRIENDS = "friends";
+            public const string FIRESTORE_KEY_PLAYERSOCIAL_FRIENDS_UID = "uid";
+            public const string FIRESTORE_KEY_PLAYERSOCIAL_FRIENDS_IMAGEID = "image";
+            public const string FIRESTORE_KEY_PLAYERSOCIAL_FRIENDS_NAME = "name";
+            public const string FIRESTORE_KEY_PLAYERSOCIAL_CHATSGROUP = "chats-group";
+            public const string FIRESTORE_KEY_PLAYERSOCIAL_CHATSGROUP_MEMBERS = "members";
+            public const string FIRESTORE_KEY_PLAYERSOCIAL_CHATSGROUP_MEMBERS_NAME = "name";
+            public const string FIRESTORE_KEY_PLAYERSOCIAL_CHATSGROUP_MEMBERS_UID = "uid";
+            public const string FIRESTORE_KEY_PLAYERSOCIAL_CHATSGROUP_MESSAGES = "messages";
+            public const string FIRESTORE_KEY_PLAYERSOCIAL_CHATSGROUP_MESSAGES_ID = "messageid";
+            public const string FIRESTORE_KEY_PLAYERSOCIAL_CHATSGROUP_MESSAGES_SENDERID = "senderid";
+            public const string FIRESTORE_KEY_PLAYERSOCIAL_CHATSGROUP_MESSAGES_MESSAGE = "message";
+            public const string FIRESTORE_KEY_PLAYERSOCIAL_CHATSGROUP_MESSAGES_TIMESTAMP = "timestamp";
+            public const string FIRESTORE_KEY_PLAYERSOCIAL_CHATSSING = "chats-singular";
+            public const string FIRESTORE_KEY_PLAYERSOCIAL_CHATSSING_MESSAGES = "messages";
+            public const string FIRESTORE_KEY_PLAYERSOCIAL_CHATSSING_MESSAGES_MESSAGE = "message";
+            public const string FIRESTORE_KEY_PLAYERSOCIAL_CHATSSING_MESSAGES_TIMESTAMP = "timestamp";
+            public const string FIRESTORE_KEY_PLAYERSOCIAL_CHATSSING_MESSAGES_MINE = "mine";
         }
     }
         

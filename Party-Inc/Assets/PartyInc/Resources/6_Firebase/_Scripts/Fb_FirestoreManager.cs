@@ -38,19 +38,21 @@ namespace PartyInc
 
             private void TestThings()
             {
-                //Fb_FirestoreStructures.TestCollection tc = new Fb_FirestoreStructures.TestCollection();
+                Fb_FirestoreStructures.TestCollection tc = new Fb_FirestoreStructures.TestCollection();
 
-                //List<string> list = new List<string>();
+                List<string> list = new List<string>();
 
                 //if (Application.isMobilePlatform)
                 //{
                 //    list.Add("Greeting from " + Application.platform.ToString());
                 //}
 
-                //list.Add("A");
+                list.Add("E");
                 //list.Add("F");
                 //list.Add("PUTO");
                 //list.Add("Me aburri");
+
+                tc.testList = list;
 
                 //Dictionary<string, object> dic = new Dictionary<string, object>();
 
@@ -89,7 +91,7 @@ namespace PartyInc
                 //tc.testMapList = dicL;
 
                 //FsAddToTest(tc.ToDictionary());
-                //FsSetTest("hg6QT9LqprrVgJ2aJszQ", tc.ToDictionary());
+                //FsSetTest("1BIGovlI7e8jrWTt4hGk", tc.ToDictionary());
                 //FsGetTest("y8xper9sv0EEVjsP45bh");
             }
 
@@ -115,15 +117,16 @@ namespace PartyInc
             {
                 DocumentReference docRef = Test.Document(id);
 
-                List<string> path1 = new List<string>();
-                path1.Add("testdict");
-                path1.Add("Atr6");
-                path1.Add("Nested Dictionaries");
-                path1.Add("D3Atr1");
+                //List<string> path1 = new List<string>();
+                //path1.Add("testdict");
+                //path1.Add("Atr6");
+                //path1.Add("Nested Dictionaries");
+                //path1.Add("D3Atr1");
 
                 string[] path2 = { "testdict", "Atr6", "Nested Dictionaries", "Nested Dictionaries" };
-                FieldPath[] fields = { new FieldPath(), new FieldPath(path2) };
-                docRef.SetAsync(data, SetOptions.MergeFields(fields)).ContinueWithOnMainThread(task =>
+                //FieldPath[] fields = { new FieldPath(), new FieldPath(path2) };
+                //FieldValue.
+                docRef.UpdateAsync("testlist", FieldValue.ArrayUnion(path2 as object)).ContinueWithOnMainThread(task =>
                 {
                     if (task.IsCompleted)
                     {
@@ -135,6 +138,19 @@ namespace PartyInc
                         Debug.LogError(task.Exception.InnerException.Message);
                     }
                 });
+
+                //docRef.SetAsync(data, SetOptions.MergeAll).ContinueWithOnMainThread(task =>
+                //{
+                //    if (task.IsCompleted)
+                //    {
+                //        Debug.Log("Successfully updated test document " + docRef.Id);
+                //    }
+                //    else
+                //    {
+                //        Debug.Log("Error updating test document");
+                //        Debug.LogError(task.Exception.InnerException.Message);
+                //    }
+                //});
 
                 /*
                  Las partidas que se jugaron en Octubre de 2022 en las cuales los jugadores jugaron Halloween Crazyness y usaron
@@ -217,6 +233,14 @@ namespace PartyInc
                 FieldPath[] fields = { new FieldPath(paths) }; => testdict.Atr1, only takes string arrays not string lists.
 
                 new FieldPath(paths) creates a reference to the nested Atr1 in the testdict dictionary.
+
+            ARRAYUNION and ARRAYDELETE:
+
+                You can use FieldValue.ArrayUnion(object) to add an element to an array if its not already in there. If its already there, it updates it.
+                You use it within the UpdateAsync function of DocumentReference.
+                FieldValue.ArrayDelete(object) deletes all the array elements equal to that object.
+
+                Similarly you can use FieldValue.Increment(incAmount) to increment simple numbers.
              */
         }
     }
