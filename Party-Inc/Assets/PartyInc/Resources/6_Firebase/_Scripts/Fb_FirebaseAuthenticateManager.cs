@@ -54,7 +54,7 @@ namespace PartyInc
                 }
             }
 
-            public void SignInEmailPassword(string email, string password)
+            public void SignInEmailPassword(string email, string password, Action Callback = null)
             {
                 Debug.Log("Attempting to sign in with: " + email + " " + password);
 
@@ -77,16 +77,14 @@ namespace PartyInc
                         Debug.Log("User with email: " + _auth.CurrentUser.Email + " logged in!");
 
                         // GO TO HUB, GET PLAYER INFO FROM FIRESTORE
-
-                        Fb_FirestorePlayers.Current.GetPlayerInformation(_auth.CurrentUser.UserId);
-                        SceneManager.LoadScene(Stt_SceneIndexes.HUB);
+                        Callback();
 
                         return;
                     }
                 });
             }
 
-            public void SignUpEmailPassword(string email, string password, string verification, string username, Fb_FirestoreStructures.FSPlayer player)
+            public void SignUpEmailPassword(string email, string password, string verification, string username, Action<string> Callback = null)
             {
                 Debug.Log("Attempting to sign up with: " + email + " " + password);
 
@@ -137,7 +135,7 @@ namespace PartyInc
                                 Debug.Log("Username set!");
 
                                 // CREATE A PLAYER INSTANCE IN FIRESTORE
-                                Fb_FirestorePlayers.Current.AddNewPlayer(task.Result.UserId, player.ToDictionary());
+                                Callback(task.Result.UserId);
 
                                 return;
                             }

@@ -24,6 +24,9 @@ EditorBuildSettings:
     path: Assets/PartyInc/Scenes/2_Hub/DisconnectedScene.unity
     guid: befd8d85c31a1431eb1c08baef49200d
   - enabled: 1
+    path: Assets/PartyInc/Scenes/2_Hub/LoadingScene.unity
+    guid: dc24ea900a00c4ccbbdefc9a04c19bc6
+  - enabled: 1
     path: Assets/PartyInc/Scenes/2_Hub/_Lobbies/EGG_GameLobby.unity
     guid: 307a71cc20749490a931c8f14d971de9
   - enabled: 1

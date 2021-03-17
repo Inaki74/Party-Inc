@@ -35,6 +35,11 @@ namespace PartyInc
 
             public void SignUp()
             {
+                Fb_FirebaseAuthenticateManager.Current.SignUpEmailPassword(_emailField.text, _passwordField.text, _passwordVerificationField.text, _nicknameField.text, SignUpOnFirestore);
+            }
+
+            public void SignUpOnFirestore(string userId)
+            {
                 Fb_FirestoreStructures.FSPlayer newPlayer = new Fb_FirestoreStructures.FSPlayer();
                 Fb_FirestoreStructures.FSPlayer.FSData newData = new Fb_FirestoreStructures.FSPlayer.FSData();
 
@@ -45,7 +50,7 @@ namespace PartyInc
 
                 newPlayer.data = newData.ToDictionary();
 
-                Fb_FirebaseAuthenticateManager.Current.SignUpEmailPassword(_emailField.text, _passwordField.text, _passwordVerificationField.text, _nicknameField.text, newPlayer);
+                Fb_FirestorePlayers.Current.AddNewPlayer(userId, newPlayer.ToDictionary());
             }
 
             public void BackToSignIn()
