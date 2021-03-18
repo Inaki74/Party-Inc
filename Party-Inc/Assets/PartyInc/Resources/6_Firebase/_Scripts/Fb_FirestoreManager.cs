@@ -48,6 +48,8 @@ namespace PartyInc
                 StartCoroutine(TestThings());
             }
 
+            private Dictionary<string, object> testData = null;
+
             private IEnumerator TestThings()
             {
                 string tp = "testPlayer";
@@ -102,6 +104,25 @@ namespace PartyInc
                 p.character = pc.ToDictionary();
                 p.stats = ps.ToDictionary();
 
+                List<Dictionary<string, object>> a = new List<Dictionary<string, object>>();
+
+                Dictionary<string, object> testdic = new Dictionary<string, object>();
+
+                testdic["a"] = "asd";
+                testdic["b"] = "r";
+
+                a.Add(testdic);
+
+                Dictionary<string, object> add = new Dictionary<string, object>();
+                add.Add("test", a);
+
+                //UpdateUniquelyArrayGeneric(Players, tp, testdic, "test", (d1, d2) =>
+                //{
+                //    return d1["b"].Equals(d2["b"]);
+                //});
+                //UpdateDocument(Players, tp, add);
+                //UpdateArray(Players, tp, testdic, "test");
+
                 yield return null;
 
                 // TEST ADD (Done, looks good)
@@ -129,13 +150,13 @@ namespace PartyInc
 
                 // TEST UPDATES
 
-                string[][] paths = new string[3][];
-                string[] a = { "character", "outfits" };
-                string[] b = { "data", "city" };
-                string[] c = { "character", "face", "mouth" };
-                paths[0] = a;
-                paths[1] = b;
-                paths[2] = c;
+                //string[][] paths = new string[3][];
+                //string[] a = { "character", "outfits" };
+                //string[] b = { "data", "city" };
+                //string[] c = { "character", "face", "mouth" };
+                //paths[0] = a;
+                //paths[1] = b;
+                //paths[2] = c;
 
                 //UpdateDocument(Players, "ASDASDASDEEWEWE", p.ToDictionary(), res => {
                 //    if (res.success)
@@ -156,11 +177,27 @@ namespace PartyInc
                 //
 
                 // TEST GETS
+                //bool wait = false;
+                //Get(Players, tp, (result) =>
+                //{
+                //    testData = result.data;
+                //    wait = true;
+                //});
 
+                //yield return new WaitUntil(() => wait);
                 //
 
-                // TEST REMOVE
+                Dictionary<string, object> toRemove = new Dictionary<string, object>();
 
+                toRemove.Add("a", "a");
+                toRemove.Add("b", "b");
+
+                // TEST REMOVE
+                //RemoveInArrayGeneric(Players, tp, toRemove, "test", (d1, d2) =>
+                //{
+                //    return d1["a"].Equals(d2["a"]);
+                //});
+                RemoveInArray(Players, tp, "ass1", "assets");
                 //
             }
 
@@ -182,13 +219,13 @@ namespace PartyInc
             /// <summary>
             /// ADD data to a collection with “id” document id. If id is not placed, it will AddAsync granting it its id.
             /// If id is placed, it will overwrite any document with id “id” there is. If there is no document with that id it will add a new one.
-            /// The assignation callback is to return the data to Unity.
+            /// The Continue is for the continuation of execution.
             /// </summary>
             /// <param name="collection"></param>
             /// <param name="data"></param>
             /// <param name="id"></param>
-            /// <param name="AssignationCallback"></param>
-            public void Add(CollectionReference collection, Dictionary<string, object> data, string id = "", Action<FirestoreCallResult> AssignationCallback = null)
+            /// <param name="Continue"></param>
+            public void Add(CollectionReference collection, Dictionary<string, object> data, string id = "", Action<FirestoreCallResult> Continue = null)
             {
                 FirestoreCallResult result = new FirestoreCallResult();
                 result.exceptions = new List<FirestoreException>();
@@ -208,7 +245,7 @@ namespace PartyInc
                             result.data = null;
                             result.oldData = null;
 
-                            AssignationCallback(result);
+                            Continue(result);
                             return;
                         }
 
@@ -225,7 +262,7 @@ namespace PartyInc
                             result.data = returnData;
                             result.oldData = null;
 
-                            AssignationCallback(result);
+                            Continue(result);
                             return;
                         }
                     });
@@ -246,7 +283,7 @@ namespace PartyInc
                             result.data = null;
                             result.oldData = null;
 
-                            AssignationCallback(result);
+                            Continue(result);
                             return;
                         }
 
@@ -262,7 +299,7 @@ namespace PartyInc
                             result.data = null;
                             result.oldData = task.Result.ToDictionary();
 
-                            AssignationCallback(result);
+                            Continue(result);
                             return;
                         }
 
@@ -271,13 +308,13 @@ namespace PartyInc
                         {
                             if (task2.IsFaulted || task2.IsCanceled)
                             {
-                                TaskFaulted(task, result);
+                                TaskFaulted(task2, result);
 
                                 result.success = false;
                                 result.data = null;
                                 result.oldData = null;
 
-                                AssignationCallback(result);
+                                Continue(result);
                                 return;
                             }
 
@@ -289,7 +326,7 @@ namespace PartyInc
                                 result.data = data;
                                 result.oldData = null;
 
-                                AssignationCallback(result);
+                                Continue(result);
                                 return;
                             }
                         });
@@ -299,12 +336,12 @@ namespace PartyInc
 
             /// <summary>
             /// GET data from a document of id “id” in a collection
-            /// The assignation callback must be a named function used to assign the result in unity.
+            /// The assignation Continue must be a named function used to assign the result in unity.
             /// </summary>
             /// <param name="collection"></param>
             /// <param name="id"></param>
-            /// <param name="AssignationCallback"></param>
-            public void Get(CollectionReference collection, string id, Action<FirestoreCallResult> AssignationCallback)
+            /// <param name="AssignationContinue"></param>
+            public void Get(CollectionReference collection, string id, Action<FirestoreCallResult> AssignationContinue)
             {
                 FirestoreCallResult result = new FirestoreCallResult();
                 result.exceptions = new List<FirestoreException>();
@@ -319,7 +356,7 @@ namespace PartyInc
                         result.data = null;
                         result.oldData = null;
 
-                        AssignationCallback(result);
+                        AssignationContinue(result);
                         return;
                     }
 
@@ -331,7 +368,7 @@ namespace PartyInc
                         result.data = task.Result.ToDictionary();
                         result.oldData = null;
 
-                        AssignationCallback(result);
+                        AssignationContinue(result);
                         return;
                     }
                 });
@@ -341,14 +378,14 @@ namespace PartyInc
             /// UPDATE data of a document of id “id” in a collection with “data”.
             /// If paths == null, the update is a MergeAll update, it will update all fields with delta != 0 (has differences). The rest are left intact. See more below.
             /// If paths != null, the update is a MergeFields update, it will update those fields that are indicated in the jagged array paths.
-            /// The assignation callback is to get the result of the update into unity.
+            /// The Continue is used for the continuation of exectution.
             /// </summary>
             /// <param name="collection"></param>
             /// <param name="id"></param>
             /// <param name="data"></param>
-            /// <param name="AssignationCallback"></param>
+            /// <param name="Continue"></param>
             /// <param name="paths"></param>
-            public void UpdateDocument(CollectionReference collection, string id, Dictionary<string, object> data, Action<FirestoreCallResult> AssignationCallback = null, string[][] paths = null)
+            public void UpdateDocument(CollectionReference collection, string id, Dictionary<string, object> data, Action<FirestoreCallResult> Continue = null, string[][] paths = null)
             {
                 FirestoreCallResult result = new FirestoreCallResult();
                 result.exceptions = new List<FirestoreException>();
@@ -376,7 +413,7 @@ namespace PartyInc
                             result.data = null;
                             result.oldData = null;
 
-                            AssignationCallback(result);
+                            Continue(result);
                             return;
                         }
 
@@ -394,7 +431,7 @@ namespace PartyInc
                             result.data = null;
                             result.oldData = null;
 
-                            AssignationCallback(result);
+                            Continue(result);
                             return;
                         }
 
@@ -402,12 +439,12 @@ namespace PartyInc
                         {
                             if (task2.IsFaulted || task2.IsCanceled)
                             {
-                                TaskFaulted(task, result);
+                                TaskFaulted(task2, result);
 
                                 result.success = false;
                                 result.data = null;
 
-                                AssignationCallback(result);
+                                Continue(result);
                                 return;
                             }
 
@@ -429,10 +466,12 @@ namespace PartyInc
                                     j++;
                                 }
 
+                                Debug.Log("SUCCESS: Document of id: " + id + " updated!");
+
                                 result.success = true;
                                 result.data = data;
 
-                                AssignationCallback(result);
+                                Continue(result);
                                 return;
                             }
                         });
@@ -452,7 +491,7 @@ namespace PartyInc
                             result.data = null;
                             result.oldData = null;
 
-                            AssignationCallback(result);
+                            Continue(result);
                             return;
                         }
 
@@ -470,7 +509,7 @@ namespace PartyInc
                             result.data = null;
                             result.oldData = null;
 
-                            AssignationCallback(result);
+                            Continue(result);
                             return;
                         }
 
@@ -479,45 +518,45 @@ namespace PartyInc
                         {
                             if (task2.IsFaulted || task2.IsCanceled)
                             {
-                                TaskFaulted(task, result);
+                                TaskFaulted(task2, result);
 
                                 result.success = false;
                                 result.data = null;
 
-                                AssignationCallback(result);
+                                Continue(result);
                                 return;
                             }
 
                             if (task2.IsCompleted)
                             {
-                                Debug.Log("SUCCESS: Document updated!");
+                                Debug.Log("SUCCESS: Document of id: " + id + " updated!");
 
                                 result.success = true;
                                 result.data = data;
 
-                                AssignationCallback(result);
+                                Continue(result);
                                 return;
                             }
                         });
                     });
                 }
-
-                
             }
 
             /// <summary>
             /// UPDATES the array of type T field “name” in the document of id “id” in a collection with the data of type T.
+            /// If the element is within the array already It wont add it, it doesn't admit repetitions.
             /// Can only do this with primitive T types, namely: string, number, bool or null. For more complex data, those will have their own separate methods.
-            /// Exhaustive list: string, char, int, long, float, double, bool, short.
+            /// Admits Dictionaries(maps), but the equals condition is that every field in the dictionary is the same (absolute equality).
+            /// Exhaustive list: string, char, int, long, float, double, bool, short and Dictionary<string, object>.
             /// PRE: The array in Firestore MUST be of equivalent type T.
             /// </summary>
             /// <typeparam name="T"></typeparam>
             /// <param name="collection"></param>
             /// <param name="id"></param>
             /// <param name="data"></param>
-            /// <param name="name"></param>
-            /// <param name="AssignationCallback"></param>
-            public void UpdateArray<T>(CollectionReference collection, string id, T data, string fieldPath, Action<FirestoreCallResult> AssignationCallback = null)
+            /// <param name="fieldPath"></param>
+            /// <param name="Continue"></param>
+            public void UpdateUniquelyArrayPrimitive<T>(CollectionReference collection, string id, T data, string fieldPath, Action<FirestoreCallResult> Continue = null)
             {
                 FirestoreCallResult result = new FirestoreCallResult();
                 result.exceptions = new List<FirestoreException>();
@@ -530,7 +569,7 @@ namespace PartyInc
                        t == typeof(double) ||
                         t == typeof(string) ||
                          t == typeof(char) ||
-                          t == typeof(bool))
+                          t == typeof(bool) || t == typeof(Dictionary<string, object>))
                 {
                     // Type admitted
 
@@ -544,19 +583,19 @@ namespace PartyInc
                             result.data = null;
                             result.oldData = null;
 
-                            AssignationCallback(result);
+                            Continue(result);
                             return;
                         }
 
                         if (task.IsCompleted)
                         {
-                            Debug.Log("Updated array!");
+                            Debug.Log("Array of path: " + fieldPath + " updated successfuly!");
 
                             result.success = true;
                             result.data = null;
                             result.oldData = null;
 
-                            AssignationCallback(result);
+                            Continue(result);
                             return;
                         }
                     });
@@ -570,46 +609,192 @@ namespace PartyInc
                     result.oldData = null;
                     result.exceptions.Add(new FirestoreException(FirestoreError.Cancelled, "Wrong Method, type T of " + t.ToString() + " not admitted."));
 
-                    AssignationCallback(result);
+                    Continue(result);
                 }
             }
 
             /// <summary>
-            /// UPDATES the array of type Dictionary field “name” in the document of id “id” in a collection with the data "data".
+            /// UPDATES the array of type T field “name” in the document of id “id” in a collection with the data "data".
+            /// Use this for non-primitive types. For primitive types use the non-generic as its faster.
+            /// This updates the array uniquely, that is, given an equals condition, if there is a T in the list considered equal within it,
+            /// it wont add the new one. (Maintains Primary Key Condition)
+            /// The EqualsPredicate is the condition provided for two maps to be equal (define PK fields).
+            /// PRE: The array in Firestore MUST be of equivalent type T.
             /// </summary>
             /// <typeparam name="T"></typeparam>
             /// <param name="collection"></param>
             /// <param name="id"></param>
             /// <param name="data"></param>
-            /// <param name="name"></param>
-            /// <param name="AssignationCallback"></param>
-            public void UpdateMapArray(CollectionReference collection, string id, Dictionary<string, object> data, string fieldPath, Action<FirestoreCallResult> AssignationCallback = null)
+            /// <param name="fieldPath"></param>
+            /// <param name="EqualsPredicate"></param>
+            /// <param name="Continue"></param>
+            public void UpdateUniquelyArrayGeneric<T>(CollectionReference collection, string id, T data, string fieldPath, Func<T, T, bool> EqualsPredicate, Action<FirestoreCallResult> Continue = null)
             {
                 FirestoreCallResult result = new FirestoreCallResult();
                 result.exceptions = new List<FirestoreException>();
 
-                // First search for a map with same id.
-                // If found, tell the user that there is an equal object in the array
-                // If not found, its safe to add
+                Debug.Log("Updating Uniquely on Array:");
+                // First search for a T that is equal (defined)
+                collection.Document(id).GetSnapshotAsync().ContinueWithOnMainThread(task =>
+                {
+                    if(task.IsFaulted || task.IsCanceled)
+                    {
+                        TaskFaulted(task, result);
+
+                        result.data = null;
+                        result.success = false;
+                        result.oldData = null;
+
+                        return;
+                    }
+
+                    if (task.Result.Exists)
+                    {
+                        Debug.Log("Data found! Checking for equals...");
+                        // There's data
+                        Dictionary<string, object> broughtData = task.Result.ToDictionary();
+                        result.oldData = broughtData;
+
+                        List<object> auxList = broughtData["test"] as List<object>;
+                        List<T> list = new List<T>();
+                        foreach(object o in auxList)
+                        {
+                            list.Add((T) o );
+                        }
+
+                        foreach (T comparee in list)
+                        {
+                            if (EqualsPredicate(data, comparee))
+                            {
+                                // If found, tell the user that there is an equal object in the array
+                                Debug.Log("Found the item in the array, can't add to maintain Primary Key condition!");
+
+                                result.exceptions.Add(new FirestoreException(FirestoreError.Cancelled, "The array has an object with the same Primary Key supplied by the data object."));
+
+                                result.success = false;
+                                result.data = null;
+
+                                Continue(result);
+                                return;
+                            }
+                        }
+
+                        // If not found, its safe to add
+                        Debug.Log("Did not find the object in the array, its safe to add.");
+                        collection.Document(id).UpdateAsync(fieldPath, FieldValue.ArrayUnion(data)).ContinueWithOnMainThread(task2 =>
+                        {
+                            if(task.IsFaulted || task.IsCanceled)
+                            {
+                                TaskFaulted(task2, result);
+
+                                result.data = null;
+                                result.success = false;
+
+                                return;
+                            }
+
+                            if (task2.IsCompleted)
+                            {
+                                Debug.Log("Array of path: " + fieldPath + " updated successfuly!");
+
+                                result.success = true;
+                                result.data = null;
+
+                                return;
+                            }
+                        });
+                    }
+                });
             }
 
             /// <summary>
             /// REMOVES the data "data" from array of type Dictionary field “name” in the document of id “id” in a collection.
             /// </summary>
-            /// <typeparam name="T"></typeparam>
             /// <param name="collection"></param>
             /// <param name="id"></param>
             /// <param name="data"></param>
-            /// <param name="name"></param>
-            /// <param name="AssignationCallback"></param>
-            public void RemoveInArrayMap(CollectionReference collection, string id, Dictionary<string, object> data, string fieldPath, Action<FirestoreCallResult> Callback = null)
+            /// <param name="fieldPath"></param>
+            /// <param name="Continue"></param>
+            public void RemoveInArrayGeneric<T>(CollectionReference collection, string id, T data, string fieldPath, Func<T, T, bool> EqualsPredicate, Action<FirestoreCallResult> Continue = null)
             {
+                FirestoreCallResult result = new FirestoreCallResult();
+                result.exceptions = new List<FirestoreException>();
 
+                Debug.Log("Removing from array:");
+                // First search for a T that is equal (defined)
+                collection.Document(id).GetSnapshotAsync().ContinueWithOnMainThread(task =>
+                {
+                    if (task.IsFaulted || task.IsCanceled)
+                    {
+                        TaskFaulted(task, result);
+
+                        result.data = null;
+                        result.success = false;
+                        result.oldData = null;
+
+                        return;
+                    }
+
+                    if (task.Result.Exists)
+                    {
+                        Debug.Log("Data found! Checking for equals...");
+                        // There's data
+                        Dictionary<string, object> broughtData = task.Result.ToDictionary();
+                        result.oldData = broughtData;
+
+                        Debug.Log("a");
+                        List<object> auxList = broughtData[fieldPath] as List<object>;
+                        Debug.Log("v");
+                        List<T> list = new List<T>();
+                        Debug.Log("c");
+                        foreach (object o in auxList)
+                        {
+                            list.Add((T)o);
+                        }
+                        Debug.Log("d");
+
+                        foreach (T comparee in list)
+                        {
+                            Debug.Log("h");
+                            if (EqualsPredicate(data, comparee))
+                            {
+                                // If found, delete that element from the array using the comparee!
+                                Debug.Log("Found the item in the array, deleting...");
+
+                                collection.Document(id).UpdateAsync(fieldPath, FieldValue.ArrayRemove(comparee)).ContinueWithOnMainThread(task2 =>
+                                {
+                                    if(task2.IsFaulted || task2.IsCanceled)
+                                    {
+                                        TaskFaulted(task2, result);
+
+                                        result.success = false;
+                                        result.data = null;
+
+                                        Continue(result);
+                                        return;
+                                    }
+
+                                    if (task2.IsCompleted)
+                                    {
+                                        Debug.Log("Item successfully deleted in document of ID: " + id + ", on field: " + fieldPath);
+
+                                        result.success = true;
+                                        result.data = null;
+
+                                        Continue(result);
+                                        return;
+                                    }
+                                });
+                            }
+                        }
+                    }
+                });
             }
 
             /// <summary>
             /// REMOVES the data "data" from array of type T field “name” in the document of id “id” in a collection.
             /// Can only do this with primitive T types, namely: string, number, bool or null. For more complex data, those will have their own separate methods.
+            /// Admits Dictionaries, but will remove dictionaries that are absolutely equal (all fields).
             /// Exhaustive list: string, char, int, long, float, double, bool, short.
             /// PRE: The array in Firestore MUST be of equivalent type T.
             /// </summary>
@@ -617,9 +802,9 @@ namespace PartyInc
             /// <param name="collection"></param>
             /// <param name="id"></param>
             /// <param name="data"></param>
-            /// <param name="name"></param>
-            /// <param name="AssignationCallback"></param>
-            public void RemoveInArray<T>(CollectionReference collection, string id, T data, string fieldPath, Action<FirestoreCallResult> Callback = null)
+            /// <param name="fieldPath"></param>
+            /// <param name="Continue"></param>
+            public void RemoveInArray<T>(CollectionReference collection, string id, T data, string fieldPath, Action<FirestoreCallResult> Continue = null)
             {
                 FirestoreCallResult result = new FirestoreCallResult();
                 result.exceptions = new List<FirestoreException>();
@@ -632,7 +817,7 @@ namespace PartyInc
                        t == typeof(double) ||
                         t == typeof(string) ||
                          t == typeof(char) ||
-                          t == typeof(bool))
+                          t == typeof(bool) || t == typeof(Dictionary<string, object>))
                 {
                     // Type admitted
 
@@ -646,19 +831,19 @@ namespace PartyInc
                             result.data = null;
                             result.oldData = null;
 
-                            Callback(result);
+                            Continue(result);
                             return;
                         }
 
                         if (task.IsCompleted)
                         {
-                            Debug.Log("Removed from array!");
+                            Debug.Log("Array of path: " + fieldPath + ", element removed successfully!");
 
                             result.success = true;
                             result.data = null;
                             result.oldData = null;
 
-                            Callback(result);
+                            Continue(result);
                             return;
                         }
                     });
@@ -672,18 +857,18 @@ namespace PartyInc
                     result.oldData = null;
                     result.exceptions.Add(new FirestoreException(FirestoreError.Cancelled, "Wrong Method, type T of " + t.ToString() + " not admitted."));
 
-                    Callback(result);
+                    Continue(result);
                 }
             }
 
             /// <summary>
             /// DELETES a document of id “id” within a collection.
-            /// The callback brings back information of wether the operation was successful or not.
+            /// The Continue brings back information of wether the operation was successful or not.
             /// </summary>
             /// <param name="collection"></param>
             /// <param name="id"></param>
-            /// <param name="Callback"></param>
-            public void Delete(CollectionReference collection, string id, Action<FirestoreCallResult> Callback)
+            /// <param name="Continue"></param>
+            public void Delete(CollectionReference collection, string id, Action<FirestoreCallResult> Continue)
             {
                 // TODO: Do this but in a trusted environment (Cloud functions).
             }
