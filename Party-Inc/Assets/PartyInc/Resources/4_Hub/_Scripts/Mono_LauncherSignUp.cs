@@ -50,7 +50,38 @@ namespace PartyInc
 
                 newPlayer.data = newData.ToDictionary();
 
-                Fb_FirestorePlayers.Current.AddNewPlayer(userId, newPlayer.ToDictionary());
+                // ADD TO PLAYERS
+                Fb_FirestoreManager.Current.Add(Fb_FirestoreManager.Current.Players, newPlayer.ToDictionary(), userId, res =>
+                {
+                    if (res.success)
+                    {
+                        Debug.Log("PLAYER ADDED");
+
+                        SceneManager.LoadScene(Stt_SceneIndexes.HUB);
+                    }
+                    else
+                    {
+                        Debug.Log("COULDNT ADD PLAYER");
+                        Debug.Log(res.exceptions[0].Message);
+                    }
+                });
+
+                Fb_FirestoreStructures.FSPlayerSocial newPlayerSoc = new Fb_FirestoreStructures.FSPlayerSocial();
+
+
+                // ADD TO PLAYERSOCIAL
+                Fb_FirestoreManager.Current.Add(Fb_FirestoreManager.Current.Players, newPlayer.ToDictionary(), userId, res =>
+                {
+                    if (res.success)
+                    {
+                        Debug.Log("PLAYER SOCIAL ADDED");
+                    }
+                    else
+                    {
+                        Debug.Log("COULDNT ADD PLAYER");
+                        Debug.Log(res.exceptions[0].Message);
+                    }
+                });
             }
 
             public void BackToSignIn()

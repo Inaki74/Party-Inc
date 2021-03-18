@@ -34,7 +34,10 @@ namespace PartyInc
 
             public void SignIn()
             {
-                PartyFirebase.Auth.Fb_FirebaseAuthenticateManager.Current.SignInEmailPassword(_emailField.text, _passwordField.text);
+                PartyFirebase.Auth.Fb_FirebaseAuthenticateManager.Current.SignInEmailPassword(_emailField.text, _passwordField.text, () =>
+                {
+                    SceneManager.LoadScene(Stt_SceneIndexes.HUB);
+                });
             }
 
             public void SignUp()

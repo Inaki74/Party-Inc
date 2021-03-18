@@ -44,176 +44,6 @@ namespace PartyInc
                 Test = FsDB.Collection(Fb_Constants.FIRESTORE_COLLECTION_TEST);
                 Players = FsDB.Collection(Fb_Constants.FIRESTORE_KEY_PLAYERS);
                 PlayerSocial = FsDB.Collection(Fb_Constants.FIRESTORE_KEY_PLAYERSOCIAL);
-
-                StartCoroutine(TestThings());
-            }
-
-            private Dictionary<string, object> testData = null;
-
-            private IEnumerator TestThings()
-            {
-                string tp = "testPlayer";
-
-                Fb_FirestoreStructures.FSPlayer p = new Fb_FirestoreStructures.FSPlayer();
-
-                Fb_FirestoreStructures.FSPlayer.FSData pd = new Fb_FirestoreStructures.FSPlayer.FSData();
-                Fb_FirestoreStructures.FSPlayer.FSCharacter pc = new Fb_FirestoreStructures.FSPlayer.FSCharacter();
-                Fb_FirestoreStructures.FSPlayer.FSStats ps = new Fb_FirestoreStructures.FSPlayer.FSStats();
-
-                Fb_FirestoreStructures.FSPlayer.FSCharacter.FSFace pcf = new Fb_FirestoreStructures.FSPlayer.FSCharacter.FSFace();
-
-                Fb_FirestoreStructures.FSPlayer.FSCharacter.FSFace.FSEyesockets pcfe = new Fb_FirestoreStructures.FSPlayer.FSCharacter.FSFace.FSEyesockets();
-                Fb_FirestoreStructures.FSPlayer.FSCharacter.FSFace.FSMouth pcfm = new Fb_FirestoreStructures.FSPlayer.FSCharacter.FSFace.FSMouth();
-
-                p.assets.Add("ass1");
-                p.assets.Add("ass2CHANGED");
-                p.assets.Add("ass3");
-
-                pd.birthdate = FieldValue.ServerTimestamp;
-                pd.city = "CARACAS";
-                pd.country = "BOLCHANGED";
-                pd.currencies["base"] = 10;
-                pd.currencies["premium"] = 150;
-                pd.currencies["lives"] = 5;
-                pd.language = "EN";
-                pd.nickname = "Sleepy";
-                pd.regdate = FieldValue.ServerTimestamp;
-
-                pcfm.mouthid = "mouth37CHANGED";
-
-                pcfe.height = 1f;
-                pcfe.scale = 1.1f;
-                pcfe.separation = 0.2f;
-                pcfe.eyeid = "eye";
-
-                pcf.browcolor = "somecol";
-                pcf.browid = "browidCHANGED";
-                pcf.eyesockets = pcfe.ToDictionary();
-                pcf.mouth = pcfm.ToDictionary();
-                pcf.facemarkid = "fmkid";
-                pcf.makeupcolor = "somecol";
-                pcf.makeupid = "mkid";
-
-                pc.face = pcf.ToDictionary();
-
-                pc.AddOutfit("outfitid", "back3", "ear3", "facialhair3", "glass3", "hair3", "jaw3", "pants3", "shirt3", "socks3");
-                pc.AddOutfit("outfitid12", "back14", "ear1", "facialhair1", "glass1", "hair1", "jaw1", "pants1", "shirt1", "socks1");
-                pc.AddOutfit("outfitid23", "back21", "ear2", "facialhair2", "glass2", "hair2", "jaw2", "pants2", "shirt2", "socks2");
-
-                p.data = pd.ToDictionary();
-                p.character = pc.ToDictionary();
-                p.stats = ps.ToDictionary();
-
-                List<Dictionary<string, object>> a = new List<Dictionary<string, object>>();
-
-                Dictionary<string, object> testdic = new Dictionary<string, object>();
-
-                testdic["a"] = "asd";
-                testdic["b"] = "r";
-
-                a.Add(testdic);
-
-                Dictionary<string, object> add = new Dictionary<string, object>();
-                add.Add("test", a);
-
-                //UpdateUniquelyArrayGeneric(Players, tp, testdic, "test", (d1, d2) =>
-                //{
-                //    return d1["b"].Equals(d2["b"]);
-                //});
-                //UpdateDocument(Players, tp, add);
-                //UpdateArray(Players, tp, testdic, "test");
-
-                yield return null;
-
-                // TEST ADD (Done, looks good)
-                //Add(Players, p.ToDictionary(), tp, (res) =>
-                //{
-                //    if (res.success)
-                //    {
-                //        Debug.Log("ID " + res.data["docid"]);
-                //    }
-                //    else
-                //    {
-                //        Debug.Log(res.exceptions.First().Message);
-                //    }
-                //});
-                //Add(Players, p.ToDictionary(), "b");
-                //Add(Players, p.ToDictionary(), "g26xki3MAel6kNgj9x9P", (res) =>
-                //{
-                //    if (!res.success)
-                //    {
-                //         Debug.Log(res.exceptions.First().Message);
-                //    }
-
-                //});
-                //
-
-                // TEST UPDATES
-
-                //string[][] paths = new string[3][];
-                //string[] a = { "character", "outfits" };
-                //string[] b = { "data", "city" };
-                //string[] c = { "character", "face", "mouth" };
-                //paths[0] = a;
-                //paths[1] = b;
-                //paths[2] = c;
-
-                //UpdateDocument(Players, "ASDASDASDEEWEWE", p.ToDictionary(), res => {
-                //    if (res.success)
-                //    {
-                //        Debug.Log("Old dic");
-                //        DictionaryToString(res.oldData);
-                //        Debug.Log("New dic");
-                //        DictionaryToString(res.data);
-                //    }
-                //    else
-                //    {
-                //        Debug.Log("bruh");
-                //        Debug.Log(res.exceptions.First().Message);
-                //    }
-                //});
-                //UpdateArray(Players, "EIEIEIASDI", "Asset20", "assets");
-                //RemoveInArray(Players, "EIEIEIEIEASDI", "Asset20", "assets");
-                //
-
-                // TEST GETS
-                //bool wait = false;
-                //Get(Players, tp, (result) =>
-                //{
-                //    testData = result.data;
-                //    wait = true;
-                //});
-
-                //yield return new WaitUntil(() => wait);
-                //
-
-                Dictionary<string, object> toRemove = new Dictionary<string, object>();
-
-                toRemove.Add("a", "a");
-                toRemove.Add("b", "b");
-
-                // TEST REMOVE
-                //RemoveInArrayGeneric(Players, tp, toRemove, "test", (d1, d2) =>
-                //{
-                //    return d1["a"].Equals(d2["a"]);
-                //});
-                RemoveInArray(Players, tp, "ass1", "assets");
-                //
-            }
-
-            private void GetCallback()
-            {
-
-            }
-
-            public string DictionaryToString(Dictionary<string, object> dictionary)
-            {
-                string dictionaryString = "{";
-                foreach (KeyValuePair<string, object> keyValues in dictionary)
-                {
-                    dictionaryString += keyValues.Key + " : " + keyValues.Value.ToString() + ", ";
-                }
-                return dictionaryString.TrimEnd(',', ' ') + "}";
             }
 
             /// <summary>
@@ -742,20 +572,15 @@ namespace PartyInc
                         Dictionary<string, object> broughtData = task.Result.ToDictionary();
                         result.oldData = broughtData;
 
-                        Debug.Log("a");
                         List<object> auxList = broughtData[fieldPath] as List<object>;
-                        Debug.Log("v");
                         List<T> list = new List<T>();
-                        Debug.Log("c");
                         foreach (object o in auxList)
                         {
                             list.Add((T)o);
                         }
-                        Debug.Log("d");
 
                         foreach (T comparee in list)
                         {
-                            Debug.Log("h");
                             if (EqualsPredicate(data, comparee))
                             {
                                 // If found, delete that element from the array using the comparee!
