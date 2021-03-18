@@ -12,6 +12,14 @@ namespace PartyInc
     using PartyFirebase.Firestore;
     namespace PartyFirebase.Auth
     {
+        public struct FireauthCallResult
+        {
+            public bool success;
+            public string uid;
+            public string username;
+            public List<Firebase.FirebaseException> exceptions;
+        }
+
         public class Fb_FirebaseAuthenticateManager : MonoSingleton<Fb_FirebaseAuthenticateManager>
         {
             private FirebaseAuth _auth;
@@ -54,8 +62,11 @@ namespace PartyInc
                 }
             }
 
-            public void SignInEmailPassword(string email, string password, Action Callback = null)
+            public void SignInEmailPassword(string email, string password, Action<FireauthCallResult> Callback = null)
             {
+                FireauthCallResult result = new FireauthCallResult();
+                result.exceptions = new List<Firebase.FirebaseException>();
+
                 Debug.Log("Attempting to sign in with: " + email + " " + password);
 
                 _auth.SignInWithEmailAndPasswordAsync(email, password).ContinueWithOnMainThread(task =>
@@ -67,8 +78,12 @@ namespace PartyInc
                         AuthError error = (AuthError)(task.Exception.Flatten().InnerException as Firebase.FirebaseException).ErrorCode;
                         ManageErrorCodes(error);
 
-                        Debug.Log("Authentication failed: " + error.ToString());
+                        result.exceptions.Add(task.Exception.Flatten().InnerException as Firebase.FirebaseException);
+                        result.success = false;
+                        result.uid = null;
+                        result.username = null;
 
+                        Callback(result);
                         return;
                     }
 
@@ -76,22 +91,32 @@ namespace PartyInc
                     {
                         Debug.Log("User with email: " + _auth.CurrentUser.Email + " logged in!");
 
-                        // GO TO HUB, GET PLAYER INFO FROM FIRESTORE
-                        Callback();
+                        result.success = true;
+                        result.uid = task.Result.UserId;
+                        result.username = task.Result.DisplayName;
 
+                        Callback(result);
                         return;
                     }
                 });
             }
 
-            public void SignUpEmailPassword(string email, string password, string verification, string username, Action<string> Callback = null)
+            public void SignUpEmailPassword(string email, string password, string verification, string username, Action<FireauthCallResult> Callback = null)
             {
+                FireauthCallResult result = new FireauthCallResult();
+                result.exceptions = new List<Firebase.FirebaseException>();
                 Debug.Log("Attempting to sign up with: " + email + " " + password);
 
                 if (password != verification)
                 {
                     SetErrorMessage("Password and verification dont match!", Color.red);
 
+                    result.exceptions.Add(new Firebase.FirebaseException((int)AuthError.Cancelled, "Password and verification dont match!"));
+                    result.success = false;
+                    result.uid = null;
+                    result.username = null;
+
+                    Callback(result);
                     return;
                 }
 
@@ -102,8 +127,12 @@ namespace PartyInc
                         AuthError error = (AuthError)(task.Exception.Flatten().InnerException as Firebase.FirebaseException).ErrorCode;
                         ManageErrorCodes(error);
 
-                        Debug.Log("Authentication failed: " + error.ToString());
-
+                        result.exceptions.Add(task.Exception.Flatten().InnerException as Firebase.FirebaseException);
+                        result.success = false;
+                        result.uid = null;
+                        result.username = null;
+                        
+                        Callback(result);
                         return;
                     }
 
@@ -125,8 +154,13 @@ namespace PartyInc
                                 AuthError error = (AuthError)(task2.Exception.Flatten().InnerException as Firebase.FirebaseException).ErrorCode;
                                 ManageErrorCodes(error);
 
+                                result.exceptions.Add(task.Exception.Flatten().InnerException as Firebase.FirebaseException);
+                                result.success = false;
+                                result.uid = null;
+                                result.username = null;
                                 Debug.Log("Setting of username failed: " + error.ToString());
 
+                                Callback(result);
                                 return;
                             }
 
@@ -134,9 +168,11 @@ namespace PartyInc
                             {
                                 Debug.Log("Username set!");
 
-                                // CREATE A PLAYER INSTANCE IN FIRESTORE
-                                Callback(task.Result.UserId);
+                                result.success = true;
+                                result.uid = task.Result.UserId;
+                                result.username = username;
 
+                                Callback(result);
                                 return;
                             }
                         });

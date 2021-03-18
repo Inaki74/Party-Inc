@@ -73,10 +73,17 @@ namespace PartyInc
             public void SignIn()
             {
                 _signingIn = true;
-                PartyFirebase.Auth.Fb_FirebaseAuthenticateManager.Current.SignInEmailPassword(_emailField.text, _passwordField.text, () =>
+                PartyFirebase.Auth.Fb_FirebaseAuthenticateManager.Current.SignInEmailPassword(_emailField.text, _passwordField.text, (result) =>
                 {
                     _signingIn = false;
-                    SceneManager.LoadScene(Stt_SceneIndexes.HUB);
+                    if (result.success)
+                    {
+                        SceneManager.LoadScene(Stt_SceneIndexes.HUB);
+                    }
+                    else
+                    {
+                        Debug.Log("Authentication failed: " + result.exceptions[0].Message);
+                    }
                 });
             }
 

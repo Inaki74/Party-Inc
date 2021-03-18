@@ -65,51 +65,58 @@ namespace PartyInc
                 Fb_FirebaseAuthenticateManager.Current.SignUpEmailPassword(_emailField.text, _passwordField.text, _passwordVerificationField.text, _nicknameField.text, SignUpOnFirestore);
             }
 
-            public void SignUpOnFirestore(string userId)
+            public void SignUpOnFirestore(FireauthCallResult result)
             {
-                Fb_FirestoreStructures.FSPlayer newPlayer = new Fb_FirestoreStructures.FSPlayer();
-                Fb_FirestoreStructures.FSPlayer.FSData newData = new Fb_FirestoreStructures.FSPlayer.FSData();
+                if (result.success)
+                {
+                    Fb_FirestoreStructures.FSPlayer newPlayer = new Fb_FirestoreStructures.FSPlayer();
+                    Fb_FirestoreStructures.FSPlayer.FSData newData = new Fb_FirestoreStructures.FSPlayer.FSData();
 
-                newData.nickname = _nicknameField.text;
-                newData.city = _cityField.text;
-                newData.country = _countryField.text;
-                newData.language = _languageField.text;
+                    newData.nickname = _nicknameField.text;
+                    newData.city = _cityField.text;
+                    newData.country = _countryField.text;
+                    newData.language = _languageField.text;
 
-                newPlayer.data = newData.ToDictionary();
+                    newPlayer.data = newData.ToDictionary();
 
-                // ADD TO PLAYERS
-                Fb_FirestoreManager.Current.Add(Fb_FirestoreManager.Current.Players, newPlayer.ToDictionary(), userId, res =>
+                    // ADD TO PLAYERS
+                    Fb_FirestoreManager.Current.Add(Fb_FirestoreManager.Current.Players, newPlayer.ToDictionary(), result.uid, res =>
+                    {
+                        _signingUp = false;
+                        if (res.success)
+                        {
+                            Debug.Log("PLAYER ADDED");
+
+                            SceneManager.LoadScene(Stt_SceneIndexes.HUB);
+                        }
+                        else
+                        {
+                            Debug.Log("COULDNT ADD PLAYER");
+                            Debug.Log(res.exceptions[0].Message);
+                        }
+                    });
+
+                    Fb_FirestoreStructures.FSPlayerSocial newPlayerSoc = new Fb_FirestoreStructures.FSPlayerSocial();
+
+                    // ADD TO PLAYERSOCIAL
+                    Fb_FirestoreManager.Current.Add(Fb_FirestoreManager.Current.Players, newPlayer.ToDictionary(), result.uid, res =>
+                    {
+                        if (res.success)
+                        {
+                            Debug.Log("PLAYER SOCIAL ADDED");
+                        }
+                        else
+                        {
+                            Debug.Log("COULDNT ADD PLAYER");
+                            Debug.Log(res.exceptions[0].Message);
+                        }
+                    });
+                }
+                else
                 {
                     _signingUp = false;
-                    if (res.success)
-                    {
-                        Debug.Log("PLAYER ADDED");
-
-                        SceneManager.LoadScene(Stt_SceneIndexes.HUB);
-                    }
-                    else
-                    {
-                        Debug.Log("COULDNT ADD PLAYER");
-                        Debug.Log(res.exceptions[0].Message);
-                    }
-                });
-
-                Fb_FirestoreStructures.FSPlayerSocial newPlayerSoc = new Fb_FirestoreStructures.FSPlayerSocial();
-
-
-                // ADD TO PLAYERSOCIAL
-                Fb_FirestoreManager.Current.Add(Fb_FirestoreManager.Current.Players, newPlayer.ToDictionary(), userId, res =>
-                {
-                    if (res.success)
-                    {
-                        Debug.Log("PLAYER SOCIAL ADDED");
-                    }
-                    else
-                    {
-                        Debug.Log("COULDNT ADD PLAYER");
-                        Debug.Log(res.exceptions[0].Message);
-                    }
-                });
+                    Debug.Log("Authentication failed: " + result.exceptions[0].Message);
+                }
             }
 
             public void BackToSignIn()
