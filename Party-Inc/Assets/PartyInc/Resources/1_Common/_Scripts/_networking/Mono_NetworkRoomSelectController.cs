@@ -26,7 +26,7 @@ namespace PartyInc
         // Start is called before the first frame update
         void Start()
         {
-            nameText.text = "Welcome " + PlayerPrefs.GetString(Constants.NAME_KEY_NETWRK) + "!";
+            nameText.text = "Welcome " + PartyFirebase.Auth.Fb_FirebaseAuthenticateManager.Current.Auth.CurrentUser.DisplayName + "!";
 
             if (PhotonNetwork.IsConnected)
             {
@@ -138,9 +138,7 @@ namespace PartyInc
 
         public override void OnDisconnected(DisconnectCause cause)
         {
-            Debug.Log("Fiesta Time/ RoomController: You have disconnected from the server. Cause: " + cause + ". Retrying...");
-            // Loads disconnected scene
-            SceneManager.LoadScene(2);
+
         }
 
         public override void OnRoomListUpdate(List<RoomInfo> roomList)
@@ -181,9 +179,10 @@ namespace PartyInc
 
         #endregion
 
-        public void ReturnToLobby()
+        public void SignOut()
         {
-            SceneManager.LoadScene(0);
+            PartyFirebase.Auth.Fb_FirebaseAuthenticateManager.Current.Auth.SignOut();
+            SceneManager.LoadScene(Stt_SceneIndexes.LAUNCHER_SIGNIN);
         }
     }
 }

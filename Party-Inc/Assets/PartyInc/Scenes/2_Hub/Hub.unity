@@ -1247,7 +1247,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 12696108}
-        m_MethodName: ReturnToLobby
+        m_MethodName: SignOut
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -1656,7 +1656,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Change name
+  m_Text: SIGN OUT
 --- !u!222 &1374016698
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -2001,7 +2001,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1599730837}
   m_Layer: 5
-  m_Name: GoBackButton
+  m_Name: SignOut
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

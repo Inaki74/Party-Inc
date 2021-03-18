@@ -37,8 +37,6 @@ namespace PartyInc
         {
             Pv = GetComponent<PhotonView>();
 
-            PlayerPrefs.SetString(Constants.CHRCTR_KEY_NETWRK, Constants.BUNNY_NAME_CHRCTR);
-
             currentCountdownTime = maxCountdownTime;
 
             PhotonNetwork.AutomaticallySyncScene = true;
@@ -81,7 +79,7 @@ namespace PartyInc
                 PhotonNetwork.CurrentRoom.IsOpen = false;
             }
             PhotonNetwork.LeaveRoom();
-            SceneManager.LoadScene(1);
+            SceneManager.LoadScene(Stt_SceneIndexes.HUB);
         }
 
         #endregion
