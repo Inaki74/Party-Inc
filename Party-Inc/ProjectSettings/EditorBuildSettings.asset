@@ -5,12 +5,6 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 0
-    path: 
-    guid: 00000000000000000000000000000000
-  - enabled: 0
-    path: 
-    guid: 00000000000000000000000000000000
   - enabled: 1
     path: Assets/PartyInc/Scenes/2_Hub/LauncherSceneSignIn.unity
     guid: 5130e088a7a0a4f6bb7fa9e44681d584
@@ -23,9 +17,6 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/PartyInc/Scenes/2_Hub/DisconnectedScene.unity
     guid: befd8d85c31a1431eb1c08baef49200d
-  - enabled: 1
-    path: Assets/PartyInc/Scenes/2_Hub/LoadingScene.unity
-    guid: dc24ea900a00c4ccbbdefc9a04c19bc6
   - enabled: 1
     path: Assets/PartyInc/Scenes/2_Hub/_Lobbies/EGG_GameLobby.unity
     guid: 307a71cc20749490a931c8f14d971de9
@@ -77,4 +68,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/PartyInc/Scenes/1_Games/AbandonSpaceship.unity
     guid: d5305a1d19b61493b876a932a068d67d
+  - enabled: 0
+    path: 
+    guid: 00000000000000000000000000000000
   m_configObjects: {}

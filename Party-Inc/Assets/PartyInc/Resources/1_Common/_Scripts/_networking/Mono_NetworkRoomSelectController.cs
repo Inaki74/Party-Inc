@@ -17,7 +17,7 @@ namespace PartyInc
     {
         private const int maxPlayers = 4;
 
-        private List<RoomInfo> currentRoomList;
+        private List<RoomInfo> currentRoomList = new List<RoomInfo>();
 
         [SerializeField] private Text nameText;
         private string gameToJoin = "";

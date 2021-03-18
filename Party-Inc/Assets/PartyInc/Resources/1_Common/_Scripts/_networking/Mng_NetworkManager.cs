@@ -15,6 +15,8 @@ namespace PartyInc
 
         private void Start()
         {
+            //Application.targetFrameRate = 60;
+
             _authValuesReady = false;
 
             if (!PhotonNetwork.IsConnected && !_runOnce)

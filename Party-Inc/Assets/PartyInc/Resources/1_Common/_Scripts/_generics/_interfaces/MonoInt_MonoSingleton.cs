@@ -27,6 +27,14 @@ namespace PartyInc
 
         private void Awake()
         {
+            T[] objs = FindObjectsOfType<T>();
+
+            if(objs.Length > 1)
+            {
+                Destroy(gameObject);
+                return;
+            }
+
             Debug.Log(typeof(T) + " Instantiated");
             _current = (T)this;
             Init();
