@@ -116,6 +116,8 @@ namespace PartyInc
 
                 Mono_ObstaclePassCheck_LL.onPlayerPassed += OnPlayerPassedGate;
                 PhotonNetwork.NetworkingClient.EventReceived += OnPlayerDied;
+
+                GameName = Stt_GameNames.GAMENAME_LL;
             }
 
             private void OnDestroy()

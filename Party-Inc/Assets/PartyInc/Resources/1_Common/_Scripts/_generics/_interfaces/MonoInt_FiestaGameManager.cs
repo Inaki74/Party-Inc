@@ -15,7 +15,10 @@ namespace PartyInc
     /// <typeparam name="T"> The Scoring Type </typeparam>
     public abstract class FiestaGameManager<G, T> : MonoSingleton<G> where G : MonoSingleton<G>
     {
+        public string GameName { get; protected set; }
+
         // The network controller in the scene.
+        protected Mono_GameMetadata gameMetadata;
         protected Mono_NetworkGameRoomController networkController;
 
         // The results of the game, every game has results and winners.
@@ -59,6 +62,7 @@ namespace PartyInc
         {
             Debug.Log("Default GM Start");
 
+            gameMetadata = FindObjectOfType<Mono_GameMetadata>();
             networkController = FindObjectOfType<Mono_NetworkGameRoomController>();
 
             if(networkController == null && PhotonNetwork.IsConnected)
@@ -84,6 +88,8 @@ namespace PartyInc
             {
                 StartCoroutine("WaitForPropertiesCo");
             }
+
+            gameMetadata.GameName = GameName;
 
             InStart();
             StartCoroutine("AllPlayersReady");

@@ -69,6 +69,13 @@ namespace PartyInc
 
                 OnGameStartInvoke();
             }
+
+            public override void Init()
+            {
+                base.Init();
+
+                GameName = Stt_GameNames.GAMENAME_EGG;
+            }
             #endregion
 
             #region Unity Callbacks

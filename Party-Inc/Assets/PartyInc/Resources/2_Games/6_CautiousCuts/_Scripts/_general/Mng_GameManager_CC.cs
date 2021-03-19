@@ -45,6 +45,7 @@ namespace PartyInc
                 InitializeSpawners();
             }
 
+
             private void InitializePlayers()
             {
                 SetPlayerPositions();
@@ -119,6 +120,8 @@ namespace PartyInc
                 PhotonNetwork.NetworkingClient.EventReceived += ClearSliced;
                 PhotonNetwork.NetworkingClient.EventReceived += GetPlayerResult;
                 Mono_Log_Controller_CC.onLogDestroyed += SendSliced;
+
+                GameName = Stt_GameNames.GAMENAME_CC;
             }
 
             private void OnDestroy()

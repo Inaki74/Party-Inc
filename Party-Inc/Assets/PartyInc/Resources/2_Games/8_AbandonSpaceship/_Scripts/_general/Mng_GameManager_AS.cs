@@ -80,6 +80,8 @@ namespace PartyInc
                 PhotonNetwork.NetworkingClient.EventReceived += OnPlayerDied;
 
                 MyPlayerZ = -1f;
+
+                GameName = Stt_GameNames.GAMENAME_AS;
             }
 
             private void OnDestroy()

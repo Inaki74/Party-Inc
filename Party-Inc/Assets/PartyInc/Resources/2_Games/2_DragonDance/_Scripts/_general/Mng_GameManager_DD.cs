@@ -66,6 +66,13 @@ namespace PartyInc
                 ResetRemotePlayersReady();
             }
 
+            public override void Init()
+            {
+                base.Init();
+
+                GameName = Stt_GameNames.GAMENAME_DD;
+            }
+
             protected override void InitializeGameManagerDependantObjects()
             {
                 // Initialize players

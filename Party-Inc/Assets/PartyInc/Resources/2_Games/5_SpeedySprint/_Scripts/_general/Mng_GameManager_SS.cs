@@ -77,6 +77,8 @@ namespace PartyInc
                 base.Init();
 
                 Mono_Player_Controller_SS.onPlayerDied += OnPlayerLost;
+
+                GameName = Stt_GameNames.GAMENAME_SS;
             }
 
             private void OnDestroy()
