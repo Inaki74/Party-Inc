@@ -2,6 +2,10 @@
 using System.Collections;
 using UnityEngine;
 using Photon.Pun;
+using Photon.Realtime;
+using ExitGames.Client.Photon;
+using System.Linq;
+using System.Collections.Generic;
 
 namespace PartyInc
 {
@@ -23,6 +27,7 @@ namespace PartyInc
 
         // The results of the game, every game has results and winners.
         public PlayerResults<T>[] playerResults = new PlayerResults<T>[4];
+        public List<PlayerResults<T>> ProvisoryPlayerResults = new List<PlayerResults<T>>();
 
         // Every game has a start.
         public delegate void ActionGameStart();
@@ -89,8 +94,6 @@ namespace PartyInc
                 StartCoroutine("WaitForPropertiesCo");
             }
 
-            gameMetadata.GameName = GameName;
-
             InStart();
             StartCoroutine("AllPlayersReady");
         }
@@ -98,6 +101,8 @@ namespace PartyInc
         public override void Init()
         {
             base.Init();
+
+            PhotonNetwork.NetworkingClient.EventReceived += GetPlayerResult;
 
             Debug.Log("Default GM Awake");
             playerCount = PhotonNetwork.PlayerList.Length;
@@ -110,15 +115,24 @@ namespace PartyInc
             }
         }
 
+        private void OnDestroy()
+        {
+
+            OnDestroyed();
+        }
+
+        public virtual void OnDestroyed()
+        {
+            PhotonNetwork.NetworkingClient.EventReceived -= GetPlayerResult;
+        }
+
         /// <summary>
         /// Starts the game once all players are ready.
         /// </summary>
         /// <returns></returns>
         private IEnumerator AllPlayersReady()
         {
-            Debug.Log("ONE");
             yield return new WaitUntil(() => networkController.playersAreReady || !PhotonNetwork.IsConnected);
-            Debug.Log("TWO");
 
             PlayersConnectedAndReady = true;
 
@@ -134,6 +148,78 @@ namespace PartyInc
         {
             onGameFinish?.Invoke();
         }
+
+        /// <summary>
+        /// Does not run OnGameFinishInvoke() within.
+        /// </summary>
+        /// <param name="descending"></param>
+        protected IEnumerator GameFinish(bool biggerScoreWins)
+        {
+            //Must get all the player results from the net (each client should have their own score tracked)
+            //Order the list based on descending variable.
+            //Get the winner from it
+            //Activate the game end screen and pass by the ordered list of player results
+            if (PhotonNetwork.IsMasterClient)
+            {
+                object[] content = new object[] { };
+                RaiseEventOptions raiseEventOptions = new RaiseEventOptions { Receivers = ReceiverGroup.All };
+                PhotonNetwork.RaiseEvent(74, content, raiseEventOptions, SendOptions.SendReliable);
+            }
+
+            Debug.Log("Sent for results");
+
+            yield return new WaitUntil(() => ProvisoryPlayerResults.Count() == playerCount);
+
+            playerResults = ProvisoryPlayerResults.ToArray();
+
+            var aux = playerResults.OrderByDescending(result => result.scoring);
+            // Order list
+            if (!biggerScoreWins)
+            {
+                aux = playerResults.OrderBy(result => result.scoring);
+            }
+            
+            playerResults = aux.ToArray();
+
+            // Find a winner
+            FindWinner();
+
+            OnGameFinishInvoke();
+        }
+
+        /// <summary>
+        /// Function that finds who is the winner.
+        /// </summary>
+        private void FindWinner()
+        {
+            T contenderScore = playerResults.First().scoring;
+            int contender = playerResults.First().playerId;
+            int hap = 0;
+
+            for (int i = 0; i < playerResults.Count(); i++)
+            {
+                if (playerResults[i].scoring.Equals(contenderScore)) hap++;
+            }
+
+            if (hap > 1) contender = -1;
+
+            WinnerId = contender;
+        }
+
+        private void GetPlayerResult(EventData eventData)
+        {
+            if (eventData.Code == 75)
+            {
+                object[] data = (object[])eventData.CustomData;
+
+                PlayerResults<T> thisPlayersResult = new PlayerResults<T>();
+                thisPlayersResult.playerId = (int)data[0];
+                thisPlayersResult.scoring = (T)data[1];
+
+                ProvisoryPlayerResults.Add(thisPlayersResult);
+            }
+        }
+
 
         /// <summary>
         /// Use this instead of start

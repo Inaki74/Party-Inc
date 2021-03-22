@@ -3,15 +3,16 @@ using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
 using Photon.Realtime;
+using ExitGames.Client.Photon;
 
 namespace PartyInc
 {
     namespace RR
     {
         [RequireComponent(typeof(Rigidbody))]
-        public class Mono_Player_Controller_RR : MonoBehaviourPun
+        public class Mono_Player_Controller_RR : MonoBehaviourPun, IPlayerResultSender
         {
-            public delegate void ActionPlayerLost(int playerId, int score);
+            public delegate void ActionPlayerLost();
             public static event ActionPlayerLost onPlayerDied;
 
             [SerializeField] public Rigidbody Rb;
@@ -33,6 +34,8 @@ namespace PartyInc
 
             public LayerMask whatIsGround;
             private float distanceGround = 0.3f;
+
+            private int _scoreDied;
             // Start is called before the first frame update
             void Start()
             {
@@ -46,6 +49,16 @@ namespace PartyInc
                 originalDrag = Rb.drag;
 
                 if (photonView.IsMine) Mr.material = mine;
+            }
+
+            private void Awake()
+            {
+                PhotonNetwork.NetworkingClient.EventReceived += SendMyResults;
+            }
+
+            private void OnDestroy()
+            {
+                PhotonNetwork.NetworkingClient.EventReceived -= SendMyResults;
             }
 
             // Update is called once per frame
@@ -91,7 +104,7 @@ namespace PartyInc
                 }
                 else
                 {
-                    cheatInput = true;
+                    //cheatInput = true;
 
                     jumpInput = Input.GetKey(KeyCode.UpArrow) || Input.GetKey(KeyCode.W);
                 }
@@ -141,19 +154,41 @@ namespace PartyInc
                 {
                     return;
                 }
-                
+
+                _scoreDied = Mng_GameManager_RR.Current.currentJump;
+
                 Rb.drag = 0f;
                 Rb.constraints = RigidbodyConstraints.None;
                 Rb.AddForce(force * 5, ForceMode.Impulse);
                 hasLost = true;
 
                 photonView.RPC("RPC_InformPlayerLost", RpcTarget.Others);
-                onPlayerDied?.Invoke(PhotonNetwork.LocalPlayer.ActorNumber, Mng_GameManager_RR.Current.currentJump);
+                onPlayerDied?.Invoke();
+            }
+
+            public void SendMyResults(EventData eventData)
+            {
+                if (eventData.Code == 74 && photonView.IsMine)
+                {
+                    Debug.Log("SENDING MY RESULTS");
+
+                    int finalScore = _scoreDied;
+                    //if (finalScore > PlayerPrefs.GetFloat(PartyInc.Constants.CC_KEY_HISCORE))
+                    //{
+                    //    Mng_GameManager_SS.Current.IsHighScore = true;
+                    //    PlayerPrefs.SetFloat(PartyInc.Constants.CC_KEY_HISCORE, finalScore);
+                    //}
+
+                    object[] content = new object[] { PhotonNetwork.LocalPlayer.ActorNumber, finalScore };
+                    RaiseEventOptions raiseEventOptions = new RaiseEventOptions { Receivers = ReceiverGroup.All };
+                    PhotonNetwork.RaiseEvent(75, content, raiseEventOptions, SendOptions.SendReliable);
+                }
             }
 
             [PunRPC]
             public void RPC_InformPlayerLost()
             {
+                onPlayerDied?.Invoke();
                 hasLost = true;
             }
         }

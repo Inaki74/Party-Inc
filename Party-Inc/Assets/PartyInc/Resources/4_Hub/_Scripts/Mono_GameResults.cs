@@ -11,6 +11,7 @@ namespace PartyInc
         public class Mono_GameResults : MonoBehaviour
         {
             private Mono_GameMetadata _gameData;
+            //private FiestaGameManager gm;
 
             [Header("Players in the list, in order")]
             [SerializeField] private GameObject[] players;
@@ -53,6 +54,11 @@ namespace PartyInc
                             break;
                         }
                     }
+                }
+
+                if(_gameData.GameName == "EGG")
+                {
+
                 }
             }
 

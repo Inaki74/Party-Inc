@@ -76,14 +76,16 @@ namespace PartyInc
             {
                 base.Init();
 
-                Mono_Player_Controller_SS.onPlayerDied += OnPlayerLost;
+                //Mono_Player_Controller_SS.onPlayerDied += OnPlayerLost;
+                Mono_Player_Controller_SS.onPlayerDied += OnPlayerDied;
 
                 GameName = Stt_GameNames.GAMENAME_SS;
             }
 
             private void OnDestroy()
             {
-                Mono_Player_Controller_SS.onPlayerDied -= OnPlayerLost;
+                //Mono_Player_Controller_SS.onPlayerDied -= OnPlayerLost;
+                Mono_Player_Controller_SS.onPlayerDied -= OnPlayerDied;
             }
 
             // Update is called once per frame
@@ -130,30 +132,21 @@ namespace PartyInc
                 }
 
                 // Game finish logic
-                if (_playersAlive == 0 && !_runOnce && PhotonNetwork.IsConnectedAndReady) 
+                if (_playersAlive <= 0 && !_runOnce && PhotonNetwork.IsConnectedAndReady) 
                 {
                     _runOnce = true;
                     GameBegan = false;
                     MovingSpeed = 0f;
 
-                    FinishGame();
+                    StartCoroutine(GameFinish(true));
+                    //FinishGame();
                 }
             }
 
-            /// <summary>
-            /// Function that finishes the game
-            /// </summary>
-            private void FinishGame()
+            private void OnPlayerDied()
             {
-                // Order list
-                var aux = playerResults.OrderByDescending(result => result.scoring);
-                playerResults = aux.ToArray();
-
-                // Find a winner
-                FindWinner();
-
-                // Invoke finishing functions
-                OnGameFinishInvoke();
+                Debug.Log("OnPlayerDied");
+                _playersAlive--;
             }
 
             /// <summary>
@@ -229,19 +222,19 @@ namespace PartyInc
             /// Event function triggered when a player loses.
             /// </summary>
             /// <param name="playerId"></param>
-            private void OnPlayerLost(int playerId)
-            {
-                PlayerResults<float> results = new PlayerResults<float>();
-                results.playerId = playerId;
-                results.scoring = InGameTime;
-                playerResults[_nextToInsert] = results;
-                _nextToInsert++;
-                _playersAlive--;
+            //private void OnPlayerLost(int playerId)
+            //{
+            //    PlayerResults<float> results = new PlayerResults<float>();
+            //    results.playerId = playerId;
+            //    results.scoring = InGameTime;
+            //    playerResults[_nextToInsert] = results;
+            //    _nextToInsert++;
+            //    _playersAlive--;
 
-                if (PhotonNetwork.LocalPlayer.ActorNumber == playerId) IsHighScore = HighScoreHelpers.DetermineHighScoreFloat(Constants.SS_KEY_HISCORE, results.scoring, true);
+            //    if (PhotonNetwork.LocalPlayer.ActorNumber == playerId) IsHighScore = HighScoreHelpers.DetermineHighScoreFloat(Constants.SS_KEY_HISCORE, results.scoring, true);
 
-                photonView.RPC("RPC_SendPlayerResult", RpcTarget.Others, results.playerId, results.scoring);
-            }
+            //    photonView.RPC("RPC_SendPlayerResult", RpcTarget.Others, results.playerId, results.scoring);
+            //}
 
             [PunRPC]
             public void RPC_SendPlayerResult(int playerId, float time)

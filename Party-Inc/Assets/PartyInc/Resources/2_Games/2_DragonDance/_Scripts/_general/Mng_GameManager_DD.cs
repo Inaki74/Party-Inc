@@ -177,13 +177,7 @@ namespace PartyInc
                     isGameRunning = !CheckPlayersStanding();
                 }
 
-                // Outro
-                if (playerCount > 1) DecideWinner();
-                else
-                {
-                    WinnerId = PhotonNetwork.LocalPlayer.ActorNumber;
-                    playerResults = GetPlayerResults();
-                } 
+                yield return StartCoroutine(GameFinish(true));
 
                 Debug.Log("Invoking Phase 4, WinnerId: " + WinnerId);
                 onNextPhase?.Invoke(4);
@@ -195,47 +189,6 @@ namespace PartyInc
 
             #region Private Functions
 
-            private void DecideWinner()
-            {
-                playerResults = GetPlayerResults();
-
-                int max = -1;
-                for(int i = 0; i < playerResults.Length; i++)
-                {
-                    if(playerResults[i].scoring > max)
-                    {
-                        max = playerResults[i].scoring;
-                        WinnerId = playerResults[i].playerId;
-                    }
-                }
-
-                PlayerResults<int> aux = new PlayerResults<int>();
-                aux.scoring = max;
-                int hap = 0;
-                foreach(PlayerResults<int> result in playerResults)
-                {
-                    if (result.Equals(aux)) hap++;
-                }
-
-                if(hap > 1)
-                {
-                    //Draw
-                    WinnerId = -1;
-                }
-            }
-
-            private PlayerResults<int>[] GetPlayerResults()
-            {
-                PlayerResults<int>[] ret = new PlayerResults<int>[playerCount];
-                Mono_Player_Controller_DD[] players = FindObjectsOfType<Mono_Player_Controller_DD>();
-
-                for(int i = 0; i < playerCount; i++)
-                {
-                    ret[i] = players[i].myResults;
-                }
-
-                return ret;
-            }
 
             /// <summary>
             /// Initializes players in their positions.
