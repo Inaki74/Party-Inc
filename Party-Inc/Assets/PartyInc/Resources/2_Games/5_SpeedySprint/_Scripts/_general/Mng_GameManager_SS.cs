@@ -150,25 +150,6 @@ namespace PartyInc
             }
 
             /// <summary>
-            /// Function that finds who is the winner.
-            /// </summary>
-            private void FindWinner()
-            {
-                float contenderScore = playerResults.First().scoring;
-                int contender = playerResults.First().playerId;
-                int hap = 0;
-
-                for (int i = 0; i < playerResults.Count(); i++)
-                {
-                    if (playerResults[i].scoring == contenderScore) hap++;
-                }
-
-                if (hap > 1) contender = -1;
-
-                WinnerId = contender;
-            }
-
-            /// <summary>
             /// Sets player positions taking account amount of players.
             /// </summary>
             private void SetPlayerPositions()
@@ -216,36 +197,6 @@ namespace PartyInc
                 }
 
                 PhotonNetwork.Instantiate("_player/" + playerPrefab.name, decidedPosition, Quaternion.identity);
-            }
-
-            /// <summary>
-            /// Event function triggered when a player loses.
-            /// </summary>
-            /// <param name="playerId"></param>
-            //private void OnPlayerLost(int playerId)
-            //{
-            //    PlayerResults<float> results = new PlayerResults<float>();
-            //    results.playerId = playerId;
-            //    results.scoring = InGameTime;
-            //    playerResults[_nextToInsert] = results;
-            //    _nextToInsert++;
-            //    _playersAlive--;
-
-            //    if (PhotonNetwork.LocalPlayer.ActorNumber == playerId) IsHighScore = HighScoreHelpers.DetermineHighScoreFloat(Constants.SS_KEY_HISCORE, results.scoring, true);
-
-            //    photonView.RPC("RPC_SendPlayerResult", RpcTarget.Others, results.playerId, results.scoring);
-            //}
-
-            [PunRPC]
-            public void RPC_SendPlayerResult(int playerId, float time)
-            {
-                PlayerResults<float> thisPlayerResult = new PlayerResults<float>();
-                thisPlayerResult.playerId = playerId;
-                thisPlayerResult.scoring = time;
-
-                playerResults[_nextToInsert] = thisPlayerResult;
-                _nextToInsert++;
-                _playersAlive--;
             }
 
             [PunRPC]

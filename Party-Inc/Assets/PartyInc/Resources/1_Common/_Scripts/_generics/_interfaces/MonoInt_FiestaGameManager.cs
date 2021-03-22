@@ -6,6 +6,7 @@ using Photon.Realtime;
 using ExitGames.Client.Photon;
 using System.Linq;
 using System.Collections.Generic;
+using UnityEngine.SceneManagement;
 
 namespace PartyInc
 {
@@ -65,10 +66,16 @@ namespace PartyInc
 
         private void Start()
         {
+            Debug.Log("WHAT THE FUCK IS GOING ON");
+            Debug.Log(typeof(G).ToString());
+            Debug.Log(typeof(T).ToString());
+
             Debug.Log("Default GM Start");
 
             gameMetadata = FindObjectOfType<Mono_GameMetadata>();
             networkController = FindObjectOfType<Mono_NetworkGameRoomController>();
+
+            gameMetadata.PlayerCount = playerCount;
 
             if(networkController == null && PhotonNetwork.IsConnected)
             {
@@ -155,6 +162,10 @@ namespace PartyInc
         /// <param name="descending"></param>
         protected IEnumerator GameFinish(bool biggerScoreWins)
         {
+            // Begin loading end scene, as getting the player results will take a tiny bit of time.
+            AsyncOperation scene = SceneManager.LoadSceneAsync(Stt_SceneIndexes.GAMERESULTS, LoadSceneMode.Additive);
+            scene.allowSceneActivation = false;
+
             //Must get all the player results from the net (each client should have their own score tracked)
             //Order the list based on descending variable.
             //Get the winner from it
@@ -184,7 +195,50 @@ namespace PartyInc
             // Find a winner
             FindWinner();
 
-            OnGameFinishInvoke();
+            // Load up metadata:
+            gameMetadata.GameName = GameName;
+            gameMetadata.WinnerId = WinnerId;
+            gameMetadata.DescendingCondition = biggerScoreWins;
+
+            if (typeof(T) == typeof(int))
+            {
+                gameMetadata.ScoreType = ScoreType.Int;
+                PlayerResults<int>[] res = new PlayerResults<int>[playerCount];
+
+                foreach(PlayerResults<T> val in playerResults)
+                {
+                    PlayerResults<int> newPR = new PlayerResults<int>();
+                    newPR.playerId = val.playerId;
+                    newPR.reachedEnd = val.reachedEnd;
+                    newPR.scoring = (int)Convert.ChangeType(val.scoring, typeof(int));
+                }
+
+                gameMetadata.PlayerResultsInt = res;
+                foreach (PlayerResults<int> a in gameMetadata.PlayerResultsInt)
+                {
+                    Debug.Log(a.ToString());
+                }
+            }
+            else
+            {
+                gameMetadata.ScoreType = ScoreType.Float;
+                PlayerResults<float>[] res = new PlayerResults<float>[playerCount];
+
+                foreach (PlayerResults<T> val in playerResults)
+                {
+                    PlayerResults<float> newPR = new PlayerResults<float>();
+                    newPR.playerId = val.playerId;
+                    newPR.reachedEnd = val.reachedEnd;
+                    newPR.scoring = (float)Convert.ChangeType(val.scoring, typeof(float));
+                }
+
+                gameMetadata.PlayerResultsFloat = res;
+            }
+
+            scene.allowSceneActivation = true;
+
+            // Load up the game end screen.
+            yield return new WaitUntil(() => scene.isDone);
         }
 
         /// <summary>
@@ -250,6 +304,7 @@ namespace PartyInc
         }
     }
 
+
     public struct PlayerResults<T>
     {
         public T scoring;
@@ -271,6 +326,12 @@ namespace PartyInc
         {
             return "PlayerID: " + playerId + " , scoring: " + scoring;
         }
+    }
+
+    public enum ScoreType
+    {
+        Float,
+        Int,
     }
 }
 

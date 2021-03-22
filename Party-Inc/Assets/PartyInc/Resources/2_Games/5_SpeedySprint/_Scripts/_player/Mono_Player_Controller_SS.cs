@@ -641,7 +641,7 @@ namespace PartyInc
                     //    PlayerPrefs.SetFloat(PartyInc.Constants.CC_KEY_HISCORE, finalScore);
                     //}
 
-                    object[] content = new object[] { PhotonNetwork.LocalPlayer.ActorNumber, finalScore };
+                    object[] content = new object[] { PhotonNetwork.LocalPlayer.ActorNumber, finalScore, "float" };
                     RaiseEventOptions raiseEventOptions = new RaiseEventOptions { Receivers = ReceiverGroup.All };
                     PhotonNetwork.RaiseEvent(75, content, raiseEventOptions, SendOptions.SendReliable);
                 }

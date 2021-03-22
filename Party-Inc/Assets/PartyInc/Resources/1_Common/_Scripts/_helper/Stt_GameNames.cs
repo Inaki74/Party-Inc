@@ -6,13 +6,13 @@ namespace PartyInc
 {
     public static class Stt_GameNames
     {
-        public const string GAMENAME_EGG = "EGG";
-        public const string GAMENAME_DD = "DragonDance";
-        public const string GAMENAME_SS = "SpeedySprint";
-        public const string GAMENAME_RR = "RowdyRope";
-        public const string GAMENAME_CC = "CautiousCuts";
-        public const string GAMENAME_LL = "LunarLanding";
-        public const string GAMENAME_AS = "AbandonSpaceship";
+        public const string GAMENAME_EGG = "E.G.G";
+        public const string GAMENAME_DD = "Dragon Dance";
+        public const string GAMENAME_SS = "Speedy Sprint";
+        public const string GAMENAME_RR = "Rowdy Rope";
+        public const string GAMENAME_CC = "Cautious Cuts";
+        public const string GAMENAME_LL = "Lunar Landing";
+        public const string GAMENAME_AS = "Abandon Spaceship !";
 
         public const string GAMENAME_ABBREVIATION_EGG = "EGG";
         public const string GAMENAME_ABBREVIATION_DD = "DD";

@@ -221,7 +221,7 @@ namespace PartyInc
                 {
                     int finalScore = _scoreDied;
 
-                    object[] content = new object[] { PhotonNetwork.LocalPlayer.ActorNumber, finalScore };
+                    object[] content = new object[] { PhotonNetwork.LocalPlayer.ActorNumber, finalScore, "int" };
                     RaiseEventOptions raiseEventOptions = new RaiseEventOptions { Receivers = ReceiverGroup.All };
                     PhotonNetwork.RaiseEvent(75, content, raiseEventOptions, SendOptions.SendReliable);
                 }
