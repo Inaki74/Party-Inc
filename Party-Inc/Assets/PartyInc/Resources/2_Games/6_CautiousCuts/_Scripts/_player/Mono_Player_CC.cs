@@ -148,13 +148,14 @@ namespace PartyInc
                 if (eventData.Code == 74 && photonView.IsMine)
                 {
                     float finalScore = (float)(_myTotalScore / Constants.AMOUNT_OF_LOGS_PER_MATCH);
+                    bool isInt = false;
                     if (finalScore > PlayerPrefs.GetFloat(PartyInc.Constants.CC_KEY_HISCORE))
                     {
                         Mng_GameManager_CC.Current.IsHighScore = true;
                         PlayerPrefs.SetFloat(PartyInc.Constants.CC_KEY_HISCORE, finalScore);
                     }
 
-                    object[] content = new object[] { PhotonNetwork.LocalPlayer.ActorNumber, finalScore, "float" };
+                    object[] content = new object[] { PhotonNetwork.LocalPlayer.ActorNumber, finalScore, isInt };
                     RaiseEventOptions raiseEventOptions = new RaiseEventOptions { Receivers = ReceiverGroup.All };
                     PhotonNetwork.RaiseEvent(75, content, raiseEventOptions, SendOptions.SendReliable);
                 }

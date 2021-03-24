@@ -173,13 +173,14 @@ namespace PartyInc
                     Debug.Log("SENDING MY RESULTS");
 
                     int finalScore = _scoreDied;
+                    bool isInt = true;
                     //if (finalScore > PlayerPrefs.GetFloat(PartyInc.Constants.CC_KEY_HISCORE))
                     //{
                     //    Mng_GameManager_SS.Current.IsHighScore = true;
                     //    PlayerPrefs.SetFloat(PartyInc.Constants.CC_KEY_HISCORE, finalScore);
                     //}
 
-                    object[] content = new object[] { PhotonNetwork.LocalPlayer.ActorNumber, finalScore, "int" };
+                    object[] content = new object[] { PhotonNetwork.LocalPlayer.ActorNumber, finalScore, isInt };
                     RaiseEventOptions raiseEventOptions = new RaiseEventOptions { Receivers = ReceiverGroup.All };
                     PhotonNetwork.RaiseEvent(75, content, raiseEventOptions, SendOptions.SendReliable);
                 }

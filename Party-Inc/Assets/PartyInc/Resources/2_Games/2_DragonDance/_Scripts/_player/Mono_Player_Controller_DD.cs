@@ -14,7 +14,7 @@ namespace PartyInc
         /// <summary>
         /// In charge of all things player, its animations, its input management and its synchronization over the network.
         /// </summary>
-        public class Mono_Player_Controller_DD : MonoBehaviourPun, IPunObservable
+        public class Mono_Player_Controller_DD : MonoBehaviourPun, IPunObservable, IPlayerResultSender
         {
             public int health;
 
@@ -189,13 +189,14 @@ namespace PartyInc
                     Debug.Log("SENDING MY RESULTS");
 
                     int finalScore = _scoreDied;
+                    bool isInt = true;
                     //if (finalScore > PlayerPrefs.GetFloat(PartyInc.Constants.CC_KEY_HISCORE))
                     //{
                     //    Mng_GameManager_SS.Current.IsHighScore = true;
                     //    PlayerPrefs.SetFloat(PartyInc.Constants.CC_KEY_HISCORE, finalScore);
                     //}
 
-                    object[] content = new object[] { PhotonNetwork.LocalPlayer.ActorNumber, finalScore, "int" };
+                    object[] content = new object[] { PhotonNetwork.LocalPlayer.ActorNumber, finalScore, isInt };
                     RaiseEventOptions raiseEventOptions = new RaiseEventOptions { Receivers = ReceiverGroup.All };
                     PhotonNetwork.RaiseEvent(75, content, raiseEventOptions, SendOptions.SendReliable);
                 }

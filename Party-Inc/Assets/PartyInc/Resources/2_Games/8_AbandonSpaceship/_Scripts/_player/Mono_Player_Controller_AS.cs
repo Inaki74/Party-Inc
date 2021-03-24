@@ -220,8 +220,9 @@ namespace PartyInc
                 if (eventData.Code == 74 && photonView.IsMine)
                 {
                     int finalScore = _scoreDied;
+                    bool isInt = true;
 
-                    object[] content = new object[] { PhotonNetwork.LocalPlayer.ActorNumber, finalScore, "int" };
+                    object[] content = new object[] { PhotonNetwork.LocalPlayer.ActorNumber, finalScore, isInt };
                     RaiseEventOptions raiseEventOptions = new RaiseEventOptions { Receivers = ReceiverGroup.All };
                     PhotonNetwork.RaiseEvent(75, content, raiseEventOptions, SendOptions.SendReliable);
                 }

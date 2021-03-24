@@ -30,7 +30,8 @@ namespace PartyInc
 
         // The results of the game, every game has results and winners.
         public PlayerResults<T>[] playerResults = new PlayerResults<T>[4];
-        public List<PlayerResults<T>> ProvisoryPlayerResults = new List<PlayerResults<T>>();
+        public List<PlayerResults<int>> ProvisoryPlayerResultsInt = new List<PlayerResults<int>>();
+        public List<PlayerResults<float>> ProvisoryPlayerResultsFloat = new List<PlayerResults<float>>();
 
         // Every game has a start.
         public delegate void ActionGameStart();
@@ -169,9 +170,6 @@ namespace PartyInc
             scene.allowSceneActivation = false;
 
             //Must get all the player results from the net (each client should have their own score tracked)
-            //Order the list based on descending variable.
-            //Get the winner from it
-            //Activate the game end screen and pass by the ordered list of player results
             if (PhotonNetwork.IsMasterClient)
             {
                 object[] content = new object[] { };
@@ -179,18 +177,10 @@ namespace PartyInc
                 PhotonNetwork.RaiseEvent(74, content, raiseEventOptions, SendOptions.SendReliable);
             }
 
-            yield return new WaitUntil(() => ProvisoryPlayerResults.Count() == playerCount);
+            yield return new WaitUntil(() => ProvisoryPlayerResultsInt.Count() == playerCount || ProvisoryPlayerResultsFloat.Count() == playerCount);
 
-            playerResults = ProvisoryPlayerResults.ToArray();
-
-            var aux = playerResults.OrderByDescending(result => result.scoring);
-            // Order list
-            if (!biggerScoreWins)
-            {
-                aux = playerResults.OrderBy(result => result.scoring);
-            }
-            
-            playerResults = aux.ToArray();
+            // Parse player results 
+            ParsePlayerResults(biggerScoreWins);
 
             // Find a winner
             FindWinner();
@@ -217,6 +207,109 @@ namespace PartyInc
 
             // Load up the game end screen.
             yield return new WaitUntil(() => scene.isDone);
+        }
+
+        /// <summary>
+        /// Function that finds who is the winner.
+        /// </summary>
+        private void FindWinner()
+        {
+            T contenderScore = playerResults.First().scoring;
+            int contender = playerResults.First().playerId;
+            int hap = 0;
+
+            for (int i = 0; i < playerResults.Count(); i++)
+            {
+                if (playerResults[i].scoring.Equals(contenderScore)) hap++;
+            }
+
+            if (hap > 1) contender = -1;
+
+            WinnerId = contender;
+        }
+
+        private void GetPlayerResult(EventData eventData)
+        {
+            // GENERICS DOESN'T WORK WITH PHOTON EVENTS.
+            // Should have known...
+            if (eventData.Code == 75)
+            {
+                object[] data = (object[])eventData.CustomData;
+
+                if ((bool)data[2])
+                {
+                    PlayerResults<int> thisPlayersResult = new PlayerResults<int>();
+                    thisPlayersResult.playerId = (int)data[0];
+                    thisPlayersResult.scoring = (int)data[1];
+
+                    ProvisoryPlayerResultsInt.Add(thisPlayersResult);
+                }
+                else
+                {
+                    PlayerResults<float> thisPlayersResult = new PlayerResults<float>();
+                    thisPlayersResult.playerId = (int)data[0];
+                    thisPlayersResult.scoring = (float)data[1];
+
+                    ProvisoryPlayerResultsFloat.Add(thisPlayersResult);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Use this instead of start
+        /// </summary>
+        protected abstract void InStart();
+
+        /// <summary>
+        /// Put in here the instantiations of everything you know depends on the game managers existance and isnt already on the scene. (Like players)
+        /// Probably networked objects will lie here.
+        /// This method will run after every player has connected.
+        /// </summary>
+        protected abstract void InitializeGameManagerDependantObjects();
+
+        //////////
+        ///
+        private void ParsePlayerResults(bool biggerScoreWins)
+        {
+            if (ProvisoryPlayerResultsInt.Count() == playerCount)
+            {
+                List<PlayerResults<T>> res = new List<PlayerResults<T>>();
+
+                foreach (PlayerResults<int> val in ProvisoryPlayerResultsInt)
+                {
+                    PlayerResults<T> newPR = new PlayerResults<T>();
+                    newPR.playerId = val.playerId;
+                    newPR.reachedEnd = val.reachedEnd;
+                    newPR.scoring = (T)Convert.ChangeType(val.scoring, typeof(T));
+                    res.Add(newPR);
+                }
+
+                playerResults = res.ToArray();
+            }
+            else
+            {
+                List<PlayerResults<T>> res = new List<PlayerResults<T>>();
+
+                foreach (PlayerResults<float> val in ProvisoryPlayerResultsFloat)
+                {
+                    PlayerResults<T> newPR = new PlayerResults<T>();
+                    newPR.playerId = val.playerId;
+                    newPR.reachedEnd = val.reachedEnd;
+                    newPR.scoring = (T)Convert.ChangeType(val.scoring, typeof(T));
+                    res.Add(newPR);
+                }
+
+                playerResults = res.ToArray();
+            }
+
+            var aux = playerResults.OrderByDescending(result => result.scoring);
+            // Order list
+            if (!biggerScoreWins)
+            {
+                aux = playerResults.OrderBy(result => result.scoring);
+            }
+
+            playerResults = aux.ToArray();
         }
 
         private void LoadUpMetadata(bool biggerScoreWins, bool localPlayerHighscore)
@@ -284,52 +377,6 @@ namespace PartyInc
                 gameMetadata.PlayerResultsFloat = res.ToArray();
             }
         }
-
-        /// <summary>
-        /// Function that finds who is the winner.
-        /// </summary>
-        private void FindWinner()
-        {
-            T contenderScore = playerResults.First().scoring;
-            int contender = playerResults.First().playerId;
-            int hap = 0;
-
-            for (int i = 0; i < playerResults.Count(); i++)
-            {
-                if (playerResults[i].scoring.Equals(contenderScore)) hap++;
-            }
-
-            if (hap > 1) contender = -1;
-
-            WinnerId = contender;
-        }
-
-        private void GetPlayerResult(EventData eventData)
-        {
-            if (eventData.Code == 75)
-            {
-                object[] data = (object[])eventData.CustomData;
-
-                PlayerResults<T> thisPlayersResult = new PlayerResults<T>();
-                thisPlayersResult.playerId = (int)data[0];
-                thisPlayersResult.scoring = (T)data[1];
-
-                ProvisoryPlayerResults.Add(thisPlayersResult);
-            }
-        }
-
-
-        /// <summary>
-        /// Use this instead of start
-        /// </summary>
-        protected abstract void InStart();
-
-        /// <summary>
-        /// Put in here the instantiations of everything you know depends on the game managers existance and isnt already on the scene. (Like players)
-        /// Probably networked objects will lie here.
-        /// This method will run after every player has connected.
-        /// </summary>
-        protected abstract void InitializeGameManagerDependantObjects();
 
         private IEnumerator WaitForPropertiesCo()
         {
