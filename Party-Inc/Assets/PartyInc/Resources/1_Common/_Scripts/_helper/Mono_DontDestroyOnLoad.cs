@@ -15,7 +15,7 @@ namespace PartyInc
         {
             DontDestroyOnLoad(gameObject);
 
-            GameObject[] allGameobjects = FindObjectsOfType<GameObject>();
+            //GameObject[] allGameobjects = FindObjectsOfType<GameObject>();
 
             //int found = 0;
             //foreach (GameObject go in allGameobjects)

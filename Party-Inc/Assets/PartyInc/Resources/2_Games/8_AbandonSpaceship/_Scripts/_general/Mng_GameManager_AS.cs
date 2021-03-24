@@ -84,11 +84,14 @@ namespace PartyInc
 
                 MyPlayerZ = -1f;
 
-                GameName = Stt_GameNames.GAMENAME_AS;
+                GameDisplayName = Stt_GameNames.GAMENAME_AS;
+                GameDBName = Stt_GameNames.GAMENAME_DB_AS;
             }
 
             private void OnDestroy()
             {
+                Physics.gravity = new Vector3(0f, -9.81f, 0f);
+
                 Mono_ObstaclePassCheck_AS.onPlayerPassed -= OnPlayerPassedGate;
                 Mono_Player_Controller_AS.onPlayerDied -= OnPlayerDied;
             }

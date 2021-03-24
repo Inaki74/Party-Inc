@@ -79,7 +79,8 @@ namespace PartyInc
                 //Mono_Player_Controller_SS.onPlayerDied += OnPlayerLost;
                 Mono_Player_Controller_SS.onPlayerDied += OnPlayerDied;
 
-                GameName = Stt_GameNames.GAMENAME_SS;
+                GameDisplayName = Stt_GameNames.GAMENAME_SS;
+                GameDBName = Stt_GameNames.GAMENAME_DB_SS;
             }
 
             private void OnDestroy()

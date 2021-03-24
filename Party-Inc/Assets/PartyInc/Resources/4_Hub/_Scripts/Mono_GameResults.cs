@@ -31,7 +31,7 @@ namespace PartyInc
             // Start is called before the first frame update
             void Start()
             {
-                _gameNameText.text = _gameData.GameName;
+                _gameNameText.text = _gameData.GameDisplayName;
 
                 // Set active for the amount of players playing.
                 for (int i = 0; i < _gameData.PlayerCount; i++)
@@ -41,30 +41,31 @@ namespace PartyInc
 
                 if (_gameData.PlayerCount == 1)
                 {
-                    //highScores.SetActive(true);
-                    //highScore.text = PlayerPrefs.GetInt(PartyInc.Constants.AS_KEY_HISCORE).ToString();
-
+                    highScores.SetActive(true);
+                    
                     playerNames[0].text = PhotonNetwork.LocalPlayer.NickName;
                     playerPlacings[0].enabled = false;
                     if(_gameData.ScoreType == ScoreType.Float)
                     {
                         playerScores[0].text = _gameData.PlayerResultsFloat[0].scoring.ToString();
+                        highScore.text = _gameData.LocalPlayerHighscoreFloat.ToString();
                     }
                     else
                     {
                         playerScores[0].text = _gameData.PlayerResultsInt[0].scoring.ToString();
+                        highScore.text = _gameData.LocalPlayerHighscoreInt.ToString();
                     }
-                    
 
-                    //if (Mng_GameManager_AS.Current.IsHighScore)
-                    //{
-                    //    flavourTitle.text = "CONGRATULATIONS! New high score!";
-                    //    highScore.color = Color.yellow;
-                    //}
-                    //else
-                    //{
-                    //    flavourTitle.text = "You'll get that high score someday!";
-                    //}
+
+                    if (_gameData.WasLocalPlayerHighscore)
+                    {
+                        flavourTitle.text = "CONGRATULATIONS! New high score!";
+                        highScore.color = Color.yellow;
+                    }
+                    else
+                    {
+                        flavourTitle.text = "You'll get that high score someday!";
+                    }
                 }
                 else
                 {
@@ -137,12 +138,6 @@ namespace PartyInc
                     aux = aux2.ToArray();
                 }
 
-                Debug.Log(aux.Count());
-                foreach(PlayerResults<int> a in aux)
-                {
-                    Debug.Log(a.ToString());
-                }
-                
                 int place = 0;
                 int lastScore = -1;
                 for (int i = 0; i < aux.Length; i++)

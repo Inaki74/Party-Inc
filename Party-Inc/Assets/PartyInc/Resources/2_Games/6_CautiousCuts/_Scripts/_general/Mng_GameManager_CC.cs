@@ -118,7 +118,8 @@ namespace PartyInc
                 PhotonNetwork.NetworkingClient.EventReceived += ClearSliced;
                 Mono_Log_Controller_CC.onLogDestroyed += SendSliced;
 
-                GameName = Stt_GameNames.GAMENAME_CC;
+                GameDisplayName = Stt_GameNames.GAMENAME_CC;
+                GameDBName = Stt_GameNames.GAMENAME_DB_CC;
             }
 
             public override void OnDestroyed()

@@ -87,6 +87,7 @@ namespace PartyInc
                         {
                             Debug.Log("PLAYER ADDED");
 
+                            Fb_FirestoreSession.Current.Setup();
                             SceneManager.LoadScene(Stt_SceneIndexes.HUB);
                         }
                         else
@@ -99,11 +100,13 @@ namespace PartyInc
                     Fb_FirestoreStructures.FSPlayerSocial newPlayerSoc = new Fb_FirestoreStructures.FSPlayerSocial();
 
                     // ADD TO PLAYERSOCIAL
-                    Fb_FirestoreManager.Current.Add(Fb_FirestoreManager.Current.Players, newPlayer.ToDictionary(), result.uid, res =>
+                    Fb_FirestoreManager.Current.Add(Fb_FirestoreManager.Current.PlayerSocial, newPlayerSoc.ToDictionary(), result.uid, res =>
                     {
                         if (res.success)
                         {
                             Debug.Log("PLAYER SOCIAL ADDED");
+
+
                         }
                         else
                         {

@@ -55,11 +55,6 @@ namespace PartyInc
             private void AuthInit()
             {
                 _auth = FirebaseAuth.DefaultInstance;
-
-                if (_auth.CurrentUser != null)
-                {
-                    SceneManager.LoadScene(Stt_SceneIndexes.HUB);
-                }
             }
 
             public void SignInEmailPassword(string email, string password, Action<FireauthCallResult> Callback = null)

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using PartyInc.PartyFirebase.Firestore;
 
 namespace PartyInc
 {
@@ -66,6 +67,13 @@ namespace PartyInc
 
             private void InitButtons()
             {
+                if (PartyFirebase.Auth.Fb_FirebaseAuthenticateManager.Current.Auth.CurrentUser != null)
+                {
+                    Fb_FirestoreSession.Current.Setup();
+                    SceneManager.LoadScene(Stt_SceneIndexes.HUB);
+                    return;
+                }
+
                 _signInButton.interactable = true;
                 _signUpButton.interactable = true;
             }
@@ -78,6 +86,7 @@ namespace PartyInc
                     _signingIn = false;
                     if (result.success)
                     {
+                        Fb_FirestoreSession.Current.Setup();
                         SceneManager.LoadScene(Stt_SceneIndexes.HUB);
                     }
                     else

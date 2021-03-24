@@ -70,7 +70,8 @@ namespace PartyInc
             {
                 base.Init();
 
-                GameName = Stt_GameNames.GAMENAME_DD;
+                GameDisplayName = Stt_GameNames.GAMENAME_DD;
+                GameDBName = Stt_GameNames.GAMENAME_DB_DD;
             }
 
             protected override void InitializeGameManagerDependantObjects()

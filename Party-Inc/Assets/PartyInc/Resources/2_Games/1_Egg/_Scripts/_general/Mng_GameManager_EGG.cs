@@ -74,7 +74,8 @@ namespace PartyInc
             {
                 base.Init();
 
-                GameName = Stt_GameNames.GAMENAME_EGG;
+                GameDisplayName = Stt_GameNames.GAMENAME_EGG;
+                GameDBName = Stt_GameNames.GAMENAME_DB_EGG;
             }
             #endregion
 

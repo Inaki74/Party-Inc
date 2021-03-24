@@ -7,6 +7,7 @@ using ExitGames.Client.Photon;
 using System.Linq;
 using System.Collections.Generic;
 using UnityEngine.SceneManagement;
+using PartyInc.PartyFirebase.Firestore;
 
 namespace PartyInc
 {
@@ -20,7 +21,8 @@ namespace PartyInc
     /// <typeparam name="T"> The Scoring Type </typeparam>
     public abstract class FiestaGameManager<G, T> : MonoSingleton<G> where G : MonoSingleton<G>
     {
-        public string GameName { get; protected set; }
+        public string GameDisplayName { get; protected set; }
+        public string GameDBName { get; protected set; }
 
         // The network controller in the scene.
         protected Mono_GameMetadata gameMetadata;
@@ -177,8 +179,6 @@ namespace PartyInc
                 PhotonNetwork.RaiseEvent(74, content, raiseEventOptions, SendOptions.SendReliable);
             }
 
-            Debug.Log("Sent for results");
-
             yield return new WaitUntil(() => ProvisoryPlayerResults.Count() == playerCount);
 
             playerResults = ProvisoryPlayerResults.ToArray();
@@ -195,34 +195,70 @@ namespace PartyInc
             // Find a winner
             FindWinner();
 
+            // Check for local players highscore and set his results
+            bool localPlayerHighscore = false;
+            foreach(PlayerResults<T> results in playerResults)
+            {
+                if(results.playerId == PhotonNetwork.LocalPlayer.ActorNumber)
+                {
+                    localPlayerHighscore = Fb_FirestoreSession.Current.CheckIfHighscore(GameDBName, results.scoring);
+
+                    Fb_FirestoreSession.Current.SetGameResults(results.scoring,
+                                                               GameDBName,
+                                                               PhotonNetwork.LocalPlayer.ActorNumber == WinnerId,
+                                                               localPlayerHighscore);
+                }
+            }
+           
             // Load up metadata:
-            gameMetadata.GameName = GameName;
+            LoadUpMetadata(biggerScoreWins, localPlayerHighscore);
+
+            scene.allowSceneActivation = true;
+
+            // Load up the game end screen.
+            yield return new WaitUntil(() => scene.isDone);
+        }
+
+        private void LoadUpMetadata(bool biggerScoreWins, bool localPlayerHighscore)
+        {
+            gameMetadata.WasLocalPlayerHighscore = localPlayerHighscore;
+            gameMetadata.GameDBName = GameDBName;
+            gameMetadata.GameDisplayName = GameDisplayName;
             gameMetadata.WinnerId = WinnerId;
             gameMetadata.DescendingCondition = biggerScoreWins;
 
             if (typeof(T) == typeof(int))
             {
                 gameMetadata.ScoreType = ScoreType.Int;
-                PlayerResults<int>[] res = new PlayerResults<int>[playerCount];
+                List<PlayerResults<int>> res = new List<PlayerResults<int>>();
 
-                foreach(PlayerResults<T> val in playerResults)
+                foreach (PlayerResults<T> val in playerResults)
                 {
                     PlayerResults<int> newPR = new PlayerResults<int>();
                     newPR.playerId = val.playerId;
                     newPR.reachedEnd = val.reachedEnd;
                     newPR.scoring = (int)Convert.ChangeType(val.scoring, typeof(int));
+                    res.Add(newPR);
+
+                    if (val.playerId == PhotonNetwork.LocalPlayer.ActorNumber)
+                    {
+                        if (localPlayerHighscore)
+                        {
+                            gameMetadata.LocalPlayerHighscoreInt = newPR.scoring;
+                        }
+                        else
+                        {
+                            gameMetadata.LocalPlayerHighscoreInt = (int)Fb_FirestoreSession.Current.GetHighscore<long>(GameDBName);
+                        }
+                    }
                 }
 
-                gameMetadata.PlayerResultsInt = res;
-                foreach (PlayerResults<int> a in gameMetadata.PlayerResultsInt)
-                {
-                    Debug.Log(a.ToString());
-                }
+                gameMetadata.PlayerResultsInt = res.ToArray();
             }
             else
             {
                 gameMetadata.ScoreType = ScoreType.Float;
-                PlayerResults<float>[] res = new PlayerResults<float>[playerCount];
+                List<PlayerResults<float>> res = new List<PlayerResults<float>>();
 
                 foreach (PlayerResults<T> val in playerResults)
                 {
@@ -230,15 +266,23 @@ namespace PartyInc
                     newPR.playerId = val.playerId;
                     newPR.reachedEnd = val.reachedEnd;
                     newPR.scoring = (float)Convert.ChangeType(val.scoring, typeof(float));
+                    res.Add(newPR);
+
+                    if (val.playerId == PhotonNetwork.LocalPlayer.ActorNumber)
+                    {
+                        if (localPlayerHighscore)
+                        {
+                            gameMetadata.LocalPlayerHighscoreFloat = newPR.scoring;
+                        }
+                        else
+                        {
+                            gameMetadata.LocalPlayerHighscoreFloat = (float)Fb_FirestoreSession.Current.GetHighscore<double>(GameDBName);
+                        }
+                    }
                 }
 
-                gameMetadata.PlayerResultsFloat = res;
+                gameMetadata.PlayerResultsFloat = res.ToArray();
             }
-
-            scene.allowSceneActivation = true;
-
-            // Load up the game end screen.
-            yield return new WaitUntil(() => scene.isDone);
         }
 
         /// <summary>

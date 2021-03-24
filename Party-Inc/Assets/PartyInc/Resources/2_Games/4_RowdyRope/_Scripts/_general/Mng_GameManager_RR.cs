@@ -107,7 +107,8 @@ namespace PartyInc
                 PhotonNetwork.NetworkingClient.EventReceived += OnRoundCompleted;
                 Mono_Player_Controller_RR.onPlayerDied += OnPlayerFinished;
 
-                GameName = Stt_GameNames.GAMENAME_RR;
+                GameDisplayName = Stt_GameNames.GAMENAME_RR;
+                GameDBName = Stt_GameNames.GAMENAME_DB_RR;
             }
 
             #endregion

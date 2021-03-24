@@ -1232,7 +1232,7 @@ MonoBehaviour:
   - {fileID: 5905322818531798440}
   - {fileID: 4255040390430473545}
   highScores: {fileID: 8919979628857671936}
-  highScore: {fileID: 2059442450165607391}
+  highScore: {fileID: 687171515202652123}
   flavourTitle: {fileID: 1625105124}
   _gameNameText: {fileID: 378596733}
   playerPlacings:
@@ -1587,7 +1587,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 'Time achieved
+  m_Text: 'Score
 
 '
 --- !u!1 &6626011786358960919
