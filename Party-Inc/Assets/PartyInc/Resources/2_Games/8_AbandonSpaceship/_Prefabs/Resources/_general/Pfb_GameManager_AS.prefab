@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 8924792927078623920}
   - component: {fileID: 744272474493817513}
   - component: {fileID: 2971152811546083695}
+  - component: {fileID: 4724901700980308919}
   m_Layer: 0
   m_Name: Pfb_GameManager_AS
   m_TagString: Untagged
@@ -73,3 +74,15 @@ MonoBehaviour:
   gameStartCountdown: 3
   _movementSpeed: 0
   _gravity: 0
+--- !u!114 &4724901700980308919
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8924792927078623922}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0fe43fee637ff431191c2716ff730ffa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

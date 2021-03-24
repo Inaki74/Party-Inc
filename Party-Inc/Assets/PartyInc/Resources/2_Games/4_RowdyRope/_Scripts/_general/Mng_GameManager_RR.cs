@@ -106,6 +106,9 @@ namespace PartyInc
 
                 PhotonNetwork.NetworkingClient.EventReceived += OnRoundCompleted;
                 Mono_Player_Controller_RR.onPlayerDied += OnPlayerFinished;
+
+                GameDisplayName = Stt_GameNames.GAMENAME_RR;
+                GameDBName = Stt_GameNames.GAMENAME_DB_RR;
             }
 
             #endregion
@@ -171,8 +174,7 @@ namespace PartyInc
                 {
                     Debug.Log("Game should end");
                     gameEnded = true;
-                    WinnerId = FindWinner();
-                    OnGameFinishInvoke();
+                    StartCoroutine(GameFinish(true));
                 }
             }
 
@@ -352,85 +354,6 @@ namespace PartyInc
 
             #endregion
 
-            #region Game Results Functions
-            /// <summary>
-            /// Finds the winner of the game.
-            /// </summary>
-            /// <returns></returns>
-            private int FindWinner()
-            {
-                foreach (Mono_Player_Controller_RR p in players)
-                {
-                    // If the player isnt in the list, its because:
-                    // It never lost
-                    // It lost but got through the sync somehow.
-                    AddPlayerResult(p.photonView.Owner.ActorNumber, currentJump);
-                }
-
-                return CheckWinner();
-            }
-
-            /// <summary>
-            /// Ultimately checks the winner.
-            /// </summary>
-            /// <returns></returns>
-            private int CheckWinner()
-            {
-                var ordered = playerResults.OrderByDescending(p => p.scoring);
-                PlayerResults<int>[] o = ordered.ToArray();
-
-                for (int i = 1; i < o.Length; i++)
-                {
-                    if (o[0].Equals(o[1]))
-                    {
-                        return -1;
-                    }
-                }
-
-                return o[0].playerId;
-            }
-
-            /// <summary>
-            /// Checks if a player result is in the list.
-            /// </summary>
-            /// <param name="playerId"></param>
-            /// <returns></returns>
-            private bool PlayerResultInList(int playerId)
-            {
-                // Cant use LINQ contains, the EQUALS is already defined with score
-
-                foreach(var p in playerResults)
-                {
-                    if (p.playerId == playerId) return true;
-                }
-
-                return false;
-            }
-
-            /// <summary>
-            /// Adds player results to the list.
-            /// </summary>
-            /// <param name="playerId"></param>
-            /// <param name="score"></param>
-            private void AddPlayerResult(int playerId, int score)
-            {
-                // Safeguard, just in case someone accessed off sync.
-                if (PlayerResultInList(playerId)) return;
-
-                Debug.Log("Added results of: " + playerId + " of score: " + score);
-                PlayerResults<int> thisPlayerResult = new PlayerResults<int>();
-                thisPlayerResult.playerId = playerId;
-                thisPlayerResult.scoring = score;
-
-                playerResults[nextToInsert] = thisPlayerResult;
-                nextToInsert--;
-                playersAlive--;
-
-                if (playerId == PhotonNetwork.LocalPlayer.ActorNumber) IsHighScore = HighScoreHelpers.DetermineHighScoreInt(PartyInc.Constants.RR_KEY_HISCORE, thisPlayerResult.scoring, true);
-            }
-
-            #endregion
-
             #region Event Functions
 
             private void OnRoundCompleted(EventData eventData)
@@ -449,12 +372,9 @@ namespace PartyInc
                 }
             }
 
-            private void OnPlayerFinished(int playerId, int score)
+            private void OnPlayerFinished()
             {
-                Debug.Log("Player " + playerId + " finished.");
-                AddPlayerResult(playerId, score);
-                // Give the result to the other players
-                photonView.RPC("RPC_SendPlayerResult", RpcTarget.Others, playerId, score);
+                playersAlive--;
             }
 
             private void CheckCheckpoints()
@@ -537,17 +457,6 @@ namespace PartyInc
 
                 return true;
             }
-
-            #region RPCs
-
-            [PunRPC]
-            public void RPC_SendPlayerResult(int playerId, int score)
-            {
-                Debug.Log("Player " + playerId + " finished over the net.");
-                AddPlayerResult(playerId, score);
-            }
-
-            #endregion
         }
     }
 }

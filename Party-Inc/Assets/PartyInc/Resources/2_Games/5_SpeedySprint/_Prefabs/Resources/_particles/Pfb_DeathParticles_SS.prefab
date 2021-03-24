@@ -11,9 +11,9 @@ GameObject:
   - component: {fileID: 4411697183774951542}
   - component: {fileID: 1374749376413500807}
   - component: {fileID: 6550221724884320294}
-  - component: {fileID: 4244960446448942046}
+  - component: {fileID: 5512327468869252159}
   m_Layer: 0
-  m_Name: DeathParticles
+  m_Name: Pfb_DeathParticles_SS
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4711,7 +4711,6 @@ ParticleSystemRenderer:
   m_RendererPriority: 0
   m_Materials:
   - {fileID: 10308, guid: 0000000000000000f000000000000000, type: 0}
-  - {fileID: 0}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -4755,7 +4754,7 @@ ParticleSystemRenderer:
   m_Mesh2: {fileID: 0}
   m_Mesh3: {fileID: 0}
   m_MaskInteraction: 0
---- !u!114 &4244960446448942046
+--- !u!114 &5512327468869252159
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -4764,7 +4763,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 774553179679105737}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d29888d0dd9bb4764920057f5353f330, type: 3}
+  m_Script: {fileID: 11500000, guid: 9587de8cf7f214442aff0035aae04825, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _timeToDestroy: 1.2
+  _timeToDie: 1
+  _destroyInstead: 1

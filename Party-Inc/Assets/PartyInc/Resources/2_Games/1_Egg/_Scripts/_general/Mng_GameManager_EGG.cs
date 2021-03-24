@@ -69,6 +69,14 @@ namespace PartyInc
 
                 OnGameStartInvoke();
             }
+
+            public override void Init()
+            {
+                base.Init();
+
+                GameDisplayName = Stt_GameNames.GAMENAME_EGG;
+                GameDBName = Stt_GameNames.GAMENAME_DB_EGG;
+            }
             #endregion
 
             #region Unity Callbacks
@@ -81,7 +89,7 @@ namespace PartyInc
                         GameBegan = true;
                     }
                 }
-                else if (_startCountdown && !GameBegan)
+                else if (!PhotonNetwork.IsConnectedAndReady && _startCountdown && !GameBegan)
                 {
                     if (gameStartCountdown <= 0f)
                     {
@@ -96,8 +104,10 @@ namespace PartyInc
 
                 if (isGameFinished && !runOnce)
                 {
-                    FinishGame();
+                    //FinishGame();
                     runOnce = true;
+                    StartCoroutine(GameFinish(true));
+                    Resources.UnloadUnusedAssets();
                 }
             }
             #endregion
@@ -155,69 +165,6 @@ namespace PartyInc
 
                 PhotonNetwork.Instantiate("_player/" + playerAssetsPrefab.name, decidedVector, Quaternion.identity);
                 PhotonNetwork.Instantiate("_player/" + playerPrefab.name, decidedVector + new Vector3(0f, 0.7f, 0f), Quaternion.identity);
-            }
-
-            private void FinishGame()
-            {
-                DecideWinner();
-
-                OnGameFinishInvoke();
-                StartCoroutine("GameFinishCo");
-            }
-
-            private void DecideWinner()
-            {
-                playerResults = GetPlayerResults();
-
-                int max = -1;
-                for (int i = 0; i < playerResults.Length; i++)
-                {
-                    if (playerResults[i].scoring > max)
-                    {
-                        max = playerResults[i].scoring;
-                        WinnerId = playerResults[i].playerId;
-                    }
-                }
-
-                PlayerResults<int> aux = new PlayerResults<int>();
-                aux.scoring = max;
-                int hap = 0;
-                foreach (PlayerResults<int> result in playerResults)
-                {
-                    if (result.Equals(aux)) hap++;
-                }
-
-                if (hap > 1)
-                {
-                    //Draw
-                    WinnerId = -1;
-                }
-            }
-
-            /// <summary>
-            /// The Game Finish coroutine which restarts the entire game.
-            /// </summary>
-            /// <returns></returns>
-            private IEnumerator GameFinishCo()
-            {
-                yield return new WaitForSeconds(2.5f);
-
-                Resources.UnloadUnusedAssets();
-
-                StopAllCoroutines();
-            }
-
-            private PlayerResults<int>[] GetPlayerResults()
-            {
-                PlayerResults<int>[] ret = new PlayerResults<int>[playerCount];
-                Mono_Player_Controller_EGG[] players = FindObjectsOfType<Mono_Player_Controller_EGG>();
-
-                for (int i = 0; i < playerCount; i++)
-                {
-                    ret[i] = players[i].MyResults;
-                }
-
-                return ret;
             }
 
             /// <summary>

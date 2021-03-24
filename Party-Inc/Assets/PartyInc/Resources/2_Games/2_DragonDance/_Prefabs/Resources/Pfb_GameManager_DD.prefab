@@ -11,8 +11,9 @@ GameObject:
   - component: {fileID: 2917444796148025021}
   - component: {fileID: 1249774565396786654}
   - component: {fileID: 1124036698949585936}
+  - component: {fileID: 7650473145195726695}
   m_Layer: 0
-  m_Name: pfb_DD_GameManager
+  m_Name: Pfb_GameManager_DD
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -44,22 +45,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f4cab51bfded643278cbb0a4b0521b57, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  playerPrefab: {fileID: 7428520905753749251, guid: 6cea402b001e0469889df4e3a76b4a4e,
+    type: 3}
+  UIPrefab: {fileID: 7039350831127629018, guid: dcdb1d92d3e8f4469861fd148e1ca5b1,
+    type: 3}
+  playerCount: 0
+  gameStartCountdown: 3
   sequenceMap: 000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
   amountOfMovesThisRound: 4
   countdownGameStart: 3
-  playersInGame: 0
-  winnerId: 0
-  isHighScore: 0
   timeForInput: 15
   timeToSeeMove: 1
   minTimeForInput: 7
   minTimeToSeeMove: 0.5
   playersHealth: 5
   playersLostAr: 
-  playerPrefab: {fileID: 7428520905753749251, guid: 6cea402b001e0469889df4e3a76b4a4e,
-    type: 3}
-  UIPrefab: {fileID: 7039350831127629018, guid: dcdb1d92d3e8f4469861fd148e1ca5b1,
-    type: 3}
 --- !u!114 &1124036698949585936
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -82,3 +82,15 @@ MonoBehaviour:
   viewIdField: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0
+--- !u!114 &7650473145195726695
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4481978196676751868}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0fe43fee637ff431191c2716ff730ffa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

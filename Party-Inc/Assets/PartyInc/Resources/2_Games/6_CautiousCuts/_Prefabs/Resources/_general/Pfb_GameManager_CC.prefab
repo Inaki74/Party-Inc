@@ -11,8 +11,9 @@ GameObject:
   - component: {fileID: 2843244080802018395}
   - component: {fileID: 2843244080802018392}
   - component: {fileID: 520511209899287726}
+  - component: {fileID: 7651862322420401856}
   m_Layer: 0
-  m_Name: GameManager
+  m_Name: Pfb_GameManager_CC
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -51,7 +52,6 @@ MonoBehaviour:
   gameStartCountdown: 3
   _logSpawner: {fileID: 4883443917830921255, guid: be859d4d5ea2f45ecbb2c446905c8a22,
     type: 3}
-  test: {fileID: 8534628423062890585, guid: 1012cda6fa1c64216ad0fae4227f284c, type: 3}
 --- !u!114 &520511209899287726
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -74,3 +74,15 @@ MonoBehaviour:
   viewIdField: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0
+--- !u!114 &7651862322420401856
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2843244080802018393}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0fe43fee637ff431191c2716ff730ffa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

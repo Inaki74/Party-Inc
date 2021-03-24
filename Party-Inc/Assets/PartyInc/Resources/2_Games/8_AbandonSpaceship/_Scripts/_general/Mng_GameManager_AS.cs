@@ -24,6 +24,9 @@ namespace PartyInc
 
             private double _gameBeginTime;
 
+            private float _playersLost;
+            private bool _finishedGame;
+
             [SerializeField] private float _movementSpeed;
             public float MovementSpeed
             {
@@ -77,15 +80,20 @@ namespace PartyInc
                 Physics.gravity = new Vector3(0f, _gravity, 0f);
 
                 Mono_ObstaclePassCheck_AS.onPlayerPassed += OnPlayerPassedGate;
-                PhotonNetwork.NetworkingClient.EventReceived += OnPlayerDied;
+                Mono_Player_Controller_AS.onPlayerDied += OnPlayerDied;
 
                 MyPlayerZ = -1f;
+
+                GameDisplayName = Stt_GameNames.GAMENAME_AS;
+                GameDBName = Stt_GameNames.GAMENAME_DB_AS;
             }
 
             private void OnDestroy()
             {
+                Physics.gravity = new Vector3(0f, -9.81f, 0f);
+
                 Mono_ObstaclePassCheck_AS.onPlayerPassed -= OnPlayerPassedGate;
-                PhotonNetwork.NetworkingClient.EventReceived -= OnPlayerDied;
+                Mono_Player_Controller_AS.onPlayerDied -= OnPlayerDied;
             }
 
             private void InitializePlayers()
@@ -159,7 +167,7 @@ namespace PartyInc
                         MovementSpeed = _startingSpeed + InGameTime * ((_finalSpeed - _startingSpeed) / _timeToReachFinalSpeedInSeconds);
                     }
 
-                    if(_deadPlayers.Count >= playerCount && PhotonNetwork.IsConnected)
+                    if(_playersLost >= playerCount && PhotonNetwork.IsConnected && !_finishedGame)
                     {
                         StartCoroutine(FinishGame());
                     }
@@ -168,35 +176,21 @@ namespace PartyInc
 
             private IEnumerator FinishGame()
             {
-                GameBegan = false;
+                _finishedGame = true;
 
                 yield return new WaitForSeconds(0.5f);
 
-                playerResults = _deadPlayers.ToArray();
-                WinnerId = DetermineWinner();
-
-                OnGameFinishInvoke();
-            }
-
-            private int DetermineWinner()
-            {
-                var ordered = playerResults.OrderByDescending(p => p.scoring);
-                PlayerResults<int>[] o = ordered.ToArray();
-
-                for (int i = 1; i < o.Length; i++)
-                {
-                    if (o[0].Equals(o[1]))
-                    {
-                        return -1;
-                    }
-                }
-
-                return o[0].playerId;
+                StartCoroutine(GameFinish(true));
             }
 
             private void OnPlayerPassedGate()
             {
                 CurrentGate++;
+            }
+
+            private void OnPlayerDied()
+            {
+                _playersLost++;
             }
 
 
@@ -214,22 +208,6 @@ namespace PartyInc
             public void RPC_SendBegin(double startT)
             {
                 _gameBeginTime = startT;
-            }
-
-            private void OnPlayerDied(EventData eventData)
-            {
-                if (eventData.Code == Constants.PlayerDiedEventCode)
-                {
-                    object[] data = (object[])eventData.CustomData;
-                    PlayerResults<int> res = new PlayerResults<int>();
-
-                    res.scoring = (int)data[0];
-                    res.playerId = (int)data[1];
-
-                    _deadPlayers.Add(res);
-
-                    Debug.Log("PLAYER DIED: " + res.playerId);
-                }
             }
         }
     }

@@ -17,7 +17,9 @@ namespace PartyInc
     {
         private const int maxPlayers = 4;
 
-        private List<RoomInfo> currentRoomList;
+        private List<RoomInfo> currentRoomList = new List<RoomInfo>();
+
+        [SerializeField] List<Button> _gameButtons = new List<Button>();
 
         [SerializeField] private Text nameText;
         private string gameToJoin = "";
@@ -28,10 +30,12 @@ namespace PartyInc
         {
             nameText.text = "Welcome " + PartyFirebase.Auth.Fb_FirebaseAuthenticateManager.Current.Auth.CurrentUser.DisplayName + "!";
 
-            if (PhotonNetwork.IsConnected)
+            foreach (Button b in _gameButtons)
             {
-                StartCoroutine("JoinLobbyCo");
+                b.interactable = false;
             }
+
+            StartCoroutine("JoinLobbyCo");
         }
 
         private IEnumerator JoinLobbyCo()
@@ -136,6 +140,28 @@ namespace PartyInc
 
         #region PUN Callbacks
 
+        public override void OnJoinedLobby()
+        {
+            base.OnJoinedLobby();
+            Debug.Log("Fiesta Time/ RoomController: Joined lobby.");
+
+            foreach (Button b in _gameButtons)
+            {
+                b.interactable = true;
+            }
+        }
+
+        public override void OnLeftLobby()
+        {
+            base.OnLeftLobby();
+            Debug.Log("Fiesta Time/ RoomController: Left lobby.");
+
+            foreach (Button b in _gameButtons)
+            {
+                b.interactable = false;
+            }
+        }
+
         public override void OnDisconnected(DisconnectCause cause)
         {
 
@@ -182,6 +208,7 @@ namespace PartyInc
         public void SignOut()
         {
             PartyFirebase.Auth.Fb_FirebaseAuthenticateManager.Current.Auth.SignOut();
+            PhotonNetwork.LeaveLobby();
             SceneManager.LoadScene(Stt_SceneIndexes.LAUNCHER_SIGNIN);
         }
     }

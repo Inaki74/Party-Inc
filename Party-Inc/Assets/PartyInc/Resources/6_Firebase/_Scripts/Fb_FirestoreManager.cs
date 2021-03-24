@@ -25,8 +25,6 @@ namespace PartyInc
             public CollectionReference Players { get; private set; }
             public CollectionReference PlayerSocial { get; private set; }
 
-            public CollectionReference Test { get; private set; }
-
             private bool _runStartOnce;
 
             private void Start()
@@ -41,7 +39,6 @@ namespace PartyInc
             {
                 FsDB = FirebaseFirestore.DefaultInstance;
 
-                Test = FsDB.Collection(Fb_Constants.FIRESTORE_COLLECTION_TEST);
                 Players = FsDB.Collection(Fb_Constants.FIRESTORE_KEY_PLAYERS);
                 PlayerSocial = FsDB.Collection(Fb_Constants.FIRESTORE_KEY_PLAYERSOCIAL);
             }

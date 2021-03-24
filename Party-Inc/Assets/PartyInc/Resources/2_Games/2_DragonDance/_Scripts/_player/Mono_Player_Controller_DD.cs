@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using Photon.Realtime;
+using ExitGames.Client.Photon;
 
 using Photon.Pun;
 
@@ -12,10 +14,11 @@ namespace PartyInc
         /// <summary>
         /// In charge of all things player, its animations, its input management and its synchronization over the network.
         /// </summary>
-        public class Mono_Player_Controller_DD : MonoBehaviourPun, IPunObservable
+        public class Mono_Player_Controller_DD : MonoBehaviourPun, IPunObservable, IPlayerResultSender
         {
             public int health;
-            public PlayerResults<int> myResults;
+
+            private int _scoreDied;
 
             private int[] currentSequence;
 
@@ -53,8 +56,6 @@ namespace PartyInc
 
                 if (photonView.IsMine)
                 {
-                    myResults.playerId = PhotonNetwork.LocalPlayer.ActorNumber;
-                    myResults.scoring = 0;
                     health = Mng_GameManager_DD.Current.playersHealth;
                     playerName.text = PhotonNetwork.NickName;
                     photonView.RPC("RPC_SendName", RpcTarget.Others, PhotonNetwork.NickName);
@@ -64,11 +65,13 @@ namespace PartyInc
             private void Awake()
             {
                 Mng_GameManager_DD.onNextPhase += OnPhaseTransit;
+                PhotonNetwork.NetworkingClient.EventReceived += SendMyResults;
             }
 
             private void OnDestroy()
             {
                 Mng_GameManager_DD.onNextPhase -= OnPhaseTransit;
+                PhotonNetwork.NetworkingClient.EventReceived -= SendMyResults;
             }
 
             #endregion
@@ -118,7 +121,6 @@ namespace PartyInc
                 {
                     // Game finished
                     inputManager.enabled = false;
-                    if(photonView.IsMine) Mng_GameManager_DD.Current.IsHighScore = HighScoreHelpers.DetermineHighScoreInt(Constants.DD_KEY_HISCORE, myResults.scoring, true);
                 }
             }
 
@@ -161,7 +163,7 @@ namespace PartyInc
                         }
                         else
                         {
-                            myResults.scoring++;
+                            _scoreDied++;
                         }
                     }
                     
@@ -180,6 +182,26 @@ namespace PartyInc
 
             #region PUN
 
+            public void SendMyResults(EventData eventData)
+            {
+                if (eventData.Code == 74 && photonView.IsMine)
+                {
+                    Debug.Log("SENDING MY RESULTS");
+
+                    int finalScore = _scoreDied;
+                    bool isInt = true;
+                    //if (finalScore > PlayerPrefs.GetFloat(PartyInc.Constants.CC_KEY_HISCORE))
+                    //{
+                    //    Mng_GameManager_SS.Current.IsHighScore = true;
+                    //    PlayerPrefs.SetFloat(PartyInc.Constants.CC_KEY_HISCORE, finalScore);
+                    //}
+
+                    object[] content = new object[] { PhotonNetwork.LocalPlayer.ActorNumber, finalScore, isInt };
+                    RaiseEventOptions raiseEventOptions = new RaiseEventOptions { Receivers = ReceiverGroup.All };
+                    PhotonNetwork.RaiseEvent(75, content, raiseEventOptions, SendOptions.SendReliable);
+                }
+            }
+
             [PunRPC]
             public void RPC_SendName(string name)
             {
@@ -191,20 +213,11 @@ namespace PartyInc
                 if (stream.IsWriting)
                 {
                     stream.SendNext(new Vector3(Mr.material.color.r, Mr.material.color.g, Mr.material.color.b));
-                    stream.SendNext(myResults.playerId);
-                    stream.SendNext(myResults.scoring);
                 }
                 else
                 {
                     Vector3 temp = (Vector3)stream.ReceiveNext();
                     Mr.material.color = new Color(temp.x, temp.y, temp.z);
-
-                    PlayerResults<int> aux = new PlayerResults<int>();
-
-                    aux.playerId = (int)stream.ReceiveNext();
-                    aux.scoring = (int)stream.ReceiveNext();
-
-                    myResults = aux;
                 }
             }
 

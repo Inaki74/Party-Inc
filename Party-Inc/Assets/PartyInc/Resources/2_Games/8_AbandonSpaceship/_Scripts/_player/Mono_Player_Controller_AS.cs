@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
 using Photon.Realtime;
+using ExitGames.Client.Photon;
 
 namespace PartyInc
 {
     namespace AS
     {
-        public class Mono_Player_Controller_AS : MonoBehaviourPun
+        public class Mono_Player_Controller_AS : MonoBehaviourPun, IPlayerResultSender
         {
             public Rigidbody Rb
             {
@@ -27,6 +28,9 @@ namespace PartyInc
             [SerializeField] private MeshRenderer _mr;
             [SerializeField] private CapsuleCollider _cc;
             [SerializeField] private Material _mineMaterial;
+
+            public delegate void ActionOnPlayerLost();
+            public static event ActionOnPlayerLost onPlayerDied;
 
             private Cinemachine.CinemachineImpulseSource _shake;
 
@@ -65,6 +69,8 @@ namespace PartyInc
 
             private bool _invincible = true;
 
+            private int _scoreDied;
+
             private void Start()
             {
                 if (_rb == null)
@@ -96,6 +102,16 @@ namespace PartyInc
                     col.a = 0.4f;
                     _mr.material.color = col;
                 }
+            }
+
+            private void Awake()
+            {
+                PhotonNetwork.NetworkingClient.EventReceived += SendMyResults;
+            }
+
+            private void OnDestroy()
+            {
+                PhotonNetwork.NetworkingClient.EventReceived -= SendMyResults;
             }
 
             // Update is called once per frame
@@ -143,18 +159,15 @@ namespace PartyInc
 
             private void PlayerLost()
             {
-                Mng_GameManager_AS.Current.IsHighScore = HighScoreHelpers.DetermineHighScoreInt(PartyInc.Constants.AS_KEY_HISCORE, Mng_GameManager_AS.Current.CurrentGate, true);
-
-                object[] content = new object[] { Mng_GameManager_AS.Current.CurrentGate, PhotonNetwork.LocalPlayer.ActorNumber };
-                RaiseEventOptions raiseEventOptions = new RaiseEventOptions { Receivers = ReceiverGroup.All };
-                PhotonNetwork.RaiseEvent(Constants.PlayerDiedEventCode, content, raiseEventOptions, ExitGames.Client.Photon.SendOptions.SendReliable);
-
+                _scoreDied = Mng_GameManager_AS.Current.CurrentGate;
                 photonView.RPC("RPC_MakeVulnerable", RpcTarget.Others);
                 Die();
             }
 
             private void Die()
             {
+                onPlayerDied?.Invoke();
+
                 _mr.enabled = false;
                 _cc.enabled = false;
 
@@ -199,6 +212,19 @@ namespace PartyInc
                     {
                         Die();
                     }
+                }
+            }
+
+            public void SendMyResults(EventData eventData)
+            {
+                if (eventData.Code == 74 && photonView.IsMine)
+                {
+                    int finalScore = _scoreDied;
+                    bool isInt = true;
+
+                    object[] content = new object[] { PhotonNetwork.LocalPlayer.ActorNumber, finalScore, isInt };
+                    RaiseEventOptions raiseEventOptions = new RaiseEventOptions { Receivers = ReceiverGroup.All };
+                    PhotonNetwork.RaiseEvent(75, content, raiseEventOptions, SendOptions.SendReliable);
                 }
             }
         }
