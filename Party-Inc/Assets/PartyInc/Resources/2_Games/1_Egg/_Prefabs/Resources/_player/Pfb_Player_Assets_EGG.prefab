@@ -313,7 +313,7 @@ GameObject:
   - component: {fileID: 8781805698683874269}
   - component: {fileID: 1919077772077941587}
   m_Layer: 0
-  m_Name: Pfb_Player_Assets_EGG
+  m_Name: pfb_eggb_PlayerAssets
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

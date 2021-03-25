@@ -1,5 +1,5 @@
 {
-    "m_SelectedDeviceId": "LDG4C18508000010",
+    "m_SelectedDeviceId": "",
     "m_SelectedPackage": {
         "deviceId": "",
         "name": "",
@@ -7,74 +7,7 @@
         "exited": false
     },
     "m_SelectedPriority": 0,
-    "m_KnownPackagesForSerialization": [
-        {
-            "deviceId": "LDG4C18508000010",
-            "name": "com.LoopStudios.PartyInc",
-            "processId": 22311,
-            "exited": true
-        },
-        {
-            "deviceId": "LDG4C18508000010",
-            "name": "com.LoopStudios.PartyInc",
-            "processId": 22668,
-            "exited": true
-        },
-        {
-            "deviceId": "LDG4C18508000010",
-            "name": "com.LoopStudios.PartyInc",
-            "processId": 23579,
-            "exited": true
-        },
-        {
-            "deviceId": "LDG4C18508000010",
-            "name": "com.LoopStudios.PartyInc",
-            "processId": 24143,
-            "exited": true
-        },
-        {
-            "deviceId": "LDG4C18508000010",
-            "name": "com.LoopStudios.PartyInc",
-            "processId": 24576,
-            "exited": true
-        },
-        {
-            "deviceId": "LDG4C18508000010",
-            "name": "com.huawei.android.launcher",
-            "processId": 1714,
-            "exited": false
-        },
-        {
-            "deviceId": "LDG4C18508000010",
-            "name": "com.LoopStudios.PartyInc",
-            "processId": 25054,
-            "exited": false
-        },
-        {
-            "deviceId": "LDG4C18508000010",
-            "name": "com.LoopStudios.PartyInc",
-            "processId": 16058,
-            "exited": false
-        },
-        {
-            "deviceId": "LDG4C18508000010",
-            "name": "com.LoopStudios.PartyInc",
-            "processId": 17242,
-            "exited": false
-        },
-        {
-            "deviceId": "LDG4C18508000010",
-            "name": "com.LoopStudios.PartyInc",
-            "processId": 18543,
-            "exited": false
-        },
-        {
-            "deviceId": "LDG4C18508000010",
-            "name": "com.LoopStudios.PartyInc",
-            "processId": 28535,
-            "exited": false
-        }
-    ],
+    "m_KnownPackagesForSerialization": [],
     "m_Tags": {
         "m_Entries": [
             {
@@ -108,20 +41,9 @@
         ]
     },
     "m_MemoryViewerState": {
-        "MemoryWindowHeight": 300.0,
-        "MemoryWindowWidth": 170.0,
-        "MemoryTypeEnabled": [
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true
-        ],
+        "MemoryWindowHeight": 0.0,
+        "MemoryWindowWidth": 0.0,
+        "MemoryTypeEnabled": [],
         "MemoryGroup": 2,
         "Behavior": 0
     },
