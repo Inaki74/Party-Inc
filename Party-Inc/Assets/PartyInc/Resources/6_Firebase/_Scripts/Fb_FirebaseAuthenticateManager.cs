@@ -175,6 +175,11 @@ namespace PartyInc
                 });
             }
 
+            public void PasswordChangeRequest(string email, Action<FireauthCallResult> Callback = null)
+            {
+                //_auth.Rese
+            }
+
             private void SetErrorMessage(string message, Color state)
             {
                 _errorText.color = state;
