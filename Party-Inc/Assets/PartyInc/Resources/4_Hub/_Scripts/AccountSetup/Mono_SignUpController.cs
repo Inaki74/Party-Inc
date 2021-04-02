@@ -270,9 +270,9 @@ namespace PartyInc
                 }
             }
 
-            public void BackToSignIn()
+            public void BtnBack()
             {
-                SceneManager.LoadScene(Stt_SceneIndexes.LAUNCHER_SIGNIN);
+                SceneManager.LoadScene(Stt_SceneIndexes.PLAYER_FORK);
             }
         }
     }

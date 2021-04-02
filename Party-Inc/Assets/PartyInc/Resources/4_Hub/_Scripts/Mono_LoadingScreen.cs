@@ -32,6 +32,8 @@ namespace PartyInc
 
             private IEnumerator LoadingCo()
             {
+                float progress = 0f;
+
                 _loadingStatusText.text = "   Connecting...";
 
                 yield return new WaitUntil(() => Fb_FirebaseManager.Current.ConnectedToFirebaseServices && Fb_FirebaseAuthenticateManager.Current.AuthInitialized);
@@ -72,6 +74,7 @@ namespace PartyInc
 
                 // Load scene
                 _loadingCanvas.SetActive(false);
+
                 scene.allowSceneActivation = true;
 
                 // Fade in
