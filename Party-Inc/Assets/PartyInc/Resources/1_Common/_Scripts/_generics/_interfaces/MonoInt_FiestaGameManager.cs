@@ -69,11 +69,11 @@ namespace PartyInc
 
         private void Start()
         {
-            Debug.Log("WHAT THE FUCK IS GOING ON");
-            Debug.Log(typeof(G).ToString());
-            Debug.Log(typeof(T).ToString());
+            //Debug.Log("WHAT THE FUCK IS GOING ON");
+            //Debug.Log(typeof(G).ToString());
+            //Debug.Log(typeof(T).ToString());
 
-            Debug.Log("Default GM Start");
+            //Debug.Log("Default GM Start");
 
             gameMetadata = FindObjectOfType<Mono_GameMetadata>();
             networkController = FindObjectOfType<Mono_NetworkGameRoomController>();
@@ -127,7 +127,6 @@ namespace PartyInc
 
         private void OnDestroy()
         {
-
             OnDestroyed();
         }
 

@@ -6,6 +6,12 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
+    path: Assets/PartyInc/Scenes/2_Hub/GameTitle_LoadingScreen.unity
+    guid: f2b1c9b974a2649b69ee23611849aa55
+  - enabled: 1
+    path: Assets/PartyInc/Scenes/2_Hub/PlayerType_Fork.unity
+    guid: 464f3de7cba0649cd98a164186b0823a
+  - enabled: 1
     path: Assets/PartyInc/Scenes/2_Hub/Sign_In.unity
     guid: 5130e088a7a0a4f6bb7fa9e44681d584
   - enabled: 1
@@ -55,9 +61,6 @@ EditorBuildSettings:
     guid: ea2817233e68a4830bf6f2e3723f40b1
   - enabled: 1
     path: Assets/PartyInc/Scenes/1_Games/CautiousCuts.unity
-    guid: 5d47b545da891465aab4db5b7244e15a
-  - enabled: 1
-    path: Assets/PartyInc/Scenes/1_Games/CautiousCuts.unity
     guid: 9c55fcf74ca904ccebb0ba9725d7fcfe
   - enabled: 1
     path: Assets/PartyInc/Scenes/1_Games/LunarLanding.unity
@@ -71,7 +74,4 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/PartyInc/Scenes/1_Games/AbandonSpaceship.unity
     guid: d5305a1d19b61493b876a932a068d67d
-  - enabled: 0
-    path: 
-    guid: 00000000000000000000000000000000
   m_configObjects: {}

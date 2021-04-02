@@ -11,6 +11,20 @@ namespace PartyInc
         [SerializeField] private GameObject _dcUI;
 
         private bool _authValuesReady;
+
+        private bool _photonAuthComplete;
+        public bool PhotonAuthComplete
+        {
+            get
+            {
+                return _photonAuthComplete;
+            }
+            private set
+            {
+                _photonAuthComplete = value;
+            }
+        }
+
         private bool _runOnce;
 
         private void Start()
@@ -18,11 +32,23 @@ namespace PartyInc
             Application.targetFrameRate = 60;
 
             _authValuesReady = false;
+            _photonAuthComplete = false;
 
             if (!PhotonNetwork.IsConnected && !_runOnce)
             {
                 _runOnce = true;
                 StartCoroutine(Connect());
+            }
+        }
+
+        private IEnumerator JoinLobbyCo()
+        {
+            if (!PhotonNetwork.InLobby)
+                yield return new WaitUntil(() => PhotonNetwork.IsConnectedAndReady && PhotonNetwork.JoinLobby());
+            else
+            {
+                yield return new WaitUntil(() => PhotonNetwork.IsConnectedAndReady && PhotonNetwork.LeaveLobby());
+                PhotonNetwork.JoinLobby();
             }
         }
 
@@ -102,6 +128,16 @@ namespace PartyInc
             {
                 PhotonNetwork.NickName = PartyFirebase.Auth.Fb_FirebaseAuthenticateManager.Current.Auth.CurrentUser.DisplayName;
             }
+
+            StartCoroutine("JoinLobbyCo");
+        }
+
+        public override void OnJoinedLobby()
+        {
+            base.OnJoinedLobby();
+            Debug.Log("Fiesta Time/ PhotonManager: You have joined a lobby!");
+
+            _photonAuthComplete = true;
         }
 
         public override void OnDisconnected(DisconnectCause cause)

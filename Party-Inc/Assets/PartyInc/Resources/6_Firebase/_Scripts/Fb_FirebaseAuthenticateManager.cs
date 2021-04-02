@@ -38,8 +38,11 @@ namespace PartyInc
             [SerializeField] private Text _errorText;
             private bool _runStartOnce;
 
+            public bool AuthInitialized { get; private set; }
+
             private void Start()
             {
+                AuthInitialized = false;
                 if (_runStartOnce) return;
 
                 _runStartOnce = true;
@@ -55,6 +58,7 @@ namespace PartyInc
             private void AuthInit()
             {
                 _auth = FirebaseAuth.DefaultInstance;
+                AuthInitialized = true;
             }
 
             public void SignInEmailPassword(string email, string password, Action<FireauthCallResult> Callback = null)
@@ -180,7 +184,7 @@ namespace PartyInc
                 //_auth.Rese
             }
 
-            private void SetErrorMessage(string message, Color state)
+            public void SetErrorMessage(string message, Color state)
             {
                 _errorText.color = state;
                 _errorText.text = message;

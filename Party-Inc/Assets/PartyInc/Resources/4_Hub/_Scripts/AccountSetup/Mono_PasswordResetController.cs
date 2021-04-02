@@ -52,6 +52,8 @@ namespace PartyInc
 
             public void BtnBackToSignIn()
             {
+                if (_signInForm.activeInHierarchy) return;
+
                 _signInForm.SetActive(true);
                 _resetPasswordForm.SetActive(false);
             }

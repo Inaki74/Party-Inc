@@ -30,23 +30,7 @@ namespace PartyInc
         {
             nameText.text = "Welcome " + PartyFirebase.Auth.Fb_FirebaseAuthenticateManager.Current.Auth.CurrentUser.DisplayName + "!";
 
-            foreach (Button b in _gameButtons)
-            {
-                b.interactable = false;
-            }
-
-            StartCoroutine("JoinLobbyCo");
-        }
-
-        private IEnumerator JoinLobbyCo()
-        {
-            if (!PhotonNetwork.InLobby)
-                yield return new WaitUntil(() => PhotonNetwork.IsConnectedAndReady && PhotonNetwork.JoinLobby());
-            else
-            {
-                yield return new WaitUntil(() => PhotonNetwork.IsConnectedAndReady && PhotonNetwork.LeaveLobby());
-                PhotonNetwork.JoinLobby();
-            }
+            
         }
 
         public override void OnEnable()
@@ -139,17 +123,6 @@ namespace PartyInc
         #endregion
 
         #region PUN Callbacks
-
-        public override void OnJoinedLobby()
-        {
-            base.OnJoinedLobby();
-            Debug.Log("Fiesta Time/ RoomController: Joined lobby.");
-
-            foreach (Button b in _gameButtons)
-            {
-                b.interactable = true;
-            }
-        }
 
         public override void OnLeftLobby()
         {

@@ -39,15 +39,15 @@ namespace PartyInc
 
                     if (_triggerTimer <= 1.0f && _triggerTimer > 0.67f)
                     {
-                        signingIn = "Signing in .";
+                        signingIn = ".";
                     }
                     else if (_triggerTimer <= 0.67f && _triggerTimer > 0.34f)
                     {
-                        signingIn = "Signing in . .";
+                        signingIn = ". .";
                     }
                     else if (_triggerTimer <= 0.34f && _triggerTimer > 0.0f)
                     {
-                        signingIn = "Signing in . . .";
+                        signingIn = ". . .";
                     }
 
                     _statusText.text = signingIn;
@@ -72,16 +72,26 @@ namespace PartyInc
 
             private void InitButtons()
             {
-                if (PartyFirebase.Auth.Fb_FirebaseAuthenticateManager.Current.Auth.CurrentUser != null)
-                {
-                    Fb_FirestoreSession.Current.Setup();
-                    SceneManager.LoadScene(Stt_SceneIndexes.HUB);
-                    return;
-                }
-
                 _signInButton.interactable = true;
                 _signUpButton.interactable = true;
                 _passwordResetButton.interactable = true;
+            }
+
+            private IEnumerator GoToHubCo()
+            {
+                Fb_FirestoreSession.Current.Setup();
+
+                AsyncOperation scene = SceneManager.LoadSceneAsync(Stt_SceneIndexes.HUB, LoadSceneMode.Additive);
+                scene.allowSceneActivation = false;
+
+                yield return new WaitUntil(() => Fb_FirestoreSession.Current.SetupCompleted);
+
+                yield return new WaitUntil(() => Mng_NetworkManager.Current.PhotonAuthComplete);
+
+                scene.allowSceneActivation = true;
+                yield return new WaitUntil(() => scene.isDone);
+
+                _signingIn = false;
             }
 
             public void BtnSignIn()
@@ -89,14 +99,13 @@ namespace PartyInc
                 _signingIn = true;
                 PartyFirebase.Auth.Fb_FirebaseAuthenticateManager.Current.SignInEmailPassword(_emailField.text, _passwordField.text, (result) =>
                 {
-                    _signingIn = false;
                     if (result.success)
                     {
-                        Fb_FirestoreSession.Current.Setup();
-                        SceneManager.LoadScene(Stt_SceneIndexes.HUB);
+                        StartCoroutine(GoToHubCo());
                     }
                     else
                     {
+                        _signingIn = false;
                         Debug.Log("Authentication failed: " + result.exceptions[0].Message);
                     }
                 });
@@ -111,6 +120,13 @@ namespace PartyInc
             {
                 _passwordResetForm.SetActive(true);
                 _signInForm.SetActive(false);
+            }
+
+            public void BtnBack()
+            {
+                if (_passwordResetForm.activeInHierarchy) return;
+
+                SceneManager.LoadScene(Stt_SceneIndexes.PLAYER_FORK);
             }
         }
     }

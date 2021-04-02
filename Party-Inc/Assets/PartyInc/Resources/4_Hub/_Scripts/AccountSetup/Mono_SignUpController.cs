@@ -1,9 +1,11 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
-
+using Firebase.Firestore;
+using Firebase;
 
 namespace PartyInc
 {
@@ -17,8 +19,8 @@ namespace PartyInc
             [SerializeField] private InputField _emailField;
             [SerializeField] private InputField _passwordField;
             [SerializeField] private InputField _passwordVerificationField;
+            [SerializeField] private InputField _DOBField;
             [SerializeField] private InputField _cityField;
-            [SerializeField] private InputField _countryField;
             [SerializeField] private InputField _languageField;
 
             [SerializeField] private Text _statusText;
@@ -39,14 +41,14 @@ namespace PartyInc
 
                     if(_triggerTimer <= 1.0f && _triggerTimer > 0.67f)
                     {
-                        signingUp = "Signing up .";
+                        signingUp = ".";
                     }else if (_triggerTimer <= 0.67f && _triggerTimer > 0.34f)
                     {
-                        signingUp = "Signing up . .";
+                        signingUp = ". .";
                     }
                     else if (_triggerTimer <= 0.34f && _triggerTimer > 0.0f)
                     {
-                        signingUp = "Signing up . . .";
+                        signingUp = ". . .";
                     }
 
                     _statusText.text = signingUp;
@@ -59,9 +61,146 @@ namespace PartyInc
                 }
             }
 
+            private Timestamp DMYDateToFirebaseTimestamp(string date)
+            {
+                string[] decomposedDate = date.Split('/');
+
+                string day = decomposedDate[1];
+                string month = decomposedDate[0];
+                string year = decomposedDate[2];
+
+                DateTime thisDate = new DateTime(int.Parse(year), int.Parse(month), int.Parse(day));
+                return Timestamp.FromDateTime(thisDate);
+            }
+
+            private bool ValidateBirthdate(string dob)
+            {
+                if (string.IsNullOrEmpty(dob))
+                {
+                    Fb_FirebaseAuthenticateManager.Current.SetErrorMessage("Please provide a birthdate!", Color.yellow);
+
+                    return false;
+                }
+
+                string[] decomposedDate = dob.Split('/');
+
+                int day = int.Parse(decomposedDate[1]);
+                int month = int.Parse(decomposedDate[0]);
+                int year = int.Parse(decomposedDate[2]);
+
+                if(year < 1900)
+                {
+                    // Unacceptable year
+                    Fb_FirebaseAuthenticateManager.Current.SetErrorMessage("It's not possible that you're THAT old!", Color.yellow);
+
+                    return false;
+                }
+
+                if(month <= 0 || month > 12)
+                {
+                    // Unacceptable month
+                    Fb_FirebaseAuthenticateManager.Current.SetErrorMessage("That month doesn't exist!", Color.yellow);
+
+                    return false;
+                }
+
+                bool isLeapYear = year % 4 == 0 && !(year % 100 == 0 && !(year % 400 == 0)); // Its a leap year if its divisible by 4, except for years that are divisible by 100 and not divisible by 400 at the same time.
+                bool isPairMonth = month % 2 == 0; // If its a pair month (except february) it has 30 days
+
+                int upperBoundDay = 0;
+                int lowerBoundDay = 0;
+
+                if(month == 2)
+                {
+                    //Its february
+                    if (isLeapYear)
+                    {
+                        // If its a leap year, then the range is 0 - 29
+                        upperBoundDay = 29;
+                    }
+                    else
+                    {
+                        // If its not a leap year, then the range is 0 - 28
+                        upperBoundDay = 28;
+                    }
+                }
+                else
+                {
+                    // Its not february
+                    if (isPairMonth)
+                    {
+                        // If its pair, then its a range of 0 - 30
+                        upperBoundDay = 30;
+                    }
+                    else
+                    {
+                        // If its not pair, then its a range of 0 - 31
+                        upperBoundDay = 31;
+                    }
+                }
+
+                if(day < lowerBoundDay || day > upperBoundDay)
+                {
+                    // Unacceptable day
+                    Fb_FirebaseAuthenticateManager.Current.SetErrorMessage("That day doesn't exist!", Color.yellow);
+
+                    return false;
+                }
+
+                return true;
+            }
+
+            private bool ValidateLanguage(string lang)
+            {
+                if (string.IsNullOrEmpty(lang))
+                {
+                    Fb_FirebaseAuthenticateManager.Current.SetErrorMessage("Please provide a language!", Color.yellow);
+
+                    return false;
+                }
+
+                return true;
+            }
+
+            private bool ValidateCity(string cit)
+            {
+                if (string.IsNullOrEmpty(cit))
+                {
+                    Fb_FirebaseAuthenticateManager.Current.SetErrorMessage("Please provide a location!", Color.yellow);
+
+                    return false;
+                }
+
+                return true;
+            }
+
+            private IEnumerator GoToHubCo()
+            {
+                Fb_FirestoreSession.Current.Setup();
+
+                AsyncOperation scene = SceneManager.LoadSceneAsync(Stt_SceneIndexes.HUB, LoadSceneMode.Additive);
+                scene.allowSceneActivation = false;
+
+                yield return new WaitUntil(() => Fb_FirestoreSession.Current.SetupCompleted);
+
+                yield return new WaitUntil(() => Mng_NetworkManager.Current.PhotonAuthComplete);
+
+                scene.allowSceneActivation = true;
+                yield return new WaitUntil(() => scene.isDone);
+
+                _signingUp = false;
+            }
+
             public void SignUp()
             {
                 _signingUp = true;
+
+                if (!ValidateBirthdate(_DOBField.text) || !ValidateLanguage(_languageField.text) || !ValidateCity(_cityField.text))
+                {
+                    _signingUp = false;
+                    return;
+                }
+
                 Fb_FirebaseAuthenticateManager.Current.SignUpEmailPassword(_emailField.text, _passwordField.text, _passwordVerificationField.text, _nicknameField.text, SignUpOnFirestore);
             }
 
@@ -74,7 +213,7 @@ namespace PartyInc
 
                     newData.nickname = _nicknameField.text;
                     newData.city = _cityField.text;
-                    newData.country = _countryField.text;
+                    newData.birthdate = DMYDateToFirebaseTimestamp(_DOBField.text);
                     newData.language = _languageField.text;
 
                     newPlayer.data = newData.ToDictionary();
@@ -82,16 +221,15 @@ namespace PartyInc
                     // ADD TO PLAYERS
                     Fb_FirestoreManager.Current.Add(Fb_FirestoreManager.Current.Players, newPlayer.ToDictionary(), result.uid, res =>
                     {
-                        _signingUp = false;
                         if (res.success)
                         {
                             Debug.Log("PLAYER ADDED");
 
-                            Fb_FirestoreSession.Current.Setup();
-                            SceneManager.LoadScene(Stt_SceneIndexes.HUB);
+                            StartCoroutine(GoToHubCo());
                         }
                         else
                         {
+                            _signingUp = false;
                             Debug.Log("COULDNT ADD PLAYER");
                             Debug.Log(res.exceptions[0].Message);
                         }
