@@ -10,7 +10,7 @@ namespace PartyInc
 {
     namespace CC
     {
-        public class Mono_Player_CC : MonoBehaviourPun
+        public class Mono_Player_CC : MonoBehaviourPun, IPlayerResultSender
         {
             public delegate void ActionSliceLog(float p, float a, float t);
             public static event ActionSliceLog onLogSlicedScore;
@@ -143,20 +143,21 @@ namespace PartyInc
 
             /// NETWORKING
             ///
-            private void SendMyResults(EventData eventData)
+            public void SendMyResults(EventData eventData)
             {
-                if (eventData.Code == Constants.GivePlayerResultEventCode && photonView.IsMine)
+                if (eventData.Code == 74 && photonView.IsMine)
                 {
-                    float finalScore = _myTotalScore / Constants.AMOUNT_OF_LOGS_PER_MATCH;
+                    float finalScore = (float)(_myTotalScore / Constants.AMOUNT_OF_LOGS_PER_MATCH);
+                    bool isInt = false;
                     if (finalScore > PlayerPrefs.GetFloat(PartyInc.Constants.CC_KEY_HISCORE))
                     {
                         Mng_GameManager_CC.Current.IsHighScore = true;
                         PlayerPrefs.SetFloat(PartyInc.Constants.CC_KEY_HISCORE, finalScore);
                     }
 
-                    object[] content = new object[] { PhotonNetwork.LocalPlayer.ActorNumber, finalScore };
+                    object[] content = new object[] { PhotonNetwork.LocalPlayer.ActorNumber, finalScore, isInt };
                     RaiseEventOptions raiseEventOptions = new RaiseEventOptions { Receivers = ReceiverGroup.All };
-                    PhotonNetwork.RaiseEvent(Constants.GetPlayerResultsEventCode, content, raiseEventOptions, SendOptions.SendReliable);
+                    PhotonNetwork.RaiseEvent(75, content, raiseEventOptions, SendOptions.SendReliable);
                 }
             }
         }

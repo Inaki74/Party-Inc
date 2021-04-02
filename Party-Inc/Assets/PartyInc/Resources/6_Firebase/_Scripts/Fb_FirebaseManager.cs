@@ -26,6 +26,17 @@ namespace PartyInc
             }
 
             private bool _connectedToFirebaseServices;
+            public bool ConnectedToFirebaseServices
+            {
+                get
+                {
+                    return _connectedToFirebaseServices;
+                }
+                private set
+                {
+                    _connectedToFirebaseServices = value;
+                }
+            }
 
             public override void Init()
             {

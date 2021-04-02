@@ -19,7 +19,7 @@ GameObject:
   - component: {fileID: 753281568516484040}
   - component: {fileID: 1008125928637082042}
   m_Layer: 12
-  m_Name: Pfb_Log_SmallVert_CC
+  m_Name: pfb_FallingLog_Small_Vert
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

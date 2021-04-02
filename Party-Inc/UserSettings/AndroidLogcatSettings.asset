@@ -3,7 +3,7 @@
     "m_SelectedPackage": {
         "deviceId": "LDG4C18508000010",
         "name": "com.LoopStudios.PartyInc",
-        "processId": 7658,
+        "processId": 2202,
         "exited": false
     },
     "m_SelectedPriority": 0,
@@ -11,67 +11,7 @@
         {
             "deviceId": "LDG4C18508000010",
             "name": "com.LoopStudios.PartyInc",
-            "processId": 28427,
-            "exited": true
-        },
-        {
-            "deviceId": "LDG4C18508000010",
-            "name": "com.LoopStudios.PartyInc",
-            "processId": 29021,
-            "exited": true
-        },
-        {
-            "deviceId": "LDG4C18508000010",
-            "name": "com.LoopStudios.PartyInc",
-            "processId": 29734,
-            "exited": true
-        },
-        {
-            "deviceId": "LDG4C18508000010",
-            "name": "com.LoopStudios.PartyInc",
-            "processId": 30368,
-            "exited": true
-        },
-        {
-            "deviceId": "LDG4C18508000010",
-            "name": "com.LoopStudios.PartyInc",
-            "processId": 1319,
-            "exited": true
-        },
-        {
-            "deviceId": "LDG4C18508000010",
-            "name": "com.huawei.android.launcher",
-            "processId": 1777,
-            "exited": false
-        },
-        {
-            "deviceId": "LDG4C18508000010",
-            "name": "com.LoopStudios.PartyInc",
-            "processId": 17242,
-            "exited": false
-        },
-        {
-            "deviceId": "LDG4C18508000010",
-            "name": "com.LoopStudios.PartyInc",
-            "processId": 18239,
-            "exited": false
-        },
-        {
-            "deviceId": "LDG4C18508000010",
-            "name": "com.LoopStudios.PartyInc",
-            "processId": 8956,
-            "exited": false
-        },
-        {
-            "deviceId": "LDG4C18508000010",
-            "name": "com.LoopStudios.PartyInc",
-            "processId": 10003,
-            "exited": false
-        },
-        {
-            "deviceId": "LDG4C18508000010",
-            "name": "com.LoopStudios.PartyInc",
-            "processId": 7658,
+            "processId": 2202,
             "exited": false
         }
     ],

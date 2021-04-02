@@ -382,7 +382,7 @@ namespace PartyInc
                         this.experience = experience;
                     }
 
-                    public void AddGameStats(string gamename, int matchesplayed, int matcheswon, int recordscore, object recorddate)
+                    public static void AddGameStatsInt(Dictionary<string, object> output, string gamename, int matchesplayed, int matcheswon, int recordscore, object recorddate)
                     {
                         Dictionary<string, object> toAdd = new Dictionary<string, object>();
 
@@ -391,7 +391,27 @@ namespace PartyInc
                         toAdd.Add(Fb_Constants.FIRESTORE_KEY_PLAYER_STATS_GAMESTATS_RECORDSCORE, recordscore);
                         toAdd.Add(Fb_Constants.FIRESTORE_KEY_PLAYER_STATS_GAMESTATS_RECORDDATE, recorddate);
 
-                        gamestats.Add(gamename, toAdd);
+                        if (output.ContainsKey(gamename))
+                        {
+                            output.Remove(gamename);
+                        }
+                        output.Add(gamename, toAdd);
+                    }
+
+                    public static void AddGameStatsFloat(Dictionary<string, object> output, string gamename, int matchesplayed, int matcheswon, float recordscore, object recorddate)
+                    {
+                        Dictionary<string, object> toAdd = new Dictionary<string, object>();
+
+                        toAdd.Add(Fb_Constants.FIRESTORE_KEY_PLAYER_STATS_GAMESTATS_MATCHESPLAYED, matchesplayed);
+                        toAdd.Add(Fb_Constants.FIRESTORE_KEY_PLAYER_STATS_GAMESTATS_MATCHESWON, matcheswon);
+                        toAdd.Add(Fb_Constants.FIRESTORE_KEY_PLAYER_STATS_GAMESTATS_RECORDSCORE, recordscore);
+                        toAdd.Add(Fb_Constants.FIRESTORE_KEY_PLAYER_STATS_GAMESTATS_RECORDDATE, recorddate);
+
+                        if (output.ContainsKey(gamename))
+                        {
+                            output.Remove(gamename);
+                        }
+                        output.Add(gamename, toAdd);
                     }
 
                     public Dictionary<string, object> ToDictionary()

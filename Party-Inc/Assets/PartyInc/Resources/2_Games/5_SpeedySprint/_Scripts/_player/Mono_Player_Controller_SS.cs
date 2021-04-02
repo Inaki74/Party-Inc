@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
+using ExitGames.Client.Photon;
+using Photon.Realtime;
 
 namespace PartyInc
 {
@@ -11,7 +13,7 @@ namespace PartyInc
         /// State machine would be overkill, since theres only 4 states.
         /// </summary>
         [RequireComponent(typeof(Mono_Player_Input_SS))]
-        public class Mono_Player_Controller_SS : MonoBehaviourPun
+        public class Mono_Player_Controller_SS : MonoBehaviourPun, IPlayerResultSender
         {
             // Components
             private CapsuleCollider _cc;
@@ -40,7 +42,7 @@ namespace PartyInc
             [SerializeField] private GameObject _upperBody;
             [SerializeField] private GameObject _lowerBody;
 
-            public delegate void ActionPlayerLost(int playerId);
+            public delegate void ActionPlayerLost();
             public static event ActionPlayerLost onPlayerDied;
 
             private bool _hasLost;
@@ -103,6 +105,8 @@ namespace PartyInc
             public Vector3 Direction { get; private set; }
             private Vector3 _lastPosition;
 
+            private float _timeDied;
+
             // Start is called before the first frame update
             void Start()
             {
@@ -131,10 +135,20 @@ namespace PartyInc
                 }
             }
 
+            private void Awake()
+            {
+                PhotonNetwork.NetworkingClient.EventReceived += SendMyResults;
+            }
+
+            private void OnDestroy()
+            {
+                PhotonNetwork.NetworkingClient.EventReceived -= SendMyResults;
+            }
+
             // Update is called once per frame
             void Update()
             {
-                if (!photonView.IsMine) return;
+                if (!photonView.IsMine || _hasLost) return;
 
                 _lastPosition = transform.position; // t = 1, l = 1
                 
@@ -538,6 +552,11 @@ namespace PartyInc
             /// <param name="direction"></param>
             private void CheckIfDead(Transform trans, Vector3 direction)
             {
+                if (_hasLost)
+                {
+                    return;
+                }
+
                 RaycastHit hit;
 
                 if (Physics.Raycast(trans.position, trans.TransformDirection(direction), out hit, 5f, 1 << 8))
@@ -585,6 +604,8 @@ namespace PartyInc
             /// </summary>
             private void PlayerDie()
             {
+                _timeDied = Mng_GameManager_SS.Current.InGameTime;
+
                 if (Mng_GameManager_SS.Current.Testing)
                 {
                     Instantiate(_deathParticles, transform.position, Quaternion.identity);
@@ -595,13 +616,31 @@ namespace PartyInc
                 _hasLost = true;
 
                 // Invoke events and RPC calls to inform of your death.
-                onPlayerDied?.Invoke(PhotonNetwork.LocalPlayer.ActorNumber);
-                photonView.RPC("RPC_InformPlayerLost", RpcTarget.Others, PhotonNetwork.LocalPlayer.ActorNumber);
+                photonView.RPC("RPC_InformPlayerLost", RpcTarget.All);
                 photonView.RPC("RPC_PlayerDied", RpcTarget.Others);
 
                 // Instantiates some death particles and deactivates the object.
                 Instantiate(_deathParticles, transform.position, Quaternion.identity);
-                gameObject.SetActive(false);
+                foreach (MeshRenderer mr in GetComponentsInChildren<MeshRenderer>())
+                {
+                    mr.enabled = false;
+                }
+                //gameObject.SetActive(false);
+            }
+
+            public void SendMyResults(EventData eventData)
+            {
+                if (eventData.Code == 74 && photonView.IsMine)
+                {
+                    Debug.Log("SENDING MY RESULTS");
+
+                    float finalScore = _timeDied;
+                    bool isInt = false;
+
+                    object[] content = new object[] { PhotonNetwork.LocalPlayer.ActorNumber, finalScore, isInt };
+                    RaiseEventOptions raiseEventOptions = new RaiseEventOptions { Receivers = ReceiverGroup.All };
+                    PhotonNetwork.RaiseEvent(75, content, raiseEventOptions, SendOptions.SendReliable);
+                }
             }
 
             private void OnTriggerEnter(Collider other)
@@ -629,12 +668,11 @@ namespace PartyInc
             }
 
             [PunRPC]
-            public void RPC_InformPlayerLost(int playerId)
+            public void RPC_InformPlayerLost()
             {
+                onPlayerDied?.Invoke();
                 _hasLost = true;
             }
-
-            
         }
     }
 }

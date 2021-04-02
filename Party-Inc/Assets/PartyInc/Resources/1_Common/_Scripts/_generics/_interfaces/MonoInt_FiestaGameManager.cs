@@ -2,6 +2,12 @@
 using System.Collections;
 using UnityEngine;
 using Photon.Pun;
+using Photon.Realtime;
+using ExitGames.Client.Photon;
+using System.Linq;
+using System.Collections.Generic;
+using UnityEngine.SceneManagement;
+using PartyInc.PartyFirebase.Firestore;
 
 namespace PartyInc
 {
@@ -15,11 +21,17 @@ namespace PartyInc
     /// <typeparam name="T"> The Scoring Type </typeparam>
     public abstract class FiestaGameManager<G, T> : MonoSingleton<G> where G : MonoSingleton<G>
     {
+        public string GameDisplayName { get; protected set; }
+        public string GameDBName { get; protected set; }
+
         // The network controller in the scene.
+        protected Mono_GameMetadata gameMetadata;
         protected Mono_NetworkGameRoomController networkController;
 
         // The results of the game, every game has results and winners.
         public PlayerResults<T>[] playerResults = new PlayerResults<T>[4];
+        public List<PlayerResults<int>> ProvisoryPlayerResultsInt = new List<PlayerResults<int>>();
+        public List<PlayerResults<float>> ProvisoryPlayerResultsFloat = new List<PlayerResults<float>>();
 
         // Every game has a start.
         public delegate void ActionGameStart();
@@ -57,9 +69,16 @@ namespace PartyInc
 
         private void Start()
         {
-            Debug.Log("Default GM Start");
+            //Debug.Log("WHAT THE FUCK IS GOING ON");
+            //Debug.Log(typeof(G).ToString());
+            //Debug.Log(typeof(T).ToString());
 
+            //Debug.Log("Default GM Start");
+
+            gameMetadata = FindObjectOfType<Mono_GameMetadata>();
             networkController = FindObjectOfType<Mono_NetworkGameRoomController>();
+
+            gameMetadata.PlayerCount = playerCount;
 
             if(networkController == null && PhotonNetwork.IsConnected)
             {
@@ -93,6 +112,8 @@ namespace PartyInc
         {
             base.Init();
 
+            PhotonNetwork.NetworkingClient.EventReceived += GetPlayerResult;
+
             Debug.Log("Default GM Awake");
             playerCount = PhotonNetwork.PlayerList.Length;
             PlayersConnectedAndReady = false;
@@ -104,15 +125,23 @@ namespace PartyInc
             }
         }
 
+        private void OnDestroy()
+        {
+            OnDestroyed();
+        }
+
+        public virtual void OnDestroyed()
+        {
+            PhotonNetwork.NetworkingClient.EventReceived -= GetPlayerResult;
+        }
+
         /// <summary>
         /// Starts the game once all players are ready.
         /// </summary>
         /// <returns></returns>
         private IEnumerator AllPlayersReady()
         {
-            Debug.Log("ONE");
             yield return new WaitUntil(() => networkController.playersAreReady || !PhotonNetwork.IsConnected);
-            Debug.Log("TWO");
 
             PlayersConnectedAndReady = true;
 
@@ -130,6 +159,102 @@ namespace PartyInc
         }
 
         /// <summary>
+        /// Does not run OnGameFinishInvoke() within.
+        /// </summary>
+        /// <param name="descending"></param>
+        protected IEnumerator GameFinish(bool biggerScoreWins)
+        {
+            // Begin loading end scene, as getting the player results will take a tiny bit of time.
+            AsyncOperation scene = SceneManager.LoadSceneAsync(Stt_SceneIndexes.GAMERESULTS, LoadSceneMode.Additive);
+            scene.allowSceneActivation = false;
+
+            //Must get all the player results from the net (each client should have their own score tracked)
+            if (PhotonNetwork.IsMasterClient)
+            {
+                object[] content = new object[] { };
+                RaiseEventOptions raiseEventOptions = new RaiseEventOptions { Receivers = ReceiverGroup.All };
+                PhotonNetwork.RaiseEvent(74, content, raiseEventOptions, SendOptions.SendReliable);
+            }
+
+            yield return new WaitUntil(() => ProvisoryPlayerResultsInt.Count() == playerCount || ProvisoryPlayerResultsFloat.Count() == playerCount);
+
+            // Parse player results 
+            ParsePlayerResults(biggerScoreWins);
+
+            // Find a winner
+            FindWinner();
+
+            // Check for local players highscore and set his results
+            bool localPlayerHighscore = false;
+            foreach(PlayerResults<T> results in playerResults)
+            {
+                if(results.playerId == PhotonNetwork.LocalPlayer.ActorNumber)
+                {
+                    localPlayerHighscore = Fb_FirestoreSession.Current.CheckIfHighscore(GameDBName, results.scoring);
+
+                    Fb_FirestoreSession.Current.SetGameResults(results.scoring,
+                                                               GameDBName,
+                                                               PhotonNetwork.LocalPlayer.ActorNumber == WinnerId,
+                                                               localPlayerHighscore);
+                }
+            }
+           
+            // Load up metadata:
+            LoadUpMetadata(biggerScoreWins, localPlayerHighscore);
+
+            scene.allowSceneActivation = true;
+
+            // Load up the game end screen.
+            yield return new WaitUntil(() => scene.isDone);
+        }
+
+        /// <summary>
+        /// Function that finds who is the winner.
+        /// </summary>
+        private void FindWinner()
+        {
+            T contenderScore = playerResults.First().scoring;
+            int contender = playerResults.First().playerId;
+            int hap = 0;
+
+            for (int i = 0; i < playerResults.Count(); i++)
+            {
+                if (playerResults[i].scoring.Equals(contenderScore)) hap++;
+            }
+
+            if (hap > 1) contender = -1;
+
+            WinnerId = contender;
+        }
+
+        private void GetPlayerResult(EventData eventData)
+        {
+            // GENERICS DOESN'T WORK WITH PHOTON EVENTS.
+            // Should have known...
+            if (eventData.Code == 75)
+            {
+                object[] data = (object[])eventData.CustomData;
+
+                if ((bool)data[2])
+                {
+                    PlayerResults<int> thisPlayersResult = new PlayerResults<int>();
+                    thisPlayersResult.playerId = (int)data[0];
+                    thisPlayersResult.scoring = (int)data[1];
+
+                    ProvisoryPlayerResultsInt.Add(thisPlayersResult);
+                }
+                else
+                {
+                    PlayerResults<float> thisPlayersResult = new PlayerResults<float>();
+                    thisPlayersResult.playerId = (int)data[0];
+                    thisPlayersResult.scoring = (float)data[1];
+
+                    ProvisoryPlayerResultsFloat.Add(thisPlayersResult);
+                }
+            }
+        }
+
+        /// <summary>
         /// Use this instead of start
         /// </summary>
         protected abstract void InStart();
@@ -140,6 +265,117 @@ namespace PartyInc
         /// This method will run after every player has connected.
         /// </summary>
         protected abstract void InitializeGameManagerDependantObjects();
+
+        //////////
+        ///
+        private void ParsePlayerResults(bool biggerScoreWins)
+        {
+            if (ProvisoryPlayerResultsInt.Count() == playerCount)
+            {
+                List<PlayerResults<T>> res = new List<PlayerResults<T>>();
+
+                foreach (PlayerResults<int> val in ProvisoryPlayerResultsInt)
+                {
+                    PlayerResults<T> newPR = new PlayerResults<T>();
+                    newPR.playerId = val.playerId;
+                    newPR.reachedEnd = val.reachedEnd;
+                    newPR.scoring = (T)Convert.ChangeType(val.scoring, typeof(T));
+                    res.Add(newPR);
+                }
+
+                playerResults = res.ToArray();
+            }
+            else
+            {
+                List<PlayerResults<T>> res = new List<PlayerResults<T>>();
+
+                foreach (PlayerResults<float> val in ProvisoryPlayerResultsFloat)
+                {
+                    PlayerResults<T> newPR = new PlayerResults<T>();
+                    newPR.playerId = val.playerId;
+                    newPR.reachedEnd = val.reachedEnd;
+                    newPR.scoring = (T)Convert.ChangeType(val.scoring, typeof(T));
+                    res.Add(newPR);
+                }
+
+                playerResults = res.ToArray();
+            }
+
+            var aux = playerResults.OrderByDescending(result => result.scoring);
+            // Order list
+            if (!biggerScoreWins)
+            {
+                aux = playerResults.OrderBy(result => result.scoring);
+            }
+
+            playerResults = aux.ToArray();
+        }
+
+        private void LoadUpMetadata(bool biggerScoreWins, bool localPlayerHighscore)
+        {
+            gameMetadata.WasLocalPlayerHighscore = localPlayerHighscore;
+            gameMetadata.GameDBName = GameDBName;
+            gameMetadata.GameDisplayName = GameDisplayName;
+            gameMetadata.WinnerId = WinnerId;
+            gameMetadata.DescendingCondition = biggerScoreWins;
+
+            if (typeof(T) == typeof(int))
+            {
+                gameMetadata.ScoreType = ScoreType.Int;
+                List<PlayerResults<int>> res = new List<PlayerResults<int>>();
+
+                foreach (PlayerResults<T> val in playerResults)
+                {
+                    PlayerResults<int> newPR = new PlayerResults<int>();
+                    newPR.playerId = val.playerId;
+                    newPR.reachedEnd = val.reachedEnd;
+                    newPR.scoring = (int)Convert.ChangeType(val.scoring, typeof(int));
+                    res.Add(newPR);
+
+                    if (val.playerId == PhotonNetwork.LocalPlayer.ActorNumber)
+                    {
+                        if (localPlayerHighscore)
+                        {
+                            gameMetadata.LocalPlayerHighscoreInt = newPR.scoring;
+                        }
+                        else
+                        {
+                            gameMetadata.LocalPlayerHighscoreInt = (int)Fb_FirestoreSession.Current.GetHighscore<long>(GameDBName);
+                        }
+                    }
+                }
+
+                gameMetadata.PlayerResultsInt = res.ToArray();
+            }
+            else
+            {
+                gameMetadata.ScoreType = ScoreType.Float;
+                List<PlayerResults<float>> res = new List<PlayerResults<float>>();
+
+                foreach (PlayerResults<T> val in playerResults)
+                {
+                    PlayerResults<float> newPR = new PlayerResults<float>();
+                    newPR.playerId = val.playerId;
+                    newPR.reachedEnd = val.reachedEnd;
+                    newPR.scoring = (float)Convert.ChangeType(val.scoring, typeof(float));
+                    res.Add(newPR);
+
+                    if (val.playerId == PhotonNetwork.LocalPlayer.ActorNumber)
+                    {
+                        if (localPlayerHighscore)
+                        {
+                            gameMetadata.LocalPlayerHighscoreFloat = newPR.scoring;
+                        }
+                        else
+                        {
+                            gameMetadata.LocalPlayerHighscoreFloat = (float)Fb_FirestoreSession.Current.GetHighscore<double>(GameDBName);
+                        }
+                    }
+                }
+
+                gameMetadata.PlayerResultsFloat = res.ToArray();
+            }
+        }
 
         private IEnumerator WaitForPropertiesCo()
         {
@@ -157,6 +393,7 @@ namespace PartyInc
             CustomProps = propertiesThatChanged;
         }
     }
+
 
     public struct PlayerResults<T>
     {
@@ -179,6 +416,12 @@ namespace PartyInc
         {
             return "PlayerID: " + playerId + " , scoring: " + scoring;
         }
+    }
+
+    public enum ScoreType
+    {
+        Float,
+        Int,
     }
 }
 

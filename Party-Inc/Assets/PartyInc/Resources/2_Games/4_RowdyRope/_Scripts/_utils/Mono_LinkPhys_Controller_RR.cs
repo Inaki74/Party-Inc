@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Mono_LinkPhys_Controller_RR : MonoBehaviour
+public class RopeLink : MonoBehaviour
 {
     private Rigidbody Rb;
     // Start is called before the first frame update

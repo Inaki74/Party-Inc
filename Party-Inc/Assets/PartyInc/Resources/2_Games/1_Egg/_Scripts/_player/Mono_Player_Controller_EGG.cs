@@ -1,14 +1,15 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using Photon.Realtime;
+using ExitGames.Client.Photon;
 using Photon.Pun;
 
 namespace PartyInc
 {
     namespace EGG
     {
-        public class Mono_Player_Controller_EGG : MonoBehaviourPun, IPunObservable
+        public class Mono_Player_Controller_EGG : MonoBehaviourPun, IPunObservable, IPlayerResultSender
         {
             #region Components
             [SerializeField]
@@ -18,21 +19,9 @@ namespace PartyInc
             private MeshRenderer Mr;
             private BoxCollider Bc;
             #endregion
-
+            
             public float movementSpeed;
             public float stunTime;
-
-            private PlayerResults<int> myResults;
-            public PlayerResults<int> MyResults {
-                get
-                {
-                    return myResults;
-                }
-                private set
-                {
-                    myResults = value;
-                }
-            }
 
             #region Instance Variables
             private Vector3 railLeft;
@@ -44,6 +33,8 @@ namespace PartyInc
             private bool runOnce;
             private bool isStunned;
             #endregion
+
+            private int _score;
 
             #region Unity Callback Functions
             private void Start()
@@ -82,9 +73,6 @@ namespace PartyInc
 
                     runOnce = true;
                     isStunned = false;
-
-                    myResults.playerId = PhotonNetwork.LocalPlayer.ActorNumber;
-                    myResults.scoring = 0;
                 }
             }
 
@@ -108,12 +96,14 @@ namespace PartyInc
 
             private void Awake()
             {
+                PhotonNetwork.NetworkingClient.EventReceived += SendMyResults;
                 Mono_Egg_EGG.onObtainEgg += OnEggObtain;
                 Mng_GameManager_EGG.onGameFinish += OnGameFinish;
             }
 
             private void OnDestroy()
             {
+                PhotonNetwork.NetworkingClient.EventReceived -= SendMyResults;
                 Mono_Egg_EGG.onObtainEgg -= OnEggObtain;
                 Mng_GameManager_EGG.onGameFinish -= OnGameFinish;
             }
@@ -182,8 +172,8 @@ namespace PartyInc
                 {
                     StartCoroutine("StunnedCo");
                 }
-                myResults.scoring += scoreModifier;
-                playerUI.UpdateScore(myResults.scoring);
+                _score++;
+                playerUI.UpdateScore(_score);
             }
 
             public bool GetIfStunned()
@@ -193,30 +183,35 @@ namespace PartyInc
 
             public void OnGameFinish()
             {
-                if (photonView.IsMine) Mng_GameManager_EGG.Current.IsHighScore = HighScoreHelpers.DetermineHighScoreInt(PartyInc.Constants.EGG_KEY_HISCORE, MyResults.scoring, true);
+                if (photonView.IsMine) Mng_GameManager_EGG.Current.IsHighScore = HighScoreHelpers.DetermineHighScoreInt(PartyInc.Constants.EGG_KEY_HISCORE, _score, true);
 
                 StopAllCoroutines();
+            }
+
+            public void SendMyResults(EventData eventData)
+            {
+                if (eventData.Code == 74 && photonView.IsMine)
+                {
+                    int finalScore = _score;
+                    bool isInt = true;
+
+                    object[] content = new object[] { PhotonNetwork.LocalPlayer.ActorNumber, finalScore, isInt };
+                    RaiseEventOptions raiseEventOptions = new RaiseEventOptions { Receivers = ReceiverGroup.All };
+                    PhotonNetwork.RaiseEvent(75, content, raiseEventOptions, SendOptions.SendReliable);
+                }
             }
 
             public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
             {
                 if (stream.IsWriting)
                 {
-                    stream.SendNext(myResults.playerId);
-                    stream.SendNext(myResults.scoring);
                     stream.SendNext(isStunned);
                     stream.SendNext(transform.position);
                 }
                 else
                 {
-                    PlayerResults<int> aux = new PlayerResults<int>();
-
-                    aux.playerId = (int)stream.ReceiveNext();
-                    aux.scoring = (int)stream.ReceiveNext();
                     isStunned = (bool)stream.ReceiveNext();
                     transform.position = (Vector3)stream.ReceiveNext();
-
-                    myResults = aux;
                 }
             }
         }

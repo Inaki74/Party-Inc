@@ -18,8 +18,6 @@ namespace PartyInc
             [SerializeField] private GameObject _logSpawner;
 
             private float _windowTime;
-
-            private List<PlayerResults<float>> _provisoryPlayerResults = new List<PlayerResults<float>>();
             private int _wave = 0;
 
             private bool _runOnce;
@@ -44,6 +42,7 @@ namespace PartyInc
                 InitializePlayers();
                 InitializeSpawners();
             }
+
 
             private void InitializePlayers()
             {
@@ -117,15 +116,18 @@ namespace PartyInc
 
                 PhotonNetwork.NetworkingClient.EventReceived += SpawnLog;
                 PhotonNetwork.NetworkingClient.EventReceived += ClearSliced;
-                PhotonNetwork.NetworkingClient.EventReceived += GetPlayerResult;
                 Mono_Log_Controller_CC.onLogDestroyed += SendSliced;
+
+                GameDisplayName = Stt_GameNames.GAMENAME_CC;
+                GameDBName = Stt_GameNames.GAMENAME_DB_CC;
             }
 
-            private void OnDestroy()
+            public override void OnDestroyed()
             {
+                base.OnDestroyed();
+
                 PhotonNetwork.NetworkingClient.EventReceived -= SpawnLog;
                 PhotonNetwork.NetworkingClient.EventReceived -= ClearSliced;
-                PhotonNetwork.NetworkingClient.EventReceived -= GetPlayerResult;
                 Mono_Log_Controller_CC.onLogDestroyed -= SendSliced;
             }
 
@@ -148,55 +150,8 @@ namespace PartyInc
                 {
                     GameBegan = false;
                     _runOnce = true;
-                    StartCoroutine(FinishGame());
+                    StartCoroutine(GameFinish(true));
                 }
-            }
-
-            /// <summary>
-            /// Function that finishes the game
-            /// </summary>
-            private IEnumerator FinishGame()
-            {
-                //Get Player Results
-                if (PhotonNetwork.IsMasterClient)
-                {
-                    object[] content = new object[] { };
-                    RaiseEventOptions raiseEventOptions = new RaiseEventOptions { Receivers = ReceiverGroup.All };
-                    PhotonNetwork.RaiseEvent(Constants.GivePlayerResultEventCode, content, raiseEventOptions, SendOptions.SendReliable);
-                }
-                
-                yield return new WaitUntil(() => _provisoryPlayerResults.Count == playerCount);
-
-                playerResults = _provisoryPlayerResults.ToArray();
-
-                // Order list
-                var aux = playerResults.OrderByDescending(result => result.scoring);
-                playerResults = aux.ToArray();
-
-                // Find a winner
-                FindWinner();
-
-                // Invoke finishing functions
-                OnGameFinishInvoke();
-            }
-
-            /// <summary>
-            /// Function that finds who is the winner.
-            /// </summary>
-            private void FindWinner()
-            {
-                float contenderScore = playerResults.First().scoring;
-                int contender = playerResults.First().playerId;
-                int hap = 0;
-
-                for (int i = 0; i < playerResults.Count(); i++)
-                {
-                    if (playerResults[i].scoring == contenderScore) hap++;
-                }
-
-                if (hap > 1) contender = -1;
-
-                WinnerId = contender;
             }
 
             private void ClearSliced(EventData data)
@@ -344,22 +299,6 @@ namespace PartyInc
             public void TestSetWindowTime(float set)
             {
                 _windowTime = set;
-            }
-
-            /// NETWORKING
-            ///
-            private void GetPlayerResult(EventData eventData)
-            {
-                if (eventData.Code == Constants.GetPlayerResultsEventCode)
-                {
-                    object[] data = (object[])eventData.CustomData;
-
-                    PlayerResults<float> thisPlayersResult = new PlayerResults<float>();
-                    thisPlayersResult.playerId = (int)data[0];
-                    thisPlayersResult.scoring = (float)data[1];
-
-                    _provisoryPlayerResults.Add(thisPlayersResult);
-                }
             }
 
             private void SpawnLog(EventData eventData)

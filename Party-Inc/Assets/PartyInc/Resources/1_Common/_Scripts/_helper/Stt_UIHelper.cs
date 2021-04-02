@@ -7,6 +7,28 @@ namespace PartyInc
 {
     public static class UIHelper
     {
+        public static IEnumerator AlphaGrowthCo(Image image, float finalAlpha, float seconds, bool fadein)
+        {
+            float startingAlpha = image.color.a;
+            float alphaStep = Mathf.Abs(finalAlpha - startingAlpha) / (seconds * 100);
+            for (int i = 0; i < seconds * 100; i++)
+            {
+                Color newColor = new Color();
+                if (fadein)
+                {
+                    newColor = new Color(image.color.r, image.color.g, image.color.b, image.color.a + alphaStep);
+                }
+                else
+                {
+                    newColor = new Color(image.color.r, image.color.g, image.color.b, image.color.a - alphaStep);
+                }
+
+                image.color = newColor;
+
+                yield return new WaitForSeconds(0.01f);
+            }
+        }
+
         public static IEnumerator GrowthAnimationCo(RectTransform toScale, float finalScale, float seconds)
         {
             float scaleDelta = finalScale - toScale.localScale.x;

@@ -78,6 +78,7 @@ namespace PartyInc
 
             private void OnGameFinish()
             {
+                Debug.Log("Finish Screen ");
                 gameRunning = false;
                 finishScreen.SetActive(true);
             }

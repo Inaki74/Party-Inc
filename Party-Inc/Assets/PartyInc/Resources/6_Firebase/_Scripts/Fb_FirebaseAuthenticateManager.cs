@@ -12,6 +12,14 @@ namespace PartyInc
     using PartyFirebase.Firestore;
     namespace PartyFirebase.Auth
     {
+        public struct FireauthCallResult
+        {
+            public bool success;
+            public string uid;
+            public string username;
+            public List<Firebase.FirebaseException> exceptions;
+        }
+
         public class Fb_FirebaseAuthenticateManager : MonoSingleton<Fb_FirebaseAuthenticateManager>
         {
             private FirebaseAuth _auth;
@@ -30,8 +38,11 @@ namespace PartyInc
             [SerializeField] private Text _errorText;
             private bool _runStartOnce;
 
+            public bool AuthInitialized { get; private set; }
+
             private void Start()
             {
+                AuthInitialized = false;
                 if (_runStartOnce) return;
 
                 _runStartOnce = true;
@@ -47,15 +58,14 @@ namespace PartyInc
             private void AuthInit()
             {
                 _auth = FirebaseAuth.DefaultInstance;
-
-                if (_auth.CurrentUser != null)
-                {
-                    SceneManager.LoadScene(Stt_SceneIndexes.HUB);
-                }
+                AuthInitialized = true;
             }
 
-            public void SignInEmailPassword(string email, string password, Action Callback = null)
+            public void SignInEmailPassword(string email, string password, Action<FireauthCallResult> Callback = null)
             {
+                FireauthCallResult result = new FireauthCallResult();
+                result.exceptions = new List<Firebase.FirebaseException>();
+
                 Debug.Log("Attempting to sign in with: " + email + " " + password);
 
                 _auth.SignInWithEmailAndPasswordAsync(email, password).ContinueWithOnMainThread(task =>
@@ -67,8 +77,12 @@ namespace PartyInc
                         AuthError error = (AuthError)(task.Exception.Flatten().InnerException as Firebase.FirebaseException).ErrorCode;
                         ManageErrorCodes(error);
 
-                        Debug.Log("Authentication failed: " + error.ToString());
+                        result.exceptions.Add(task.Exception.Flatten().InnerException as Firebase.FirebaseException);
+                        result.success = false;
+                        result.uid = null;
+                        result.username = null;
 
+                        Callback(result);
                         return;
                     }
 
@@ -76,22 +90,32 @@ namespace PartyInc
                     {
                         Debug.Log("User with email: " + _auth.CurrentUser.Email + " logged in!");
 
-                        // GO TO HUB, GET PLAYER INFO FROM FIRESTORE
-                        Callback();
+                        result.success = true;
+                        result.uid = task.Result.UserId;
+                        result.username = task.Result.DisplayName;
 
+                        Callback(result);
                         return;
                     }
                 });
             }
 
-            public void SignUpEmailPassword(string email, string password, string verification, string username, Action<string> Callback = null)
+            public void SignUpEmailPassword(string email, string password, string verification, string username, Action<FireauthCallResult> Callback = null)
             {
+                FireauthCallResult result = new FireauthCallResult();
+                result.exceptions = new List<Firebase.FirebaseException>();
                 Debug.Log("Attempting to sign up with: " + email + " " + password);
 
                 if (password != verification)
                 {
                     SetErrorMessage("Password and verification dont match!", Color.red);
 
+                    result.exceptions.Add(new Firebase.FirebaseException((int)AuthError.Cancelled, "Password and verification dont match!"));
+                    result.success = false;
+                    result.uid = null;
+                    result.username = null;
+
+                    Callback(result);
                     return;
                 }
 
@@ -102,8 +126,12 @@ namespace PartyInc
                         AuthError error = (AuthError)(task.Exception.Flatten().InnerException as Firebase.FirebaseException).ErrorCode;
                         ManageErrorCodes(error);
 
-                        Debug.Log("Authentication failed: " + error.ToString());
-
+                        result.exceptions.Add(task.Exception.Flatten().InnerException as Firebase.FirebaseException);
+                        result.success = false;
+                        result.uid = null;
+                        result.username = null;
+                        
+                        Callback(result);
                         return;
                     }
 
@@ -125,8 +153,13 @@ namespace PartyInc
                                 AuthError error = (AuthError)(task2.Exception.Flatten().InnerException as Firebase.FirebaseException).ErrorCode;
                                 ManageErrorCodes(error);
 
+                                result.exceptions.Add(task.Exception.Flatten().InnerException as Firebase.FirebaseException);
+                                result.success = false;
+                                result.uid = null;
+                                result.username = null;
                                 Debug.Log("Setting of username failed: " + error.ToString());
 
+                                Callback(result);
                                 return;
                             }
 
@@ -134,9 +167,11 @@ namespace PartyInc
                             {
                                 Debug.Log("Username set!");
 
-                                // CREATE A PLAYER INSTANCE IN FIRESTORE
-                                Callback(task.Result.UserId);
+                                result.success = true;
+                                result.uid = task.Result.UserId;
+                                result.username = username;
 
+                                Callback(result);
                                 return;
                             }
                         });
@@ -144,7 +179,44 @@ namespace PartyInc
                 });
             }
 
-            private void SetErrorMessage(string message, Color state)
+            public void PasswordChangeRequest(string email, Action<FireauthCallResult> Callback = null)
+            {
+                FireauthCallResult result = new FireauthCallResult();
+                result.exceptions = new List<Firebase.FirebaseException>();
+                Debug.Log("Attempting password reset for: " + email);
+
+                _auth.SendPasswordResetEmailAsync(email).ContinueWithOnMainThread(task =>
+                {
+                    if (task.IsFaulted || task.IsCanceled)
+                    {
+                        AuthError error = (AuthError)(task.Exception.Flatten().InnerException as Firebase.FirebaseException).ErrorCode;
+                        ManageErrorCodes(error);
+
+                        result.exceptions.Add(task.Exception.Flatten().InnerException as Firebase.FirebaseException);
+                        result.success = false;
+                        result.uid = null;
+                        result.username = null;
+                        Debug.Log("Password reset failed: " + error.ToString());
+
+                        Callback(result);
+                        return;
+                    }
+
+                    if (task.IsCompleted)
+                    {
+                        Debug.Log("Password reset sent to email!");
+
+                        result.success = true;
+                        result.uid = null;
+                        result.username = null;
+
+                        Callback(result);
+                        return;
+                    }
+                });
+            }
+
+            public void SetErrorMessage(string message, Color state)
             {
                 _errorText.color = state;
                 _errorText.text = message;
@@ -184,6 +256,12 @@ namespace PartyInc
                         break;
                     case AuthError.UserNotFound: // 
                         SetErrorMessage("That account doesn't exist!", Color.red);
+                        break;
+                    case AuthError.InvalidSender: // 
+                        SetErrorMessage("That email is invalid!", Color.red);
+                        break;
+                    case AuthError.InvalidMessagePayload: // 
+                        SetErrorMessage("There are invalid parameters in the password reset!", Color.red);
                         break;
                 }
             }
