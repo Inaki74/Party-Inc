@@ -11,7 +11,6 @@ namespace PartyInc
         {
             public void BtnReturningPlayer()
             {
-                print("aaa");
                 SceneManager.LoadScene(Stt_SceneIndexes.LAUNCHER_SIGNIN);
             }
 

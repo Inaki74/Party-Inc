@@ -181,7 +181,39 @@ namespace PartyInc
 
             public void PasswordChangeRequest(string email, Action<FireauthCallResult> Callback = null)
             {
-                //_auth.Rese
+                FireauthCallResult result = new FireauthCallResult();
+                result.exceptions = new List<Firebase.FirebaseException>();
+                Debug.Log("Attempting password reset for: " + email);
+
+                _auth.SendPasswordResetEmailAsync(email).ContinueWithOnMainThread(task =>
+                {
+                    if (task.IsFaulted || task.IsCanceled)
+                    {
+                        AuthError error = (AuthError)(task.Exception.Flatten().InnerException as Firebase.FirebaseException).ErrorCode;
+                        ManageErrorCodes(error);
+
+                        result.exceptions.Add(task.Exception.Flatten().InnerException as Firebase.FirebaseException);
+                        result.success = false;
+                        result.uid = null;
+                        result.username = null;
+                        Debug.Log("Password reset failed: " + error.ToString());
+
+                        Callback(result);
+                        return;
+                    }
+
+                    if (task.IsCompleted)
+                    {
+                        Debug.Log("Password reset sent to email!");
+
+                        result.success = true;
+                        result.uid = null;
+                        result.username = null;
+
+                        Callback(result);
+                        return;
+                    }
+                });
             }
 
             public void SetErrorMessage(string message, Color state)
@@ -224,6 +256,12 @@ namespace PartyInc
                         break;
                     case AuthError.UserNotFound: // 
                         SetErrorMessage("That account doesn't exist!", Color.red);
+                        break;
+                    case AuthError.InvalidSender: // 
+                        SetErrorMessage("That email is invalid!", Color.red);
+                        break;
+                    case AuthError.InvalidMessagePayload: // 
+                        SetErrorMessage("There are invalid parameters in the password reset!", Color.red);
                         break;
                 }
             }

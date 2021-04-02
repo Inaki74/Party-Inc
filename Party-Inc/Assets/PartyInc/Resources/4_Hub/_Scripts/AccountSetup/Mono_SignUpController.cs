@@ -88,12 +88,22 @@ namespace PartyInc
                 int month = int.Parse(decomposedDate[0]);
                 int year = int.Parse(decomposedDate[2]);
 
-                if(year < 1900)
+                if(year < 1900 || year > DateTime.Now.Year)
                 {
                     // Unacceptable year
-                    Fb_FirebaseAuthenticateManager.Current.SetErrorMessage("It's not possible that you're THAT old!", Color.yellow);
+                    Fb_FirebaseAuthenticateManager.Current.SetErrorMessage("That year is not valid!", Color.yellow);
 
                     return false;
+                }
+
+                if(year == DateTime.Now.Year)
+                {
+                    if(month > DateTime.Now.Month || (month == DateTime.Now.Month && day > DateTime.Now.Day))
+                    {
+                        Fb_FirebaseAuthenticateManager.Current.SetErrorMessage("That's the future, Terminator.", Color.yellow);
+
+                        return false;
+                    }
                 }
 
                 if(month <= 0 || month > 12)

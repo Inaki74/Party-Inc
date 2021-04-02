@@ -1,13 +1,20 @@
 {
-    "m_SelectedDeviceId": "",
+    "m_SelectedDeviceId": "LDG4C18508000010",
     "m_SelectedPackage": {
-        "deviceId": "",
-        "name": "",
-        "processId": 0,
+        "deviceId": "LDG4C18508000010",
+        "name": "com.LoopStudios.PartyInc",
+        "processId": 2202,
         "exited": false
     },
     "m_SelectedPriority": 0,
-    "m_KnownPackagesForSerialization": [],
+    "m_KnownPackagesForSerialization": [
+        {
+            "deviceId": "LDG4C18508000010",
+            "name": "com.LoopStudios.PartyInc",
+            "processId": 2202,
+            "exited": false
+        }
+    ],
     "m_Tags": {
         "m_Entries": [
             {

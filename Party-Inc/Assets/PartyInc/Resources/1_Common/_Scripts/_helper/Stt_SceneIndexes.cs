@@ -4,6 +4,7 @@ using UnityEngine;
 
 namespace PartyInc
 {
+    //TODO: turn into enum
     public static class Stt_SceneIndexes
     {
         public const int LAUNCHER_SIGNUP = 3;
