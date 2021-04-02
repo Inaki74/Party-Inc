@@ -30,7 +30,7 @@ namespace PartyInc
         {
             nameText.text = "Welcome " + PartyFirebase.Auth.Fb_FirebaseAuthenticateManager.Current.Auth.CurrentUser.DisplayName + "!";
 
-            
+            Screen.orientation = ScreenOrientation.Portrait;
         }
 
         public override void OnEnable()
@@ -161,6 +161,8 @@ namespace PartyInc
         public override void OnJoinedRoom()
         {
             Debug.Log("Fiesta Time/ RoomController: Successfully joined room. Entering game...");
+
+            Screen.orientation = ScreenOrientation.Landscape;
 
             PhotonNetwork.LoadLevel(gameToJoin + "GameLobby");
         }
