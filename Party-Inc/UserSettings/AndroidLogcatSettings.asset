@@ -3,7 +3,7 @@
     "m_SelectedPackage": {
         "deviceId": "LDG4C18508000010",
         "name": "com.LoopStudios.PartyInc",
-        "processId": 23324,
+        "processId": 736,
         "exited": false
     },
     "m_SelectedPriority": 0,
@@ -18,6 +18,30 @@
             "deviceId": "LDG4C18508000010",
             "name": "com.LoopStudios.PartyInc",
             "processId": 23324,
+            "exited": false
+        },
+        {
+            "deviceId": "LDG4C18508000010",
+            "name": "com.LoopStudios.PartyInc",
+            "processId": 24621,
+            "exited": false
+        },
+        {
+            "deviceId": "LDG4C18508000010",
+            "name": "com.LoopStudios.PartyInc",
+            "processId": 25896,
+            "exited": false
+        },
+        {
+            "deviceId": "LDG4C18508000010",
+            "name": "com.LoopStudios.PartyInc",
+            "processId": 27692,
+            "exited": false
+        },
+        {
+            "deviceId": "LDG4C18508000010",
+            "name": "com.LoopStudios.PartyInc",
+            "processId": 736,
             "exited": false
         }
     ],

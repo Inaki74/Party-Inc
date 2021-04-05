@@ -136,7 +136,7 @@ namespace PartyInc
             {
                 PhotonNetwork.LeaveRoom();
 
-                SceneManager.LoadScene(Stt_SceneIndexes.HUB);
+                SceneManager.LoadScene((int)Stt_SceneIndexes.HUB);
             }
         }
     }

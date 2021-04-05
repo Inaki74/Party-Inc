@@ -14,7 +14,7 @@ namespace PartyInc
         public float Progress { get; private set; } = 0f;
         public bool LoadingScenesAsync { get; private set; } = false;
 
-        private Stack<int> _sceneStack;
+        private Stack<int> _sceneStack = new Stack<int>();
 
         public bool ActivateLoadedSceneIgnoreStack(int index)
         {
@@ -92,7 +92,7 @@ namespace PartyInc
                     go.SetActive(false);
                 }
 
-                if(_sceneStack.Peek() == index)
+                if(_sceneStack.Count != 0 && _sceneStack.Peek() == index)
                 {
                     _sceneStack.Pop();
                 }
@@ -130,7 +130,7 @@ namespace PartyInc
             for(int i = 0; i < scenesToLoad.Length; i++)
             {
                 yield return new WaitUntil(() => loadingScenes[i].isDone);
-                yield return null;
+                //yield return null;
                 DeactivateLoadedSceneIgnoreStack(scenesToLoad[i]);
             }
 
@@ -178,6 +178,20 @@ namespace PartyInc
         public int GetLastScene()
         {
             return _sceneStack.Peek();
+        }
+
+        public void GoToLastScene()
+        {
+            int lastSceneIndex = _sceneStack.Pop();
+
+            if (SceneManager.GetSceneByBuildIndex(lastSceneIndex).IsValid())
+            {
+                ActivateLoadedSceneIgnoreStack(lastSceneIndex);
+            }
+            else
+            {
+                SceneManager.LoadScene(lastSceneIndex);
+            }
         }
     }
 

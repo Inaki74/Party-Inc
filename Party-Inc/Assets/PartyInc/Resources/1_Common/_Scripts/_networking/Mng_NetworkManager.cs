@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
 using Photon.Realtime;
+using UnityEngine.SceneManagement;
 
 namespace PartyInc
 {
@@ -147,7 +148,13 @@ namespace PartyInc
             // Loads disconnected scene
             _dcUI.SetActive(true);
         }
-        
+
+        public override void OnLeftRoom()
+        {
+            base.OnLeftRoom();
+            SceneManager.LoadScene((int)Stt_SceneIndexes.HUB);
+        }
+
         #endregion
     }
 }

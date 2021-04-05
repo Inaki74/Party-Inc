@@ -79,7 +79,7 @@ namespace PartyInc
                 PhotonNetwork.CurrentRoom.IsOpen = false;
             }
             PhotonNetwork.LeaveRoom();
-            SceneManager.LoadScene(Stt_SceneIndexes.HUB);
+            
         }
 
         #endregion

@@ -60,8 +60,6 @@ namespace PartyInc
         public void BtnQuitToMenu()
         {
             PhotonNetwork.LeaveRoom();
-
-            SceneManager.LoadScene(Stt_SceneIndexes.HUB);
         }
 
         public void BtnResetGame()

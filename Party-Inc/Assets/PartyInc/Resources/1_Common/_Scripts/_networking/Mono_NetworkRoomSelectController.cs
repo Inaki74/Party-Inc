@@ -30,7 +30,13 @@ namespace PartyInc
         {
             nameText.text = "Welcome " + PartyFirebase.Auth.Fb_FirebaseAuthenticateManager.Current.Auth.CurrentUser.DisplayName + "!";
 
-            Screen.orientation = ScreenOrientation.Portrait;
+            if (Screen.orientation == ScreenOrientation.Landscape || Screen.autorotateToLandscapeLeft || Screen.autorotateToLandscapeRight)
+            {
+                Screen.orientation = ScreenOrientation.Portrait;
+                Screen.autorotateToLandscapeLeft = false;
+                Screen.autorotateToLandscapeRight = false;
+                Screen.autorotateToPortrait = true;
+            }
         }
 
         public override void OnEnable()
@@ -120,6 +126,25 @@ namespace PartyInc
             return roomName.Contains(gamePrefix);
         }
 
+        private IEnumerator GoToLobbyCo()
+        {
+            int[] scn = { (int)Stt_SceneIndexes.ROTATEDEVICE };
+            int currScn = SceneManager.GetActiveScene().buildIndex;
+            yield return StartCoroutine(Mng_SceneNavigationSystem.Current.LoadScenesAsyncAdditive(scn));
+
+            Mng_SceneNavigationSystem.Current.ActivateLoadedScene(scn[0]);
+
+            print("pre wait");
+
+            yield return new WaitForSeconds(4.5f);
+
+            Mng_SceneNavigationSystem.Current.DeactivateLoadedScene(currScn);
+
+            print("waited");
+
+            PhotonNetwork.LoadLevel(gameToJoin + "GameLobby");
+        }
+
         #endregion
 
         #region PUN Callbacks
@@ -162,9 +187,8 @@ namespace PartyInc
         {
             Debug.Log("Fiesta Time/ RoomController: Successfully joined room. Entering game...");
 
-            Screen.orientation = ScreenOrientation.Landscape;
-
-            PhotonNetwork.LoadLevel(gameToJoin + "GameLobby");
+            StopCoroutine("GoToLobbyCo");
+            StartCoroutine("GoToLobbyCo");
         }
 
         public override void OnJoinRoomFailed(short returnCode, string message)
@@ -184,7 +208,7 @@ namespace PartyInc
         {
             PartyFirebase.Auth.Fb_FirebaseAuthenticateManager.Current.Auth.SignOut();
             PhotonNetwork.LeaveLobby();
-            SceneManager.LoadScene(Stt_SceneIndexes.LAUNCHER_SIGNIN);
+            SceneManager.LoadScene((int)Stt_SceneIndexes.LAUNCHER_SIGNIN);
         }
     }
 }

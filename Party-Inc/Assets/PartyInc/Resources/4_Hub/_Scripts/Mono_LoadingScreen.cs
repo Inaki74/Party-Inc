@@ -45,7 +45,7 @@ namespace PartyInc
                 if (Fb_FirebaseAuthenticateManager.Current.Auth.CurrentUser != null)
                 {
                     Fb_FirestoreSession.Current.Setup();
-                    sceneToLoad = Stt_SceneIndexes.HUB;
+                    sceneToLoad = (int)Stt_SceneIndexes.HUB;
 
                     yield return new WaitUntil(() => Fb_FirestoreSession.Current.SetupCompleted);
 
@@ -55,7 +55,7 @@ namespace PartyInc
                 }
                 else
                 {
-                    sceneToLoad = Stt_SceneIndexes.PLAYER_FORK;
+                    sceneToLoad = (int)Stt_SceneIndexes.PLAYER_FORK;
                 }
 
                 _loadingStatusText.text = "   Loading some resources...";

@@ -81,7 +81,7 @@ namespace PartyInc
             {
                 Fb_FirestoreSession.Current.Setup();
 
-                AsyncOperation scene = SceneManager.LoadSceneAsync(Stt_SceneIndexes.HUB, LoadSceneMode.Additive);
+                AsyncOperation scene = SceneManager.LoadSceneAsync((int)Stt_SceneIndexes.HUB, LoadSceneMode.Additive);
                 scene.allowSceneActivation = false;
 
                 yield return new WaitUntil(() => Fb_FirestoreSession.Current.SetupCompleted);
@@ -113,7 +113,7 @@ namespace PartyInc
 
             public void BtnSignUp()
             {
-                SceneManager.LoadScene(Stt_SceneIndexes.LAUNCHER_SIGNUP);
+                SceneManager.LoadScene((int)Stt_SceneIndexes.LAUNCHER_SIGNUP);
             }
 
             public void BtnResetPassword()
@@ -126,7 +126,7 @@ namespace PartyInc
             {
                 if (_passwordResetForm.activeInHierarchy) return;
 
-                SceneManager.LoadScene(Stt_SceneIndexes.PLAYER_FORK);
+                SceneManager.LoadScene((int)Stt_SceneIndexes.PLAYER_FORK);
             }
         }
     }

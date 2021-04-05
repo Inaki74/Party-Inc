@@ -60,6 +60,7 @@ namespace PartyInc
             public void BtnRequestPasswordChange()
             {
                 _processing = true;
+                
                 string email = _emailInput.text;
 
                 Fb_FirebaseAuthenticateManager.Current.PasswordChangeRequest(email, res =>

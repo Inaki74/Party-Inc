@@ -61,11 +61,11 @@ namespace PartyInc
         {
             if(PartyFirebase.Auth.Fb_FirebaseAuthenticateManager.Current.Auth.CurrentUser != null)
             {
-                SceneManager.LoadScene(Stt_SceneIndexes.HUB);
+                SceneManager.LoadScene((int)Stt_SceneIndexes.HUB);
             }
             else
             {
-                SceneManager.LoadScene(Stt_SceneIndexes.LAUNCHER_SIGNIN);
+                SceneManager.LoadScene((int)Stt_SceneIndexes.LAUNCHER_SIGNIN);
             }
             
         }

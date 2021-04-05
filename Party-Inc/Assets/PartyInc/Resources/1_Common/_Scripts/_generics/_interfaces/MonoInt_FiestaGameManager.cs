@@ -165,7 +165,7 @@ namespace PartyInc
         protected IEnumerator GameFinish(bool biggerScoreWins)
         {
             // Begin loading end scene, as getting the player results will take a tiny bit of time.
-            AsyncOperation scene = SceneManager.LoadSceneAsync(Stt_SceneIndexes.GAMERESULTS, LoadSceneMode.Additive);
+            AsyncOperation scene = SceneManager.LoadSceneAsync((int)Stt_SceneIndexes.GAMERESULTS, LoadSceneMode.Additive);
             scene.allowSceneActivation = false;
 
             //Must get all the player results from the net (each client should have their own score tracked)

@@ -11,12 +11,12 @@ namespace PartyInc
         {
             public void BtnReturningPlayer()
             {
-                SceneManager.LoadScene(Stt_SceneIndexes.LAUNCHER_SIGNIN);
+                SceneManager.LoadScene((int)Stt_SceneIndexes.LAUNCHER_SIGNIN);
             }
 
             public void BtnNewPlayer()
             {
-                SceneManager.LoadScene(Stt_SceneIndexes.LAUNCHER_SIGNUP);
+                SceneManager.LoadScene((int)Stt_SceneIndexes.LAUNCHER_SIGNUP);
             }
         }
     }
