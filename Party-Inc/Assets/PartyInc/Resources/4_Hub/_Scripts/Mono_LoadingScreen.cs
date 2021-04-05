@@ -38,14 +38,14 @@ namespace PartyInc
 
                 yield return new WaitUntil(() => Fb_FirebaseManager.Current.ConnectedToFirebaseServices && Fb_FirebaseAuthenticateManager.Current.AuthInitialized);
 
-                int sceneToLoad = 0;
+                int sceneToActivate = 0;
 
                 _loadingStatusText.text = "   Getting account...";
 
                 if (Fb_FirebaseAuthenticateManager.Current.Auth.CurrentUser != null)
                 {
                     Fb_FirestoreSession.Current.Setup();
-                    sceneToLoad = (int)Stt_SceneIndexes.HUB;
+                    sceneToActivate = (int)Stt_SceneIndexes.HUB;
 
                     yield return new WaitUntil(() => Fb_FirestoreSession.Current.SetupCompleted);
 
@@ -55,32 +55,24 @@ namespace PartyInc
                 }
                 else
                 {
-                    sceneToLoad = (int)Stt_SceneIndexes.PLAYER_FORK;
+                    sceneToActivate = (int)Stt_SceneIndexes.PLAYER_FORK;
                 }
 
                 _loadingStatusText.text = "   Loading some resources...";
 
-                AsyncOperation scene = SceneManager.LoadSceneAsync(sceneToLoad, LoadSceneMode.Additive);
-                scene.allowSceneActivation = false;
-
-                yield return new WaitUntil(() => scene.progress == 0.9f);
+                yield return StartCoroutine(Mng_SceneNavigationSystem.Current.LoadScenesAsyncAdditive(Mng_SceneNavigationSystem.Current.EssentialHubScenes));
 
                 _loadingStatusText.text = "   Finishing up...";
 
                 yield return new WaitForSeconds(3f);
 
                 // Fade out black
-                yield return StartCoroutine(UIHelper.AlphaGrowthCo(_blackForeground, 1f, 1f, true));
+                yield return StartCoroutine(Mng_SceneNavigationSystem.Current.DramaticSceneTransitionStartCo(1.0f));
 
-                // Load scene
-                _loadingCanvas.SetActive(false);
+                Mng_SceneNavigationSystem.Current.DeactivateActiveScene();
+                Mng_SceneNavigationSystem.Current.ActivateLoadedScene(sceneToActivate);
 
-                scene.allowSceneActivation = true;
-
-                // Fade in
-                yield return StartCoroutine(UIHelper.AlphaGrowthCo(_blackForeground, 0f, 0.7f, false));
-
-                _forescreenCanvas.SetActive(false);
+                Mng_SceneNavigationSystem.Current.DramaticSceneTransitionEnd(0.7f);
             }
         }
     }

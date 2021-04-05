@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 namespace PartyInc
 {
@@ -11,10 +12,47 @@ namespace PartyInc
     /// </summary>
     public class Mng_SceneNavigationSystem : MonoSingleton<Mng_SceneNavigationSystem>
     {
+        [SerializeField] private Image _blackForeground;
+        [SerializeField] private GameObject _blackForegroundGO;
+
         public float Progress { get; private set; } = 0f;
         public bool LoadingScenesAsync { get; private set; } = false;
 
         private Stack<int> _sceneStack = new Stack<int>();
+
+        public int[] EssentialHubScenes { get; private set; }
+
+        private void Start()
+        {
+            int[] essScns = { (int)Stt_SceneIndexes.HUB, (int)Stt_SceneIndexes.LAUNCHER_SIGNIN, (int)Stt_SceneIndexes.LAUNCHER_SIGNUP, (int)Stt_SceneIndexes.PLAYER_FORK };
+            EssentialHubScenes = essScns;
+        }
+
+        /////// SHOULD BE ON ANOTHER CLASS
+        /// Didnt pass it yet since Im not sure this will be a big thing.
+        public IEnumerator DramaticSceneTransitionStartCo(float time)
+        {
+            _blackForegroundGO.SetActive(true);
+            yield return StartCoroutine(UIHelper.AlphaGrowthCo(_blackForeground, 1f, time, true));
+        }
+
+        public IEnumerator DramaticSceneTransitionEndCo(float time )
+        {
+            yield return StartCoroutine(UIHelper.AlphaGrowthCo(_blackForeground, 0f, time, false));
+            _blackForegroundGO.SetActive(false);
+        }
+
+        public void DramaticSceneTransitionStart(float time)
+        {
+            StartCoroutine(DramaticSceneTransitionStartCo(time));
+        }
+
+        public void DramaticSceneTransitionEnd(float time)
+        {
+            StartCoroutine(DramaticSceneTransitionEndCo(time));
+        }
+
+        ///////
 
         public bool ActivateLoadedSceneIgnoreStack(int index)
         {
@@ -22,6 +60,8 @@ namespace PartyInc
 
             if (sceneToActivate.IsValid() && sceneToActivate.isLoaded)
             {
+                SceneManager.SetActiveScene(sceneToActivate);
+
                 foreach (GameObject go in sceneToActivate.GetRootGameObjects())
                 {
                     go.SetActive(true);
@@ -62,6 +102,8 @@ namespace PartyInc
 
             if (sceneToActivate.IsValid() && sceneToActivate.isLoaded)
             {
+                SceneManager.SetActiveScene(sceneToActivate);
+
                 foreach (GameObject go in sceneToActivate.GetRootGameObjects())
                 {
                     go.SetActive(true);
@@ -158,6 +200,11 @@ namespace PartyInc
                     yield return new WaitForEndOfFrame();
                 }
             }
+        }
+
+        public void DeactivateActiveScene()
+        {
+            DeactivateLoadedScene(SceneManager.GetActiveScene().buildIndex);
         }
 
         /// <summary>

@@ -141,6 +141,13 @@ namespace PartyInc
             _photonAuthComplete = true;
         }
 
+        public override void OnLeftLobby()
+        {
+            base.OnLeftLobby();
+            Mng_SceneNavigationSystem.Current.DeactivateActiveScene();
+            Mng_SceneNavigationSystem.Current.ActivateLoadedScene((int)Stt_SceneIndexes.LAUNCHER_SIGNIN);
+        }
+
         public override void OnDisconnected(DisconnectCause cause)
         {
             Debug.Log("Fiesta Time/ PhotonManager: You have disconnected from the server. Cause: " + cause + " Retrying...");
@@ -152,7 +159,15 @@ namespace PartyInc
         public override void OnLeftRoom()
         {
             base.OnLeftRoom();
-            SceneManager.LoadScene((int)Stt_SceneIndexes.HUB);
+            StartCoroutine(ReturnToHubCo());
+        }
+
+        private IEnumerator ReturnToHubCo()
+        {
+            yield return StartCoroutine(Mng_SceneNavigationSystem.Current.LoadScenesAsyncAdditive(Mng_SceneNavigationSystem.Current.EssentialHubScenes));
+
+            Mng_SceneNavigationSystem.Current.DeactivateActiveScene();
+            Mng_SceneNavigationSystem.Current.ActivateLoadedScene((int)Stt_SceneIndexes.HUB);
         }
 
         #endregion

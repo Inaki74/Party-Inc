@@ -188,15 +188,12 @@ namespace PartyInc
             {
                 Fb_FirestoreSession.Current.Setup();
 
-                AsyncOperation scene = SceneManager.LoadSceneAsync((int)Stt_SceneIndexes.HUB, LoadSceneMode.Additive);
-                scene.allowSceneActivation = false;
-
                 yield return new WaitUntil(() => Fb_FirestoreSession.Current.SetupCompleted);
 
                 yield return new WaitUntil(() => Mng_NetworkManager.Current.PhotonAuthComplete);
 
-                scene.allowSceneActivation = true;
-                yield return new WaitUntil(() => scene.isDone);
+                Mng_SceneNavigationSystem.Current.DeactivateActiveScene();
+                Mng_SceneNavigationSystem.Current.ActivateLoadedScene((int)Stt_SceneIndexes.HUB);
 
                 _signingUp = false;
             }
@@ -272,7 +269,8 @@ namespace PartyInc
 
             public void BtnBack()
             {
-                SceneManager.LoadScene((int)Stt_SceneIndexes.PLAYER_FORK);
+                Mng_SceneNavigationSystem.Current.DeactivateActiveScene();
+                Mng_SceneNavigationSystem.Current.ActivateLoadedScene((int)Stt_SceneIndexes.PLAYER_FORK);
             }
         }
     }

@@ -123,7 +123,7 @@ GameObject:
   - component: {fileID: 4020565045351193407}
   - component: {fileID: -2563745771276940001}
   m_Layer: 12
-  m_Name: pfb_FallingLog_Small_Horiz
+  m_Name: Pfb_Log_SmallHoriz_CC
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

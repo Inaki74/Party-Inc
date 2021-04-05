@@ -19,29 +19,20 @@ namespace PartyInc
 
         private List<RoomInfo> currentRoomList = new List<RoomInfo>();
 
-        [SerializeField] List<Button> _gameButtons = new List<Button>();
-
         [SerializeField] private Text nameText;
         private string gameToJoin = "";
 
         #region Unity Callbacks
-        // Start is called before the first frame update
-        void Start()
-        {
-            nameText.text = "Welcome " + PartyFirebase.Auth.Fb_FirebaseAuthenticateManager.Current.Auth.CurrentUser.DisplayName + "!";
-
-            if (Screen.orientation == ScreenOrientation.Landscape || Screen.autorotateToLandscapeLeft || Screen.autorotateToLandscapeRight)
-            {
-                Screen.orientation = ScreenOrientation.Portrait;
-                Screen.autorotateToLandscapeLeft = false;
-                Screen.autorotateToLandscapeRight = false;
-                Screen.autorotateToPortrait = true;
-            }
-        }
 
         public override void OnEnable()
         {
             base.OnEnable();
+
+            if(PartyFirebase.Auth.Fb_FirebaseAuthenticateManager.Current.Auth.CurrentUser != null)
+                nameText.text = "Welcome " + PartyFirebase.Auth.Fb_FirebaseAuthenticateManager.Current.Auth.CurrentUser.DisplayName + "!";
+
+            SetPhoneOrientation();
+            
             PhotonNetwork.AddCallbackTarget(this);
         }
 
@@ -52,6 +43,29 @@ namespace PartyInc
         }
 
         #endregion
+
+        private void SetPhoneOrientation()
+        {
+            Scene activeScene = SceneManager.GetActiveScene();
+            bool isInActiveScene = false;
+
+            foreach (GameObject go in activeScene.GetRootGameObjects())
+            {
+                if (go.name == name)
+                {
+                    isInActiveScene = true;
+                    break;
+                }
+            }
+
+            if (isInActiveScene && (Screen.orientation == ScreenOrientation.Landscape || Screen.autorotateToLandscapeLeft || Screen.autorotateToLandscapeRight))
+            {
+                Screen.orientation = ScreenOrientation.Portrait;
+                Screen.autorotateToLandscapeLeft = false;
+                Screen.autorotateToLandscapeRight = false;
+                Screen.autorotateToPortrait = true;
+            }
+        }
 
         #region Join Functions
 
@@ -134,13 +148,13 @@ namespace PartyInc
 
             Mng_SceneNavigationSystem.Current.ActivateLoadedScene(scn[0]);
 
-            print("pre wait");
-
             yield return new WaitForSeconds(4.5f);
+
+            yield return StartCoroutine(Mng_SceneNavigationSystem.Current.DramaticSceneTransitionStartCo(0.1f));
 
             Mng_SceneNavigationSystem.Current.DeactivateLoadedScene(currScn);
 
-            print("waited");
+            Mng_SceneNavigationSystem.Current.DramaticSceneTransitionEnd(0.1f);
 
             PhotonNetwork.LoadLevel(gameToJoin + "GameLobby");
         }
@@ -154,10 +168,8 @@ namespace PartyInc
             base.OnLeftLobby();
             Debug.Log("Fiesta Time/ RoomController: Left lobby.");
 
-            foreach (Button b in _gameButtons)
-            {
-                b.interactable = false;
-            }
+            Mng_SceneNavigationSystem.Current.DeactivateActiveScene();
+            Mng_SceneNavigationSystem.Current.ActivateLoadedScene((int)Stt_SceneIndexes.LAUNCHER_SIGNIN);
         }
 
         public override void OnDisconnected(DisconnectCause cause)
@@ -187,7 +199,6 @@ namespace PartyInc
         {
             Debug.Log("Fiesta Time/ RoomController: Successfully joined room. Entering game...");
 
-            StopCoroutine("GoToLobbyCo");
             StartCoroutine("GoToLobbyCo");
         }
 
@@ -208,7 +219,6 @@ namespace PartyInc
         {
             PartyFirebase.Auth.Fb_FirebaseAuthenticateManager.Current.Auth.SignOut();
             PhotonNetwork.LeaveLobby();
-            SceneManager.LoadScene((int)Stt_SceneIndexes.LAUNCHER_SIGNIN);
         }
     }
 }

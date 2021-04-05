@@ -68,7 +68,7 @@ namespace PartyInc
 
             Debug.Log(reload);
 
-            SceneManager.LoadScene(reload);
+            Mng_SceneNavigationSystem.Current.LoadSceneSingular(reload);
         }
     }
 }

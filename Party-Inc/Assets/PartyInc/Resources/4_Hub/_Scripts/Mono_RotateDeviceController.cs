@@ -8,7 +8,7 @@ namespace PartyInc
     {
         public class Mono_RotateDeviceController : MonoBehaviour
         {
-            private float _waitTime;
+            private float _waitTime = 0f;
             private bool _runOnce;
 
             // Start is called before the first frame update
@@ -16,7 +16,6 @@ namespace PartyInc
             {
                 Screen.autorotateToLandscapeLeft = true;
                 Screen.autorotateToLandscapeRight = true;
-                Screen.autorotateToPortrait = false;
             }
 
             // Update is called once per frame
@@ -25,6 +24,7 @@ namespace PartyInc
                 if(_waitTime > 3f && !_runOnce)
                 {
                     _runOnce = true;
+                    Screen.autorotateToPortrait = false;
                     Screen.orientation = ScreenOrientation.Landscape;
                 }
 

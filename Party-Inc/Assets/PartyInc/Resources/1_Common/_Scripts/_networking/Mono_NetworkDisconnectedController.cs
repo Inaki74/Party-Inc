@@ -57,16 +57,25 @@ namespace PartyInc
 
         #endregion
 
-        public void ReturnToLobby()
+        private IEnumerator ReturnToLobbyCo()
         {
-            if(PartyFirebase.Auth.Fb_FirebaseAuthenticateManager.Current.Auth.CurrentUser != null)
+            yield return StartCoroutine(Mng_SceneNavigationSystem.Current.LoadScenesAsyncAdditive(Mng_SceneNavigationSystem.Current.EssentialHubScenes));
+
+            if (PartyFirebase.Auth.Fb_FirebaseAuthenticateManager.Current.Auth.CurrentUser != null)
             {
-                SceneManager.LoadScene((int)Stt_SceneIndexes.HUB);
+                Mng_SceneNavigationSystem.Current.DeactivateActiveScene();
+                Mng_SceneNavigationSystem.Current.ActivateLoadedScene((int)Stt_SceneIndexes.HUB);
             }
             else
             {
-                SceneManager.LoadScene((int)Stt_SceneIndexes.LAUNCHER_SIGNIN);
+                Mng_SceneNavigationSystem.Current.DeactivateActiveScene();
+                Mng_SceneNavigationSystem.Current.ActivateLoadedScene((int)Stt_SceneIndexes.LAUNCHER_SIGNIN);
             }
+        }
+
+        public void ReturnToLobby()
+        {
+            StartCoroutine(ReturnToLobbyCo());
             
         }
     }

@@ -4,7 +4,6 @@ using UnityEngine;
 using Firebase.Auth;
 using Firebase.Extensions;
 using UnityEngine.UI;
-using UnityEngine.SceneManagement;
 using System;
 
 namespace PartyInc
