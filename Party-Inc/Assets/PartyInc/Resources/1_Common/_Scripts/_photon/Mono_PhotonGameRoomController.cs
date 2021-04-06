@@ -7,7 +7,7 @@ using Photon.Realtime;
 
 namespace PartyInc
 {
-    public class Mono_NetworkGameRoomController : MonoBehaviourPunCallbacks
+    public class Mono_PhotonGameRoomController : MonoBehaviourPunCallbacks
     {
         public bool playersAreReady;
 

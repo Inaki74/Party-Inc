@@ -13,7 +13,7 @@ namespace PartyInc
     /// <summary>
     /// Its the class in charge of the game selection.
     /// </summary>
-    public class Mono_NetworkRoomSelectController : MonoBehaviourPunCallbacks
+    public class Mono_PhotonRoomSelectController : MonoBehaviourPunCallbacks
     {
         private const int maxPlayers = 4;
 

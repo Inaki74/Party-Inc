@@ -13,7 +13,7 @@ namespace PartyInc
     /// <summary>
     /// Its the class that controls all game lobbies.
     /// </summary>
-    public class Mono_NetworkGameLobbyController : MonoBehaviourPunCallbacks
+    public class Mono_PhotonGameLobbyController : MonoBehaviourPunCallbacks
     {
         public float maxCountdownTime = 8f;
         public string gameSceneName;

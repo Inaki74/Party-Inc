@@ -190,7 +190,7 @@ namespace PartyInc
 
                 yield return new WaitUntil(() => Fb_FirestoreSession.Current.SetupCompleted);
 
-                yield return new WaitUntil(() => Mng_NetworkManager.Current.PhotonAuthComplete);
+                yield return new WaitUntil(() => Mng_PhotonManager.Current.PhotonAuthComplete);
 
                 Mng_SceneNavigationSystem.Current.DeactivateActiveScene();
                 Mng_SceneNavigationSystem.Current.ActivateLoadedScene((int)Stt_SceneIndexes.HUB);

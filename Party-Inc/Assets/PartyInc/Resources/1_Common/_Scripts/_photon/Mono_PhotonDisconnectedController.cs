@@ -13,7 +13,7 @@ namespace PartyInc
     /// <summary>
     /// Script in charge of the disconnected scene.
     /// </summary>
-    public class Mono_NetworkDisconnectedController : MonoBehaviourPunCallbacks
+    public class Mono_PhotonDisconnectedController : MonoBehaviourPunCallbacks
     {
         [SerializeField] private GameObject goBackButton;
 

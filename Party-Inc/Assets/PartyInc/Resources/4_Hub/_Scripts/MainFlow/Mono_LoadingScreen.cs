@@ -51,7 +51,7 @@ namespace PartyInc
 
                     _loadingStatusText.text = "   Connecting to game servers...";
 
-                    yield return new WaitUntil(() => Mng_NetworkManager.Current.PhotonAuthComplete);
+                    yield return new WaitUntil(() => Mng_PhotonManager.Current.PhotonAuthComplete);
                 }
                 else
                 {

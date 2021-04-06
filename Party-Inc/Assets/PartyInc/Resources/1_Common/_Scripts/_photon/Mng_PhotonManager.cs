@@ -7,7 +7,7 @@ using UnityEngine.SceneManagement;
 
 namespace PartyInc
 {
-    public class Mng_NetworkManager : MonoSingleton<Mng_NetworkManager>
+    public class Mng_PhotonManager : MonoSingleton<Mng_PhotonManager>
     {
         [SerializeField] private GameObject _dcUI;
 

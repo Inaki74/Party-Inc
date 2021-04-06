@@ -26,7 +26,7 @@ namespace PartyInc
 
         // The network controller in the scene.
         protected Mono_GameMetadata gameMetadata;
-        protected Mono_NetworkGameRoomController networkController;
+        protected Mono_PhotonGameRoomController networkController;
 
         // The results of the game, every game has results and winners.
         public PlayerResults<T>[] playerResults = new PlayerResults<T>[4];
@@ -76,7 +76,7 @@ namespace PartyInc
             //Debug.Log("Default GM Start");
 
             gameMetadata = FindObjectOfType<Mono_GameMetadata>();
-            networkController = FindObjectOfType<Mono_NetworkGameRoomController>();
+            networkController = FindObjectOfType<Mono_PhotonGameRoomController>();
 
             gameMetadata.PlayerCount = playerCount;
 
