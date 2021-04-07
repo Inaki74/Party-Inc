@@ -5,6 +5,9 @@ using UnityEngine.Rendering;
 
 namespace PartyInc
 {
+    using PartyFirebase.Storage;
+    using PartyFirebase.Auth;
+
     public class Mono_PhotoTakerController : MonoBehaviour
     {
         private static string path;
@@ -17,7 +20,7 @@ namespace PartyInc
 
         private void Awake()
         {
-            path = Application.dataPath + "/PartyInc/Resources/5_Experimental/Inaki/HEReIAM.jpg";
+            path = "player-data/{0}/images/account-image.jpg";
             Camera.onPostRender += RunPostRender;
         }
 
@@ -38,9 +41,26 @@ namespace PartyInc
 
                 myPhoto.ReadPixels(rectangle, 0, 0);
 
+                // Wait for confirm (Shows two buttons, confirm , retake)
+                // On yes save photo and send it to DB
+                // On no, cleanup
+
                 byte[] photoEncoded = myPhoto.EncodeToJPG();
-                System.IO.File.WriteAllBytes(path, photoEncoded);
-                print("Photo taken in: " + path);
+
+                string url = string.Format(path, Fb_FirebaseAuthenticateManager.Current.Auth.CurrentUser.UserId); //
+                Fb_FirebaseStorageManager.Current.UploadByteArrayAtURL(photoEncoded, url, res =>
+                {
+                    if (res.success)
+                    {
+                        Debug.Log("Upload successful!");
+                        Debug.Log("URL: " + url);
+                    }
+                    else
+                    {
+                        Debug.Log("Upload failed!");
+                        Debug.Log(res.exceptions[0].Message);
+                    }
+                });
 
                 RenderTexture.ReleaseTemporary(myPhotoRendered);
                 _photoCamera.targetTexture = null;
