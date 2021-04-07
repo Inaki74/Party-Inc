@@ -14,6 +14,7 @@ TagManager:
   - CheckpointPlane
   - Portal
   - Tile
+  - Carousel
   layers:
   - Default
   - TransparentFX
