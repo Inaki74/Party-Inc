@@ -45,7 +45,7 @@ namespace PartyInc
                 if (Fb_FirebaseAuthenticateManager.Current.Auth.CurrentUser != null)
                 {
                     Fb_FirestoreSession.Current.Setup();
-                    sceneToActivate = (int)Stt_SceneIndexes.HUB;
+                    sceneToActivate = (int)Stt_SceneIndexes.GAME_LIST;
 
                     yield return new WaitUntil(() => Fb_FirestoreSession.Current.SetupCompleted);
 

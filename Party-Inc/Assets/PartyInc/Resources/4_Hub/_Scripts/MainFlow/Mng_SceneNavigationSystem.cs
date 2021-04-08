@@ -24,7 +24,7 @@ namespace PartyInc
 
         private void Start()
         {
-            int[] essScns = { (int)Stt_SceneIndexes.HUB, (int)Stt_SceneIndexes.LAUNCHER_SIGNIN, (int)Stt_SceneIndexes.LAUNCHER_SIGNUP, (int)Stt_SceneIndexes.PLAYER_FORK };
+            int[] essScns = { (int)Stt_SceneIndexes.GAME_LIST, (int)Stt_SceneIndexes.LAUNCHER_SIGNIN, (int)Stt_SceneIndexes.LAUNCHER_SIGNUP, (int)Stt_SceneIndexes.PLAYER_FORK };
             EssentialHubScenes = essScns;
         }
 

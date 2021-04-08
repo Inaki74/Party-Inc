@@ -64,7 +64,7 @@ namespace PartyInc
             if (PartyFirebase.Auth.Fb_FirebaseAuthenticateManager.Current.Auth.CurrentUser != null)
             {
                 Mng_SceneNavigationSystem.Current.DeactivateActiveScene();
-                Mng_SceneNavigationSystem.Current.ActivateLoadedScene((int)Stt_SceneIndexes.HUB);
+                Mng_SceneNavigationSystem.Current.ActivateLoadedScene((int)Stt_SceneIndexes.GAME_LIST);
             }
             else
             {

@@ -167,7 +167,7 @@ namespace PartyInc
             yield return StartCoroutine(Mng_SceneNavigationSystem.Current.LoadScenesAsyncAdditive(Mng_SceneNavigationSystem.Current.EssentialHubScenes));
 
             Mng_SceneNavigationSystem.Current.DeactivateActiveScene();
-            Mng_SceneNavigationSystem.Current.ActivateLoadedScene((int)Stt_SceneIndexes.HUB);
+            Mng_SceneNavigationSystem.Current.ActivateLoadedScene((int)Stt_SceneIndexes.GAME_LIST);
         }
 
         #endregion

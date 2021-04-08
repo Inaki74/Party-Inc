@@ -193,7 +193,7 @@ namespace PartyInc
                 yield return new WaitUntil(() => Mng_PhotonManager.Current.PhotonAuthComplete);
 
                 Mng_SceneNavigationSystem.Current.DeactivateActiveScene();
-                Mng_SceneNavigationSystem.Current.ActivateLoadedScene((int)Stt_SceneIndexes.HUB);
+                Mng_SceneNavigationSystem.Current.ActivateLoadedScene((int)Stt_SceneIndexes.GAME_LIST);
 
                 _signingUp = false;
             }
