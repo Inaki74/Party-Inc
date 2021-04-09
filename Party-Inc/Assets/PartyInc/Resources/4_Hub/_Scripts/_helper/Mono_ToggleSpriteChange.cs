@@ -16,7 +16,7 @@ namespace PartyInc
             [SerializeField] private Sprite _isOffSprite;
             [SerializeField] private Sprite _isOnSprite;
 
-            private void Start()
+            private void Awake()
             {
                 _theToggleImage = GetComponent<Image>();
                 _theToggle = GetComponent<Toggle>();
