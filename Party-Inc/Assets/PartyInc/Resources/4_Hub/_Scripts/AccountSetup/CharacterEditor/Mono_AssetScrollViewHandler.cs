@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace PartyInc
 {
@@ -11,14 +12,19 @@ namespace PartyInc
             [SerializeField] private GameObject _elementToSpawnPrefab;
             [SerializeField] private GameObject _spawnerContainer;
 
-            public void InitializeScrollview(string[] data)
+            public void InitializeScrollview(string[] data, ToggleGroup buttonsToggle)
             {
+                print(data.Length);
                 foreach(string unit in data)
                 {
+                    print(unit);
+
+                    if (unit == null) continue;
+
                     GameObject element = Instantiate(_elementToSpawnPrefab, _spawnerContainer.transform); // Prefab pool?
                     element.tag = "Carousel";
 
-                    element.GetComponent<Mono_AssetButtonHandler>().InitializeButton();// (unit)
+                    element.GetComponent<Mono_AssetButtonHandler>().InitializeButton(buttonsToggle);// (unit)
                 }
             }
         }

@@ -1,18 +1,27 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace PartyInc
 {
     namespace Hub
     {
+        [RequireComponent(typeof(Toggle))]
         public class Mono_AssetButtonHandler : MonoBehaviour
         {
+            private Toggle _theToggle;
+
             //DATA
 
-            public void InitializeButton()
+            private void Awake()
             {
+                _theToggle = GetComponent<Toggle>();
+            }
 
+            public void InitializeButton(ToggleGroup theTG)
+            {
+                _theToggle.group = theTG;
             }
         }
     }
