@@ -41,6 +41,11 @@ namespace PartyInc
 
                 Players = FsDB.Collection(Fb_Constants.FIRESTORE_KEY_PLAYERS);
                 PlayerSocial = FsDB.Collection(Fb_Constants.FIRESTORE_KEY_PLAYERSOCIAL);
+
+                //Players.GetSnapshotAsync(Source.Default).ContinueWithOnMainThread(task =>
+                //{
+                //    //
+                //});
             }
 
             /// <summary>

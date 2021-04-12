@@ -21,7 +21,7 @@ EditorBuildSettings:
     path: Assets/PartyInc/Scenes/1_Hub/Game_Library.unity
     guid: 4eef4e09d748a4f4ab13c5a77fe58555
   - enabled: 1
-    path: Assets/PartyInc/Scenes/1_Hub/GameResults.unity
+    path: Assets/PartyInc/Scenes/1_Hub/Game_Results.unity
     guid: 7fa8fb723edca45dd89600892a82df21
   - enabled: 1
     path: Assets/PartyInc/Scenes/1_Hub/Rotate_Device.unity

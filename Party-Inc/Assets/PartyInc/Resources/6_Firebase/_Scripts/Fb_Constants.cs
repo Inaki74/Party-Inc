@@ -31,6 +31,10 @@ namespace PartyInc
             public const string FIRESTORE_KEY_PLAYER_DATA_REGDATE = "regdate";
             public const string FIRESTORE_KEY_PLAYER_DATA_WALLPAPER = "wallpaper";
 
+            //PLAYER ASSETS KEYS
+            public const string FIRESTORE_KEY_PLAYER_ASSETS_ID = "assetId";
+            public const string FIRESTORE_KEY_PLAYER_ASSETS_TYPE = "assetType";
+
             // PLAYER STATS KEYS
             public const string FIRESTORE_KEY_PLAYER_STATS = "stats";
             // PLAYER GAMESTATS KEYS

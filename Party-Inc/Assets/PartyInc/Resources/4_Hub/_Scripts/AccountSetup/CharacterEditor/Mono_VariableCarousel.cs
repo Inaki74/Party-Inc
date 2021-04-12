@@ -21,7 +21,30 @@ namespace PartyInc
             [SerializeField] private ToggleGroup _elementsToggleGroup;
 
             [SerializeField] private GameObject _elementToCarouselPrefab;
+            public GameObject ElementToCarouselPrefab
+            {
+                get
+                {
+                    return _elementToCarouselPrefab;
+                }
+                set
+                {
+                    _elementToCarouselPrefab = value;
+                }
+            }
+
             [SerializeField] private int _amountOfElementsPerScrollView;
+            public int AmountOfElementsPerScrollView
+            {
+                get
+                {
+                    return _amountOfElementsPerScrollView;
+                }
+                set
+                {
+                    _amountOfElementsPerScrollView = value;
+                }
+            }
 
             private List<GameObject> _carouselElements = new List<GameObject>();
 
@@ -32,7 +55,8 @@ namespace PartyInc
 
             private enum ContentType
             {
-                AssetScrollView
+                AssetScrollView,
+                AssetScrollViewPlayable
             }
 
             private int _carouselLength;
@@ -60,6 +84,7 @@ namespace PartyInc
                 //Fetch the Event System from the Scene
                 _eventSystem = FindObjectOfType<EventSystem>();
 
+                // Get the information required
                 InitializeCarousel(test.ToArray());
             }
 
@@ -162,6 +187,18 @@ namespace PartyInc
 
                 _lastCarouselSpot = 0;
                 _placeIndicators[0].interactable = true;
+            }
+
+            public void UnstageCarousel()
+            {
+                for(int i = 0; i < _placeIndicatorHolder.transform.childCount; i++)
+                {
+                    Destroy(_carousel.transform.GetChild(i).gameObject);
+                    Destroy(_placeIndicatorHolder.transform.GetChild(i).gameObject);
+                }
+
+                _carouselElements.Clear();
+                _placeIndicators = null;
             }
 
             private void CheckIfCarouselSwipe()

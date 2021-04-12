@@ -24,7 +24,16 @@ namespace PartyInc
                     GameObject element = Instantiate(_elementToSpawnPrefab, _spawnerContainer.transform); // Prefab pool?
                     element.tag = "Carousel";
 
-                    element.GetComponent<Mono_AssetButtonHandler>().InitializeButton(buttonsToggle);// (unit)
+                    Mono_AssetButtonHandler buttonHandler = element.GetComponent<Mono_AssetButtonHandler>();
+                    if(buttonHandler != null)
+                    {
+                        element.GetComponent<Mono_AssetButtonHandler>().InitializeButton(buttonsToggle);// (unit)
+                    }
+                    else
+                    {
+                        element.GetComponent<Mono_AssetButtonPlayableHandler>().InitializeButton(buttonsToggle);// (unit)
+                    }
+                    
                 }
             }
         }

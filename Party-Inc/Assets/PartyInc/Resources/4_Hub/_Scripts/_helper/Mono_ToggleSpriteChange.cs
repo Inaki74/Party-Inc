@@ -24,8 +24,6 @@ namespace PartyInc
 
             public void ToggleChanged(bool isOn)
             {
-                print(gameObject.name);
-                print(_theToggle.isOn);
                 if (_theToggle.isOn)
                 {
                     _theToggleImage.sprite = _isOnSprite;
