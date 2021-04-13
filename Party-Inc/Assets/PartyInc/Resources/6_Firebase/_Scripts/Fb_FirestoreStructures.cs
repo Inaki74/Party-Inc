@@ -28,7 +28,7 @@ namespace PartyInc
             {
                 public CollectionReference sessions;
                 public List<string> achievements;
-                public Dictionary<string, object> assets;
+                public List<Dictionary<string, object>> assets;
                 public Dictionary<string, object> character;
                 public Dictionary<string, object> data;
                 public Dictionary<string, object> stats;
@@ -37,17 +37,17 @@ namespace PartyInc
                 public FSPlayer()
                 {
                     achievements = new List<string>();
-                    assets = new FSPlayerAssets().ToDictionary();
+                    assets = new List<Dictionary<string, object>>();
                     character = new FSCharacter().ToDictionary();
                     data = new FSData().ToDictionary();
                     stats = new FSStats().ToDictionary();
                     goals = new Dictionary<string, object>();
                 }
 
-                public FSPlayer(List<string> achievements, FSPlayerAssets assets, FSCharacter character, FSData data, FSStats stats)
+                public FSPlayer(List<string> achievements, FSCharacter character, FSData data, FSStats stats)
                 {
                     this.achievements = achievements;
-                    this.assets = assets.ToDictionary(); ;
+                    this.assets = new List<Dictionary<string, object>>();
                     this.character = character.ToDictionary();
                     this.data = data.ToDictionary();
                     this.stats = stats.ToDictionary();
@@ -63,6 +63,16 @@ namespace PartyInc
                     goals.Add(Fb_Constants.FIRESTORE_KEY_PLAYER_TASKS, goal);
                 }
 
+                public void AddAsset(string assetId, int assetType)
+                {
+                    Dictionary<string, object> ass = new Dictionary<string, object>();
+
+                    ass.Add(Fb_Constants.FIRESTORE_KEY_PLAYER_ASSETS_TYPE, assetType);
+                    ass.Add(Fb_Constants.FIRESTORE_KEY_PLAYER_ASSETS_ID, assetId);
+
+                    assets.Add(ass);
+                }
+
                 public Dictionary<string, object> ToDictionary()
                 {
                     Dictionary<string, object> dic = new Dictionary<string, object>();
@@ -74,34 +84,6 @@ namespace PartyInc
                     dic.Add(Fb_Constants.FIRESTORE_KEY_PLAYER_TASKS, goals);
 
                     return dic;
-                }
-
-                public class FSPlayerAssets : IFb_FirestoreMapStructure
-                {
-                    public int assetType;
-                    public string assetId;
-
-                    public FSPlayerAssets()
-                    {
-                        assetType = 0;
-                        assetId = null;
-                    }
-
-                    public FSPlayerAssets(int assetType, string assetId)
-                    {
-                        this.assetType = assetType;
-                        this.assetId = assetId;
-                    }
-
-                    public Dictionary<string, object> ToDictionary()
-                    {
-                        Dictionary<string, object> dic = new Dictionary<string, object>();
-
-                        dic.Add(Fb_Constants.FIRESTORE_KEY_PLAYER_ASSETS_TYPE, assetType);
-                        dic.Add(Fb_Constants.FIRESTORE_KEY_PLAYER_ASSETS_ID, assetId);
-
-                        return dic;
-                    }
                 }
 
                 public class FSCharacter : IFb_FirestoreMapStructure

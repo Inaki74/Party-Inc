@@ -15,8 +15,8 @@ EditorBuildSettings:
     path: Assets/PartyInc/Scenes/1_Hub/Sign_In.unity
     guid: 5130e088a7a0a4f6bb7fa9e44681d584
   - enabled: 1
-    path: Assets/PartyInc/Scenes/1_Hub/Sign_Up.unity
-    guid: 0fa36884b3a564f3c89ccd2e76dd913e
+    path: Assets/PartyInc/Scenes/1_Hub/Avatar_New.unity
+    guid: d294f8040973f4d8db09fc70e53627da
   - enabled: 1
     path: Assets/PartyInc/Scenes/1_Hub/Game_Library.unity
     guid: 4eef4e09d748a4f4ab13c5a77fe58555

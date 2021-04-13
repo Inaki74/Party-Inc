@@ -79,6 +79,7 @@ namespace PartyInc
                         }
                         else if (_faceOptionsButtons[1].isOn)
                         {
+                            // Will use a variable carousel, but with a fixed list
                             _constantCarousel.SetActive(true);
                         }
                         else
@@ -95,6 +96,7 @@ namespace PartyInc
                         }
                         else
                         {
+                            // Will use a variable carousel, but with a fixed list
                             _constantCarousel.SetActive(true);
                         }
 

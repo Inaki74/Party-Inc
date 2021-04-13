@@ -55,6 +55,8 @@ namespace PartyInc
                 }
                 else
                 {
+                    //Fb_FirestoreSession.Current.SetupAnonymousSession()
+
                     sceneToActivate = (int)Stt_SceneIndexes.PLAYER_FORK;
                 }
 

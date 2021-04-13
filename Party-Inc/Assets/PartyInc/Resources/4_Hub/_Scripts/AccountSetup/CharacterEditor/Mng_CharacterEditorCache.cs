@@ -1,13 +1,15 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 
 namespace PartyInc
 {
     namespace Hub
     {
+        using PartyFirebase;
         using PartyFirebase.Firestore;
-
+        using PartyFirebase.Auth;
 
         public class Mng_CharacterEditorCache : MonoSingleton<Mng_CharacterEditorCache>
         {
@@ -19,8 +21,12 @@ namespace PartyInc
             // Face assets populate numbers 16 - 23 (last since they are not buyable)
             private List<string>[] _classifiedOwnedAssets = new List<string>[24];
 
-            private void Awake()
+            [SerializeField] private Data_InitialAssets _initialAssets;
+
+            public override void Init()
             {
+                base.Init();
+
                 for (int i = 0; i < _classifiedOwnedAssets.Length; i++)
                 {
                     _classifiedOwnedAssets[i] = new List<string>();
@@ -30,13 +36,7 @@ namespace PartyInc
             // Start is called before the first frame update
             void Start()
             {
-
-            }
-
-            // Update is called once per frame
-            void Update()
-            {
-
+                StartCoroutine(StartCache());
             }
 
             public List<string> GetTypeList(int type)
@@ -51,19 +51,35 @@ namespace PartyInc
                 // Build up lists for each type of asset (24)
                 // Save them in an Array of List of strings
 
-                List<Dictionary<string, object>> ownedAssets = (List<Dictionary<string, object>>)Fb_FirestoreSession.Current.LocalPlayerData[Fb_Constants.FIRESTORE_KEY_PLAYER_ASSETS];
+                yield return new WaitUntil(() => Fb_FirebaseManager.Current.ConnectedToFirebaseServices);
 
-                yield return null;
+                yield return new WaitUntil(() => Fb_FirebaseAuthenticateManager.Current.AuthInitialized);
 
-                foreach (Dictionary<string, object> asset in ownedAssets)
+                List<Dictionary<string, object>> ownedAssets;
+
+                if (Fb_FirebaseAuthenticateManager.Current.Auth.CurrentUser != null)
                 {
-                    string assetId = (string)asset[Fb_Constants.FIRESTORE_KEY_PLAYER_ASSETS_ID];
+                    yield return new WaitUntil(() => Fb_FirestoreSession.Current.SetupCompleted);
 
-                    LoadAssetImages(assetId);
-                    LoadAssetModels(assetId);
+                    ownedAssets  = (List<Dictionary<string, object>>)Fb_FirestoreSession.Current.LocalPlayerData[Fb_Constants.FIRESTORE_KEY_PLAYER_ASSETS];
+
+                    ClassifyAssets(ownedAssets);
+                }
+                else
+                {
+                    PutInitialAssetsClassified();
                 }
 
-                ClassifyAssets(ownedAssets);
+                // Loading assets all at once
+                // Or load assets in the moment?
+                // If this stays, load from classified list
+                //foreach (Dictionary<string, object> asset in ownedAssets)
+                //{
+                //    string assetId = (string)asset[Fb_Constants.FIRESTORE_KEY_PLAYER_ASSETS_ID];
+
+                //    LoadAssetImages(assetId);
+                //    LoadAssetModels(assetId);
+                //}
             }
 
             private void ClassifyAssets(List<Dictionary<string, object>> assets)
@@ -78,16 +94,55 @@ namespace PartyInc
                 }
             }
 
+            private void PutInitialAssetsClassified()
+            {
+                // Using reflection is much slower.
+                // This is faster, but its also less maintainable
+
+                PutFieldList(_initialAssets.angryEmotes, "angryEmotes");
+                PutFieldList(_initialAssets.beautyMarks, "beautyMarks");
+                PutFieldList(_initialAssets.brows, "brows");
+                PutFieldList(_initialAssets.celebratoryEmotes, "celebratoryEmotes");
+                PutFieldList(_initialAssets.ears, "ears");
+                PutFieldList(_initialAssets.eyes, "eyes");
+                PutFieldList(_initialAssets.facialHairs, "facialHairs");
+                PutFieldList(_initialAssets.footwears, "footwears");
+                PutFieldList(_initialAssets.glasses, "glasses");
+                PutFieldList(_initialAssets.hairs, "hairs");
+                PutFieldList(_initialAssets.happyEmotes, "happyEmotes");
+                PutFieldList(_initialAssets.laughingEmotes, "laughingEmotes");
+                PutFieldList(_initialAssets.lips, "lips");
+                PutFieldList(_initialAssets.makeup, "makeup");
+                PutFieldList(_initialAssets.noses, "noses");
+                PutFieldList(_initialAssets.pants, "pants");
+                PutFieldList(_initialAssets.sadEmotes, "sadEmotes");
+                PutFieldList(_initialAssets.shirts, "shirts");
+                PutFieldList(_initialAssets.skinColors, "skinColors");
+                PutFieldList(_initialAssets.socks, "socks");
+                PutFieldList(_initialAssets.surprisedEmotes, "surprisedEmotes");
+                PutFieldList(_initialAssets.tunes, "tunes");
+                PutFieldList(_initialAssets.wallpapers, "wallpapers");
+                PutFieldList(_initialAssets.wrinkles, "wrinkles");
+            }
+
+            private void PutFieldList(List<string> field, string fieldName)
+            {
+                var fieldInfo = _initialAssets.GetType().GetField(fieldName, System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+                var type = ((AssetsType)Attribute.GetCustomAttribute(fieldInfo, typeof(AssetsType))).Type;
+
+                _classifiedOwnedAssets[type] = field;
+            }
+
             //TODO
             private void LoadAssetModels(string assetId)
             {
-
+                print("Here goes loading of models, BEEP BOOP BOOP");
             }
 
             //TODO
             private void LoadAssetImages(string assetId)
             {
-
+                print("Here goes loading of images, BEEP BOOP BOOP");
             }
         }
     }

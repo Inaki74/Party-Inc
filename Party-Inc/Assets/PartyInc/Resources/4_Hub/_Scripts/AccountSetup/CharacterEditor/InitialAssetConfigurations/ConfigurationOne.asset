@@ -1,0 +1,285 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 44ed6fed5a8b84053827026540bf0164, type: 3}
+  m_Name: ConfigurationOne
+  m_EditorClassIdentifier: 
+  skinColors:
+  - '#c92031'
+  - asdas
+  - asdasda
+  - asdasd
+  - sdsd
+  - sd
+  - sd
+  - sd
+  - sd
+  - sd
+  eyes:
+  - EY_1002
+  - EY_1008
+  - sd
+  - sd
+  - sd
+  - sd
+  - sd
+  - sd
+  - sd
+  - sd
+  - sd
+  - sd
+  brows:
+  - sd
+  - sd
+  - sd
+  - sd
+  - sds
+  noses:
+  - sd
+  - sd
+  - sd
+  - sd
+  lips:
+  - l
+  - l
+  - l
+  - l
+  - l
+  - l
+  - l
+  makeup:
+  - l
+  - l
+  - l
+  wrinkles:
+  - l
+  - l
+  - l
+  - l
+  beautyMarks:
+  - '#NONE'
+  - o
+  - o
+  - o
+  hairs:
+  - o
+  - o
+  - o
+  - o
+  - o
+  - o
+  - o
+  - o
+  - o
+  - o
+  - o
+  - o
+  - o
+  - o
+  - o
+  - o
+  - o
+  - o
+  - o
+  - o
+  - o
+  - o
+  facialHairs:
+  - o
+  - o
+  - o
+  - o
+  - o
+  - o
+  - o
+  - o
+  - o
+  - o
+  - o
+  - o
+  - o
+  - o
+  - o
+  - o
+  ears:
+  - i
+  - i
+  - i
+  - i
+  - i
+  - i
+  - i
+  - i
+  - i
+  - i
+  - i
+  - i
+  - i
+  - i
+  - i
+  - i
+  - i
+  - i
+  - i
+  shirts:
+  - l
+  - l
+  - l
+  - l
+  - l
+  - l
+  - l
+  - l
+  - l
+  - l
+  - l
+  - l
+  - l
+  - l
+  - l
+  - l
+  - l
+  - l
+  - l
+  - ll
+  - l
+  - l
+  - l
+  - l
+  - l
+  pants:
+  - l
+  - l
+  - l
+  - l
+  - l
+  - l
+  - l
+  - l
+  - l
+  - l
+  - l
+  - l
+  - l
+  - l
+  socks:
+  - l
+  - l
+  - l
+  - l
+  - l
+  - l
+  - l
+  - l
+  - l
+  footwears:
+  - l
+  - l
+  - l
+  - l
+  - l
+  - l
+  - l
+  - l
+  - l
+  - l
+  - l
+  - l
+  - l
+  - l
+  - l
+  - l
+  glasses:
+  - l
+  - l
+  - l
+  - l
+  wallpapers:
+  - l
+  - l
+  - l
+  - l
+  - l
+  - l
+  happyEmotes:
+  - l
+  - l
+  - l
+  - l
+  - l
+  - l
+  - l
+  sadEmotes:
+  - l
+  - l
+  - l
+  - l
+  - ll
+  - l
+  - l
+  - l
+  - l
+  angryEmotes:
+  - l
+  - l
+  - l
+  - l
+  - l
+  - l
+  laughingEmotes:
+  - l
+  - l
+  - l
+  - l
+  - l
+  - l
+  - l
+  - l
+  - l
+  surprisedEmotes:
+  - l
+  - l
+  - l
+  - l
+  - l
+  celebratoryEmotes:
+  - l
+  - l
+  - l
+  - l
+  - l
+  - l
+  - l
+  - l
+  - l
+  - l
+  - l
+  - l
+  - l
+  tunes:
+  - l
+  - l
+  - l
+  - l
+  - l
+  - l
+  - l
+  - l
+  - l
+  - l
+  - l
+  - l
+  - l
+  - l
+  - l
+  - l
+  - l
+  - l
