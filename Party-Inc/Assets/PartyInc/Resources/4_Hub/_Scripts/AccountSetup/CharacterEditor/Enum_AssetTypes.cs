@@ -8,15 +8,15 @@ namespace PartyInc
     {
         public enum Enum_AssetTypes
         {
-            HAIR = 0,
-            FACIALHAIR = 1,
+            HAIR = 0, // COLOR
+            FACIALHAIR = 1, // COLOR
             EARS = 2,
-            SHIRT = 3,
-            PANTS = 4,
-            SOCKS = 5,
-            FOOTWEAR = 6,
-            GLASSES = 7,
-            WALLPAPER = 8,
+            SHIRT = 3, // COLOR
+            PANTS = 4, // COLOR
+            SOCKS = 5, // COLOR
+            FOOTWEAR = 6, // COLOR
+            GLASSES = 7, // COLOR
+            WALLPAPER = 8, //maybe
             EMOTE_HAPPY = 9,
             EMOTE_SAD = 10,
             EMOTE_ANGRY = 11,
@@ -24,12 +24,12 @@ namespace PartyInc
             EMOTE_SURPRISED = 13,
             EMOTE_CELEBRATION = 14,
             TUNE = 15,
-            SKINCOLOR = 16,
-            EYES = 17,
-            BROWS = 18,
+            SKINCOLOR = 16, // COLOR
+            EYES = 17, // COLOR
+            BROWS = 18, // COLOR
             NOSE = 19,
-            LIPS = 20,
-            MAKEUP = 21,
+            LIPS = 20, // COLOR
+            MAKEUP = 21, // COLOR
             WRINKLES = 22,
             BEAUTYMARKS = 23
         }

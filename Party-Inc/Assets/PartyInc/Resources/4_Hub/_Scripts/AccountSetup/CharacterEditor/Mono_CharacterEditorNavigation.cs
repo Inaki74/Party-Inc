@@ -26,6 +26,7 @@ namespace PartyInc
             [SerializeField] private GameObject[] _pages;
             [SerializeField] private GameObject _base;
             [SerializeField] private Mono_SignUpController _signUpController;
+            [SerializeField] private GameObject _characterPreview;
 
             public delegate void ActionChangePage(Enum_CharacterEditorPages page);
             public static event ActionChangePage onChangePage;
@@ -35,20 +36,37 @@ namespace PartyInc
             // Start is called before the first frame update
             void Start()
             {
-
+                
             }
 
             public void BtnBack()
             {
-                if(_currentPage ==(int)Enum_CharacterEditorPages.OVERVIEW)
+                if(_currentPage == (int)Enum_CharacterEditorPages.OVERVIEW)
                 {
                     // Back to Fork Scene
+                    Mng_SceneNavigationSystem.Current.DeactivateActiveScene();
+                    Mng_SceneNavigationSystem.Current.ActivateLoadedScene((int)Stt_SceneIndexes.PLAYER_FORK);
+                    
                 }
                 else if(_currentPage == (int)Enum_CharacterEditorPages.FACE)
                 {
                     _pages[_currentPage].SetActive(false);
                     _base.SetActive(false);
                     _currentPage--;
+                }
+                else if (_currentPage == (int)Enum_CharacterEditorPages.PHOTO)
+                {
+                    _base.SetActive(true);
+                    _pages[_currentPage].SetActive(false);
+                    _currentPage--;
+                    _pages[_currentPage].SetActive(true);
+                }
+                else if(_currentPage == (int)Enum_CharacterEditorPages.SIGNUP)
+                {
+                    _characterPreview.SetActive(true);
+                    _pages[_currentPage].SetActive(false);
+                    _currentPage--;
+                    _pages[_currentPage].SetActive(true);
                 }
                 else
                 {
@@ -68,14 +86,23 @@ namespace PartyInc
                     _currentPage++;
                     _pages[_currentPage].SetActive(true);
                 }
-                if(_currentPage == (int)Enum_CharacterEditorPages.PHOTO)
+                else if (_currentPage == (int)Enum_CharacterEditorPages.TUNE)
                 {
                     _base.SetActive(false);
                     // Stop showing character
+                    _pages[_currentPage].SetActive(false);
                     _currentPage++;
                     _pages[_currentPage].SetActive(true);
                 }
-                if (_currentPage == (int)Enum_CharacterEditorPages.SIGNUP)
+                else if(_currentPage == (int)Enum_CharacterEditorPages.PHOTO)
+                {
+                    // Stop showing character
+                    _characterPreview.SetActive(false);
+                    _pages[_currentPage].SetActive(false);
+                    _currentPage++;
+                    _pages[_currentPage].SetActive(true);
+                }
+                else if (_currentPage == (int)Enum_CharacterEditorPages.SIGNUP)
                 {
                     // Finish sign up
                     _signUpController.SignUp();

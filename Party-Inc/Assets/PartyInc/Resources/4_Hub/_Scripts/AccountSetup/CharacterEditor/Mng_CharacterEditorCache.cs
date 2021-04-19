@@ -39,8 +39,7 @@ namespace PartyInc
                 }
             }
 
-            // Start is called before the first frame update
-            void Start()
+            public override void OnEnable()
             {
                 StartCoroutine(StartCache());
             }
@@ -63,7 +62,7 @@ namespace PartyInc
                 // Build up lists for each type of asset (24)
                 // Save them in an Array of List of strings
 
-                yield return new WaitUntil(() => Fb_FirebaseManager.Current.ConnectedToFirebaseServices);
+                print("Checking auth initialized");
 
                 yield return new WaitUntil(() => Fb_FirebaseAuthenticateManager.Current.AuthInitialized);
 
@@ -71,6 +70,7 @@ namespace PartyInc
 
                 if (Fb_FirebaseAuthenticateManager.Current.Auth.CurrentUser != null)
                 {
+                    print("Classifying assets with user");
                     yield return new WaitUntil(() => Fb_FirestoreSession.Current.SetupCompleted);
 
                     ownedAssets  = (List<Dictionary<string, object>>)Fb_FirestoreSession.Current.LocalPlayerData[Fb_Constants.FIRESTORE_KEY_PLAYER_ASSETS];
@@ -79,6 +79,7 @@ namespace PartyInc
                 }
                 else
                 {
+                    print("Classifying assets");
                     PutInitialAssetsClassified();
                 }
 
@@ -139,6 +140,8 @@ namespace PartyInc
 
             private void PutFieldList(List<string> field, string fieldName)
             {
+                print("Asset classified");
+
                 var fieldInfo = _initialAssets.GetType().GetField(fieldName);
                 var type = ((AssetsType)Attribute.GetCustomAttribute(fieldInfo, typeof(AssetsType))).Type;
 

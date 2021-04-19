@@ -119,14 +119,14 @@ namespace PartyInc
                     case Enum_CharacterEditorPages.EMOTE:
                         ActivateVariableCarousel(
                             _assetButtonScrollViewPlayable,
-                            10,
+                            8,
                             Mng_CharacterEditorCache.Current.GetTypeList(GetIndexOfActiveToggleInRange(EMOTES_LOWER_BOUND, EMOTES_UPPER_BOUND)).ToArray(),
                             (Enum_AssetTypes)GetIndexOfActiveToggleInRange(EMOTES_LOWER_BOUND, EMOTES_UPPER_BOUND));
                         break;
                     case Enum_CharacterEditorPages.TUNE:
                         ActivateVariableCarousel(
                             _assetButtonScrollViewPlayable,
-                            10,
+                            8,
                             Mng_CharacterEditorCache.Current.GetTypeList((int)Enum_AssetTypes.TUNE).ToArray(),
                             Enum_AssetTypes.TUNE);
                         break;
@@ -165,7 +165,7 @@ namespace PartyInc
             {
                 if(type >= (int)Enum_AssetTypes.EMOTE_HAPPY && type <= (int)Enum_AssetTypes.TUNE)
                 {
-                    ActivateVariableCarousel(_assetButtonScrollViewPlayable, 10, Mng_CharacterEditorCache.Current.GetTypeList(type).ToArray(), (Enum_AssetTypes)type);
+                    ActivateVariableCarousel(_assetButtonScrollViewPlayable, 8, Mng_CharacterEditorCache.Current.GetTypeList(type).ToArray(), (Enum_AssetTypes)type);
                 }
                 else
                 {

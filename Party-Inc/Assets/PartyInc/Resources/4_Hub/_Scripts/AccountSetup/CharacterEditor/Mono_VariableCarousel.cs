@@ -130,15 +130,9 @@ namespace PartyInc
                 float destination = originalPosition + _carouselMovingDistance * swipeDirection;
                 Vector2 destinationVector = new Vector2(destination, _carousel.localPosition.y);
 
-                while(Vector2.Distance(destinationVector, _carousel.localPosition) > 0.5f)
-                {
-                    LeanTween.moveLocalX(_carousel.gameObject, destination, 0.5f).setEaseOutExpo();
-                    yield return new WaitForEndOfFrame();
-                }
+                LeanTween.moveLocalX(_carousel.gameObject, destination, 0.5f).setEaseOutExpo();
 
-                bool esperar = false;
-
-                yield return new WaitUntil(() => esperar);
+                yield return new WaitForSeconds(0.5f);
 
                 _carouselMoving = false;
                 _swipe = false;
@@ -192,11 +186,18 @@ namespace PartyInc
 
                     GameObject carouselIndicator = Instantiate(_placeIndicatorPrefab, _placeIndicatorHolder.transform);
                     _placeIndicators[i] = carouselIndicator.GetComponent<Button>();
-                    _placeIndicators[i].interactable = false;
+                    if(i == 0)
+                    {
+                        _placeIndicators[i].interactable = true;
+                    }
+                    else
+                    {
+                        _placeIndicators[i].interactable = false;
+                    }
+                    
                 }
 
                 _lastCarouselSpot = 0;
-                _placeIndicators[0].interactable = true;
             }
 
             public void UnstageCarousel()
@@ -212,6 +213,9 @@ namespace PartyInc
                 _carouselSpot = 0;
                 _carouselElements.Clear();
                 _placeIndicators = null;
+
+                _swipe = false;
+                
             }
 
             private void CheckIfCarouselSwipe()
