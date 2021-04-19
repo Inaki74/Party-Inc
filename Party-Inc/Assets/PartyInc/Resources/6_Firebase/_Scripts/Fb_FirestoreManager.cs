@@ -15,6 +15,7 @@ namespace PartyInc
         {
             public bool success;
             public Dictionary<string, object> data;
+            public string docId;
             public Dictionary<string, object> oldData;
             public List<FirestoreException> exceptions;
         }
@@ -186,6 +187,7 @@ namespace PartyInc
 
                         result.success = false;
                         result.data = null;
+                        result.docId = null;
                         result.oldData = null;
 
                         AssignationContinue(result);
@@ -198,6 +200,7 @@ namespace PartyInc
 
                         result.success = true;
                         result.data = task.Result.ToDictionary();
+                        result.docId = task.Result.Id;
                         result.oldData = null;
 
                         AssignationContinue(result);
