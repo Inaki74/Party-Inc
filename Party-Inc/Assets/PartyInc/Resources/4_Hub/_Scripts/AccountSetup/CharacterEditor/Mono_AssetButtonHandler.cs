@@ -11,6 +11,7 @@ namespace PartyInc
         public class Mono_AssetButtonHandler : MonoBehaviour
         {
             private Toggle _theToggle;
+            private Enum_AssetTypes _assetType;
 
             //DATA
 
@@ -19,9 +20,11 @@ namespace PartyInc
                 _theToggle = GetComponent<Toggle>();
             }
 
-            public void InitializeButton(ToggleGroup theTG)
+            public void InitializeButton(string assetId, ToggleGroup theTG, Enum_AssetTypes assetType)
             {
                 _theToggle.group = theTG;
+
+                _assetType = assetType;
             }
         }
     }

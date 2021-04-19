@@ -43,7 +43,7 @@ namespace PartyInc
 
             private int GetIndexOfActiveToggleInRange(int start, int end)
             {
-                for(int i = start; i < end; i++)
+                for(int i = start; i <= end; i++)
                 {
                     if (_allToggles[i].isOn)
                     {
@@ -55,7 +55,7 @@ namespace PartyInc
                 return -1;
             }
 
-            private void OnPageChange(CharacterEditorPages thePage)
+            private void OnPageChange(Enum_CharacterEditorPages thePage)
             {
                 if (_variableCarousel.activeInHierarchy)
                     _variableCarousel.SetActive(false);
@@ -68,14 +68,18 @@ namespace PartyInc
 
                 switch (thePage)
                 {
-                    case CharacterEditorPages.OVERVIEW:
+                    case Enum_CharacterEditorPages.OVERVIEW:
                         // Might do nothing
                         break;
-                    case CharacterEditorPages.FACE:
+                    case Enum_CharacterEditorPages.FACE:
 
                         if (_faceOptionsButtons[0].isOn)
                         {
-                            ActivateVariableCarousel(_assetButtonScrollView, 15, Mng_CharacterEditorCache.Current.GetTypeList(GetIndexOfActiveToggleInRange(FACE_LOWER_BOUND, FACE_UPPER_BOUND)).ToArray());
+                            ActivateVariableCarousel(
+                                _assetButtonScrollView,
+                                15,
+                                Mng_CharacterEditorCache.Current.GetTypeList(GetIndexOfActiveToggleInRange(FACE_LOWER_BOUND, FACE_UPPER_BOUND)).ToArray(),
+                                (Enum_AssetTypes)GetIndexOfActiveToggleInRange(FACE_LOWER_BOUND, FACE_UPPER_BOUND));
                         }
                         else if (_faceOptionsButtons[1].isOn)
                         {
@@ -88,11 +92,15 @@ namespace PartyInc
                         }
 
                         break;
-                    case CharacterEditorPages.OUTFIT:
+                    case Enum_CharacterEditorPages.OUTFIT:
 
                         if (_outfitOptionsButtons[0].isOn)
                         {
-                            ActivateVariableCarousel(_assetButtonScrollView, 15, Mng_CharacterEditorCache.Current.GetTypeList(GetIndexOfActiveToggleInRange(OUTFIT_LOWER_BOUND, OUTFIT_UPPER_BOUND)).ToArray());
+                            ActivateVariableCarousel(
+                                _assetButtonScrollView,
+                                15,
+                                Mng_CharacterEditorCache.Current.GetTypeList(GetIndexOfActiveToggleInRange(OUTFIT_LOWER_BOUND, OUTFIT_UPPER_BOUND)).ToArray(),
+                                (Enum_AssetTypes)GetIndexOfActiveToggleInRange(OUTFIT_LOWER_BOUND, OUTFIT_UPPER_BOUND));
                         }
                         else
                         {
@@ -101,32 +109,46 @@ namespace PartyInc
                         }
 
                         break;
-                    case CharacterEditorPages.WALLPAPER:
-                        ActivateVariableCarousel(_assetButtonScrollView, 15, Mng_CharacterEditorCache.Current.GetTypeList(8).ToArray());
+                    case Enum_CharacterEditorPages.WALLPAPER:
+                        ActivateVariableCarousel(
+                            _assetButtonScrollView,
+                            15,
+                            Mng_CharacterEditorCache.Current.GetTypeList((int)Enum_AssetTypes.WALLPAPER).ToArray(),
+                            Enum_AssetTypes.WALLPAPER);
                         break;
-                    case CharacterEditorPages.EMOTE:
-                        ActivateVariableCarousel(_assetButtonScrollViewPlayable, 10, Mng_CharacterEditorCache.Current.GetTypeList(GetIndexOfActiveToggleInRange(EMOTES_LOWER_BOUND, EMOTES_UPPER_BOUND)).ToArray());
+                    case Enum_CharacterEditorPages.EMOTE:
+                        ActivateVariableCarousel(
+                            _assetButtonScrollViewPlayable,
+                            10,
+                            Mng_CharacterEditorCache.Current.GetTypeList(GetIndexOfActiveToggleInRange(EMOTES_LOWER_BOUND, EMOTES_UPPER_BOUND)).ToArray(),
+                            (Enum_AssetTypes)GetIndexOfActiveToggleInRange(EMOTES_LOWER_BOUND, EMOTES_UPPER_BOUND));
                         break;
-                    case CharacterEditorPages.TUNE:
-                        ActivateVariableCarousel(_assetButtonScrollViewPlayable, 10, Mng_CharacterEditorCache.Current.GetTypeList(15).ToArray());
+                    case Enum_CharacterEditorPages.TUNE:
+                        ActivateVariableCarousel(
+                            _assetButtonScrollViewPlayable,
+                            10,
+                            Mng_CharacterEditorCache.Current.GetTypeList((int)Enum_AssetTypes.TUNE).ToArray(),
+                            Enum_AssetTypes.TUNE);
                         break;
-                    case CharacterEditorPages.PHOTO:
+                    case Enum_CharacterEditorPages.PHOTO:
                         break;
-                    case CharacterEditorPages.SIGNUP:
+                    case Enum_CharacterEditorPages.SIGNUP:
                         break;
                     default:
                         break;
                 }
             }
 
-            private void ActivateVariableCarousel(GameObject prefab, int amountElements, string[] elements)
+            private void ActivateVariableCarousel(GameObject prefab, int amountElements, string[] elements, Enum_AssetTypes assetType)
             {
                 _variableCarousel.SetActive(true);
+
+                _theVariableCarousel.UnstageCarousel();
 
                 _theVariableCarousel.ElementToCarouselPrefab = prefab;
                 _theVariableCarousel.AmountOfElementsPerScrollView = amountElements;
 
-                _theVariableCarousel.InitializeCarousel(elements);
+                _theVariableCarousel.InitializeCarousel(elements, assetType);
             }
 
             private void Awake()
@@ -137,6 +159,18 @@ namespace PartyInc
             private void OnDestroy()
             {
                 Mono_CharacterEditorNavigation.onChangePage -= OnPageChange;
+            }
+
+            public void OnToggle(int type)
+            {
+                if(type >= (int)Enum_AssetTypes.EMOTE_HAPPY && type <= (int)Enum_AssetTypes.TUNE)
+                {
+                    ActivateVariableCarousel(_assetButtonScrollViewPlayable, 10, Mng_CharacterEditorCache.Current.GetTypeList(type).ToArray(), (Enum_AssetTypes)type);
+                }
+                else
+                {
+                    ActivateVariableCarousel(_assetButtonScrollView, 15, Mng_CharacterEditorCache.Current.GetTypeList(type).ToArray(), (Enum_AssetTypes)type);
+                }
             }
         }
     }

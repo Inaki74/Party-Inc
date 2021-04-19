@@ -200,6 +200,8 @@ namespace PartyInc
 
             public void SignUp()
             {
+                // Need to grab the selected pieces
+
                 _signingUp = true;
 
                 if (!ValidateBirthdate(_DOBField.text) || !ValidateLanguage(_languageField.text) || !ValidateCity(_cityField.text))

@@ -85,7 +85,7 @@ namespace PartyInc
                 _eventSystem = FindObjectOfType<EventSystem>();
 
                 // Get the information required
-                InitializeCarousel(test.ToArray());
+                //InitializeCarousel(test.ToArray());
             }
 
             private void Update()
@@ -136,23 +136,33 @@ namespace PartyInc
                     yield return new WaitForEndOfFrame();
                 }
 
+                bool esperar = false;
+
+                yield return new WaitUntil(() => esperar);
+
                 _carouselMoving = false;
                 _swipe = false;
             }
 
-            public void InitializeCarousel(string[] elements)
+            public void InitializeCarousel(string[] elements, Enum_AssetTypes assetType)
             {
+                if(elements.Count() == 0)
+                {
+                    print("No elements");
+                }
+
                 int amountOfButtons = elements.Length;
-                int amountOfCarouselElements = Mathf.RoundToInt(amountOfButtons / _amountOfElementsPerScrollView);
+                int amountOfCarouselElements = Mathf.CeilToInt((float)amountOfButtons / (float)_amountOfElementsPerScrollView);
 
                 _carouselLength = amountOfCarouselElements;
 
-                _placeIndicators = new Button[amountOfCarouselElements + 1];
+                _placeIndicators = new Button[amountOfCarouselElements];
 
-                for(int i = 0; i <= amountOfCarouselElements; i++)
+                for(int i = 0; i < amountOfCarouselElements; i++)
                 {
                     int amountNewList = 0;
 
+                    // 
                     if(amountOfButtons - i * _amountOfElementsPerScrollView >= _amountOfElementsPerScrollView)
                     {
                         amountNewList = _amountOfElementsPerScrollView;
@@ -171,10 +181,10 @@ namespace PartyInc
 
                     GameObject elementToCarousel = Instantiate(_elementToCarouselPrefab, transform);
                     _carouselElements.Add(elementToCarousel);
-
+                    
                     if(_contentType == ContentType.AssetScrollView)
                     {
-                        elementToCarousel.GetComponent<Mono_AssetScrollViewHandler>().InitializeScrollview(newList, _elementsToggleGroup);
+                        elementToCarousel.GetComponent<Mono_AssetScrollViewHandler>().InitializeScrollview(newList, _elementsToggleGroup, assetType);
                     }
 
                     elementToCarousel.GetComponent<RectTransform>().transform.SetParent(_carousel.transform);
@@ -191,12 +201,15 @@ namespace PartyInc
 
             public void UnstageCarousel()
             {
+                _carousel.localPosition = new Vector2(0f, _carousel.localPosition.y);
+
                 for(int i = 0; i < _placeIndicatorHolder.transform.childCount; i++)
                 {
                     Destroy(_carousel.transform.GetChild(i).gameObject);
                     Destroy(_placeIndicatorHolder.transform.GetChild(i).gameObject);
                 }
 
+                _carouselSpot = 0;
                 _carouselElements.Clear();
                 _placeIndicators = null;
             }
@@ -258,7 +271,7 @@ namespace PartyInc
                     return true;
                 }
 
-                if((strongSwipe == -1 || softSwipe == -1) && _carouselSpot < _carouselLength)
+                if((strongSwipe == -1 || softSwipe == -1) && _carouselSpot < _carouselLength - 1)
                 {
                     _swipeDirection = -1;
                     return true;

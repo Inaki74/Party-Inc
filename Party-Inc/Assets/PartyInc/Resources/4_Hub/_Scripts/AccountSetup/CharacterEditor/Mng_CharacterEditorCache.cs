@@ -20,6 +20,7 @@ namespace PartyInc
             // Tune assets populate the number 15
             // Face assets populate numbers 16 - 23 (last since they are not buyable)
             private List<string>[] _classifiedOwnedAssets = new List<string>[24];
+            private Dictionary<Enum_AssetTypes, string> _chosenAssets = new Dictionary<Enum_AssetTypes, string>();
 
             [SerializeField] private Data_InitialAssets _initialAssets;
 
@@ -31,6 +32,11 @@ namespace PartyInc
                 {
                     _classifiedOwnedAssets[i] = new List<string>();
                 }
+
+                foreach(KeyValuePair<Enum_AssetTypes, string> kp in _chosenAssets)
+                {
+                    //kp.Value
+                }
             }
 
             // Start is called before the first frame update
@@ -41,7 +47,13 @@ namespace PartyInc
 
             public List<string> GetTypeList(int type)
             {
+                print(type);
                 return _classifiedOwnedAssets[type];
+            }
+
+            public void ChooseAsset(string data, Enum_AssetTypes assetType)
+            {
+                _chosenAssets.Add(assetType, data);
             }
 
             private IEnumerator StartCache()
@@ -127,10 +139,10 @@ namespace PartyInc
 
             private void PutFieldList(List<string> field, string fieldName)
             {
-                var fieldInfo = _initialAssets.GetType().GetField(fieldName, System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+                var fieldInfo = _initialAssets.GetType().GetField(fieldName);
                 var type = ((AssetsType)Attribute.GetCustomAttribute(fieldInfo, typeof(AssetsType))).Type;
 
-                _classifiedOwnedAssets[type] = field;
+                _classifiedOwnedAssets[(int)type] = field;
             }
 
             //TODO

@@ -12,13 +12,10 @@ namespace PartyInc
             [SerializeField] private GameObject _elementToSpawnPrefab;
             [SerializeField] private GameObject _spawnerContainer;
 
-            public void InitializeScrollview(string[] data, ToggleGroup buttonsToggle)
+            public void InitializeScrollview(string[] data, ToggleGroup buttonsToggle, Enum_AssetTypes assetType)
             {
-                print(data.Length);
                 foreach(string unit in data)
                 {
-                    print(unit);
-
                     if (unit == null) continue;
 
                     GameObject element = Instantiate(_elementToSpawnPrefab, _spawnerContainer.transform); // Prefab pool?
@@ -27,11 +24,11 @@ namespace PartyInc
                     Mono_AssetButtonHandler buttonHandler = element.GetComponent<Mono_AssetButtonHandler>();
                     if(buttonHandler != null)
                     {
-                        element.GetComponent<Mono_AssetButtonHandler>().InitializeButton(buttonsToggle);// (unit)
+                        element.GetComponent<Mono_AssetButtonHandler>().InitializeButton(unit, buttonsToggle, assetType);// (unit)
                     }
                     else
                     {
-                        element.GetComponent<Mono_AssetButtonPlayableHandler>().InitializeButton(buttonsToggle);// (unit)
+                        element.GetComponent<Mono_AssetButtonPlayableHandler>().InitializeButton(unit, buttonsToggle, assetType);// (unit)
                     }
                     
                 }

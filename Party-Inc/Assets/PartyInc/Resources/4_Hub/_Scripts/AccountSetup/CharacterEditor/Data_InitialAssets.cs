@@ -15,73 +15,73 @@ namespace PartyInc
             // Since the face assets will always be the same assets
             // Might get them from their folders in resources
             // While we dont have that though, this will do.
-            [AssetsType(16)]
+            [AssetsType(Enum_AssetTypes.SKINCOLOR)]
             public List<string> skinColors;
-            [AssetsType(17)]
+            [AssetsType(Enum_AssetTypes.EYES)]
             public List<string> eyes;
-            [AssetsType(18)]
+            [AssetsType(Enum_AssetTypes.BROWS)]
             public List<string> brows;
-            [AssetsType(19)]
+            [AssetsType(Enum_AssetTypes.NOSE)]
             public List<string> noses;
-            [AssetsType(20)]
+            [AssetsType(Enum_AssetTypes.LIPS)]
             public List<string> lips;
-            [AssetsType(21)]
+            [AssetsType(Enum_AssetTypes.MAKEUP)]
             public List<string> makeup;
-            [AssetsType(22)]
+            [AssetsType(Enum_AssetTypes.WRINKLES)]
             public List<string> wrinkles;
-            [AssetsType(23)]
+            [AssetsType(Enum_AssetTypes.BEAUTYMARKS)]
             public List<string> beautyMarks;
 
             [Header("Outfit Assets")]
-            [AssetsType(0)]
+            [AssetsType(Enum_AssetTypes.HAIR)]
             public List<string> hairs;
-            [AssetsType(1)]
+            [AssetsType(Enum_AssetTypes.FACIALHAIR)]
             public List<string> facialHairs;
-            [AssetsType(2)]
+            [AssetsType(Enum_AssetTypes.EARS)]
             public List<string> ears;
-            [AssetsType(3)]
+            [AssetsType(Enum_AssetTypes.SHIRT)]
             public List<string> shirts;
-            [AssetsType(4)]
+            [AssetsType(Enum_AssetTypes.PANTS)]
             public List<string> pants;
-            [AssetsType(5)]
+            [AssetsType(Enum_AssetTypes.SOCKS)]
             public List<string> socks;
-            [AssetsType(6)]
+            [AssetsType(Enum_AssetTypes.FOOTWEAR)]
             public List<string> footwears;
-            [AssetsType(7)]
+            [AssetsType(Enum_AssetTypes.GLASSES)]
             public List<string> glasses;
 
             [Header("Wallpaper Assets")]
-            [AssetsType(8)]
+            [AssetsType(Enum_AssetTypes.WALLPAPER)]
             public List<string> wallpapers;
 
             [Header("Emote Assets")]
-            [AssetsType(9)]
+            [AssetsType(Enum_AssetTypes.EMOTE_HAPPY)]
             public List<string> happyEmotes;
-            [AssetsType(10)]
+            [AssetsType(Enum_AssetTypes.EMOTE_SAD)]
             public List<string> sadEmotes;
-            [AssetsType(11)]
+            [AssetsType(Enum_AssetTypes.EMOTE_ANGRY)]
             public List<string> angryEmotes;
-            [AssetsType(12)]
+            [AssetsType(Enum_AssetTypes.EMOTE_LAUGHING)]
             public List<string> laughingEmotes; //XD
-            [AssetsType(13)]
+            [AssetsType(Enum_AssetTypes.EMOTE_SURPRISED)]
             public List<string> surprisedEmotes;
-            [AssetsType(14)]
+            [AssetsType(Enum_AssetTypes.EMOTE_CELEBRATION)]
             public List<string> celebratoryEmotes;
 
             [Header("Tune Assets")]
-            [AssetsType(15)]
+            [AssetsType(Enum_AssetTypes.TUNE)]
             public List<string> tunes;
         }
 
         [AttributeUsage(AttributeTargets.Field)]
         public class AssetsType : Attribute
         {
-            public AssetsType(int type)
+            public AssetsType(Enum_AssetTypes type)
             {
                 this.Type = type;
             }
 
-            public int Type { get; private set; }
+            public Enum_AssetTypes Type { get; private set; }
         }
     }
 }

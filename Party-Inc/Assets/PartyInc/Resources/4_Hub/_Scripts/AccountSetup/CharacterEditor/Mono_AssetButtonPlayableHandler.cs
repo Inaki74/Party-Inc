@@ -10,7 +10,9 @@ namespace PartyInc
         [RequireComponent(typeof(Toggle))]
         public class Mono_AssetButtonPlayableHandler : MonoBehaviour
         {
+            private string _assetId;
             private Toggle _theToggle;
+            private Enum_AssetTypes _assetType;
 
             //DATA
 
@@ -19,9 +21,13 @@ namespace PartyInc
                 _theToggle = GetComponent<Toggle>();
             }
 
-            public void InitializeButton(ToggleGroup theTG)
+            public void InitializeButton(string assetId, ToggleGroup theTG, Enum_AssetTypes assetTypes)
             {
+                _assetId = assetId;
+
                 _theToggle.group = theTG;
+
+                _assetType = assetTypes;
             }
         }
     }
