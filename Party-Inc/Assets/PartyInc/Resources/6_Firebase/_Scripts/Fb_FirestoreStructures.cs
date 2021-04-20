@@ -63,12 +63,13 @@ namespace PartyInc
                     goals.Add(Fb_Constants.FIRESTORE_KEY_PLAYER_TASKS, goal);
                 }
 
-                public void AddAsset(string assetId, int assetType)
+                public void AddAsset(string assetId, int assetType, List<string> variations)
                 {
                     Dictionary<string, object> ass = new Dictionary<string, object>();
 
                     ass.Add(Fb_Constants.FIRESTORE_KEY_PLAYER_ASSETS_TYPE, assetType);
                     ass.Add(Fb_Constants.FIRESTORE_KEY_PLAYER_ASSETS_ID, assetId);
+                    ass.Add(Fb_Constants.FIRESTORE_KEY_PLAYER_ASSETS_VARIATIONS, variations);
 
                     assets.Add(ass);
                 }
@@ -661,6 +662,8 @@ namespace PartyInc
                 public int premiumprice;
                 public string name;
                 public int type;
+                public int rarity;
+                public List<string> variations;
 
                 public FSAsset()
                 {
@@ -669,15 +672,19 @@ namespace PartyInc
                     premiumprice = 0;
                     name = null;
                     type = 0;
+                    rarity = 0;
+                    variations = null;
                 }
 
-                public FSAsset(string achievement, int baseprice, int premiumprice, string name, int type)
+                public FSAsset(string achievement, int baseprice, int premiumprice, string name, int type, int rarity, List<string> variations)
                 {
                     this.achievement = achievement;
                     this.baseprice = baseprice;
                     this.premiumprice = premiumprice;
                     this.name = name;
                     this.type = type;
+                    this.rarity = rarity;
+                    this.variations = variations;
                 }
 
                 public Dictionary<string, object> ToDictionary()
@@ -689,6 +696,8 @@ namespace PartyInc
                     dic.Add(Fb_Constants.FIRESTORE_KEY_ASSETS_PREMIUMPRICE, premiumprice);
                     dic.Add(Fb_Constants.FIRESTORE_KEY_ASSETS_NAME, name);
                     dic.Add(Fb_Constants.FIRESTORE_KEY_ASSETS_TYPE, type);
+                    dic.Add(Fb_Constants.FIRESTORE_KEY_ASSETS_RARITY, rarity);
+                    dic.Add(Fb_Constants.FIRESTORE_KEY_ASSETS_VARIATIONS, variations);
 
                     return dic;
                 }

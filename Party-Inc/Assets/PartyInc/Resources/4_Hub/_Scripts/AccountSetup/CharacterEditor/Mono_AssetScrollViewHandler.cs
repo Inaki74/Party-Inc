@@ -12,11 +12,11 @@ namespace PartyInc
             [SerializeField] private GameObject _elementToSpawnPrefab;
             [SerializeField] private GameObject _spawnerContainer;
 
-            public void InitializeScrollview(string[] data, ToggleGroup buttonsToggle, Enum_AssetTypes assetType)
+            public void InitializeScrollview(CharacterAsset[] data, ToggleGroup buttonsToggle, Enum_CharacterAssetTypes assetType)
             {
-                foreach(string unit in data)
+                foreach(CharacterAsset unit in data)
                 {
-                    if (unit == null) continue;
+                    if (unit.Equals(default(CharacterAsset))) continue;
 
                     GameObject element = Instantiate(_elementToSpawnPrefab, _spawnerContainer.transform); // Prefab pool?
                     element.tag = "Carousel";
@@ -30,7 +30,6 @@ namespace PartyInc
                     {
                         element.GetComponent<Mono_AssetButtonPlayableHandler>().InitializeButton(unit, buttonsToggle, assetType);// (unit)
                     }
-                    
                 }
             }
         }

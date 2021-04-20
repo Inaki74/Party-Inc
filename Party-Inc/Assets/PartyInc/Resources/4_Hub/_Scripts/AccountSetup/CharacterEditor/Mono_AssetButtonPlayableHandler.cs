@@ -16,7 +16,7 @@ namespace PartyInc
 
             private string _assetId;
             private Toggle _theToggle;
-            private Enum_AssetTypes _assetType;
+            private Enum_CharacterAssetTypes _assetType;
 
             //DATA
 
@@ -27,7 +27,7 @@ namespace PartyInc
 
             private void OnDestroy()
             {
-                if (_assetType == Enum_AssetTypes.TUNE)
+                if (_assetType == Enum_CharacterAssetTypes.TUNE)
                 {
                     _theToggle.onValueChanged.RemoveListener(delegate {
                         TuneEvent();
@@ -35,15 +35,15 @@ namespace PartyInc
                 }
             }
 
-            public void InitializeButton(string assetId, ToggleGroup theTG, Enum_AssetTypes assetTypes)
+            public void InitializeButton(CharacterAsset assetId, ToggleGroup theTG, Enum_CharacterAssetTypes assetTypes)
             {
-                _assetId = assetId;
+                _assetId = assetId.id;
 
                 _theToggle.group = theTG;
 
                 _assetType = assetTypes;
 
-                if(_assetType == Enum_AssetTypes.TUNE)
+                if(_assetType == Enum_CharacterAssetTypes.TUNE)
                 {
                     if (_theToggle.isOn)
                     {

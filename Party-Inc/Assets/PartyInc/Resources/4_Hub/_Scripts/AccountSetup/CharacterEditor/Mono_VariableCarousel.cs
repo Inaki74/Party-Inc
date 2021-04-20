@@ -138,7 +138,7 @@ namespace PartyInc
                 _swipe = false;
             }
 
-            public void InitializeCarousel(string[] elements, Enum_AssetTypes assetType)
+            public void InitializeCarousel(CharacterAsset[] elements, Enum_CharacterAssetTypes assetType)
             {
                 if(elements.Count() == 0)
                 {
@@ -166,7 +166,7 @@ namespace PartyInc
                         amountNewList = amountOfButtons - i * _amountOfElementsPerScrollView;
                     }
 
-                    string[] newList = new string[amountNewList];
+                    CharacterAsset[] newList = new CharacterAsset[amountNewList];
 
                     for(int j = 0; j < amountNewList; j++)
                     {

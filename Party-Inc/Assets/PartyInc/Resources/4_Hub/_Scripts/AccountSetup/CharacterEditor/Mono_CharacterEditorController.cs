@@ -79,11 +79,18 @@ namespace PartyInc
                                 _assetButtonScrollView,
                                 15,
                                 Mng_CharacterEditorCache.Current.GetTypeList(GetIndexOfActiveToggleInRange(FACE_LOWER_BOUND, FACE_UPPER_BOUND)).ToArray(),
-                                (Enum_AssetTypes)GetIndexOfActiveToggleInRange(FACE_LOWER_BOUND, FACE_UPPER_BOUND));
+                                (Enum_CharacterAssetTypes)GetIndexOfActiveToggleInRange(FACE_LOWER_BOUND, FACE_UPPER_BOUND));
                         }
                         else if (_faceOptionsButtons[1].isOn)
                         {
                             // Will use a variable carousel, but with a fixed list
+                            //ActivateVariableCarousel(
+                            //    _assetButtonScrollView,
+                            //    15,
+                            //    Mng_CharacterEditorCache.Current.GetVariations().ToArray(),
+                            //    (Enum_CharacterAssetTypes)GetIndexOfActiveToggleInRange(FACE_LOWER_BOUND, FACE_UPPER_BOUND)
+                            //);
+
                             _constantCarousel.SetActive(true);
                         }
                         else
@@ -100,7 +107,7 @@ namespace PartyInc
                                 _assetButtonScrollView,
                                 15,
                                 Mng_CharacterEditorCache.Current.GetTypeList(GetIndexOfActiveToggleInRange(OUTFIT_LOWER_BOUND, OUTFIT_UPPER_BOUND)).ToArray(),
-                                (Enum_AssetTypes)GetIndexOfActiveToggleInRange(OUTFIT_LOWER_BOUND, OUTFIT_UPPER_BOUND));
+                                (Enum_CharacterAssetTypes)GetIndexOfActiveToggleInRange(OUTFIT_LOWER_BOUND, OUTFIT_UPPER_BOUND));
                         }
                         else
                         {
@@ -113,22 +120,22 @@ namespace PartyInc
                         ActivateVariableCarousel(
                             _assetButtonScrollView,
                             15,
-                            Mng_CharacterEditorCache.Current.GetTypeList((int)Enum_AssetTypes.WALLPAPER).ToArray(),
-                            Enum_AssetTypes.WALLPAPER);
+                            Mng_CharacterEditorCache.Current.GetTypeList((int)Enum_CharacterAssetTypes.WALLPAPER).ToArray(),
+                            Enum_CharacterAssetTypes.WALLPAPER);
                         break;
                     case Enum_CharacterEditorPages.EMOTE:
                         ActivateVariableCarousel(
                             _assetButtonScrollViewPlayable,
                             8,
                             Mng_CharacterEditorCache.Current.GetTypeList(GetIndexOfActiveToggleInRange(EMOTES_LOWER_BOUND, EMOTES_UPPER_BOUND)).ToArray(),
-                            (Enum_AssetTypes)GetIndexOfActiveToggleInRange(EMOTES_LOWER_BOUND, EMOTES_UPPER_BOUND));
+                            (Enum_CharacterAssetTypes)GetIndexOfActiveToggleInRange(EMOTES_LOWER_BOUND, EMOTES_UPPER_BOUND));
                         break;
                     case Enum_CharacterEditorPages.TUNE:
                         ActivateVariableCarousel(
                             _assetButtonScrollViewPlayable,
                             8,
-                            Mng_CharacterEditorCache.Current.GetTypeList((int)Enum_AssetTypes.TUNE).ToArray(),
-                            Enum_AssetTypes.TUNE);
+                            Mng_CharacterEditorCache.Current.GetTypeList((int)Enum_CharacterAssetTypes.TUNE).ToArray(),
+                            Enum_CharacterAssetTypes.TUNE);
                         break;
                     case Enum_CharacterEditorPages.PHOTO:
                         break;
@@ -139,7 +146,7 @@ namespace PartyInc
                 }
             }
 
-            private void ActivateVariableCarousel(GameObject prefab, int amountElements, string[] elements, Enum_AssetTypes assetType)
+            private void ActivateVariableCarousel(GameObject prefab, int amountElements, CharacterAsset[] elements, Enum_CharacterAssetTypes assetType)
             {
                 _variableCarousel.SetActive(true);
 
@@ -163,13 +170,13 @@ namespace PartyInc
 
             public void OnToggle(int type)
             {
-                if(type >= (int)Enum_AssetTypes.EMOTE_HAPPY && type <= (int)Enum_AssetTypes.TUNE)
+                if(type >= (int)Enum_CharacterAssetTypes.EMOTE_HAPPY && type <= (int)Enum_CharacterAssetTypes.TUNE)
                 {
-                    ActivateVariableCarousel(_assetButtonScrollViewPlayable, 8, Mng_CharacterEditorCache.Current.GetTypeList(type).ToArray(), (Enum_AssetTypes)type);
+                    ActivateVariableCarousel(_assetButtonScrollViewPlayable, 8, Mng_CharacterEditorCache.Current.GetTypeList(type).ToArray(), (Enum_CharacterAssetTypes)type);
                 }
                 else
                 {
-                    ActivateVariableCarousel(_assetButtonScrollView, 15, Mng_CharacterEditorCache.Current.GetTypeList(type).ToArray(), (Enum_AssetTypes)type);
+                    ActivateVariableCarousel(_assetButtonScrollView, 15, Mng_CharacterEditorCache.Current.GetTypeList(type).ToArray(), (Enum_CharacterAssetTypes)type);
                 }
             }
         }

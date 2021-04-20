@@ -34,6 +34,7 @@ namespace PartyInc
             //PLAYER ASSETS KEYS
             public const string FIRESTORE_KEY_PLAYER_ASSETS_ID = "assetId";
             public const string FIRESTORE_KEY_PLAYER_ASSETS_TYPE = "assetType";
+            public const string FIRESTORE_KEY_PLAYER_ASSETS_VARIATIONS = "assetVariations";
 
             // PLAYER STATS KEYS
             public const string FIRESTORE_KEY_PLAYER_STATS = "stats";
@@ -116,6 +117,8 @@ namespace PartyInc
             public const string FIRESTORE_KEY_ASSETS_PREMIUMPRICE = "premiumprice";
             public const string FIRESTORE_KEY_ASSETS_NAME = "name";
             public const string FIRESTORE_KEY_ASSETS_TYPE = "type";
+            public const string FIRESTORE_KEY_ASSETS_RARITY = "rarity";
+            public const string FIRESTORE_KEY_ASSETS_VARIATIONS = "variations";
 
             // TEAM KEYS
             public const string FIRESTORE_KEY_TEAM = "teams";
