@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using System;
 
 namespace PartyInc
 {
@@ -20,6 +21,7 @@ namespace PartyInc
 
             [SerializeField] private Toggle[] _faceOptionsButtons = new Toggle[3]; // 1->Features, 2->Color, 3->Position
             [SerializeField] private Toggle[] _outfitOptionsButtons = new Toggle[2]; // 1->Features, 2->Color
+            [SerializeField] private Toggle[] _wallpaperOptionsButtons = new Toggle[2]; // 1->Features, 2->Color
 
             [SerializeField] private GameObject _variableCarousel;
             [SerializeField] private GameObject _constantCarousel;
@@ -36,9 +38,9 @@ namespace PartyInc
                 _theVariableCarousel = _variableCarousel.GetComponent<Mono_VariableCarousel>();
             }
 
-            // Update is called once per frame
-            void Update()
+            private void OnToggleGetInfo(Data_CharacterAssetMetadata assetData)
             {
+                Mng_CharacterEditorCache.Current.ChooseAsset(assetData.AssetId, assetData.AssetType);
             }
 
             private int GetIndexOfActiveToggleInRange(int start, int end)
@@ -66,6 +68,8 @@ namespace PartyInc
                 if (_positionsEditor.activeInHierarchy)
                     _positionsEditor.SetActive(false);
 
+                // Smells like poop here
+                // *SNNNNIFFFF*, yep poop.
                 switch (thePage)
                 {
                     case Enum_CharacterEditorPages.OVERVIEW:
@@ -73,69 +77,32 @@ namespace PartyInc
                         break;
                     case Enum_CharacterEditorPages.FACE:
 
-                        if (_faceOptionsButtons[0].isOn)
-                        {
-                            ActivateVariableCarousel(
-                                _assetButtonScrollView,
-                                15,
-                                Mng_CharacterEditorCache.Current.GetTypeList(GetIndexOfActiveToggleInRange(FACE_LOWER_BOUND, FACE_UPPER_BOUND)).ToArray(),
-                                (Enum_CharacterAssetTypes)GetIndexOfActiveToggleInRange(FACE_LOWER_BOUND, FACE_UPPER_BOUND));
-                        }
-                        else if (_faceOptionsButtons[1].isOn)
-                        {
-                            // Will use a variable carousel, but with a fixed list
-                            //ActivateVariableCarousel(
-                            //    _assetButtonScrollView,
-                            //    15,
-                            //    Mng_CharacterEditorCache.Current.GetVariations().ToArray(),
-                            //    (Enum_CharacterAssetTypes)GetIndexOfActiveToggleInRange(FACE_LOWER_BOUND, FACE_UPPER_BOUND)
-                            //);
+                        IdentifyToggledOptionsAndLoadCarousel(_faceOptionsButtons, (Enum_CharacterAssetTypes)GetIndexOfActiveToggleInRange(FACE_LOWER_BOUND, FACE_UPPER_BOUND));
 
-                            _constantCarousel.SetActive(true);
-                        }
-                        else
-                        {
-                            _positionsEditor.SetActive(true);
-                        }
+                        TriggerChosenAsset();
 
                         break;
                     case Enum_CharacterEditorPages.OUTFIT:
 
-                        if (_outfitOptionsButtons[0].isOn)
-                        {
-                            ActivateVariableCarousel(
-                                _assetButtonScrollView,
-                                15,
-                                Mng_CharacterEditorCache.Current.GetTypeList(GetIndexOfActiveToggleInRange(OUTFIT_LOWER_BOUND, OUTFIT_UPPER_BOUND)).ToArray(),
-                                (Enum_CharacterAssetTypes)GetIndexOfActiveToggleInRange(OUTFIT_LOWER_BOUND, OUTFIT_UPPER_BOUND));
-                        }
-                        else
-                        {
-                            // Will use a variable carousel, but with a fixed list
-                            _constantCarousel.SetActive(true);
-                        }
+                        IdentifyToggledOptionsAndLoadCarousel(_outfitOptionsButtons, (Enum_CharacterAssetTypes)GetIndexOfActiveToggleInRange(OUTFIT_LOWER_BOUND, OUTFIT_UPPER_BOUND));
 
                         break;
                     case Enum_CharacterEditorPages.WALLPAPER:
-                        ActivateVariableCarousel(
-                            _assetButtonScrollView,
-                            15,
-                            Mng_CharacterEditorCache.Current.GetTypeList((int)Enum_CharacterAssetTypes.WALLPAPER).ToArray(),
-                            Enum_CharacterAssetTypes.WALLPAPER);
+
+                        IdentifyToggledOptionsAndLoadCarousel(_wallpaperOptionsButtons, Enum_CharacterAssetTypes.WALLPAPER);
+
                         break;
                     case Enum_CharacterEditorPages.EMOTE:
                         ActivateVariableCarousel(
                             _assetButtonScrollViewPlayable,
                             8,
-                            Mng_CharacterEditorCache.Current.GetTypeList(GetIndexOfActiveToggleInRange(EMOTES_LOWER_BOUND, EMOTES_UPPER_BOUND)).ToArray(),
-                            (Enum_CharacterAssetTypes)GetIndexOfActiveToggleInRange(EMOTES_LOWER_BOUND, EMOTES_UPPER_BOUND));
+                            Mng_CharacterEditorCache.Current.GetMetadataListOfAssetType(GetIndexOfActiveToggleInRange(EMOTES_LOWER_BOUND, EMOTES_UPPER_BOUND)).ToArray());
                         break;
                     case Enum_CharacterEditorPages.TUNE:
                         ActivateVariableCarousel(
                             _assetButtonScrollViewPlayable,
                             8,
-                            Mng_CharacterEditorCache.Current.GetTypeList((int)Enum_CharacterAssetTypes.TUNE).ToArray(),
-                            Enum_CharacterAssetTypes.TUNE);
+                            Mng_CharacterEditorCache.Current.GetMetadataListOfAssetType((int)Enum_CharacterAssetTypes.TUNE).ToArray());
                         break;
                     case Enum_CharacterEditorPages.PHOTO:
                         break;
@@ -146,7 +113,16 @@ namespace PartyInc
                 }
             }
 
-            private void ActivateVariableCarousel(GameObject prefab, int amountElements, CharacterAsset[] elements, Enum_CharacterAssetTypes assetType)
+            private void TriggerChosenAsset()
+            {
+                // The system must remember which choice i made.
+                // I can get the choice made from the dictionary of chosen assets
+                // Now i need to look through the list of all the active toggles
+                // Find the one bound to the chosen asset
+                // Toggle it.
+            }
+
+            private void ActivateVariableCarousel(GameObject prefab, int amountElements, Data_CharacterAssetMetadata[] elements)
             {
                 _variableCarousel.SetActive(true);
 
@@ -155,11 +131,11 @@ namespace PartyInc
                 _theVariableCarousel.ElementToCarouselPrefab = prefab;
                 _theVariableCarousel.AmountOfElementsPerScrollView = amountElements;
 
-                _theVariableCarousel.InitializeCarousel(elements, assetType);
+                _theVariableCarousel.InitializeCarousel(elements, OnToggleGetInfo);
             }
 
             private void Awake()
-            {
+            { 
                 Mono_CharacterEditorNavigation.onChangePage += OnPageChange;
             }
 
@@ -168,15 +144,71 @@ namespace PartyInc
                 Mono_CharacterEditorNavigation.onChangePage -= OnPageChange;
             }
 
-            public void OnToggle(int type)
+            private void IdentifyToggledOptionsAndLoadCarousel(Toggle[] toggles, Enum_CharacterAssetTypes toggleSelected)
             {
-                if(type >= (int)Enum_CharacterAssetTypes.EMOTE_HAPPY && type <= (int)Enum_CharacterAssetTypes.TUNE)
+                for (int i = 0; i < toggles.Length; i++)
                 {
-                    ActivateVariableCarousel(_assetButtonScrollViewPlayable, 8, Mng_CharacterEditorCache.Current.GetTypeList(type).ToArray(), (Enum_CharacterAssetTypes)type);
+                    if (toggles[i].isOn)
+                    {
+                        if (i == 0)
+                        {
+                            // feature
+                            ActivateVariableCarousel(
+                                _assetButtonScrollView,
+                                15,
+                                Mng_CharacterEditorCache.Current.GetMetadataListOfAssetType((int)toggleSelected).ToArray());
+                        }
+                        else if (i == 1)
+                        {
+                            // color
+                            ActivateVariableCarousel(
+                                _assetButtonScrollView,
+                                15,
+                                Mng_CharacterEditorCache.Current.GetVariationsOfSelectedAsset(toggleSelected).ToArray());
+                        }
+                        else
+                        {
+                            // position
+                        }
+                    }
+                }
+            }
+
+            public void OnOptionToggle(int pageToggle)
+            {
+                if(pageToggle == 1)
+                {
+                    //face
+                    Enum_CharacterAssetTypes toggleSelected = (Enum_CharacterAssetTypes)GetIndexOfActiveToggleInRange(FACE_LOWER_BOUND, FACE_UPPER_BOUND);
+
+                    IdentifyToggledOptionsAndLoadCarousel(_faceOptionsButtons, toggleSelected);
+                }
+                else if (pageToggle == 2)
+                {
+                    //outfit
+
+                    Enum_CharacterAssetTypes toggleSelected = (Enum_CharacterAssetTypes)GetIndexOfActiveToggleInRange(OUTFIT_LOWER_BOUND, OUTFIT_UPPER_BOUND);
+
+                    IdentifyToggledOptionsAndLoadCarousel(_faceOptionsButtons, toggleSelected);
                 }
                 else
                 {
-                    ActivateVariableCarousel(_assetButtonScrollView, 15, Mng_CharacterEditorCache.Current.GetTypeList(type).ToArray(), (Enum_CharacterAssetTypes)type);
+                    //wallpaper
+                    Enum_CharacterAssetTypes toggleSelected = Enum_CharacterAssetTypes.WALLPAPER;
+
+                    IdentifyToggledOptionsAndLoadCarousel(_faceOptionsButtons, toggleSelected);
+                }
+            }
+
+            public void OnBarToggle(int type)
+            {
+                if(type >= (int)Enum_CharacterAssetTypes.EMOTE_HAPPY && type <= (int)Enum_CharacterAssetTypes.TUNE)
+                {
+                    ActivateVariableCarousel(_assetButtonScrollViewPlayable, 8, Mng_CharacterEditorCache.Current.GetMetadataListOfAssetType(type).ToArray());
+                }
+                else
+                {
+                    ActivateVariableCarousel(_assetButtonScrollView, 15, Mng_CharacterEditorCache.Current.GetMetadataListOfAssetType(type).ToArray());
                 }
             }
         }

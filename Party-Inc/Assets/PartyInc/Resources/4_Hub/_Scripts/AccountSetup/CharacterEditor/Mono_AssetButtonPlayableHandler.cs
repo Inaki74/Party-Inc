@@ -2,32 +2,24 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using System;
 
 namespace PartyInc
 {
     namespace Hub
     {
-        [RequireComponent(typeof(Toggle))]
-        public class Mono_AssetButtonPlayableHandler : MonoBehaviour
+        public class Mono_AssetButtonPlayableHandler : Mono_AssetButtonHandler
         {
             [SerializeField] private Sprite _pausedSprite;
             [SerializeField] private Sprite _playingSprite;
             [SerializeField] private Image _assetImage;
 
-            private string _assetId;
-            private Toggle _theToggle;
-            private Enum_CharacterAssetTypes _assetType;
-
             //DATA
-
-            private void Awake()
+            protected override void DestroyOverride()
             {
-                _theToggle = GetComponent<Toggle>();
-            }
+                base.DestroyOverride();
 
-            private void OnDestroy()
-            {
-                if (_assetType == Enum_CharacterAssetTypes.TUNE)
+                if (_assetData.AssetType == Enum_CharacterAssetTypes.TUNE)
                 {
                     _theToggle.onValueChanged.RemoveListener(delegate {
                         TuneEvent();
@@ -35,15 +27,11 @@ namespace PartyInc
                 }
             }
 
-            public void InitializeButton(CharacterAsset assetId, ToggleGroup theTG, Enum_CharacterAssetTypes assetTypes)
+            public override void InitializeButton(Data_CharacterAssetMetadata assetData, ToggleGroup theTG, Action<Data_CharacterAssetMetadata> onToggle)
             {
-                _assetId = assetId.id;
+                base.InitializeButton(assetData, theTG, onToggle);
 
-                _theToggle.group = theTG;
-
-                _assetType = assetTypes;
-
-                if(_assetType == Enum_CharacterAssetTypes.TUNE)
+                if (assetData.AssetType == Enum_CharacterAssetTypes.TUNE)
                 {
                     if (_theToggle.isOn)
                     {

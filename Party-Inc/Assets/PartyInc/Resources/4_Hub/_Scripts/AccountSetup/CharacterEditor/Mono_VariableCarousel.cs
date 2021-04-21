@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using System.Linq;
+using System;
 using DentedPixel;
 
 namespace PartyInc
@@ -12,8 +13,6 @@ namespace PartyInc
     {
         public class Mono_VariableCarousel : MonoBehaviour
         {
-            [SerializeField] private List<string> test = new List<string>();
-
             private GraphicRaycaster _raycaster;
             private PointerEventData _pointerEventData;
             private EventSystem _eventSystem;
@@ -128,7 +127,6 @@ namespace PartyInc
                 // Lerp the holder in direction
                 float originalPosition = _carousel.localPosition.x;
                 float destination = originalPosition + _carouselMovingDistance * swipeDirection;
-                Vector2 destinationVector = new Vector2(destination, _carousel.localPosition.y);
 
                 LeanTween.moveLocalX(_carousel.gameObject, destination, 0.5f).setEaseOutExpo();
 
@@ -138,7 +136,7 @@ namespace PartyInc
                 _swipe = false;
             }
 
-            public void InitializeCarousel(CharacterAsset[] elements, Enum_CharacterAssetTypes assetType)
+            public void InitializeCarousel(Data_CharacterAssetMetadata[] elements, Action<Data_CharacterAssetMetadata> onToggle)
             {
                 if(elements.Count() == 0)
                 {
@@ -166,7 +164,7 @@ namespace PartyInc
                         amountNewList = amountOfButtons - i * _amountOfElementsPerScrollView;
                     }
 
-                    CharacterAsset[] newList = new CharacterAsset[amountNewList];
+                    Data_CharacterAssetMetadata[] newList = new Data_CharacterAssetMetadata[amountNewList];
 
                     for(int j = 0; j < amountNewList; j++)
                     {
@@ -178,7 +176,7 @@ namespace PartyInc
                     
                     if(_contentType == ContentType.AssetScrollView)
                     {
-                        elementToCarousel.GetComponent<Mono_AssetScrollViewHandler>().InitializeScrollview(newList, _elementsToggleGroup, assetType);
+                        elementToCarousel.GetComponent<Mono_AssetScrollViewHandler>().InitializeScrollview(newList, _elementsToggleGroup, onToggle);
                     }
 
                     elementToCarousel.GetComponent<RectTransform>().transform.SetParent(_carousel.transform);

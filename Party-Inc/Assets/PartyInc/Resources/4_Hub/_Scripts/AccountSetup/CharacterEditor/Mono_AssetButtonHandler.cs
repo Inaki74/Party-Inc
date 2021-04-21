@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -10,22 +11,53 @@ namespace PartyInc
         [RequireComponent(typeof(Toggle))]
         public class Mono_AssetButtonHandler : MonoBehaviour
         {
-            private string _assetId;
-            private Toggle _theToggle;
-            private Enum_CharacterAssetTypes _assetType;
+            public Data_CharacterAssetMetadata AssetData
+            {
+                get
+                {
+                    return _assetData;
+                }
+                protected set
+                {
+                    _assetData = value;
+                }
+            }
+
+            protected Data_CharacterAssetMetadata _assetData;
+            protected Toggle _theToggle;
 
             //DATA
 
             private void Awake()
             {
+                AwakeOverride();
+            }
+
+            private void OnDestroy()
+            {
+                DestroyOverride();
+            }
+
+            protected virtual void DestroyOverride()
+            {
+
+            }
+
+            protected virtual void AwakeOverride()
+            {
                 _theToggle = GetComponent<Toggle>();
             }
 
-            public void InitializeButton(CharacterAsset assetId, ToggleGroup theTG, Enum_CharacterAssetTypes assetType)
+            public virtual void InitializeButton(Data_CharacterAssetMetadata assetData, ToggleGroup theTG, Action<Data_CharacterAssetMetadata> onToggle)
             {
+                _assetData = assetData;
+
                 _theToggle.group = theTG;
 
-                _assetType = assetType;
+                _theToggle.onValueChanged.AddListener(delegate
+                {
+                    onToggle(_assetData);
+                });
             }
         }
     }

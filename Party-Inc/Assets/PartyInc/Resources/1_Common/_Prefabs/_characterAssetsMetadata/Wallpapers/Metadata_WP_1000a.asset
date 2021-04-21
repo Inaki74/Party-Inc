@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3a52e5e7d61764bb7a098c8d822d0e3f, type: 3}
   m_Name: Metadata_WP_1000a
   m_EditorClassIdentifier: 
-  _assetId: 1000a
+  _assetId: 1000_a
   _assetType: 8
   _variationAssetsIds: []
-  _isVariation: 1
+  _isVariation: 0

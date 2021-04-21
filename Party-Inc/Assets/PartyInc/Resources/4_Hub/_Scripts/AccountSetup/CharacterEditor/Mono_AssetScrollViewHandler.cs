@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using System;
 
 namespace PartyInc
 {
@@ -9,27 +10,23 @@ namespace PartyInc
     {
         public class Mono_AssetScrollViewHandler : MonoBehaviour
         {
+            private List<Mono_AssetButtonHandler> _toggles = new List<Mono_AssetButtonHandler>();
             [SerializeField] private GameObject _elementToSpawnPrefab;
             [SerializeField] private GameObject _spawnerContainer;
 
-            public void InitializeScrollview(CharacterAsset[] data, ToggleGroup buttonsToggle, Enum_CharacterAssetTypes assetType)
+            public void InitializeScrollview(Data_CharacterAssetMetadata[] data, ToggleGroup buttonsToggle, Action<Data_CharacterAssetMetadata> onToggle)
             {
-                foreach(CharacterAsset unit in data)
+                foreach(Data_CharacterAssetMetadata unit in data)
                 {
-                    if (unit.Equals(default(CharacterAsset))) continue;
+                    if (unit == null) continue;
 
                     GameObject element = Instantiate(_elementToSpawnPrefab, _spawnerContainer.transform); // Prefab pool?
                     element.tag = "Carousel";
 
                     Mono_AssetButtonHandler buttonHandler = element.GetComponent<Mono_AssetButtonHandler>();
-                    if(buttonHandler != null)
-                    {
-                        element.GetComponent<Mono_AssetButtonHandler>().InitializeButton(unit, buttonsToggle, assetType);// (unit)
-                    }
-                    else
-                    {
-                        element.GetComponent<Mono_AssetButtonPlayableHandler>().InitializeButton(unit, buttonsToggle, assetType);// (unit)
-                    }
+                    buttonHandler.InitializeButton(unit, buttonsToggle, onToggle);// (unit)
+
+                    _toggles.Add(buttonHandler);
                 }
             }
         }

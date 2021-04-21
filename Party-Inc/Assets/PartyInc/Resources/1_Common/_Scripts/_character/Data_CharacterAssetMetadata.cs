@@ -10,10 +10,59 @@ namespace PartyInc
         // Make a system to make sure its unique?
         // An asset registry DB?
         [Header("The asset ID. Please be sure that its unique within its type.")]
+
         [SerializeField] private string _assetId;
         [SerializeField] private Enum_CharacterAssetTypes _assetType;
         [SerializeField] private List<string> _variationAssetsIds;
         [SerializeField] private bool _isVariation;
+
+        public string AssetId
+        {
+            get
+            {
+                return _assetId;
+            }
+            set
+            {
+                _assetId = value;
+            }
+        }
+
+        public Enum_CharacterAssetTypes AssetType
+        {
+            get
+            {
+                return _assetType;
+            }
+            set
+            {
+                _assetType = value;
+            }
+        }
+
+        public List<string> VariationAssetsIds
+        {
+            get
+            {
+                return _variationAssetsIds;
+            }
+            set
+            {
+                _variationAssetsIds = value;
+            }
+        }
+
+        public bool IsVariation
+        {
+            get
+            {
+                return _isVariation;
+            }
+            set
+            {
+                _isVariation = value;
+            }
+        }
     }
 }
 
