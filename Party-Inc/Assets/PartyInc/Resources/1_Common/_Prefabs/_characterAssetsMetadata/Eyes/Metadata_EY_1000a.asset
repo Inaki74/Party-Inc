@@ -10,10 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3a52e5e7d61764bb7a098c8d822d0e3f, type: 3}
-  m_Name: Metadata_WP_1000
+  m_Name: Metadata_EY_1000a
   m_EditorClassIdentifier: 
-  _assetId: 1000
-  _assetType: 8
-  _variationAssets:
-  - {fileID: 11400000, guid: 7be37561d51d0408596f40c939dd7ac3, type: 2}
-  _isVariation: 0
+  _assetId: 1000_a
+  _assetType: 17
+  _variationAssetsIds: []
+  _isVariation: 1

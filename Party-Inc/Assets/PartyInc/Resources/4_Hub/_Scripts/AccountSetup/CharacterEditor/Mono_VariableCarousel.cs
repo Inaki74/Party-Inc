@@ -46,6 +46,17 @@ namespace PartyInc
             }
 
             private List<GameObject> _carouselElements = new List<GameObject>();
+            public List<GameObject> CarouselElements
+            {
+                get
+                {
+                    return _carouselElements;
+                }
+                private set
+                {
+                    _carouselElements = value;
+                }
+            }
 
             [SerializeField] private float _carouselMovingDistance;
             [SerializeField] private ContentType _contentType;

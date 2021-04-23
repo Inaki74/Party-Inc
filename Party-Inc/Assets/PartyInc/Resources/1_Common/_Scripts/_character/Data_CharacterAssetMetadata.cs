@@ -13,7 +13,7 @@ namespace PartyInc
 
         [SerializeField] private string _assetId;
         [SerializeField] private Enum_CharacterAssetTypes _assetType;
-        [SerializeField] private List<string> _variationAssetsIds;
+        [SerializeField] private List<Data_CharacterAssetMetadata> _variationAssets;
         [SerializeField] private bool _isVariation;
 
         public string AssetId
@@ -40,15 +40,15 @@ namespace PartyInc
             }
         }
 
-        public List<string> VariationAssetsIds
+        public List<Data_CharacterAssetMetadata> VariationAssets
         {
             get
             {
-                return _variationAssetsIds;
+                return _variationAssets;
             }
             set
             {
-                _variationAssetsIds = value;
+                _variationAssets = value;
             }
         }
 

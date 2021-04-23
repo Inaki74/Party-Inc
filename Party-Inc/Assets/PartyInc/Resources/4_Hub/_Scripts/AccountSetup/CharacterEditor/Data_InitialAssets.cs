@@ -16,61 +16,61 @@ namespace PartyInc
             // Might get them from their folders in resources
             // While we dont have that though, this will do.
             [AssetsType(Enum_CharacterAssetTypes.SKINCOLOR)]
-            public List<string> skinColors;
+            public List<Data_CharacterAssetMetadata> skinColors;
             [AssetsType(Enum_CharacterAssetTypes.EYES)]
-            public List<string> eyes;
+            public List<Data_CharacterAssetMetadata> eyes;
             [AssetsType(Enum_CharacterAssetTypes.BROWS)]
-            public List<string> brows;
+            public List<Data_CharacterAssetMetadata> brows;
             [AssetsType(Enum_CharacterAssetTypes.NOSE)]
-            public List<string> noses;
+            public List<Data_CharacterAssetMetadata> noses;
             [AssetsType(Enum_CharacterAssetTypes.LIPS)]
-            public List<string> lips;
+            public List<Data_CharacterAssetMetadata> lips;
             [AssetsType(Enum_CharacterAssetTypes.MAKEUP)]
-            public List<string> makeup;
+            public List<Data_CharacterAssetMetadata> makeup;
             [AssetsType(Enum_CharacterAssetTypes.WRINKLES)]
-            public List<string> wrinkles;
+            public List<Data_CharacterAssetMetadata> wrinkles;
             [AssetsType(Enum_CharacterAssetTypes.BEAUTYMARKS)]
-            public List<string> beautyMarks;
+            public List<Data_CharacterAssetMetadata> beautyMarks;
 
             [Header("Outfit Assets")]
             [AssetsType(Enum_CharacterAssetTypes.HAIR)]
-            public List<string> hairs;
+            public List<Data_CharacterAssetMetadata> hairs;
             [AssetsType(Enum_CharacterAssetTypes.FACIALHAIR)]
-            public List<string> facialHairs;
+            public List<Data_CharacterAssetMetadata> facialHairs;
             [AssetsType(Enum_CharacterAssetTypes.EARS)]
-            public List<string> ears;
+            public List<Data_CharacterAssetMetadata> ears;
             [AssetsType(Enum_CharacterAssetTypes.SHIRT)]
-            public List<string> shirts;
+            public List<Data_CharacterAssetMetadata> shirts;
             [AssetsType(Enum_CharacterAssetTypes.PANTS)]
-            public List<string> pants;
+            public List<Data_CharacterAssetMetadata> pants;
             [AssetsType(Enum_CharacterAssetTypes.SOCKS)]
-            public List<string> socks;
+            public List<Data_CharacterAssetMetadata> socks;
             [AssetsType(Enum_CharacterAssetTypes.FOOTWEAR)]
-            public List<string> footwears;
+            public List<Data_CharacterAssetMetadata> footwears;
             [AssetsType(Enum_CharacterAssetTypes.GLASSES)]
-            public List<string> glasses;
+            public List<Data_CharacterAssetMetadata> glasses;
 
             [Header("Wallpaper Assets")]
             [AssetsType(Enum_CharacterAssetTypes.WALLPAPER)]
-            public List<string> wallpapers;
+            public List<Data_CharacterAssetMetadata> wallpapers;
 
             [Header("Emote Assets")]
             [AssetsType(Enum_CharacterAssetTypes.EMOTE_HAPPY)]
-            public List<string> happyEmotes;
+            public List<Data_CharacterAssetMetadata> happyEmotes;
             [AssetsType(Enum_CharacterAssetTypes.EMOTE_SAD)]
-            public List<string> sadEmotes;
+            public List<Data_CharacterAssetMetadata> sadEmotes;
             [AssetsType(Enum_CharacterAssetTypes.EMOTE_ANGRY)]
-            public List<string> angryEmotes;
+            public List<Data_CharacterAssetMetadata> angryEmotes;
             [AssetsType(Enum_CharacterAssetTypes.EMOTE_LAUGHING)]
-            public List<string> laughingEmotes; //XD
+            public List<Data_CharacterAssetMetadata> laughingEmotes; //XD
             [AssetsType(Enum_CharacterAssetTypes.EMOTE_SURPRISED)]
-            public List<string> surprisedEmotes;
+            public List<Data_CharacterAssetMetadata> surprisedEmotes;
             [AssetsType(Enum_CharacterAssetTypes.EMOTE_CELEBRATION)]
-            public List<string> celebratoryEmotes;
+            public List<Data_CharacterAssetMetadata> celebratoryEmotes;
 
             [Header("Tune Assets")]
             [AssetsType(Enum_CharacterAssetTypes.TUNE)]
-            public List<string> tunes;
+            public List<Data_CharacterAssetMetadata> tunes;
         }
 
         [AttributeUsage(AttributeTargets.Field)]

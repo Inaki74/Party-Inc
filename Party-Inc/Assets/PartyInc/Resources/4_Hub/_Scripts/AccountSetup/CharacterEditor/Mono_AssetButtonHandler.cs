@@ -40,12 +40,26 @@ namespace PartyInc
 
             protected virtual void DestroyOverride()
             {
-
+                
             }
 
             protected virtual void AwakeOverride()
             {
                 _theToggle = GetComponent<Toggle>();
+            }
+
+            public void ToggleButton()
+            {
+                if (_theToggle.isOn)
+                {
+                    _theToggle.SetIsOnWithoutNotify(false);
+                }
+                else
+                {
+                    _theToggle.isOn = true;
+                }
+
+                
             }
 
             public virtual void InitializeButton(Data_CharacterAssetMetadata assetData, ToggleGroup theTG, Action<Data_CharacterAssetMetadata> onToggle)

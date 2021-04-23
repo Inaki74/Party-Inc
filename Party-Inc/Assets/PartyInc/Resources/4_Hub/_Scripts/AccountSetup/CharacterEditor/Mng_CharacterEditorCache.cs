@@ -20,13 +20,13 @@ namespace PartyInc
             // Emote assets populate numbers 9 - 14
             // Tune assets populate the number 15
             // Face assets populate numbers 16 - 23 (last since they are not buyable)
-            private Dictionary<Enum_CharacterAssetTypes, List<Data_CharacterAssetMetadata>> _ownedAssets = new Dictionary<Enum_CharacterAssetTypes, List<Data_CharacterAssetMetadata>>();
+            private List<Data_CharacterAssetMetadata>[] _ownedAssets = new List<Data_CharacterAssetMetadata>[24];
             private List<string>[] _ownedAssetsIds = new List<string>[24];
-            private Dictionary<Enum_CharacterAssetTypes, string> _chosenAssets = new Dictionary<Enum_CharacterAssetTypes, string>();
-            private Dictionary<Enum_CharacterAssetTypes, List<Data_CharacterAssetMetadata>> _allAssetsMetadata = new Dictionary<Enum_CharacterAssetTypes, List<Data_CharacterAssetMetadata>>();
+            private string[] _chosenAssets = new string[24];
+            private List<Data_CharacterAssetMetadata>[] _allAssetsMetadata = new List<Data_CharacterAssetMetadata>[24];
 
-            private const string ASSETS_METADATA_PATH = "/1_Common/_Prefabs/_characterAssetsMetadata";
-            private const char ASSET_NAME_SEPARATOR = '_';
+            private const string ASSETS_METADATA_PATH = "1_Common/_Prefabs/_characterAssetsMetadata/";
+            public const char ASSET_NAME_SEPARATOR = '_';
 
             [SerializeField] private Data_InitialAssets _initialAssets;
 
@@ -39,12 +39,15 @@ namespace PartyInc
                     _ownedAssetsIds[i] = new List<string>();
                 }
 
-                foreach(KeyValuePair<Enum_CharacterAssetTypes, string> kp in _chosenAssets)
+                for (int i = 0; i < _ownedAssets.Length; i++)
                 {
-                    //kp.Value
+                    _ownedAssets[i] = new List<Data_CharacterAssetMetadata>();
                 }
 
-                InitializeAllAssetsMetadata();
+                for (int i = 0; i < _allAssetsMetadata.Length; i++)
+                {
+                    _allAssetsMetadata[i] = new List<Data_CharacterAssetMetadata>();
+                }
             }
 
             private void InitializeAllAssetsMetadata()
@@ -53,8 +56,13 @@ namespace PartyInc
 
                 foreach(Data_CharacterAssetMetadata metadata in allAssets)
                 {
-                    _allAssetsMetadata[metadata.AssetType].Add(metadata);
+                    _allAssetsMetadata[(int)metadata.AssetType].Add(metadata);
                 }
+            }
+
+            private void OnDestroy()
+            {
+                Resources.UnloadUnusedAssets();
             }
 
             public override void OnEnable()
@@ -65,16 +73,20 @@ namespace PartyInc
             public List<Data_CharacterAssetMetadata> GetVariationsOfSelectedAsset(Enum_CharacterAssetTypes type)
             {
                 List<Data_CharacterAssetMetadata> variationsMetadata = new List<Data_CharacterAssetMetadata>();
-                string selectedAssetForType = _chosenAssets[type];
-                Data_CharacterAssetMetadata theSelectedAsset = _ownedAssets[type].First(m => m.AssetId == selectedAssetForType);
+                string selectedAssetForType = _chosenAssets[(int)type];
+                Data_CharacterAssetMetadata theSelectedAsset = _ownedAssets[(int)type].First(m => m.AssetId == selectedAssetForType);
 
                 if (!theSelectedAsset.IsVariation)
                 {
-                    List<string> variationsList = theSelectedAsset.VariationAssetsIds;
+                    // The parent is, in itself, a variation
+                    variationsMetadata.Add(theSelectedAsset);
 
-                    foreach (string variationId in variationsList)
+                    List<Data_CharacterAssetMetadata> variationsList = theSelectedAsset.VariationAssets;
+
+                    foreach (Data_CharacterAssetMetadata variation in variationsList)
                     {
-                        variationsMetadata.Add(_ownedAssets[type].First(m => m.AssetId == variationId));
+                        print(variation);
+                        variationsMetadata.Add(variation);
                     }
                 }
                 else
@@ -83,28 +95,44 @@ namespace PartyInc
                     string[] split = theSelectedAsset.AssetId.Split(ASSET_NAME_SEPARATOR);
 
                     string parentAssetForType = split[0];
-                    Data_CharacterAssetMetadata theSelectedAssetsParent = _ownedAssets[type].First(m => m.AssetId == parentAssetForType);
+                    Data_CharacterAssetMetadata theSelectedAssetsParent = _ownedAssets[(int)type].First(m => m.AssetId == parentAssetForType);
 
-                    List<string> variationsList = theSelectedAssetsParent.VariationAssetsIds;
+                    variationsMetadata.Add(theSelectedAssetsParent);
 
-                    foreach (string variationId in variationsList)
+                    List<Data_CharacterAssetMetadata> variationsList = theSelectedAssetsParent.VariationAssets;
+
+                    foreach (Data_CharacterAssetMetadata variation in variationsList)
                     {
-                        variationsMetadata.Add(_ownedAssets[type].First(m => m.AssetId == variationId));
+                        variationsMetadata.Add(variation);
                     }
                 }
 
                 return variationsMetadata;
             }
 
-            public List<Data_CharacterAssetMetadata> GetMetadataListOfAssetType(int type)
+            public List<Data_CharacterAssetMetadata> GetParentsMetadataListOfAssetType(int type)
             {
-                return _ownedAssets[(Enum_CharacterAssetTypes)type];
+                List<Data_CharacterAssetMetadata> listWithoutVariations = new List<Data_CharacterAssetMetadata>();
+
+                foreach(Data_CharacterAssetMetadata metadata in _ownedAssets[type])
+                {
+                    if (!metadata.IsVariation)
+                    {
+                        listWithoutVariations.Add(metadata);
+                    }
+                }
+
+                return listWithoutVariations;
+            }
+
+            public string GetChosenAssetId(Enum_CharacterAssetTypes assetType)
+            {
+                return _chosenAssets[(int)assetType];
             }
 
             public void ChooseAsset(string data, Enum_CharacterAssetTypes assetType)
             {
-                _chosenAssets.Remove(assetType);
-                _chosenAssets.Add(assetType, data);
+                _chosenAssets[(int)assetType] = data;
             }
 
             private IEnumerator StartCache()
@@ -112,7 +140,6 @@ namespace PartyInc
                 // Get the owned assets list (already in memory)
                 // Async load the resources
                 // Build up lists for each type of asset (24)
-                // Save them in an Array of List of strings
 
                 yield return new WaitUntil(() => Fb_FirebaseAuthenticateManager.Current.AuthInitialized);
 
@@ -120,20 +147,24 @@ namespace PartyInc
 
                 if (Fb_FirebaseAuthenticateManager.Current.Auth.CurrentUser != null)
                 {
+                    InitializeAllAssetsMetadata();
+
                     yield return new WaitUntil(() => Fb_FirestoreSession.Current.SetupCompleted);
 
                     ownedAssets = (List<Dictionary<string, object>>)Fb_FirestoreSession.Current.LocalPlayerData[Fb_Constants.FIRESTORE_KEY_PLAYER_ASSETS];
 
-                    PutBasicAssets();
+                    LoadBasicAssetsMetadata();
 
                     PutOwnedAssets(ownedAssets);
+
+                    LoadOwnedAssetsMetadata();
                 }
                 else
                 {
-                    PutBasicAssets();
+                    LoadBasicAssetsMetadata();
                 }
 
-                LoadOwnedAssetsMetadata();
+                SetChosenAssetsToDefault();
 
                 // Loading assets all at once
                 // Or load assets in the moment?
@@ -147,6 +178,17 @@ namespace PartyInc
                 //}
             }
 
+            private void SetChosenAssetsToDefault()
+            {
+                for(int i = 0; i < _chosenAssets.Length; i++)
+                {
+                    if(_ownedAssets[i].Count > 0)
+                    {
+                        _chosenAssets[i] = _ownedAssets[i].First().AssetId;
+                    }
+                }
+            }
+
             private void LoadOwnedAssetsMetadata()
             {
                 for(int i = 0; i < _ownedAssetsIds.Length; i++)
@@ -156,19 +198,21 @@ namespace PartyInc
 
                     foreach(string id in _ownedAssetsIds[i])
                     {
-                        if(_allAssetsMetadata[currentType].Any(m => m.AssetId == id))
+                        if(_allAssetsMetadata[(int)currentType].Any(m => m.AssetId == id))
                         {
-                            Data_CharacterAssetMetadata theMetadata = _allAssetsMetadata[currentType].First(m => m.AssetId == id);
+                            Data_CharacterAssetMetadata theMetadata = _allAssetsMetadata[(int)currentType].First(m => m.AssetId == id);
 
                             ownedAssetMetadataListForType.Add(theMetadata);
 
-                            if (theMetadata.VariationAssetsIds.Count() > 0)
+                            if (theMetadata.VariationAssets.Count() > 0)
                             {
                                 // Add the variations of the asset.
                                 // PRE: All variations are within the all assets list and are unique.
-                                foreach(string variationId in theMetadata.VariationAssetsIds)
+                                foreach(Data_CharacterAssetMetadata variation in theMetadata.VariationAssets)
                                 {
-                                    _allAssetsMetadata[currentType].First(m => m.AssetId == variationId);
+                                    print("Asset of type: " + currentType + " and id: " + variation.AssetId);
+
+                                    ownedAssetMetadataListForType.Add(variation);
                                 }
                             }
                         }
@@ -178,7 +222,7 @@ namespace PartyInc
                         }
                     }
 
-                    _ownedAssets[currentType] = ownedAssetMetadataListForType;
+                    _ownedAssets[(int)currentType] = ownedAssetMetadataListForType;
                 }
             }
 
@@ -193,7 +237,7 @@ namespace PartyInc
                 }
             }
 
-            private void PutBasicAssets()
+            private void LoadBasicAssetsMetadata()
             {
                 // Using reflection is much slower.
                 // This is faster, but its also less maintainable
@@ -225,12 +269,21 @@ namespace PartyInc
                 PutFieldList(_initialAssets.wrinkles, "wrinkles");
             }
 
-            private void PutFieldList(List<string> field, string fieldName)
+            private void PutFieldList(List<Data_CharacterAssetMetadata> field, string fieldName)
             {
                 var fieldInfo = _initialAssets.GetType().GetField(fieldName);
                 var type = ((AssetsType)Attribute.GetCustomAttribute(fieldInfo, typeof(AssetsType))).Type;
 
-                _ownedAssetsIds[(int)type] = field;
+                _ownedAssets[(int)type] = new List<Data_CharacterAssetMetadata>();
+
+                foreach(Data_CharacterAssetMetadata metadata in field)
+                {
+                    _ownedAssets[(int)type].Add(metadata);
+                    foreach(Data_CharacterAssetMetadata variation in metadata.VariationAssets)
+                    {
+                        _ownedAssets[(int)type].Add(variation);
+                    }
+                }
             }
 
             //TODO
