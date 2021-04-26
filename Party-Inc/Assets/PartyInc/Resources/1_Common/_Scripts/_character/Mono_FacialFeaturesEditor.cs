@@ -8,7 +8,7 @@ namespace PartyInc
     /// The editor of facial features.
     /// It contains a bunch of sliders to modify the face of the character.
     /// </summary>
-    [RequireComponent(typeof(Mono_MeshProjector))]
+    //[RequireComponent(typeof(Mono_MeshProjector))]
     [ExecuteInEditMode]
     public class Mono_FacialFeaturesEditor : MonoBehaviour
     {
@@ -18,45 +18,80 @@ namespace PartyInc
         [SerializeField] private Transform _rightEyeSocketTransform;
         [SerializeField] private Transform _mouthTransform;
 
+        public const float EYE_HEIGHT_LOW = -4.0f;
+        public const float EYE_HEIGHT_HI = 1.0f;
+        public const float EYE_SEPARATION_LOW = -0.9f;
+        public const float EYE_SEPARATION_HI = 2.0f;
+        public const float EYE_ROTATION_LOW = -25.0f;
+        public const float EYE_ROTATION_HI = 25.0f;
+        public const float EYE_SCALE_LOW = 0.5f;
+        public const float EYE_SCALE_HI = 1.5f;
+        public const float EYE_SQUASH_LOW = 0.5f;
+        public const float EYE_SQUASH_HI = 1.5f;
+
+        public const float MOUTH_HEIGHT_LOW = -2.0f;
+        public const float MOUTH_HEIGHT_HI = 4.0f;
+        public const float MOUTH_SCALE_LOW = 0.5f;
+        public const float MOUTH_SCALE_HI = 1.5f;
+        public const float MOUTH_SQUASH_LOW = 0.5f;
+        public const float MOUTH_SQUASH_HI = 1.5f;
+
         // SLIDERS
         [Header("SLIDERS")]
         [Header("Eye Sockets")]
-        [Range(-4.0f, 1.0f)]
+        [Range(EYE_HEIGHT_LOW, EYE_HEIGHT_HI)]
         [SerializeField] private float _eyeHeight;
         private float _lastEyeHeight;
 
-        [Range(-0.9f, 2.0f)]
+        public float EyeHeight { set { _eyeHeight = value; } }
+
+        [Range(EYE_SEPARATION_LOW, EYE_SEPARATION_HI)]
         [SerializeField] private float _eyeSeparation;
         private float _lastEyeSeparation;
 
-        [Range(-25.0f, 25.0f)]
+        public float EyeSeparation { set { _eyeSeparation = value; } }
+
+        [Range(EYE_ROTATION_LOW, EYE_ROTATION_HI)]
         [SerializeField] private float _eyeRotation;
         private float _lastEyeRotation;
 
-        [Range(0.5f, 1.5f)]
+        public float EyeRotation { set { _eyeRotation = value; } }
+
+        [Range(EYE_SCALE_LOW, EYE_SCALE_HI)]
         [SerializeField] private float _eyeScale;
         private float _lastEyeScale;
 
-        [Range(0.5f, 1.5f)]
+        public float EyeScale { set { _eyeScale = value; } }
+
+        [Range(EYE_SQUASH_LOW, EYE_SQUASH_HI)]
         [SerializeField] private float _eyeSquash;
         private float _lastEyeSquash;
 
+        public float EyeSquash { set { _eyeSquash = value; } }
+
         [Header("Mouth")]
-        [Range(-2.0f, 4.0f)]
+        [Range(MOUTH_HEIGHT_LOW, MOUTH_HEIGHT_HI)]
         [SerializeField] private float _mouthHeight;
         private float _lastMouthHeight;
 
-        [Range(0.5f, 1.5f)]
+        public float MouthHeight { set { _mouthHeight = value; } }
+
+        [Range(MOUTH_SCALE_LOW, MOUTH_SCALE_HI)]
         [SerializeField] private float _mouthScale;
         private float _lastMouthScale;
 
-        [Range(0.5f, 1.5f)]
+        public float MouthScale { set { _mouthScale = value; } }
+
+        [Range(MOUTH_SQUASH_LOW, MOUTH_SQUASH_HI)]
         [SerializeField] private float _mouthSquash;
         private float _lastMouthSquash;
+
+        public float MouthSquash { set { _mouthSquash = value; } }
 
         // Start is called before the first frame update
         void Start()
         {
+            return;
             // Initialize everything that is necessary.
             Init();
         }
@@ -82,6 +117,8 @@ namespace PartyInc
         // Update is called once per frame
         void Update()
         {
+            return;
+
             if (_meshProjector == null) Init();
 
             // Slider to change eye _eyeHeight

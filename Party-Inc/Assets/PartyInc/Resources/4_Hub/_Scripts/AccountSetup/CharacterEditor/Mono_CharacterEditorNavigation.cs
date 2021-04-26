@@ -10,7 +10,7 @@ namespace PartyInc
         {
             OVERVIEW = 0,
             FACE = 1,
-            OUTFIT = 2,
+            LOADOUT = 2,
             WALLPAPER = 3,
             EMOTE= 4,
             TUNE = 5,
@@ -22,7 +22,7 @@ namespace PartyInc
         public class Mono_CharacterEditorNavigation : MonoBehaviour
         {
             //      0       1       2            3          4       5        6        7
-            // Overview -> Face -> Outfit -> Wallpaper -> Emote -> Tune -> Photo -> Signup
+            // Overview -> Face -> Loadout -> Wallpaper -> Emote -> Tune -> Photo -> Signup
             [SerializeField] private GameObject[] _pages;
             [SerializeField] private GameObject _base;
             [SerializeField] private Mono_SignUpController _signUpController;

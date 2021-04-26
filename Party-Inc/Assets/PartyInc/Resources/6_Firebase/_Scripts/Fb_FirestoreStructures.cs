@@ -89,83 +89,102 @@ namespace PartyInc
 
                 public class FSCharacter : IFb_FirestoreMapStructure
                 {
-                    public int currentoutfit;
+                    public int currentloadout;
                     public Dictionary<string, object> face;
-                    public Dictionary<string, object> outfits;
+                    public Dictionary<int, object> loadouts;
 
                     public FSCharacter()
                     {
-                        currentoutfit = 0;
+                        currentloadout = 0;
                         face = new FSFace().ToDictionary();
-                        outfits = new Dictionary<string, object>();
+                        loadouts = new Dictionary<int, object>();
                     }
 
-                    public FSCharacter(int currentoutfit, FSFace face)
+                    public FSCharacter(int currentloadout, FSFace face)
                     {
-                        this.currentoutfit = currentoutfit;
+                        this.currentloadout = currentloadout;
                         this.face = face.ToDictionary();
-                        this.outfits = new Dictionary<string, object>();
+                        this.loadouts = new Dictionary<int, object>();
                     }
 
                     public Dictionary<string, object> ToDictionary()
                     {
                         Dictionary<string, object> dic = new Dictionary<string, object>();
 
-                        dic.Add(Fb_Constants.FIRESTORE_KEY_PLAYER_CHARACTER_CURRENTOUTFIT, currentoutfit);
+                        dic.Add(Fb_Constants.FIRESTORE_KEY_PLAYER_CHARACTER_CURRENTLOADOUT, currentloadout);
                         dic.Add(Fb_Constants.FIRESTORE_KEY_PLAYER_CHARACTER_FACE, face);
-                        dic.Add(Fb_Constants.FIRESTORE_KEY_PLAYER_CHARACTER_OUTFITS, outfits);
+                        dic.Add(Fb_Constants.FIRESTORE_KEY_PLAYER_CHARACTER_LOADOUTS, loadouts);
 
                         return dic;
                     }
 
-                    public void AddOutfit(string outfitId,
-                                              string backid, string earid, string facialhairid, string glassid,
-                                              string hairid, string jawid, string pantsid, string shirtid, string socksid
+                    public void AddLoadout(int loadoutId,
+                                           string backid, string earid, string facialhairid, string glassid, string wallpaperid,
+                                           string hairid, string pantsid, string shirtid, string socksid, string shoesid,
+                                           string emoteHappyid, string emoteSadid, string emoteAngryid, string emoteLaughid, string emoteSurpriseid, string celebrationid,
+                                           string tuneid
                             )
                     {
                         Dictionary<string, object> toAdd = new Dictionary<string, object>();
 
-                        toAdd.Add(Fb_Constants.FIRESTORE_KEY_PLAYER_CHARACTER_OUTFITS_BACK, backid);
-                        toAdd.Add(Fb_Constants.FIRESTORE_KEY_PLAYER_CHARACTER_OUTFITS_EAR, earid);
-                        toAdd.Add(Fb_Constants.FIRESTORE_KEY_PLAYER_CHARACTER_OUTFITS_FACIALHAIR, facialhairid);
-                        toAdd.Add(Fb_Constants.FIRESTORE_KEY_PLAYER_CHARACTER_OUTFITS_GLASS, glassid);
-                        toAdd.Add(Fb_Constants.FIRESTORE_KEY_PLAYER_CHARACTER_OUTFITS_HAIR, hairid);
-                        toAdd.Add(Fb_Constants.FIRESTORE_KEY_PLAYER_CHARACTER_OUTFITS_JAW, jawid);
-                        toAdd.Add(Fb_Constants.FIRESTORE_KEY_PLAYER_CHARACTER_OUTFITS_PANTS, pantsid);
-                        toAdd.Add(Fb_Constants.FIRESTORE_KEY_PLAYER_CHARACTER_OUTFITS_SHIRT, shirtid);
-                        toAdd.Add(Fb_Constants.FIRESTORE_KEY_PLAYER_CHARACTER_OUTFITS_SOCKS, socksid);
-                        //etc
+                        toAdd.Add(Fb_Constants.FIRESTORE_KEY_PLAYER_CHARACTER_LOADOUTS_SHOES, shoesid);
+                        toAdd.Add(Fb_Constants.FIRESTORE_KEY_PLAYER_CHARACTER_LOADOUTS_BACK, backid);
+                        toAdd.Add(Fb_Constants.FIRESTORE_KEY_PLAYER_CHARACTER_LOADOUTS_EAR, earid);
+                        toAdd.Add(Fb_Constants.FIRESTORE_KEY_PLAYER_CHARACTER_LOADOUTS_FACIALHAIR, facialhairid);
+                        toAdd.Add(Fb_Constants.FIRESTORE_KEY_PLAYER_CHARACTER_LOADOUTS_GLASS, glassid);
+                        toAdd.Add(Fb_Constants.FIRESTORE_KEY_PLAYER_CHARACTER_LOADOUTS_HAIR, hairid);
+                        //toAdd.Add(Fb_Constants.FIRESTORE_KEY_PLAYER_CHARACTER_LOADOUTS_JAW, jawid);
+                        toAdd.Add(Fb_Constants.FIRESTORE_KEY_PLAYER_CHARACTER_LOADOUTS_PANTS, pantsid);
+                        toAdd.Add(Fb_Constants.FIRESTORE_KEY_PLAYER_CHARACTER_LOADOUTS_SHIRT, shirtid);
+                        toAdd.Add(Fb_Constants.FIRESTORE_KEY_PLAYER_CHARACTER_LOADOUTS_SOCKS, socksid);
+                        toAdd.Add(Fb_Constants.FIRESTORE_KEY_PLAYER_CHARACTER_LOADOUTS_WALLPAPER, wallpaperid);
+                        toAdd.Add(Fb_Constants.FIRESTORE_KEY_PLAYER_CHARACTER_LOADOUTS_EMOTEHAPPY, emoteHappyid);
+                        toAdd.Add(Fb_Constants.FIRESTORE_KEY_PLAYER_CHARACTER_LOADOUTS_EMOTESAD, emoteSadid);
+                        toAdd.Add(Fb_Constants.FIRESTORE_KEY_PLAYER_CHARACTER_LOADOUTS_EMOTEANGRY, emoteAngryid);
+                        toAdd.Add(Fb_Constants.FIRESTORE_KEY_PLAYER_CHARACTER_LOADOUTS_EMOTELAUGH, emoteLaughid);
+                        toAdd.Add(Fb_Constants.FIRESTORE_KEY_PLAYER_CHARACTER_LOADOUTS_EMOTESURPRISE, emoteSurpriseid);
+                        toAdd.Add(Fb_Constants.FIRESTORE_KEY_PLAYER_CHARACTER_LOADOUTS_CELEBRATION, celebrationid);
+                        toAdd.Add(Fb_Constants.FIRESTORE_KEY_PLAYER_CHARACTER_LOADOUTS_TUNE, tuneid);
 
-                        outfits.Add(outfitId, toAdd);
+                        loadouts.Add(loadoutId, toAdd);
                     }
 
                     public class FSFace : IFb_FirestoreMapStructure
                     {
-                        public string browcolor;
+                        public string skinColor;
+                        public string noseId; 
+                        public string browcolor; // One asset? Two? One and color? We will see
                         public string browid;
                         public Dictionary<string, object> eyesockets;
-                        public string facemarkid;
+                        public string wrinklesId;
+                        public string beautyMarkId; // TODO: Height and width? Scale and stretch?
                         public string makeupcolor;
                         public string makeupid;
                         public Dictionary<string, object> mouth;
 
                         public FSFace()
                         {
+                            skinColor = null;
+                            noseId = null;
+                            beautyMarkId = null;
                             browcolor = null;
                             browid = null;
                             eyesockets = new FSEyesockets().ToDictionary();
-                            facemarkid = null;
+                            wrinklesId = null;
                             makeupcolor = null;
                             makeupid = null;
                             mouth = new FSMouth().ToDictionary();
                         }
 
-                        public FSFace(string browcolor, string browid, FSEyesockets eyesockets, string facemarkid, string makeupcolor, string makeupid, FSMouth mouth)
+                        public FSFace(string skinColor, string noseId, string beautyMarkId, string browcolor, string browid, FSEyesockets eyesockets, string wrinklesId, string makeupcolor, string makeupid, FSMouth mouth)
                         {
+                            this.skinColor = skinColor;
+                            this.noseId = noseId;
+                            this.beautyMarkId = beautyMarkId;
                             this.browcolor = browcolor;
                             this.browid = browid;
                             this.eyesockets = eyesockets.ToDictionary();
-                            this.facemarkid = facemarkid;
+                            this.wrinklesId = wrinklesId;
                             this.makeupcolor = makeupcolor;
                             this.makeupid = makeupid;
                             this.mouth = mouth.ToDictionary();
@@ -175,10 +194,13 @@ namespace PartyInc
                         {
                             Dictionary<string, object> dic = new Dictionary<string, object>();
 
+                            dic.Add(Fb_Constants.FIRESTORE_KEY_PLAYER_CHARACTER_FACE_SKINCOLOR, skinColor);
+                            dic.Add(Fb_Constants.FIRESTORE_KEY_PLAYER_CHARACTER_FACE_NOSE, noseId);
+                            dic.Add(Fb_Constants.FIRESTORE_KEY_PLAYER_CHARACTER_FACE_BEAUTYMARKS, beautyMarkId);
                             dic.Add(Fb_Constants.FIRESTORE_KEY_PLAYER_CHARACTER_FACE_BROWCOLOR, browcolor);
                             dic.Add(Fb_Constants.FIRESTORE_KEY_PLAYER_CHARACTER_FACE_BROW, browid);
                             dic.Add(Fb_Constants.FIRESTORE_KEY_PLAYER_CHARACTER_FACE_EYESOCKETS, eyesockets);
-                            dic.Add(Fb_Constants.FIRESTORE_KEY_PLAYER_CHARACTER_FACE_FACEMARK, facemarkid);
+                            dic.Add(Fb_Constants.FIRESTORE_KEY_PLAYER_CHARACTER_FACE_WRINKLES, wrinklesId);
                             dic.Add(Fb_Constants.FIRESTORE_KEY_PLAYER_CHARACTER_FACE_MAKEUPCOLOR, makeupcolor);
                             dic.Add(Fb_Constants.FIRESTORE_KEY_PLAYER_CHARACTER_FACE_MAKEUP, makeupid);
                             dic.Add(Fb_Constants.FIRESTORE_KEY_PLAYER_CHARACTER_FACE_MOUTH, mouth);
@@ -273,7 +295,6 @@ namespace PartyInc
                                 return dic;
                             }
                         }
-
                     }
                 }
 

@@ -15,6 +15,7 @@ namespace PartyInc
         [SerializeField] private Enum_CharacterAssetTypes _assetType;
         [SerializeField] private List<Data_CharacterAssetMetadata> _variationAssets;
         [SerializeField] private bool _isVariation;
+        [SerializeField] private Sprite _buttonImage;
 
         public string AssetId
         {
@@ -61,6 +62,18 @@ namespace PartyInc
             set
             {
                 _isVariation = value;
+            }
+        }
+
+        public Sprite ButtonImage
+        {
+            get
+            {
+                return _buttonImage;
+            }
+            set
+            {
+                _buttonImage = value;
             }
         }
     }

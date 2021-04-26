@@ -58,8 +58,6 @@ namespace PartyInc
                 {
                     _theToggle.isOn = true;
                 }
-
-                
             }
 
             public virtual void InitializeButton(Data_CharacterAssetMetadata assetData, ToggleGroup theTG, Action<Data_CharacterAssetMetadata> onToggle)

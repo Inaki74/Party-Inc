@@ -52,7 +52,7 @@ namespace PartyInc
 
             // PLAYER CHARACTER KEYS
             public const string FIRESTORE_KEY_PLAYER_CHARACTER = "character";
-            public const string FIRESTORE_KEY_PLAYER_CHARACTER_CURRENTOUTFIT = "currentoutfit";
+            public const string FIRESTORE_KEY_PLAYER_CHARACTER_CURRENTLOADOUT = "currentloadout";
             // PLAYER FACE KEYS
             public const string FIRESTORE_KEY_PLAYER_CHARACTER_FACE = "face";
             public const string FIRESTORE_KEY_PLAYER_CHARACTER_FACE_BROWCOLOR = "browcolor";
@@ -66,9 +66,12 @@ namespace PartyInc
             public const string FIRESTORE_KEY_PLAYER_CHARACTER_FACE_EYESOCKETS_SCALE = "scale";
             public const string FIRESTORE_KEY_PLAYER_CHARACTER_FACE_EYESOCKETS_SQUASH = "squash";
             public const string FIRESTORE_KEY_PLAYER_CHARACTER_FACE_EYESOCKETS_SEPARATION = "separation";
-            public const string FIRESTORE_KEY_PLAYER_CHARACTER_FACE_FACEMARK = "facemarkid";
+            public const string FIRESTORE_KEY_PLAYER_CHARACTER_FACE_WRINKLES = "wrinklesid";
             public const string FIRESTORE_KEY_PLAYER_CHARACTER_FACE_MAKEUPCOLOR = "makeupcolor";
             public const string FIRESTORE_KEY_PLAYER_CHARACTER_FACE_MAKEUP = "makeupid";
+            public const string FIRESTORE_KEY_PLAYER_CHARACTER_FACE_SKINCOLOR = "skincolor";
+            public const string FIRESTORE_KEY_PLAYER_CHARACTER_FACE_NOSE = "noseid";
+            public const string FIRESTORE_KEY_PLAYER_CHARACTER_FACE_BEAUTYMARKS = "beautymarksid";
             // PLAYER MOUTH KEYS
             public const string FIRESTORE_KEY_PLAYER_CHARACTER_FACE_MOUTH = "mouth";
             public const string FIRESTORE_KEY_PLAYER_CHARACTER_FACE_MOUTH_HEIGHT = "height";
@@ -77,17 +80,26 @@ namespace PartyInc
             public const string FIRESTORE_KEY_PLAYER_CHARACTER_FACE_MOUTH_SCALE = "scale";
             public const string FIRESTORE_KEY_PLAYER_CHARACTER_FACE_MOUTH_SQUASH = "squash";
 
-            // PLAYER OUTFIT KEYS
-            public const string FIRESTORE_KEY_PLAYER_CHARACTER_OUTFITS = "outfits";
-            public const string FIRESTORE_KEY_PLAYER_CHARACTER_OUTFITS_BACK = "backpieceid";
-            public const string FIRESTORE_KEY_PLAYER_CHARACTER_OUTFITS_EAR = "earid";
-            public const string FIRESTORE_KEY_PLAYER_CHARACTER_OUTFITS_FACIALHAIR = "facialhairid";
-            public const string FIRESTORE_KEY_PLAYER_CHARACTER_OUTFITS_GLASS = "glassid";
-            public const string FIRESTORE_KEY_PLAYER_CHARACTER_OUTFITS_HAIR = "hairid";
-            public const string FIRESTORE_KEY_PLAYER_CHARACTER_OUTFITS_JAW = "jawid";
-            public const string FIRESTORE_KEY_PLAYER_CHARACTER_OUTFITS_SHIRT = "shirtid";
-            public const string FIRESTORE_KEY_PLAYER_CHARACTER_OUTFITS_PANTS = "pantsid";
-            public const string FIRESTORE_KEY_PLAYER_CHARACTER_OUTFITS_SOCKS = "socksid";
+            // PLAYER LOADOUT KEYS
+            public const string FIRESTORE_KEY_PLAYER_CHARACTER_LOADOUTS = "loadouts";
+            public const string FIRESTORE_KEY_PLAYER_CHARACTER_LOADOUTS_BACK = "backpieceid";
+            public const string FIRESTORE_KEY_PLAYER_CHARACTER_LOADOUTS_EAR = "earid";
+            public const string FIRESTORE_KEY_PLAYER_CHARACTER_LOADOUTS_FACIALHAIR = "facialhairid";
+            public const string FIRESTORE_KEY_PLAYER_CHARACTER_LOADOUTS_GLASS = "glassid";
+            public const string FIRESTORE_KEY_PLAYER_CHARACTER_LOADOUTS_HAIR = "hairid";
+            public const string FIRESTORE_KEY_PLAYER_CHARACTER_LOADOUTS_JAW = "jawid";
+            public const string FIRESTORE_KEY_PLAYER_CHARACTER_LOADOUTS_SHIRT = "shirtid";
+            public const string FIRESTORE_KEY_PLAYER_CHARACTER_LOADOUTS_PANTS = "pantsid";
+            public const string FIRESTORE_KEY_PLAYER_CHARACTER_LOADOUTS_SOCKS = "socksid";
+            public const string FIRESTORE_KEY_PLAYER_CHARACTER_LOADOUTS_SHOES = "shoesid";
+            public const string FIRESTORE_KEY_PLAYER_CHARACTER_LOADOUTS_WALLPAPER = "wallpaperid";
+            public const string FIRESTORE_KEY_PLAYER_CHARACTER_LOADOUTS_EMOTEHAPPY = "emotehappyid";
+            public const string FIRESTORE_KEY_PLAYER_CHARACTER_LOADOUTS_EMOTESAD = "emotesadid";
+            public const string FIRESTORE_KEY_PLAYER_CHARACTER_LOADOUTS_EMOTEANGRY = "emoteangryid";
+            public const string FIRESTORE_KEY_PLAYER_CHARACTER_LOADOUTS_EMOTELAUGH = "emotelaughid";
+            public const string FIRESTORE_KEY_PLAYER_CHARACTER_LOADOUTS_EMOTESURPRISE = "emotesurpriseid";
+            public const string FIRESTORE_KEY_PLAYER_CHARACTER_LOADOUTS_CELEBRATION = "celebrationid";
+            public const string FIRESTORE_KEY_PLAYER_CHARACTER_LOADOUTS_TUNE = "tuneid";
 
             // PLAYER ASSETS KEY
             public const string FIRESTORE_KEY_PLAYER_ASSETS = "assets";

@@ -32,7 +32,7 @@ namespace PartyInc
             [AssetsType(Enum_CharacterAssetTypes.BEAUTYMARKS)]
             public List<Data_CharacterAssetMetadata> beautyMarks;
 
-            [Header("Outfit Assets")]
+            [Header("Loadout Assets")]
             [AssetsType(Enum_CharacterAssetTypes.HAIR)]
             public List<Data_CharacterAssetMetadata> hairs;
             [AssetsType(Enum_CharacterAssetTypes.FACIALHAIR)]

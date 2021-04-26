@@ -15,8 +15,8 @@ namespace PartyInc
             [SerializeField] private Toggle[] _allToggles = new Toggle[24];
             private const int FACE_LOWER_BOUND = 16; // 16->skin, 17->eyes, 18->brows, 19->nose, 20->lips, 21->makeup, 22->wrinkles, 23->beauty
             private const int FACE_UPPER_BOUND = 23;
-            private const int OUTFIT_LOWER_BOUND = 0; // 0->hair, 1->fhair, 2->ears, 3->shirt, 4->pants, 5->socks, 6->shoes, 7->glasses
-            private const int OUTFIT_UPPER_BOUND = 7;
+            private const int LOADOUT_LOWER_BOUND = 0; // 0->hair, 1->fhair, 2->ears, 3->shirt, 4->pants, 5->socks, 6->shoes, 7->glasses
+            private const int LOADOUT_UPPER_BOUND = 7;
             private const int EMOTES_LOWER_BOUND = 9; // 9->happy, 10->sad, 11->angry, 12->XD, 13->surprised, 14->celebration
             private const int EMOTES_UPPER_BOUND = 14;
 
@@ -26,10 +26,10 @@ namespace PartyInc
             private List<Toggle>[] _allOptionsToggles = new List<Toggle>[24];
 
             [SerializeField] private GameObject _variableCarousel;
-            [SerializeField] private GameObject _constantCarousel;
             [SerializeField] private GameObject _positionsEditor;
 
             [SerializeField] private Mono_VariableCarousel _theVariableCarousel;
+            [SerializeField] private Mono_FacePositionEditor _thePositionsEditor;
 
             [SerializeField] private GameObject _assetButtonScrollView;
             [SerializeField] private GameObject _assetButtonScrollViewPlayable;
@@ -62,6 +62,11 @@ namespace PartyInc
                 Mng_CharacterEditorCache.Current.ChooseAsset(assetData.AssetId, assetData.AssetType);
             }
 
+            private void OnToggleGetPositionInfo(PositionData positionData, Enum_CharacterAssetTypes assetType)
+            {
+                Mng_CharacterEditorCache.Current.ChangePositionData(positionData, assetType);
+            }
+
             private int GetIndexOfActiveToggleInRange(int start, int end)
             {
                 for(int i = start; i <= end; i++)
@@ -83,9 +88,6 @@ namespace PartyInc
                 if (_variableCarousel.activeInHierarchy)
                     _variableCarousel.SetActive(false);
 
-                if (_constantCarousel.activeInHierarchy)
-                    _constantCarousel.SetActive(false);
-
                 if (_positionsEditor.activeInHierarchy)
                     _positionsEditor.SetActive(false);
 
@@ -105,13 +107,13 @@ namespace PartyInc
                         TriggerChosenAsset((Enum_CharacterAssetTypes)activeToggleIndexFace);
 
                         break;
-                    case Enum_CharacterEditorPages.OUTFIT:
+                    case Enum_CharacterEditorPages.LOADOUT:
 
-                        int activeToggleIndexOutfit = GetIndexOfActiveToggleInRange(OUTFIT_LOWER_BOUND, OUTFIT_UPPER_BOUND);
+                        int activeToggleIndexLoadout = GetIndexOfActiveToggleInRange(LOADOUT_LOWER_BOUND, LOADOUT_UPPER_BOUND);
 
-                        IdentifyToggledOptionsAndLoadCarousel(_allOptionsToggles[activeToggleIndexOutfit].ToArray(), (Enum_CharacterAssetTypes)activeToggleIndexOutfit);
+                        IdentifyToggledOptionsAndLoadCarousel(_allOptionsToggles[activeToggleIndexLoadout].ToArray(), (Enum_CharacterAssetTypes)activeToggleIndexLoadout);
 
-                        TriggerChosenAsset((Enum_CharacterAssetTypes)activeToggleIndexOutfit);
+                        TriggerChosenAsset((Enum_CharacterAssetTypes)activeToggleIndexLoadout);
 
                         break;
                     case Enum_CharacterEditorPages.WALLPAPER:
@@ -170,13 +172,6 @@ namespace PartyInc
                 //There are no objects.
                 if (string.IsNullOrEmpty(chosenAssetId)) return;
 
-                // If the chosen asset id is a variation, we need to find its parent here and trigger it.
-                if (chosenAssetId.Contains(Mng_CharacterEditorCache.ASSET_NAME_SEPARATOR))
-                {
-                    //Its a variation
-                    chosenAssetId = chosenAssetId.Split(Mng_CharacterEditorCache.ASSET_NAME_SEPARATOR)[0];
-                }
-
                 // Now i need to look through the list of all the active toggles
                 // To get that list i need to get the carousel elements
                 // Foreach element get its AssetScrollView component
@@ -194,7 +189,12 @@ namespace PartyInc
 
                 print(theButtons.Count);
 
-                //if (theButtons.Count <= 0) return;
+                // If the chosen asset id is a variation and the variation ISNT present, we need to find its parent here and trigger it.
+                if (chosenAssetId.Contains(Mng_CharacterEditorCache.ASSET_NAME_SEPARATOR) && !theButtons.Any(b => b.AssetData.AssetId == chosenAssetId))
+                {
+                    //Its a variation
+                    chosenAssetId = chosenAssetId.Split(Mng_CharacterEditorCache.ASSET_NAME_SEPARATOR)[0];
+                }
 
                 // Find the one bound to the chosen asset
                 Mono_AssetButtonHandler chosenButtonHandler = theButtons.First(b => b.AssetData.AssetId == chosenAssetId);
@@ -215,9 +215,17 @@ namespace PartyInc
 
                 if (elements.Length <= 0) return;
 
-
-
                 _theVariableCarousel.InitializeCarousel(elements, OnToggleGetInfo);
+            }
+
+            private void ActivatePositionSliders(Enum_CharacterAssetTypes assetType, Action<PositionData, Enum_CharacterAssetTypes> onToggle)
+            {
+                _variableCarousel.SetActive(false);
+                _theVariableCarousel.UnstageCarousel();
+
+                _positionsEditor.SetActive(true);
+
+                _thePositionsEditor.InitializePositionEditor(Mng_CharacterEditorCache.Current.GetChosenAssetPosition(assetType), assetType, onToggle);
             }
 
             private void Awake()
@@ -232,7 +240,7 @@ namespace PartyInc
 
             private void IdentifyToggledOptionsAndLoadCarousel(Toggle[] toggles, Enum_CharacterAssetTypes toggleSelected)
             {
-                print("IdenitfyToggledOptionsAndLoadCarousel");
+                print("IdentifyToggledOptionsAndLoadCarousel");
 
                 for (int i = 0; i < toggles.Length; i++)
                 {
@@ -240,6 +248,7 @@ namespace PartyInc
                     {
                         if (i == 0)
                         {
+                            print("feature");
                             // feature
                             ActivateVariableCarousel(
                                 _assetButtonScrollView,
@@ -248,6 +257,7 @@ namespace PartyInc
                         }
                         else if (i == 1)
                         {
+                            print("color");
                             // color
                             ActivateVariableCarousel(
                                 _assetButtonScrollView,
@@ -256,7 +266,9 @@ namespace PartyInc
                         }
                         else
                         {
+                            print("position");
                             // position
+                            ActivatePositionSliders(toggleSelected, OnToggleGetPositionInfo);
                         }
                     }
                 }
@@ -264,7 +276,6 @@ namespace PartyInc
 
             private void SetOptionsButtons()
             {
-
                 for(int i = 0; i < _allOptionsButtonsHolders.Length; i++)
                 {
                     if (_allOptionsButtonsHolders[i] == null) continue;
@@ -282,8 +293,7 @@ namespace PartyInc
 
             public void OnOptionToggle(int pageToggle)
             {
-                // Toggle groups always deactivate the toggled toggle and then activate the one that was selected.
-                // Therefore, if we have a counter starting at 0, we only accept the ones that have the counter be a pair number
+                // TODO THIS SHIT
                 // runs twice
                 _optionCounter++;
 
@@ -298,8 +308,8 @@ namespace PartyInc
                 }
                 else if (pageToggle == 2)
                 {
-                    //outfit
-                    toggleSelected = (Enum_CharacterAssetTypes)GetIndexOfActiveToggleInRange(OUTFIT_LOWER_BOUND, OUTFIT_UPPER_BOUND);
+                    //loadout
+                    toggleSelected = (Enum_CharacterAssetTypes)GetIndexOfActiveToggleInRange(LOADOUT_LOWER_BOUND, LOADOUT_UPPER_BOUND);
                 }
                 else
                 {
@@ -312,22 +322,24 @@ namespace PartyInc
                 TriggerChosenAsset(toggleSelected);
             }
 
-            private int _barCounter = 0;
-
             public void OnBarToggle(int type)
             {
-                print(type);
-
-                // runs twice
-                //_barCounter++;
-
-                //_allOptionsButtonsHolders[type].SetActive(false);
-
-                //if (_barCounter % 2 != 0) return;
+                if (!_allToggles[type].isOn)
+                {
+                    //Turned false, ignore
+                    if (_allOptionsButtonsHolders[type] != null)
+                    {
+                        _allOptionsButtonsHolders[type].SetActive(false);
+                    }
+                    return;
+                }
 
                 //Toggle on option buttons
-                _allOptionsButtonsHolders[type].SetActive(true);
-
+                if(_allOptionsButtonsHolders[type] != null)
+                {
+                    _allOptionsButtonsHolders[type].SetActive(true);
+                }
+                
                 print("OnBarToggle");
                 if (type >= (int)Enum_CharacterAssetTypes.EMOTE_HAPPY && type <= (int)Enum_CharacterAssetTypes.TUNE)
                 {

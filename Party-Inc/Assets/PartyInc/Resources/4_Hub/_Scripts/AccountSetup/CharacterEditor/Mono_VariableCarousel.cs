@@ -154,6 +154,11 @@ namespace PartyInc
                     print("No elements");
                 }
 
+                foreach(Data_CharacterAssetMetadata e in elements)
+                {
+                    print(e.AssetId);
+                }
+
                 int amountOfButtons = elements.Length;
                 int amountOfCarouselElements = Mathf.CeilToInt((float)amountOfButtons / (float)_amountOfElementsPerScrollView);
 
