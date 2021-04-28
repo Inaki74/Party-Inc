@@ -95,9 +95,6 @@ namespace PartyInc
                 // *SNNNNIFFFF*, yep poop.
                 switch (thePage)
                 {
-                    case Enum_CharacterEditorPages.OVERVIEW:
-                        // Might do nothing
-                        break;
                     case Enum_CharacterEditorPages.FACE:
 
                         int activeToggleIndexFace = GetIndexOfActiveToggleInRange(FACE_LOWER_BOUND, FACE_UPPER_BOUND);
@@ -127,37 +124,17 @@ namespace PartyInc
 
                         Data_CharacterAssetMetadata[] emotesMetadataArray = Mng_CharacterEditorCache.Current.GetParentsMetadataListOfAssetType(GetIndexOfActiveToggleInRange(EMOTES_LOWER_BOUND, EMOTES_UPPER_BOUND)).ToArray();
 
-                        if (emotesMetadataArray.Length > 0)
-                        {
-                            ActivateVariableCarousel(
-                            _assetButtonScrollViewPlayable,
-                            8,
-                            emotesMetadataArray);
+                        Enum_CharacterAssetTypes toggled = (Enum_CharacterAssetTypes)GetIndexOfActiveToggleInRange(EMOTES_LOWER_BOUND, EMOTES_UPPER_BOUND);
 
-                            TriggerChosenAsset((Enum_CharacterAssetTypes)GetIndexOfActiveToggleInRange(EMOTES_LOWER_BOUND, EMOTES_UPPER_BOUND));
-                        }
+                        TogglePlayableCarousel(emotesMetadataArray, toggled);
 
                         break;
                     case Enum_CharacterEditorPages.TUNE:
 
                         Data_CharacterAssetMetadata[] tuneMetadataArray = Mng_CharacterEditorCache.Current.GetParentsMetadataListOfAssetType((int)Enum_CharacterAssetTypes.TUNE).ToArray();
 
-                        if (tuneMetadataArray.Length > 0)
-                        {
-                            ActivateVariableCarousel(
-                            _assetButtonScrollViewPlayable,
-                            8,
-                            tuneMetadataArray);
+                        TogglePlayableCarousel(tuneMetadataArray, Enum_CharacterAssetTypes.TUNE);
 
-                            TriggerChosenAsset(Enum_CharacterAssetTypes.TUNE);
-                        }
-
-                        break;
-                    case Enum_CharacterEditorPages.PHOTO:
-                        break;
-                    case Enum_CharacterEditorPages.SIGNUP:
-                        break;
-                    default:
                         break;
                 }
             }
@@ -247,6 +224,19 @@ namespace PartyInc
             private void OnDestroy()
             {
                 Mono_CharacterEditorNavigation.onChangePage -= OnPageChange;
+            }
+
+            private void TogglePlayableCarousel(Data_CharacterAssetMetadata[] metadataArray, Enum_CharacterAssetTypes toggleSelected)
+            {
+                if (metadataArray.Length > 0)
+                {
+                    ActivateVariableCarousel(
+                    _assetButtonScrollViewPlayable,
+                    8,
+                    metadataArray);
+
+                    TriggerChosenAsset(toggleSelected);
+                }
             }
 
             private void IdentifyToggledOptionsAndLoadCarousel(Toggle[] toggles, Enum_CharacterAssetTypes toggleSelected)
