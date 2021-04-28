@@ -24,6 +24,14 @@ namespace PartyInc
 
             public void ToggleChanged(bool isOn)
             {
+                print(_theToggle);
+                print(_theToggleImage);
+                print(_isOffSprite);
+                if(_theToggle == null)
+                {
+                    _theToggle = GetComponent<Toggle>();
+                }
+
                 if (_theToggle.isOn)
                 {
                     _theToggleImage.sprite = _isOnSprite;

@@ -165,6 +165,12 @@ namespace PartyInc
             private void TriggerChosenAsset(Enum_CharacterAssetTypes type)
             {
                 print("TriggerChosenAsset");
+                // No carousel active
+                if (_positionsEditor.activeInHierarchy)
+                {
+                    return;
+                }
+
                 // The system must remember which choice i made.
                 // I can get the choice made from the dictionary of chosen assets
                 string chosenAssetId = Mng_CharacterEditorCache.Current.GetChosenAssetId(type);
@@ -206,6 +212,11 @@ namespace PartyInc
             private void ActivateVariableCarousel(GameObject prefab, int amountElements, Data_CharacterAssetMetadata[] elements)
             {
                 print("ActivateCarousel");
+                if (_positionsEditor.activeInHierarchy)
+                {
+                    _positionsEditor.SetActive(false);
+                }
+
                 _variableCarousel.SetActive(true);
 
                 _theVariableCarousel.UnstageCarousel();
@@ -301,6 +312,16 @@ namespace PartyInc
 
                 print("OnOptionToggle");
                 Enum_CharacterAssetTypes toggleSelected;
+
+                if (pageToggle == -1)
+                {
+                    toggleSelected = (Enum_CharacterAssetTypes)GetIndexOfActiveToggleInRange(FACE_LOWER_BOUND, FACE_UPPER_BOUND);
+
+                    IdentifyToggledOptionsAndLoadCarousel(_allOptionsToggles[(int)toggleSelected].ToArray(), toggleSelected);
+
+                    return;
+                }
+
                 if (pageToggle == 1)
                 {
                     //face
