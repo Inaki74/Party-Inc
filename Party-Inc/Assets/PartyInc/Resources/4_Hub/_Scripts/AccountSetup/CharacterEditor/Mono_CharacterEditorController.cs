@@ -42,11 +42,11 @@ namespace PartyInc
                 SetOptionsButtons();
             }
 
-            private void OnToggleGetInfo(Data_CharacterAssetMetadata assetData)
+            protected virtual void OnToggleGetInfo(Data_CharacterAssetMetadata assetData)
             {
                 // If the current asset chosen is a variation
                 // If the one im toggling is parent of the current chosen asset, dont change
-                string currentChosenAssetId = Mng_CharacterEditorCache.Current.GetChosenAssetId(assetData.AssetType);
+                string currentChosenAssetId = Mng_CharacterEditorChoicesCache.Current.GetChosenAssetId(assetData.AssetType);
 
                 if (currentChosenAssetId.Contains(Mng_CharacterEditorCache.ASSET_NAME_SEPARATOR))
                 {
@@ -59,12 +59,12 @@ namespace PartyInc
                     }
                 }
 
-                Mng_CharacterEditorCache.Current.ChooseAsset(assetData.AssetId, assetData.AssetType);
+                Mng_CharacterEditorChoicesCache.Current.ChooseAsset(assetData.AssetId, assetData.AssetType);
             }
 
             private void OnToggleGetPositionInfo(PositionData positionData, Enum_CharacterAssetTypes assetType)
             {
-                Mng_CharacterEditorCache.Current.ChangePositionData(positionData, assetType);
+                Mng_CharacterEditorChoicesCache.Current.ChangePositionData(positionData, assetType);
             }
 
             private int GetIndexOfActiveToggleInRange(int start, int end)
@@ -142,24 +142,15 @@ namespace PartyInc
             private void TriggerChosenAsset(Enum_CharacterAssetTypes type)
             {
                 print("TriggerChosenAsset");
-                // No carousel active
                 if (_positionsEditor.activeInHierarchy)
                 {
                     return;
                 }
 
-                // The system must remember which choice i made.
-                // I can get the choice made from the dictionary of chosen assets
-                string chosenAssetId = Mng_CharacterEditorCache.Current.GetChosenAssetId(type);
+                string chosenAssetId = Mng_CharacterEditorChoicesCache.Current.GetChosenAssetId(type);
                 
-                //There are no objects.
                 if (string.IsNullOrEmpty(chosenAssetId)) return;
 
-                // Now i need to look through the list of all the active toggles
-                // To get that list i need to get the carousel elements
-                // Foreach element get its AssetScrollView component
-                // Get the buttons it has
-                // Thats the list
                 List<Mono_AssetButtonHandler> theButtons = new List<Mono_AssetButtonHandler>();
                 foreach(GameObject assetScrollViewGO in _theVariableCarousel.CarouselElements)
                 {
@@ -175,14 +166,11 @@ namespace PartyInc
                 // If the chosen asset id is a variation and the variation ISNT present, we need to find its parent here and trigger it.
                 if (chosenAssetId.Contains(Mng_CharacterEditorCache.ASSET_NAME_SEPARATOR) && !theButtons.Any(b => b.AssetData.AssetId == chosenAssetId))
                 {
-                    //Its a variation
                     chosenAssetId = chosenAssetId.Split(Mng_CharacterEditorCache.ASSET_NAME_SEPARATOR)[0];
                 }
 
-                // Find the one bound to the chosen asset
                 Mono_AssetButtonHandler chosenButtonHandler = theButtons.First(b => b.AssetData.AssetId == chosenAssetId);
 
-                // Toggle it.
                 chosenButtonHandler.ToggleButton();
             }
 
@@ -213,7 +201,7 @@ namespace PartyInc
 
                 _positionsEditor.SetActive(true);
 
-                _thePositionsEditor.InitializePositionEditor(Mng_CharacterEditorCache.Current.GetChosenAssetPosition(assetType), assetType, onToggle);
+                _thePositionsEditor.InitializePositionEditor(Mng_CharacterEditorChoicesCache.Current.GetChosenAssetPosition(assetType), assetType, onToggle);
             }
 
             private void Awake()
@@ -239,7 +227,7 @@ namespace PartyInc
                 }
             }
 
-            private void IdentifyToggledOptionsAndLoadCarousel(Toggle[] toggles, Enum_CharacterAssetTypes toggleSelected)
+            protected virtual void IdentifyToggledOptionsAndLoadCarousel(Toggle[] toggles, Enum_CharacterAssetTypes toggleSelected)
             {
                 print("IdentifyToggledOptionsAndLoadCarousel");
 

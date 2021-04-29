@@ -31,8 +31,6 @@ namespace PartyInc
             // Face assets populate numbers 16 - 23 (last since they are not buyable)
             private List<Data_CharacterAssetMetadata>[] _ownedAssets = new List<Data_CharacterAssetMetadata>[24];
             private List<string>[] _ownedAssetsIds = new List<string>[24];
-            private string[] _chosenAssets = new string[24];
-            private PositionData[] _chosenPositions = new PositionData[24];
             private List<Data_CharacterAssetMetadata>[] _allAssetsMetadata = new List<Data_CharacterAssetMetadata>[24];
 
             private const string ASSETS_METADATA_PATH = "1_Common/_Prefabs/_characterAssetsMetadata/";
@@ -47,11 +45,6 @@ namespace PartyInc
                 for (int i = 0; i < _ownedAssetsIds.Length; i++)
                 {
                     _ownedAssetsIds[i] = new List<string>();
-                }
-
-                for(int i = 0; i < _chosenPositions.Length; i++)
-                {
-                    _chosenPositions[i] = new PositionData();
                 }
 
                 for (int i = 0; i < _ownedAssets.Length; i++)
@@ -88,7 +81,7 @@ namespace PartyInc
             public List<Data_CharacterAssetMetadata> GetVariationsOfSelectedAsset(Enum_CharacterAssetTypes type)
             {
                 List<Data_CharacterAssetMetadata> variationsMetadata = new List<Data_CharacterAssetMetadata>();
-                string selectedAssetForType = _chosenAssets[(int)type];
+                string selectedAssetForType = Mng_CharacterEditorChoicesCache.Current.GetChosenAssetId(type);
                 Data_CharacterAssetMetadata theSelectedAsset = _ownedAssets[(int)type].First(m => m.AssetId == selectedAssetForType);
 
                 if (!theSelectedAsset.IsVariation)
@@ -140,26 +133,6 @@ namespace PartyInc
                 return listWithoutVariations;
             }
 
-            public string GetChosenAssetId(Enum_CharacterAssetTypes assetType)
-            {
-                return _chosenAssets[(int)assetType];
-            }
-
-            public PositionData GetChosenAssetPosition(Enum_CharacterAssetTypes assetType)
-            {
-                return _chosenPositions[(int)assetType];
-            }
-
-            public void ChooseAsset(string data, Enum_CharacterAssetTypes assetType)
-            {
-                _chosenAssets[(int)assetType] = data;
-            }
-
-            public void ChangePositionData(PositionData data, Enum_CharacterAssetTypes assetType)
-            {
-                _chosenPositions[(int)assetType] = data;
-            }
-
             private IEnumerator StartCache()
             {
                 // Get the owned assets list (already in memory)
@@ -205,11 +178,11 @@ namespace PartyInc
 
             private void SetChosenAssetsToDefault()
             {
-                for(int i = 0; i < _chosenAssets.Length; i++)
+                for(int i = 0; i < _ownedAssets.Length; i++)
                 {
                     if(_ownedAssets[i].Count > 0)
                     {
-                        _chosenAssets[i] = _ownedAssets[i].First().AssetId;
+                        Mng_CharacterEditorChoicesCache.Current.ChooseAsset(_ownedAssets[i].First().AssetId, (Enum_CharacterAssetTypes)i);
                     }
                 }
             }
@@ -321,94 +294,7 @@ namespace PartyInc
             private void LoadAssetImages(string assetId)
             {
                 print("Here goes loading of images, BEEP BOOP BOOP");
-            }
-
-            public Fb_FirestoreStructures.FSPlayer.FSCharacter ExportSelectedSettingsAsFirestoreStructure(int currentLoadout)
-            {
-                Fb_FirestoreStructures.FSPlayer.FSCharacter finalPlayerCharacter = new Fb_FirestoreStructures.FSPlayer.FSCharacter();
-                
-                finalPlayerCharacter.currentloadout = currentLoadout;
-                finalPlayerCharacter.AddLoadout(
-                    currentLoadout,
-                    "", // BACK, TODO: Add it to UI
-                    GetChosenAssetId(Enum_CharacterAssetTypes.EARS),
-                    GetChosenAssetId(Enum_CharacterAssetTypes.FACIALHAIR),
-                    GetChosenAssetId(Enum_CharacterAssetTypes.GLASSES),
-                    GetChosenAssetId(Enum_CharacterAssetTypes.WALLPAPER),
-                    GetChosenAssetId(Enum_CharacterAssetTypes.HAIR),
-                    GetChosenAssetId(Enum_CharacterAssetTypes.PANTS),
-                    GetChosenAssetId(Enum_CharacterAssetTypes.SHIRT),
-                    GetChosenAssetId(Enum_CharacterAssetTypes.SOCKS),
-                    GetChosenAssetId(Enum_CharacterAssetTypes.FOOTWEAR),
-                    GetChosenAssetId(Enum_CharacterAssetTypes.EMOTE_HAPPY),
-                    GetChosenAssetId(Enum_CharacterAssetTypes.EMOTE_SAD),
-                    GetChosenAssetId(Enum_CharacterAssetTypes.EMOTE_ANGRY),
-                    GetChosenAssetId(Enum_CharacterAssetTypes.EMOTE_LAUGHING),
-                    GetChosenAssetId(Enum_CharacterAssetTypes.EMOTE_SURPRISED),
-                    GetChosenAssetId(Enum_CharacterAssetTypes.EMOTE_CELEBRATION),
-                    GetChosenAssetId(Enum_CharacterAssetTypes.TUNE)
-                );
-
-                Fb_FirestoreStructures.FSPlayer.FSCharacter.FSFace finalPlayersFace = CreatePlayerFaceWithSettings();
-                //finalPlayersFace.
-
-                finalPlayerCharacter.face = finalPlayersFace.ToDictionary();
-
-                return finalPlayerCharacter;
-            }
-
-            private Fb_FirestoreStructures.FSPlayer.FSCharacter.FSFace CreatePlayerFaceWithSettings()
-            {
-                Fb_FirestoreStructures.FSPlayer.FSCharacter.FSFace finalPlayersFace = new Fb_FirestoreStructures.FSPlayer.FSCharacter.FSFace();
-
-                Fb_FirestoreStructures.FSPlayer.FSCharacter.FSFace.FSEyesockets finalPlayersEyes = CreatePlayerEyesWithSettings();
-
-                Fb_FirestoreStructures.FSPlayer.FSCharacter.FSFace.FSMouth finalPlayersMouth = CreatePlayerMouthWithSettings();
-
-                finalPlayersFace.browid = GetChosenAssetId(Enum_CharacterAssetTypes.BROWS);
-                finalPlayersFace.browcolor = ""; // TODO: Decide what to do.
-                finalPlayersFace.makeupid = GetChosenAssetId(Enum_CharacterAssetTypes.MAKEUP);
-                finalPlayersFace.makeupcolor = ""; // TODO: Decide what to do.
-                finalPlayersFace.noseId = GetChosenAssetId(Enum_CharacterAssetTypes.NOSE);
-                finalPlayersFace.skinColor = GetChosenAssetId(Enum_CharacterAssetTypes.SKINCOLOR);
-                finalPlayersFace.wrinklesId = GetChosenAssetId(Enum_CharacterAssetTypes.WRINKLES);
-                finalPlayersFace.eyesockets = finalPlayersEyes.ToDictionary();
-                finalPlayersFace.mouth = finalPlayersMouth.ToDictionary();
-
-                return finalPlayersFace;
-            }
-
-            private Fb_FirestoreStructures.FSPlayer.FSCharacter.FSFace.FSEyesockets CreatePlayerEyesWithSettings()
-            {
-                Fb_FirestoreStructures.FSPlayer.FSCharacter.FSFace.FSEyesockets finalPlayersEyes = new Fb_FirestoreStructures.FSPlayer.FSCharacter.FSFace.FSEyesockets();
-
-                PositionData eyesPosition = GetChosenAssetPosition(Enum_CharacterAssetTypes.EYES);
-                finalPlayersEyes.eyeid = GetChosenAssetId(Enum_CharacterAssetTypes.EYES);
-                finalPlayersEyes.eyecolor = ""; // TODO: Decide what to do.
-                finalPlayersEyes.height = eyesPosition.height;
-                finalPlayersEyes.rotation = eyesPosition.rotation;
-                finalPlayersEyes.scale = eyesPosition.scale;
-                finalPlayersEyes.separation = eyesPosition.separation;
-                finalPlayersEyes.squash = eyesPosition.squash;
-
-                return finalPlayersEyes;
-            }
-
-            private Fb_FirestoreStructures.FSPlayer.FSCharacter.FSFace.FSMouth CreatePlayerMouthWithSettings()
-            {
-                Fb_FirestoreStructures.FSPlayer.FSCharacter.FSFace.FSMouth finalPlayersMouth = new Fb_FirestoreStructures.FSPlayer.FSCharacter.FSFace.FSMouth();
-
-                PositionData lipsPosition = GetChosenAssetPosition(Enum_CharacterAssetTypes.LIPS);
-                finalPlayersMouth.mouthid = GetChosenAssetId(Enum_CharacterAssetTypes.LIPS);
-                finalPlayersMouth.mouthcolor = ""; // TODO: Decide what to do.
-                finalPlayersMouth.height = lipsPosition.height;
-                finalPlayersMouth.scale = lipsPosition.scale;
-                finalPlayersMouth.squash = lipsPosition.squash;
-
-                return finalPlayersMouth;
-            }
-
-            
+            } 
         }
     }
 }

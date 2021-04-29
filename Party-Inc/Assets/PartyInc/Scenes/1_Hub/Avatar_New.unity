@@ -11506,6 +11506,7 @@ GameObject:
   - component: {fileID: 687080920}
   - component: {fileID: 687080924}
   - component: {fileID: 687080925}
+  - component: {fileID: 687080927}
   - component: {fileID: 687080926}
   m_Layer: 5
   m_Name: Avatar_Root_Canvas
@@ -11513,7 +11514,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &687080920
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11707,6 +11708,18 @@ MonoBehaviour:
     type: 3}
   _assetButtonScrollViewPlayable: {fileID: 5359430437424945238, guid: e8c8152ed73144bf192a8bf72f346570,
     type: 3}
+--- !u!114 &687080927
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 687080919}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0814d88e9875e4046a74331d475b54a8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &690259362
 GameObject:
   m_ObjectHideFlags: 0

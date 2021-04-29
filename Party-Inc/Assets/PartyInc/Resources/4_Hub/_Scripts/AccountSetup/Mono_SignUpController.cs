@@ -219,7 +219,7 @@ namespace PartyInc
                 {
                     Fb_FirestoreStructures.FSPlayer newPlayer = new Fb_FirestoreStructures.FSPlayer();
                     Fb_FirestoreStructures.FSPlayer.FSData newData = new Fb_FirestoreStructures.FSPlayer.FSData();
-                    Fb_FirestoreStructures.FSPlayer.FSCharacter newCharacter = Mng_CharacterEditorCache.Current.ExportSelectedSettingsAsFirestoreStructure(0);
+                    Fb_FirestoreStructures.FSPlayer.FSCharacter newCharacter = Mng_CharacterEditorChoicesCache.Current.ExportSelectedSettingsAsFirestoreStructure(0);
 
                     newData.nickname = _nicknameField.text;
                     newData.city = _cityField.text;
