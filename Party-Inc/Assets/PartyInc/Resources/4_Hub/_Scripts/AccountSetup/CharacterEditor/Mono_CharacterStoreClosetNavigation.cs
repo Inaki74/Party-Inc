@@ -6,7 +6,7 @@ namespace PartyInc
 {
     namespace Hub
     {
-        public class Mono_CharacterClosetNavigation : MonoBehaviour
+        public class Mono_CharacterStoreClosetNavigation : MonoBehaviour
         {
             [SerializeField] private GameObject[] _closetPages;
             [SerializeField] private GameObject[] _storePages;
