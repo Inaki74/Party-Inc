@@ -684,7 +684,7 @@ namespace PartyInc
                 public string name;
                 public int type;
                 public int rarity;
-                public List<string> variations;
+                public string assetid;
 
                 public FSAsset()
                 {
@@ -694,10 +694,10 @@ namespace PartyInc
                     name = null;
                     type = 0;
                     rarity = 0;
-                    variations = null;
+                    assetid = null;
                 }
 
-                public FSAsset(string achievement, int baseprice, int premiumprice, string name, int type, int rarity, List<string> variations)
+                public FSAsset(string achievement, int baseprice, int premiumprice, string name, int type, int rarity, string assetid)
                 {
                     this.achievement = achievement;
                     this.baseprice = baseprice;
@@ -705,7 +705,7 @@ namespace PartyInc
                     this.name = name;
                     this.type = type;
                     this.rarity = rarity;
-                    this.variations = variations;
+                    this.assetid = assetid;
                 }
 
                 public Dictionary<string, object> ToDictionary()
@@ -718,7 +718,7 @@ namespace PartyInc
                     dic.Add(Fb_Constants.FIRESTORE_KEY_ASSETS_NAME, name);
                     dic.Add(Fb_Constants.FIRESTORE_KEY_ASSETS_TYPE, type);
                     dic.Add(Fb_Constants.FIRESTORE_KEY_ASSETS_RARITY, rarity);
-                    dic.Add(Fb_Constants.FIRESTORE_KEY_ASSETS_VARIATIONS, variations);
+                    dic.Add(Fb_Constants.FIRESTORE_KEY_ASSETS_ASSETID, assetid);
 
                     return dic;
                 }

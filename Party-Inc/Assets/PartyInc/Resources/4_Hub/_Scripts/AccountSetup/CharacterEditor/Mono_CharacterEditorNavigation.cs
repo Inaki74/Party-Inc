@@ -75,6 +75,7 @@ namespace PartyInc
                     _pages[_currentPage].SetActive(true);
                 }
 
+
                 onChangePage?.Invoke((Enum_CharacterEditorPages)_currentPage);
             }
 

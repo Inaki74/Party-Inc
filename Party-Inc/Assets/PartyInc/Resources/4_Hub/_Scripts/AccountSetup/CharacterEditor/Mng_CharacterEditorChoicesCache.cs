@@ -12,6 +12,7 @@ namespace PartyInc
 
         public class Mng_CharacterEditorChoicesCache : MonoSingleton<Mng_CharacterEditorChoicesCache>
         {
+            [SerializeField] private Mono_CharacterStoreChoicesCache _storeCache;
             private string[] _chosenAssets = new string[24];
             private PositionData[] _chosenPositions = new PositionData[24];
 

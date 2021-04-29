@@ -29,6 +29,7 @@ namespace PartyInc
             // Emote assets populate numbers 9 - 14
             // Tune assets populate the number 15
             // Face assets populate numbers 16 - 23 (last since they are not buyable)
+            [SerializeField] private Mono_CharacterStoreCache _storeCache;
             private List<Data_CharacterAssetMetadata>[] _ownedAssets = new List<Data_CharacterAssetMetadata>[24];
             private List<string>[] _ownedAssetsIds = new List<string>[24];
             private List<Data_CharacterAssetMetadata>[] _allAssetsMetadata = new List<Data_CharacterAssetMetadata>[24];

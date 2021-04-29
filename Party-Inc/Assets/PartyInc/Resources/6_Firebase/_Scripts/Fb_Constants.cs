@@ -127,10 +127,10 @@ namespace PartyInc
             public const string FIRESTORE_KEY_ASSETS_ACHIEVEMENT = "achievement";
             public const string FIRESTORE_KEY_ASSETS_BASEPRICE = "baseprice";
             public const string FIRESTORE_KEY_ASSETS_PREMIUMPRICE = "premiumprice";
-            public const string FIRESTORE_KEY_ASSETS_NAME = "name";
+            public const string FIRESTORE_KEY_ASSETS_NAME = "storename";
             public const string FIRESTORE_KEY_ASSETS_TYPE = "type";
             public const string FIRESTORE_KEY_ASSETS_RARITY = "rarity";
-            public const string FIRESTORE_KEY_ASSETS_VARIATIONS = "variations";
+            public const string FIRESTORE_KEY_ASSETS_ASSETID = "assetid";
 
             // TEAM KEYS
             public const string FIRESTORE_KEY_TEAM = "teams";

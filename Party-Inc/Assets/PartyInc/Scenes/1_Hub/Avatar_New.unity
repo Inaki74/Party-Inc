@@ -11637,6 +11637,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ddfe884afabb34408930e5365b3cfc41, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _storeCache: {fileID: 0}
   _initialAssets: {fileID: 11400000, guid: a7c7e3383e193411dbf76c20a90abbad, type: 2}
 --- !u!114 &687080926
 MonoBehaviour:
@@ -11720,6 +11721,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0814d88e9875e4046a74331d475b54a8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _storeCache: {fileID: 0}
 --- !u!1 &690259362
 GameObject:
   m_ObjectHideFlags: 0
@@ -36890,8 +36892,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 808908268}
   m_HandleRect: {fileID: 808908267}
   m_Direction: 0
-  m_Value: -0.00000138889
-  m_Size: 0.68323165
+  m_Value: -0.0000013888906
+  m_Size: 0.6832317
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
