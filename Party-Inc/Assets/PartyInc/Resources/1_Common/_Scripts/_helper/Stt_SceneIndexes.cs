@@ -12,6 +12,7 @@ namespace PartyInc
         GAMERESULTS = 5,
         PLAYER_FORK = 1,
         ROTATEDEVICE = 6,
+        AVATAR_CLOSE_STORE = 8, 
     }
 }
 

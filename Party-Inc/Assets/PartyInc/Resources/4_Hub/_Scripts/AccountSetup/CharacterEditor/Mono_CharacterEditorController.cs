@@ -12,27 +12,27 @@ namespace PartyInc
         public class Mono_CharacterEditorController : MonoBehaviour
         {
             
-            [SerializeField] private Toggle[] _allToggles = new Toggle[24];
-            private const int FACE_LOWER_BOUND = 16; // 16->skin, 17->eyes, 18->brows, 19->nose, 20->lips, 21->makeup, 22->wrinkles, 23->beauty
-            private const int FACE_UPPER_BOUND = 23;
-            private const int LOADOUT_LOWER_BOUND = 0; // 0->hair, 1->fhair, 2->ears, 3->shirt, 4->pants, 5->socks, 6->shoes, 7->glasses
-            private const int LOADOUT_UPPER_BOUND = 7;
-            private const int EMOTES_LOWER_BOUND = 9; // 9->happy, 10->sad, 11->angry, 12->XD, 13->surprised, 14->celebration
-            private const int EMOTES_UPPER_BOUND = 14;
+            [SerializeField] protected Toggle[] _allToggles = new Toggle[24];
+            protected const int FACE_LOWER_BOUND = 16; // 16->skin, 17->eyes, 18->brows, 19->nose, 20->lips, 21->makeup, 22->wrinkles, 23->beauty
+            protected const int FACE_UPPER_BOUND = 23;
+            protected const int LOADOUT_LOWER_BOUND = 0; // 0->hair, 1->fhair, 2->ears, 3->shirt, 4->pants, 5->socks, 6->shoes, 7->glasses
+            protected const int LOADOUT_UPPER_BOUND = 7;
+            protected const int EMOTES_LOWER_BOUND = 9; // 9->happy, 10->sad, 11->angry, 12->XD, 13->surprised, 14->celebration
+            protected const int EMOTES_UPPER_BOUND = 14;
 
-            //private Enum_CharacterAssetTypes _lastToggled = ;
+            //protected Enum_CharacterAssetTypes _lastToggled = ;
 
-            [SerializeField] private GameObject[] _allOptionsButtonsHolders = new GameObject[24];
-            private List<Toggle>[] _allOptionsToggles = new List<Toggle>[24];
+            [SerializeField] protected GameObject[] _allOptionsButtonsHolders = new GameObject[24];
+            protected List<Toggle>[] _allOptionsToggles = new List<Toggle>[24];
 
-            [SerializeField] private GameObject _variableCarousel;
-            [SerializeField] private GameObject _positionsEditor;
+            [SerializeField] protected GameObject _variableCarousel;
+            [SerializeField] protected GameObject _positionsEditor;
 
-            [SerializeField] private Mono_VariableCarousel _theVariableCarousel;
-            [SerializeField] private Mono_FacePositionEditor _thePositionsEditor;
+            [SerializeField] protected Mono_VariableCarousel _theVariableCarousel;
+            [SerializeField] protected Mono_FacePositionEditor _thePositionsEditor;
 
-            [SerializeField] private GameObject _assetButtonScrollView;
-            [SerializeField] private GameObject _assetButtonScrollViewPlayable;
+            [SerializeField] protected GameObject _assetButtonScrollView;
+            [SerializeField] protected GameObject _assetButtonScrollViewPlayable;
 
             // Start is called before the first frame update
             void Start()
@@ -42,32 +42,12 @@ namespace PartyInc
                 SetOptionsButtons();
             }
 
-            protected virtual void OnToggleGetInfo(Data_CharacterAssetMetadata assetData)
-            {
-                // If the current asset chosen is a variation
-                // If the one im toggling is parent of the current chosen asset, dont change
-                string currentChosenAssetId = Mng_CharacterEditorChoicesCache.Current.GetChosenAssetId(assetData.AssetType);
-
-                if (currentChosenAssetId.Contains(Mng_CharacterEditorCache.ASSET_NAME_SEPARATOR))
-                {
-                    // Its a variation
-                    string[] splitCurrentChosenAssetId = currentChosenAssetId.Split(Mng_CharacterEditorCache.ASSET_NAME_SEPARATOR);
-                    if (splitCurrentChosenAssetId[0] == assetData.AssetId)
-                    {
-                        // The current chosen asset is a child of the triggered button
-                        return;
-                    }
-                }
-
-                Mng_CharacterEditorChoicesCache.Current.ChooseAsset(assetData.AssetId, assetData.AssetType);
-            }
-
-            private void OnToggleGetPositionInfo(PositionData positionData, Enum_CharacterAssetTypes assetType)
+            protected void OnToggleGetPositionInfo(PositionData positionData, Enum_CharacterAssetTypes assetType)
             {
                 Mng_CharacterEditorChoicesCache.Current.ChangePositionData(positionData, assetType);
             }
 
-            private int GetIndexOfActiveToggleInRange(int start, int end)
+            protected int GetIndexOfActiveToggleInRange(int start, int end)
             {
                 for(int i = start; i <= end; i++)
                 {
@@ -81,7 +61,7 @@ namespace PartyInc
                 return -1;
             }
 
-            private void OnPageChange(Enum_CharacterEditorPages thePage)
+            protected void OnPageChange(Enum_CharacterEditorPages thePage)
             {
                 print("OnPageChange");
 
@@ -139,7 +119,7 @@ namespace PartyInc
                 }
             }
 
-            private void TriggerChosenAsset(Enum_CharacterAssetTypes type)
+            protected void TriggerChosenAsset(Enum_CharacterAssetTypes type)
             {
                 print("TriggerChosenAsset");
                 if (_positionsEditor.activeInHierarchy)
@@ -174,7 +154,7 @@ namespace PartyInc
                 chosenButtonHandler.ToggleButton();
             }
 
-            private void ActivateVariableCarousel(GameObject prefab, int amountElements, Data_CharacterAssetMetadata[] elements)
+            protected void ActivateVariableCarousel(GameObject prefab, int amountElements, Data_CharacterAssetMetadata[] elements)
             {
                 print("ActivateCarousel");
                 if (_positionsEditor.activeInHierarchy)
@@ -194,7 +174,7 @@ namespace PartyInc
                 _theVariableCarousel.InitializeCarousel(elements, OnToggleGetInfo);
             }
 
-            private void ActivatePositionSliders(Enum_CharacterAssetTypes assetType, Action<PositionData, Enum_CharacterAssetTypes> onToggle)
+            protected void ActivatePositionSliders(Enum_CharacterAssetTypes assetType, Action<PositionData, Enum_CharacterAssetTypes> onToggle)
             {
                 _variableCarousel.SetActive(false);
                 _theVariableCarousel.UnstageCarousel();
@@ -205,16 +185,16 @@ namespace PartyInc
             }
 
             private void Awake()
-            { 
-                Mono_CharacterEditorNavigation.onChangePage += OnPageChange;
+            {
+                Init();
             }
 
             private void OnDestroy()
             {
-                Mono_CharacterEditorNavigation.onChangePage -= OnPageChange;
+                Outro();
             }
 
-            private void TogglePlayableCarousel(Data_CharacterAssetMetadata[] metadataArray, Enum_CharacterAssetTypes toggleSelected)
+            protected virtual void TogglePlayableCarousel(Data_CharacterAssetMetadata[] metadataArray, Enum_CharacterAssetTypes toggleSelected)
             {
                 if (metadataArray.Length > 0)
                 {
@@ -225,6 +205,16 @@ namespace PartyInc
 
                     TriggerChosenAsset(toggleSelected);
                 }
+            }
+
+            protected virtual void Init()
+            {
+                Mono_CharacterEditorNavigation.onChangePage += OnPageChange;
+            }
+
+            protected virtual void Outro()
+            {
+                Mono_CharacterEditorNavigation.onChangePage -= OnPageChange;
             }
 
             protected virtual void IdentifyToggledOptionsAndLoadCarousel(Toggle[] toggles, Enum_CharacterAssetTypes toggleSelected)
@@ -263,7 +253,27 @@ namespace PartyInc
                 }
             }
 
-            private void SetOptionsButtons()
+            protected virtual void OnToggleGetInfo(Data_CharacterAssetMetadata assetData)
+            {
+                // If the current asset chosen is a variation
+                // If the one im toggling is parent of the current chosen asset, dont change
+                string currentChosenAssetId = Mng_CharacterEditorChoicesCache.Current.GetChosenAssetId(assetData.AssetType);
+
+                if (currentChosenAssetId.Contains(Mng_CharacterEditorCache.ASSET_NAME_SEPARATOR))
+                {
+                    // Its a variation
+                    string[] splitCurrentChosenAssetId = currentChosenAssetId.Split(Mng_CharacterEditorCache.ASSET_NAME_SEPARATOR);
+                    if (splitCurrentChosenAssetId[0] == assetData.AssetId)
+                    {
+                        // The current chosen asset is a child of the triggered button
+                        return;
+                    }
+                }
+
+                Mng_CharacterEditorChoicesCache.Current.ChooseAsset(assetData.AssetId, assetData.AssetType);
+            }
+
+            protected void SetOptionsButtons()
             {
                 for(int i = 0; i < _allOptionsButtonsHolders.Length; i++)
                 {
@@ -278,7 +288,7 @@ namespace PartyInc
                 }
             }
 
-            private int _optionCounter = 0;
+            protected int _optionCounter = 0;
 
             public void OnOptionToggle(int pageToggle)
             {
@@ -291,6 +301,9 @@ namespace PartyInc
                 print("OnOptionToggle");
                 Enum_CharacterAssetTypes toggleSelected;
 
+                // If its -1, then its a position toggle.
+                // Yes its fucking terrible design, fuck me.
+                // The name doesnt even fucking line up
                 if (pageToggle == -1)
                 {
                     toggleSelected = (Enum_CharacterAssetTypes)GetIndexOfActiveToggleInRange(FACE_LOWER_BOUND, FACE_UPPER_BOUND);

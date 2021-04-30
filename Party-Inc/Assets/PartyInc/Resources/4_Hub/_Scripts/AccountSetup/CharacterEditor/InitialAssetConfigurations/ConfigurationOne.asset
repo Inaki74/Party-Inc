@@ -33,7 +33,8 @@ MonoBehaviour:
   glasses: []
   wallpapers:
   - {fileID: 11400000, guid: 3ec4317a8995542b0a62df16f761b903, type: 2}
-  happyEmotes: []
+  happyEmotes:
+  - {fileID: 11400000, guid: d3bcbba8eb3984239b31ff931a015e9a, type: 2}
   sadEmotes: []
   angryEmotes: []
   laughingEmotes: []

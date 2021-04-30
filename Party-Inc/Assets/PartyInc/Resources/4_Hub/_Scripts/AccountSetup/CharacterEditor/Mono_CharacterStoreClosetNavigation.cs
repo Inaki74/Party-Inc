@@ -20,15 +20,18 @@ namespace PartyInc
             public static event ActionChangePage onStoreChangePage;
 
             // Start is called before the first frame update
-            void Start()
+            private void OnEnable()
             {
+                // TODO: Need a way to determine if the user entered to the store first or to the closet first
 
+                _closetPages[_lastClosetPage].SetActive(true);
+
+                onClosetChangePage?.Invoke((Enum_CharacterEditorPages)_lastClosetPage);
             }
 
-            // Update is called once per frame
-            void Update()
+            private void OnDisable()
             {
-
+                
             }
 
             public void OnStorePageToggle(int pageType)
