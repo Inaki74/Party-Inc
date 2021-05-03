@@ -30,6 +30,8 @@ namespace PartyInc
             // Tune assets populate the number 15
             // Face assets populate numbers 16 - 23 (last since they are not buyable)
             [SerializeField] private Mono_CharacterStoreCache _storeCache;
+            private List<Data_CharacterAssetMetadata>[] _storeDisplayAssetsMetadata = new List<Data_CharacterAssetMetadata>[24];
+
             private List<Data_CharacterAssetMetadata>[] _ownedAssets = new List<Data_CharacterAssetMetadata>[24];
             private List<string>[] _ownedAssetsIds = new List<string>[24];
             private List<Data_CharacterAssetMetadata>[] _allAssetsMetadata = new List<Data_CharacterAssetMetadata>[24];
@@ -56,6 +58,14 @@ namespace PartyInc
                 for (int i = 0; i < _allAssetsMetadata.Length; i++)
                 {
                     _allAssetsMetadata[i] = new List<Data_CharacterAssetMetadata>();
+                }
+
+                if(_storeCache != null)
+                {
+                    for (int i = 0; i < _storeDisplayAssetsMetadata.Length; i++)
+                    {
+                        _storeDisplayAssetsMetadata[i] = new List<Data_CharacterAssetMetadata>();
+                    }
                 }
             }
 
@@ -119,11 +129,81 @@ namespace PartyInc
                 return variationsMetadata;
             }
 
+            public List<Data_CharacterAssetMetadata> GetVariationsOfSelectedDisplayAsset(Enum_CharacterAssetTypes type)
+            {
+                List<Data_CharacterAssetMetadata> variationsMetadata = new List<Data_CharacterAssetMetadata>();
+                string selectedAssetForType = Mng_CharacterEditorChoicesCache.Current.GetChosenStoreAssetId(type);
+                Data_CharacterAssetMetadata theSelectedAsset = _storeDisplayAssetsMetadata[(int)type].First(m => m.AssetId == selectedAssetForType);
+
+                if (!theSelectedAsset.IsVariation)
+                {
+                    // The parent is, in itself, a variation
+                    variationsMetadata.Add(theSelectedAsset);
+
+                    List<Data_CharacterAssetMetadata> variationsList = theSelectedAsset.VariationAssets;
+
+                    foreach (Data_CharacterAssetMetadata variation in variationsList)
+                    {
+                        print(variation);
+                        variationsMetadata.Add(variation);
+                    }
+                }
+                else
+                {
+                    // Its a variation, look for parent and then get its variations
+                    string[] split = theSelectedAsset.AssetId.Split(ASSET_NAME_SEPARATOR);
+
+                    string parentAssetForType = split[0];
+                    Data_CharacterAssetMetadata theSelectedAssetsParent = _ownedAssets[(int)type].First(m => m.AssetId == parentAssetForType);
+
+                    variationsMetadata.Add(theSelectedAssetsParent);
+
+                    List<Data_CharacterAssetMetadata> variationsList = theSelectedAssetsParent.VariationAssets;
+
+                    foreach (Data_CharacterAssetMetadata variation in variationsList)
+                    {
+                        variationsMetadata.Add(variation);
+                    }
+                }
+
+                return variationsMetadata;
+            }
+
             public List<Data_CharacterAssetMetadata> GetParentsMetadataListOfAssetType(int type)
             {
                 List<Data_CharacterAssetMetadata> listWithoutVariations = new List<Data_CharacterAssetMetadata>();
 
                 foreach(Data_CharacterAssetMetadata metadata in _ownedAssets[type])
+                {
+                    if (!metadata.IsVariation)
+                    {
+                        listWithoutVariations.Add(metadata);
+                    }
+                }
+
+                return listWithoutVariations;
+            }
+
+            public void SetDisplayAssetMetadataList(List<AssetsStoreData> list, int type)
+            {
+                foreach(AssetsStoreData assetData in list)
+                {
+                    Data_CharacterAssetMetadata theMetadata = _allAssetsMetadata[type].Find(data => data.AssetId == assetData.assetid);
+
+                    _storeDisplayAssetsMetadata[type].Add(theMetadata);
+
+                    foreach (Data_CharacterAssetMetadata variation in theMetadata.VariationAssets)
+                    {
+                        _storeDisplayAssetsMetadata[type].Add(variation);
+                    }
+                }
+            }
+
+            public List<Data_CharacterAssetMetadata> GetParentsDisplayAssetsMetadata(int type)
+            {
+                List<Data_CharacterAssetMetadata> listWithoutVariations = new List<Data_CharacterAssetMetadata>();
+
+                foreach (Data_CharacterAssetMetadata metadata in _storeDisplayAssetsMetadata[type])
                 {
                     if (!metadata.IsVariation)
                     {
@@ -142,7 +222,7 @@ namespace PartyInc
 
                 yield return new WaitUntil(() => Fb_FirebaseAuthenticateManager.Current.AuthInitialized);
 
-                List<Dictionary<string, object>> ownedAssets;
+                
 
                 if (Fb_FirebaseAuthenticateManager.Current.Auth.CurrentUser != null)
                 {
@@ -150,13 +230,12 @@ namespace PartyInc
 
                     yield return new WaitUntil(() => Fb_FirestoreSession.Current.SetupCompleted);
 
-                    ownedAssets = (List<Dictionary<string, object>>)Fb_FirestoreSession.Current.LocalPlayerData[Fb_Constants.FIRESTORE_KEY_PLAYER_ASSETS];
-
                     LoadBasicAssetsMetadata();
 
-                    PutOwnedAssets(ownedAssets);
+                    SetupOwnedAssets();
 
-                    LoadOwnedAssetsMetadata();
+                    print("About to get asset data");
+                    _storeCache.GetAllAssetsStoreData();
                 }
                 else
                 {
@@ -175,6 +254,24 @@ namespace PartyInc
                 //    LoadAssetImages(assetId);
                 //    LoadAssetModels(assetId);
                 //}
+            }
+
+            private void SetupOwnedAssets()
+            {
+                List<Dictionary<string, object>> ownedAssets = new List<Dictionary<string, object>>();
+                object playerAssetsObject = Fb_FirestoreSession.Current.LocalPlayerData[Fb_Constants.FIRESTORE_KEY_PLAYER_ASSETS];
+                List<object> playerAssetsListObject = (List<object>)Convert.ChangeType(playerAssetsObject, typeof(List<object>));
+
+                if (playerAssetsListObject.Count > 0)
+                {
+                    foreach (object listObject in playerAssetsListObject)
+                    {
+                        ownedAssets.Add((Dictionary<string, object>)Convert.ChangeType(listObject, typeof(Dictionary<string, object>)));
+                    }
+
+                    PutOwnedAssets(ownedAssets);
+                    LoadOwnedAssetsMetadata();
+                }
             }
 
             private void SetChosenAssetsToDefault()
@@ -229,8 +326,8 @@ namespace PartyInc
             {
                 foreach (Dictionary<string, object> asset in assets)
                 {
-                    string id = (string)asset[Fb_Constants.FIRESTORE_KEY_PLAYER_ASSETS_ID];
-                    int type = (int)asset[Fb_Constants.FIRESTORE_KEY_PLAYER_ASSETS_TYPE];
+                    string id = (string)Convert.ChangeType(asset[Fb_Constants.FIRESTORE_KEY_PLAYER_ASSETS_ID], typeof(string));
+                    int type = (int)Convert.ChangeType(asset[Fb_Constants.FIRESTORE_KEY_PLAYER_ASSETS_TYPE], typeof(int));
 
                     _ownedAssetsIds[type].Add(id);
                 }

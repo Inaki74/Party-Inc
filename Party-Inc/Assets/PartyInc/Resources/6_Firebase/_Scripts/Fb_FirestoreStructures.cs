@@ -63,13 +63,12 @@ namespace PartyInc
                     goals.Add(Fb_Constants.FIRESTORE_KEY_PLAYER_TASKS, goal);
                 }
 
-                public void AddAsset(string assetId, int assetType, List<string> variations)
+                public void AddAsset(string assetId, int assetType)
                 {
                     Dictionary<string, object> ass = new Dictionary<string, object>();
 
                     ass.Add(Fb_Constants.FIRESTORE_KEY_PLAYER_ASSETS_TYPE, assetType);
                     ass.Add(Fb_Constants.FIRESTORE_KEY_PLAYER_ASSETS_ID, assetId);
-                    ass.Add(Fb_Constants.FIRESTORE_KEY_PLAYER_ASSETS_VARIATIONS, variations);
 
                     assets.Add(ass);
                 }

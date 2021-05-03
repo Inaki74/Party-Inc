@@ -220,5 +220,11 @@ namespace PartyInc
             PartyFirebase.Auth.Fb_FirebaseAuthenticateManager.Current.Auth.SignOut();
             PhotonNetwork.LeaveLobby();
         }
+
+        public void GoToClosetStore()
+        {
+            Mng_SceneNavigationSystem.Current.DeactivateActiveScene();
+            Mng_SceneNavigationSystem.Current.ActivateLoadedScene((int)Stt_SceneIndexes.AVATAR_CLOSE_STORE);
+        }
     }
 }

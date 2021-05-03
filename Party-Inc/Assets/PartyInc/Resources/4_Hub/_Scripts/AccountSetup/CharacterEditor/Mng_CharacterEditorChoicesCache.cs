@@ -26,6 +26,12 @@ namespace PartyInc
                 }
             }
 
+            public string GetChosenStoreAssetId(Enum_CharacterAssetTypes assetType)
+            {
+                //TODO: make it
+                return null;
+            }
+
             public string GetChosenAssetId(Enum_CharacterAssetTypes assetType)
             {
                 return _chosenAssets[(int)assetType];

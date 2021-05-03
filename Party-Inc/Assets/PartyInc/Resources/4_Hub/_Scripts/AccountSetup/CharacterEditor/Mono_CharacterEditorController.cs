@@ -102,18 +102,14 @@ namespace PartyInc
                         break;
                     case Enum_CharacterEditorPages.EMOTE:
 
-                        Data_CharacterAssetMetadata[] emotesMetadataArray = Mng_CharacterEditorCache.Current.GetParentsMetadataListOfAssetType(GetIndexOfActiveToggleInRange(EMOTES_LOWER_BOUND, EMOTES_UPPER_BOUND)).ToArray();
-
                         Enum_CharacterAssetTypes toggled = (Enum_CharacterAssetTypes)GetIndexOfActiveToggleInRange(EMOTES_LOWER_BOUND, EMOTES_UPPER_BOUND);
 
-                        TogglePlayableCarousel(emotesMetadataArray, toggled);
+                        IdentifyToggledOptionsAndLoadPlayableCarousel(toggled);
 
                         break;
                     case Enum_CharacterEditorPages.TUNE:
 
-                        Data_CharacterAssetMetadata[] tuneMetadataArray = Mng_CharacterEditorCache.Current.GetParentsMetadataListOfAssetType((int)Enum_CharacterAssetTypes.TUNE).ToArray();
-
-                        TogglePlayableCarousel(tuneMetadataArray, Enum_CharacterAssetTypes.TUNE);
+                        IdentifyToggledOptionsAndLoadPlayableCarousel(Enum_CharacterAssetTypes.TUNE);
 
                         break;
                 }
@@ -215,6 +211,13 @@ namespace PartyInc
             protected virtual void Outro()
             {
                 Mono_CharacterEditorNavigation.onChangePage -= OnPageChange;
+            }
+
+            protected virtual void IdentifyToggledOptionsAndLoadPlayableCarousel(Enum_CharacterAssetTypes toggled)
+            {
+                Data_CharacterAssetMetadata[] metadataArray = Mng_CharacterEditorCache.Current.GetParentsMetadataListOfAssetType((int)toggled).ToArray();
+
+                TogglePlayableCarousel(metadataArray, toggled);
             }
 
             protected virtual void IdentifyToggledOptionsAndLoadCarousel(Toggle[] toggles, Enum_CharacterAssetTypes toggleSelected)

@@ -23,6 +23,7 @@ namespace PartyInc
         public class Fb_FirestoreManager : MonoSingleton<Fb_FirestoreManager>
         {
             public FirebaseFirestore FsDB { get; private set; }
+            public CollectionReference Assets { get; private set; }
             public CollectionReference Players { get; private set; }
             public CollectionReference PlayerSocial { get; private set; }
 
@@ -40,6 +41,7 @@ namespace PartyInc
             {
                 FsDB = FirebaseFirestore.DefaultInstance;
 
+                Assets = FsDB.Collection(Fb_Constants.FIRESTORE_KEY_ASSETS);
                 Players = FsDB.Collection(Fb_Constants.FIRESTORE_KEY_PLAYERS);
                 PlayerSocial = FsDB.Collection(Fb_Constants.FIRESTORE_KEY_PLAYERSOCIAL);
 
@@ -692,7 +694,7 @@ namespace PartyInc
             }
 
             /// <summary>
-            /// DELETES a document of id “id” within a collection.
+            /// DELETES a document of id “id” within a collection.s
             /// The Continue brings back information of wether the operation was successful or not.
             /// </summary>
             /// <param name="collection"></param>
@@ -701,6 +703,45 @@ namespace PartyInc
             public void Delete(CollectionReference collection, string id, Action<FirestoreCallResult> Continue)
             {
                 // TODO: Do this but in a trusted environment (Cloud functions).
+            }
+
+            public void QueryAllDocumentsInCollection(CollectionReference collection, Action<FirestoreCallResult> Continue)
+            {
+                FirestoreCallResult result = new FirestoreCallResult();
+                result.exceptions = new List<FirestoreException>();
+
+                collection.GetSnapshotAsync().ContinueWithOnMainThread(task =>
+                {
+                    if (task.IsFaulted || task.IsCanceled)
+                    {
+                        TaskFaulted(task, result);
+
+                        result.success = false;
+                        result.data = null;
+                        result.oldData = null;
+
+                        Continue(result);
+                        return;
+                    }
+
+                    if (task.IsCompleted)
+                    {
+                        Debug.Log("Query completed");
+
+                        Dictionary<string, object> allDocuments = new Dictionary<string, object>();
+                        foreach(DocumentSnapshot doc in task.Result.Documents)
+                        {
+                            allDocuments.Add(doc.Id, doc.ToDictionary());
+                        }
+
+                        result.success = true;
+                        result.data = allDocuments;
+                        result.oldData = null;
+
+                        Continue(result);
+                        return;
+                    }
+                });
             }
 
             private void TaskFaulted(Task task, FirestoreCallResult result)

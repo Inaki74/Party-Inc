@@ -18,8 +18,7 @@ namespace PartyInc
             public void BtnNewPlayer()
             {
                 Mng_SceneNavigationSystem.Current.DeactivateActiveScene();
-                //Mng_SceneNavigationSystem.Current.ActivateLoadedScene((int)Stt_SceneIndexes.LAUNCHER_SIGNUP);
-                Mng_SceneNavigationSystem.Current.ActivateLoadedScene((int)Stt_SceneIndexes.AVATAR_CLOSE_STORE);
+                Mng_SceneNavigationSystem.Current.ActivateLoadedScene((int)Stt_SceneIndexes.LAUNCHER_SIGNUP);
             }
         }
     }

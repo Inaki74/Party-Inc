@@ -32,9 +32,8 @@ namespace PartyInc
             public const string FIRESTORE_KEY_PLAYER_DATA_WALLPAPER = "wallpaper";
 
             //PLAYER ASSETS KEYS
-            public const string FIRESTORE_KEY_PLAYER_ASSETS_ID = "assetId";
-            public const string FIRESTORE_KEY_PLAYER_ASSETS_TYPE = "assetType";
-            public const string FIRESTORE_KEY_PLAYER_ASSETS_VARIATIONS = "assetVariations";
+            public const string FIRESTORE_KEY_PLAYER_ASSETS_ID = "assetid";
+            public const string FIRESTORE_KEY_PLAYER_ASSETS_TYPE = "assettype";
 
             // PLAYER STATS KEYS
             public const string FIRESTORE_KEY_PLAYER_STATS = "stats";

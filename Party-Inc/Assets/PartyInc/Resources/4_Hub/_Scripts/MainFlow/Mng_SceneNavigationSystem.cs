@@ -24,7 +24,7 @@ namespace PartyInc
 
         private void Start()
         {
-            int[] essScns = { (int)Stt_SceneIndexes.GAME_LIST, (int)Stt_SceneIndexes.LAUNCHER_SIGNIN, (int)Stt_SceneIndexes.AVATAR_CLOSE_STORE, (int)Stt_SceneIndexes.PLAYER_FORK };
+            int[] essScns = { (int)Stt_SceneIndexes.GAME_LIST, (int)Stt_SceneIndexes.LAUNCHER_SIGNIN, (int)Stt_SceneIndexes.LAUNCHER_SIGNUP, (int)Stt_SceneIndexes.PLAYER_FORK };
             EssentialHubScenes = essScns;
         }
 
@@ -96,7 +96,7 @@ namespace PartyInc
         /// </summary>
         /// <param name="index"></param>
         /// <returns></returns>
-        public bool ActivateLoadedScene(int index)
+        public void ActivateLoadedScene(int index)
         {
             Scene sceneToActivate = SceneManager.GetSceneByBuildIndex(index);
 
@@ -111,10 +111,10 @@ namespace PartyInc
 
                 _sceneStack.Push(index);
 
-                return true;
+                return;
             }
-            
-            return false;
+
+            StartCoroutine(LoadSceneAsync(index));
         }
 
         /// <summary>
@@ -182,6 +182,16 @@ namespace PartyInc
 
             Progress = 0f;
             LoadingScenesAsync = false;
+        }
+
+        public IEnumerator LoadSceneAsync(int sceneToLoad)
+        {
+            AsyncOperation load = SceneManager.LoadSceneAsync(sceneToLoad, LoadSceneMode.Additive);
+
+            yield return new WaitUntil(() => load.isDone);
+            yield return new WaitForSeconds(0.2f);
+
+            ActivateLoadedScene(sceneToLoad);
         }
 
         private IEnumerator UpdateProgress(int[] scenesToLoad, List<AsyncOperation> loadingScenes)
