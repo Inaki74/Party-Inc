@@ -11,7 +11,6 @@ namespace PartyInc
     {
         public class Mono_CharacterEditorController : MonoBehaviour
         {
-            
             [SerializeField] protected Toggle[] _allToggles = new Toggle[24];
             protected const int FACE_LOWER_BOUND = 16; // 16->skin, 17->eyes, 18->brows, 19->nose, 20->lips, 21->makeup, 22->wrinkles, 23->beauty
             protected const int FACE_UPPER_BOUND = 23;
@@ -137,13 +136,13 @@ namespace PartyInc
                     }
                 }
 
-                print(theButtons.Count);
-
                 // If the chosen asset id is a variation and the variation ISNT present, we need to find its parent here and trigger it.
                 if (chosenAssetId.Contains(Mng_CharacterEditorCache.ASSET_NAME_SEPARATOR) && !theButtons.Any(b => b.AssetData.AssetId == chosenAssetId))
                 {
                     chosenAssetId = chosenAssetId.Split(Mng_CharacterEditorCache.ASSET_NAME_SEPARATOR)[0];
                 }
+
+                print(chosenAssetId);
 
                 Mono_AssetButtonHandler chosenButtonHandler = theButtons.First(b => b.AssetData.AssetId == chosenAssetId);
 

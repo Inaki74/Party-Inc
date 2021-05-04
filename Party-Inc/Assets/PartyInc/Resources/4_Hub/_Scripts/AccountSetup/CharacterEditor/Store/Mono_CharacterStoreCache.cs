@@ -26,14 +26,23 @@ namespace PartyInc
 
             private bool _ownedItemsIdentified = false;
             private List<AssetsStoreData>[] _displayAssetsStoreData = new List<AssetsStoreData>[24];
+            public List<AssetsStoreData>[] DisplayAssetsStoreData
+            {
+                get
+                {
+                    return _displayAssetsStoreData;
+                }
+                set
+                {
+                    _displayAssetsStoreData = value;
+                }
+            }
 
             private void Update()
             {
                 if (GotData && !_ownedItemsIdentified)
                 {
                     IdentifyUnownedItems();
-
-
                 }
             }
 
@@ -79,6 +88,11 @@ namespace PartyInc
                 });
             }
 
+            public AssetsStoreData GetAssetData(string assetid, int assettype)
+            {
+                return _displayAssetsStoreData[assettype].First(ass => ass.assetid == assetid);
+            }
+
             private void IdentifyUnownedItems()
             {
                 Debug.Log("IdOwnedItems");
@@ -118,7 +132,6 @@ namespace PartyInc
                     }
                 }
             }
-
 
             private void InitializeStoreCache()
             {

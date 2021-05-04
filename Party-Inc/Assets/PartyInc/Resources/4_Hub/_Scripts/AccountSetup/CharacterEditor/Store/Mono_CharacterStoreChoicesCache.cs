@@ -9,6 +9,17 @@ namespace PartyInc
         public class Mono_CharacterStoreChoicesCache : MonoBehaviour
         {
             private List<string> _chosenAssets = new List<string>();
+            public List<string> ChoosenAssets
+            {
+                get
+                {
+                    return _chosenAssets;
+                }
+                set
+                {
+                    _chosenAssets = value;
+                }
+            }
 
             // Start is called before the first frame update
             void Start()

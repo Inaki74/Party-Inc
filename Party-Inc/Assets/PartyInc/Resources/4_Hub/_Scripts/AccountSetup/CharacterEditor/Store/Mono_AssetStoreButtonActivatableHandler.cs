@@ -8,10 +8,8 @@ namespace PartyInc
 {
     namespace Hub
     {
-        public class Mono_AssetStoreButtonActivatableHandler : Mono_AssetButtonHandler
+        public class Mono_AssetStoreButtonActivatableHandler : Mono_AssetStoreButtonHandler
         {
-            [SerializeField] private Text _priceText;
-
             public override void InitializeButton(Data_CharacterAssetMetadata assetData, ToggleGroup theTG, Action<Data_CharacterAssetMetadata> onToggle)
             {
                 base.InitializeButton(assetData, theTG, onToggle);

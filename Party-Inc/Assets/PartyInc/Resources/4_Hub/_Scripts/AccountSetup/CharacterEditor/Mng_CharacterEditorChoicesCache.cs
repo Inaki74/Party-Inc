@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 
 namespace PartyInc
 {
@@ -30,6 +31,16 @@ namespace PartyInc
             {
                 //TODO: make it
                 return null;
+            }
+
+            public void AddStoreAssetToCart(string assetid)
+            {
+                if(_storeCache.ChoosenAssets.Any(asset => asset == assetid))
+                {
+                    return;
+                }
+
+                _storeCache.ChoosenAssets.Add(assetid);
             }
 
             public string GetChosenAssetId(Enum_CharacterAssetTypes assetType)

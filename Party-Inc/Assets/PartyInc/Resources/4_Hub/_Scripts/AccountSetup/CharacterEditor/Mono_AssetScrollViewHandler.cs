@@ -38,6 +38,11 @@ namespace PartyInc
                     element.tag = "Carousel";
 
                     Mono_AssetButtonHandler buttonHandler = element.GetComponent<Mono_AssetButtonHandler>();
+                    if(buttonHandler == null)
+                    {
+                        buttonHandler = element.GetComponentInChildren<Mono_AssetButtonHandler>();
+                    }
+
                     buttonHandler.InitializeButton(unit, buttonsToggle, onToggle);// (unit)
 
                     _toggles.Add(buttonHandler);

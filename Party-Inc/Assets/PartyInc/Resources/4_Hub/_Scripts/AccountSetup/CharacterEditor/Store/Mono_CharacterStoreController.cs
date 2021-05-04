@@ -9,6 +9,9 @@ namespace PartyInc
     {
         public class Mono_CharacterStoreController : Mono_CharacterEditorController
         {
+            [SerializeField] private GameObject _storeAssetButtonScrollView;
+            [SerializeField] private GameObject _storeAssetButtonScrollViewPlayable;
+
             protected override void IdentifyToggledOptionsAndLoadPlayableCarousel(Enum_CharacterAssetTypes toggled)
             {
                 Data_CharacterAssetMetadata[] metadataArray = Mng_CharacterEditorCache.Current.GetParentsDisplayAssetsMetadata((int)toggled).ToArray();
@@ -26,27 +29,24 @@ namespace PartyInc
                     {
                         if (i == 0)
                         {
+                            // Store buttons
+                            // This activation needs to be different (button hold)
                             print("feature");
                             // feature
                             ActivateVariableCarousel(
-                                _assetButtonScrollView,
+                                _storeAssetButtonScrollView,
                                 10,
                                 Mng_CharacterEditorCache.Current.GetParentsDisplayAssetsMetadata((int)toggleSelected).ToArray());
                         }
                         else if (i == 1)
                         {
+                            // Closet buttons
                             print("color");
                             // color
                             ActivateVariableCarousel(
                                 _assetButtonScrollView,
                                 10,
                                 Mng_CharacterEditorCache.Current.GetVariationsOfSelectedAsset(toggleSelected).ToArray());
-                        }
-                        else
-                        {
-                            print("position");
-                            // position
-                            ActivatePositionSliders(toggleSelected, OnToggleGetPositionInfo);
                         }
                     }
                 }
@@ -57,7 +57,7 @@ namespace PartyInc
                 if (metadataArray.Length > 0)
                 {
                     ActivateVariableCarousel(
-                    _assetButtonScrollViewPlayable,
+                    _storeAssetButtonScrollViewPlayable,
                     6,
                     metadataArray);
 
@@ -67,6 +67,7 @@ namespace PartyInc
 
             protected override void OnToggleGetInfo(Data_CharacterAssetMetadata assetData)
             {
+                // This looks the same
                 base.OnToggleGetInfo(assetData);
             }
 
@@ -77,7 +78,7 @@ namespace PartyInc
 
             protected override void Outro()
             {
-                Mono_CharacterStoreClosetNavigation.onStoreChangePage += OnPageChange;
+                Mono_CharacterStoreClosetNavigation.onStoreChangePage -= OnPageChange;
             }
         }
     }

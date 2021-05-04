@@ -18,6 +18,7 @@ namespace PartyInc
             public void BtnNewPlayer()
             {
                 Mng_SceneNavigationSystem.Current.DeactivateActiveScene();
+                Mng_SceneProps.Current.SetProperty<string>(Mono_StoreClosetResolver.SCENE_PROPS_KEY, "closet");
                 Mng_SceneNavigationSystem.Current.ActivateLoadedScene((int)Stt_SceneIndexes.LAUNCHER_SIGNUP);
             }
         }

@@ -10,28 +10,43 @@ namespace PartyInc
         {
             [SerializeField] private GameObject[] _closetPages;
             [SerializeField] private GameObject[] _storePages;
-            [SerializeField] private GameObject _base;
+            [SerializeField] private GameObject _loading;
 
             private int _lastClosetPage = 1;
-            private int _lastStorePage = 1;
+            private int _lastStorePage = 2;
 
             public delegate void ActionChangePage(Enum_CharacterEditorPages page);
             public static event ActionChangePage onClosetChangePage;
             public static event ActionChangePage onStoreChangePage;
 
-            // Start is called before the first frame update
-            private void OnEnable()
+            private void Start()
             {
-                // TODO: Need a way to determine if the user entered to the store first or to the closet first
+                if (FindObjectOfType<Mono_StoreClosetResolver>().EnteredStore)
+                {
+                    StartCoroutine(ActivateStorePage());
+                }
+                else
+                {
+                    _closetPages[_lastClosetPage].SetActive(true);
 
-                _closetPages[_lastClosetPage].SetActive(true);
-
-                onClosetChangePage?.Invoke((Enum_CharacterEditorPages)_lastClosetPage);
+                    onClosetChangePage?.Invoke((Enum_CharacterEditorPages)_lastClosetPage);
+                }
             }
 
             private void OnDisable()
             {
                 
+            }
+
+            private IEnumerator ActivateStorePage()
+            {
+                _storePages[_lastStorePage].SetActive(true);
+                _loading.SetActive(true);
+
+                yield return new WaitUntil(() => Mng_CharacterEditorCache.Current.GetAssetStoreReady());
+                _loading.SetActive(false);
+
+                onStoreChangePage?.Invoke((Enum_CharacterEditorPages)_lastStorePage);
             }
 
             public void OnStorePageToggle(int pageType)

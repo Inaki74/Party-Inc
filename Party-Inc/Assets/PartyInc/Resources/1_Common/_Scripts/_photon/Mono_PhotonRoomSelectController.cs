@@ -224,6 +224,9 @@ namespace PartyInc
         public void GoToClosetStore()
         {
             Mng_SceneNavigationSystem.Current.DeactivateActiveScene();
+
+            Mng_SceneProps.Current.SetProperty<string>(Hub.Mono_StoreClosetResolver.SCENE_PROPS_KEY, "store");
+
             Mng_SceneNavigationSystem.Current.ActivateLoadedScene((int)Stt_SceneIndexes.AVATAR_CLOSE_STORE);
         }
     }

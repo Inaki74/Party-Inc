@@ -168,7 +168,7 @@ namespace PartyInc
 
                 for(int i = 0; i < amountOfCarouselElements; i++)
                 {
-                    int amountNewList = 0;
+                    int amountNewList;
 
                     // 
                     if(amountOfButtons - i * _amountOfElementsPerScrollView >= _amountOfElementsPerScrollView)

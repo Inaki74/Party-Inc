@@ -93,7 +93,7 @@ namespace PartyInc
             {
                 List<Data_CharacterAssetMetadata> variationsMetadata = new List<Data_CharacterAssetMetadata>();
                 string selectedAssetForType = Mng_CharacterEditorChoicesCache.Current.GetChosenAssetId(type);
-                Data_CharacterAssetMetadata theSelectedAsset = _ownedAssets[(int)type].First(m => m.AssetId == selectedAssetForType);
+                Data_CharacterAssetMetadata theSelectedAsset = _allAssetsMetadata[(int)type].First(m => m.AssetId == selectedAssetForType);
 
                 if (!theSelectedAsset.IsVariation)
                 {
@@ -114,7 +114,7 @@ namespace PartyInc
                     string[] split = theSelectedAsset.AssetId.Split(ASSET_NAME_SEPARATOR);
 
                     string parentAssetForType = split[0];
-                    Data_CharacterAssetMetadata theSelectedAssetsParent = _ownedAssets[(int)type].First(m => m.AssetId == parentAssetForType);
+                    Data_CharacterAssetMetadata theSelectedAssetsParent = _allAssetsMetadata[(int)type].First(m => m.AssetId == parentAssetForType);
 
                     variationsMetadata.Add(theSelectedAssetsParent);
 
@@ -201,6 +201,7 @@ namespace PartyInc
 
             public List<Data_CharacterAssetMetadata> GetParentsDisplayAssetsMetadata(int type)
             {
+
                 List<Data_CharacterAssetMetadata> listWithoutVariations = new List<Data_CharacterAssetMetadata>();
 
                 foreach (Data_CharacterAssetMetadata metadata in _storeDisplayAssetsMetadata[type])
@@ -214,6 +215,16 @@ namespace PartyInc
                 return listWithoutVariations;
             }
 
+            public AssetsStoreData GetAssetStoreData(string assetId, int assetType)
+            {
+                return _storeCache.GetAssetData(assetId, assetType);
+            }
+
+            public bool GetAssetStoreReady()
+            {
+                return _storeCache.GotData;
+            }
+
             private IEnumerator StartCache()
             {
                 // Get the owned assets list (already in memory)
@@ -221,8 +232,6 @@ namespace PartyInc
                 // Build up lists for each type of asset (24)
 
                 yield return new WaitUntil(() => Fb_FirebaseAuthenticateManager.Current.AuthInitialized);
-
-                
 
                 if (Fb_FirebaseAuthenticateManager.Current.Auth.CurrentUser != null)
                 {
@@ -236,6 +245,10 @@ namespace PartyInc
 
                     print("About to get asset data");
                     _storeCache.GetAllAssetsStoreData();
+                    print("About to check get data");
+                    yield return new WaitUntil(() => _storeCache.GotData);
+                    print("Got data");
+                    BuildDisplayList();
                 }
                 else
                 {
@@ -254,6 +267,24 @@ namespace PartyInc
                 //    LoadAssetImages(assetId);
                 //    LoadAssetModels(assetId);
                 //}
+            }
+
+            private void BuildDisplayList()
+            {
+                print("Build list");
+                List<AssetsStoreData>[] displayStoreList = _storeCache.DisplayAssetsStoreData;
+
+                int i = 0;
+                foreach(List<AssetsStoreData> assetList in displayStoreList)
+                {
+                    foreach(AssetsStoreData asset in assetList)
+                    {
+                        _storeDisplayAssetsMetadata[i].Add(_allAssetsMetadata[i].Find(assetMeta => assetMeta.AssetId == asset.assetid));
+                    }
+
+                    i++;
+                }
+                //_storeDisplayAssetsMetadata;
             }
 
             private void SetupOwnedAssets()
@@ -276,11 +307,34 @@ namespace PartyInc
 
             private void SetChosenAssetsToDefault()
             {
-                for(int i = 0; i < _ownedAssets.Length; i++)
+                if (FindObjectOfType<Mono_StoreClosetResolver>().EnteredStore)
                 {
-                    if(_ownedAssets[i].Count > 0)
+                    SetChosenAssetsStore();
+                }
+                else
+                {
+                    SetChosenAssetsCloset();
+                }
+            }
+
+            public void SetChosenAssetsCloset()
+            {
+                for (int i = 0; i < _ownedAssets.Length; i++)
+                {
+                    if (_ownedAssets[i].Count > 0)
                     {
                         Mng_CharacterEditorChoicesCache.Current.ChooseAsset(_ownedAssets[i].First().AssetId, (Enum_CharacterAssetTypes)i);
+                    }
+                }
+            }
+
+            public void SetChosenAssetsStore()
+            {
+                for (int i = 0; i < _storeDisplayAssetsMetadata.Length; i++)
+                {
+                    if (_storeDisplayAssetsMetadata[i].Count > 0)
+                    {
+                        Mng_CharacterEditorChoicesCache.Current.ChooseAsset(_storeDisplayAssetsMetadata[i].First().AssetId, (Enum_CharacterAssetTypes)i);
                     }
                 }
             }
