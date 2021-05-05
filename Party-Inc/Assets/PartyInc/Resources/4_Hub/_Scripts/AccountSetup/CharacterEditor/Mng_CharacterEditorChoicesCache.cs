@@ -27,20 +27,19 @@ namespace PartyInc
                 }
             }
 
-            public string GetChosenStoreAssetId(Enum_CharacterAssetTypes assetType)
+            public List<AssetsStoreData> GetChosenStoreAssets()
             {
-                //TODO: make it
-                return null;
+                return _storeCache.ChosenAssets;
             }
 
-            public void AddStoreAssetToCart(string assetid)
+            public void AddStoreAssetToCart(AssetsStoreData assetData)
             {
-                if(_storeCache.ChoosenAssets.Any(asset => asset == assetid))
-                {
-                    return;
-                }
+                _storeCache.AddAsset(assetData);
+            }
 
-                _storeCache.ChoosenAssets.Add(assetid);
+            public void RemoveStoreAssetFromCart(AssetsStoreData assetData)
+            {
+                _storeCache.RemoveAsset(assetData);
             }
 
             public string GetChosenAssetId(Enum_CharacterAssetTypes assetType)

@@ -33,6 +33,10 @@ namespace PartyInc
             [SerializeField] protected GameObject _assetButtonScrollView;
             [SerializeField] protected GameObject _assetButtonScrollViewPlayable;
 
+            [SerializeField] protected GameObject _searchModalScreen;
+            [SerializeField] protected GameObject _sortModalScreen;
+
+
             // Start is called before the first frame update
             void Start()
             {
@@ -290,7 +294,18 @@ namespace PartyInc
                 }
             }
 
+            public void BtnOpenSearchModal()
+            {
+                _searchModalScreen.SetActive(true);
+            }
+
+            public void BtnOpenSortModal()
+            {
+                _sortModalScreen.SetActive(true);
+            }
+
             protected int _optionCounter = 0;
+
 
             public void OnOptionToggle(int pageToggle)
             {

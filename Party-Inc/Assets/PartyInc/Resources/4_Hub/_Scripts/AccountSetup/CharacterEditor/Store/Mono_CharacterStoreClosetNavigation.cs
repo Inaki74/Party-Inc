@@ -66,6 +66,13 @@ namespace PartyInc
 
                 onClosetChangePage?.Invoke((Enum_CharacterEditorPages) pageType);
             }
+
+            public void BtnGoBack()
+            {
+                // Where to?
+                //TODO: Actually decide where go back to
+
+            }
         }
     }
 }

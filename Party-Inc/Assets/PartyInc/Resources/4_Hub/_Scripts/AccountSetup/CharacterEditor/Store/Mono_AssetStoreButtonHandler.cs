@@ -29,11 +29,12 @@ namespace PartyInc
 
             private void OnHoldButton()
             {
-                Mng_CharacterEditorChoicesCache.Current.AddStoreAssetToCart(AssetData.AssetId);
+                Mng_CharacterEditorChoicesCache.Current.AddStoreAssetToCart(storeData);
             }
 
             private IEnumerator GetStoreInformation()
             {
+                // I think this is unneeded
                 yield return new WaitUntil(() => Mng_CharacterEditorCache.Current.GetAssetStoreReady());
 
                 storeData = Mng_CharacterEditorCache.Current.GetAssetStoreData(AssetData.AssetId, (int)AssetData.AssetType);

@@ -129,46 +129,6 @@ namespace PartyInc
                 return variationsMetadata;
             }
 
-            public List<Data_CharacterAssetMetadata> GetVariationsOfSelectedDisplayAsset(Enum_CharacterAssetTypes type)
-            {
-                List<Data_CharacterAssetMetadata> variationsMetadata = new List<Data_CharacterAssetMetadata>();
-                string selectedAssetForType = Mng_CharacterEditorChoicesCache.Current.GetChosenStoreAssetId(type);
-                Data_CharacterAssetMetadata theSelectedAsset = _storeDisplayAssetsMetadata[(int)type].First(m => m.AssetId == selectedAssetForType);
-
-                if (!theSelectedAsset.IsVariation)
-                {
-                    // The parent is, in itself, a variation
-                    variationsMetadata.Add(theSelectedAsset);
-
-                    List<Data_CharacterAssetMetadata> variationsList = theSelectedAsset.VariationAssets;
-
-                    foreach (Data_CharacterAssetMetadata variation in variationsList)
-                    {
-                        print(variation);
-                        variationsMetadata.Add(variation);
-                    }
-                }
-                else
-                {
-                    // Its a variation, look for parent and then get its variations
-                    string[] split = theSelectedAsset.AssetId.Split(ASSET_NAME_SEPARATOR);
-
-                    string parentAssetForType = split[0];
-                    Data_CharacterAssetMetadata theSelectedAssetsParent = _ownedAssets[(int)type].First(m => m.AssetId == parentAssetForType);
-
-                    variationsMetadata.Add(theSelectedAssetsParent);
-
-                    List<Data_CharacterAssetMetadata> variationsList = theSelectedAssetsParent.VariationAssets;
-
-                    foreach (Data_CharacterAssetMetadata variation in variationsList)
-                    {
-                        variationsMetadata.Add(variation);
-                    }
-                }
-
-                return variationsMetadata;
-            }
-
             public List<Data_CharacterAssetMetadata> GetParentsMetadataListOfAssetType(int type)
             {
                 List<Data_CharacterAssetMetadata> listWithoutVariations = new List<Data_CharacterAssetMetadata>();
@@ -201,7 +161,6 @@ namespace PartyInc
 
             public List<Data_CharacterAssetMetadata> GetParentsDisplayAssetsMetadata(int type)
             {
-
                 List<Data_CharacterAssetMetadata> listWithoutVariations = new List<Data_CharacterAssetMetadata>();
 
                 foreach (Data_CharacterAssetMetadata metadata in _storeDisplayAssetsMetadata[type])
@@ -344,7 +303,6 @@ namespace PartyInc
                 for(int i = 0; i < _ownedAssetsIds.Length; i++)
                 {
                     Enum_CharacterAssetTypes currentType = (Enum_CharacterAssetTypes)i;
-                    List<Data_CharacterAssetMetadata> ownedAssetMetadataListForType = new List<Data_CharacterAssetMetadata>();
 
                     foreach(string id in _ownedAssetsIds[i])
                     {
@@ -352,7 +310,7 @@ namespace PartyInc
                         {
                             Data_CharacterAssetMetadata theMetadata = _allAssetsMetadata[(int)currentType].First(m => m.AssetId == id);
 
-                            ownedAssetMetadataListForType.Add(theMetadata);
+                            _ownedAssets[(int)currentType].Add(theMetadata);
 
                             if (theMetadata.VariationAssets.Count() > 0)
                             {
@@ -362,7 +320,7 @@ namespace PartyInc
                                 {
                                     print("Asset of type: " + currentType + " and id: " + variation.AssetId);
 
-                                    ownedAssetMetadataListForType.Add(variation);
+                                    _ownedAssets[(int)currentType].Add(variation);
                                 }
                             }
                         }
@@ -371,8 +329,6 @@ namespace PartyInc
                             // Something went wrong (DB impairment with local metadata files probably).
                         }
                     }
-
-                    _ownedAssets[(int)currentType] = ownedAssetMetadataListForType;
                 }
             }
 
@@ -424,7 +380,7 @@ namespace PartyInc
                 var fieldInfo = _initialAssets.GetType().GetField(fieldName);
                 var type = ((AssetsType)Attribute.GetCustomAttribute(fieldInfo, typeof(AssetsType))).Type;
 
-                _ownedAssets[(int)type] = new List<Data_CharacterAssetMetadata>();
+                //_ownedAssets[(int)type] = 
 
                 foreach(Data_CharacterAssetMetadata metadata in field)
                 {

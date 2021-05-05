@@ -12,6 +12,15 @@ namespace PartyInc
             [SerializeField] private GameObject _storeAssetButtonScrollView;
             [SerializeField] private GameObject _storeAssetButtonScrollViewPlayable;
 
+            [SerializeField] private GameObject _checkoutModalScreen;
+            [SerializeField] private GameObject _indicatorBadge;
+            [SerializeField] private Text _indicatorCountText;
+
+            public void BtnOpenCheckoutModal()
+            {
+                _checkoutModalScreen.SetActive(true);
+            }
+
             protected override void IdentifyToggledOptionsAndLoadPlayableCarousel(Enum_CharacterAssetTypes toggled)
             {
                 Data_CharacterAssetMetadata[] metadataArray = Mng_CharacterEditorCache.Current.GetParentsDisplayAssetsMetadata((int)toggled).ToArray();
@@ -74,11 +83,29 @@ namespace PartyInc
             protected override void Init()
             {
                 Mono_CharacterStoreClosetNavigation.onStoreChangePage += OnPageChange;
+                Mono_CharacterStoreChoicesCache.onChosenAssetListModified += UpdateCheckoutIndicator;
             }
 
             protected override void Outro()
             {
                 Mono_CharacterStoreClosetNavigation.onStoreChangePage -= OnPageChange;
+                Mono_CharacterStoreChoicesCache.onChosenAssetListModified -= UpdateCheckoutIndicator;
+            }
+
+            private void UpdateCheckoutIndicator(int amountOfElements)
+            {
+                if(amountOfElements <= 0)
+                {
+                    _indicatorBadge.SetActive(false);
+                    return;
+                }
+
+                if (!_indicatorBadge.activeInHierarchy)
+                {
+                    _indicatorBadge.SetActive(true);
+                }
+
+                _indicatorCountText.text = amountOfElements.ToString();
             }
         }
     }

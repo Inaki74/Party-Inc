@@ -12,10 +12,27 @@ namespace PartyInc
 
         public struct AssetsStoreData
         {
+            public Enum_CharacterAssetTypes assettype; 
             public int baseprice;
             public int premiumprice;
             public string storename;
             public string assetid;
+            public Enum_AssetRarities rarity;
+
+
+            public override bool Equals(object obj)
+            {
+                AssetsStoreData outsider = (AssetsStoreData)obj;
+                return this.assetid == outsider.assetid;
+            }
+        }
+
+        public enum Enum_AssetRarities
+        {
+            COMMON = 0,
+            UNCOMMON = 1,
+            RARE = 2,
+            UNIQUE = 3
         }
 
         public class Mono_CharacterStoreCache : MonoBehaviour
@@ -67,6 +84,12 @@ namespace PartyInc
                                 newData.assetid = (string)Convert.ChangeType(theAsset[Fb_Constants.FIRESTORE_KEY_ASSETS_ASSETID], typeof(string));
                                 newData.premiumprice = (int)Convert.ChangeType(theAsset[Fb_Constants.FIRESTORE_KEY_ASSETS_PREMIUMPRICE], typeof(int));
                                 newData.storename = (string)Convert.ChangeType(theAsset[Fb_Constants.FIRESTORE_KEY_ASSETS_NAME], typeof(string));
+
+                                int assettype = (int)Convert.ChangeType(theAsset[Fb_Constants.FIRESTORE_KEY_ASSETS_TYPE], typeof(int));
+                                int rarity = (int)Convert.ChangeType(theAsset[Fb_Constants.FIRESTORE_KEY_ASSETS_RARITY], typeof(int));
+
+                                newData.assettype = (Enum_CharacterAssetTypes)assettype;
+                                newData.rarity = (Enum_AssetRarities)rarity;
 
                                 int type = (int)Convert.ChangeType(theAsset[Fb_Constants.FIRESTORE_KEY_ASSETS_TYPE], typeof(int));
 
