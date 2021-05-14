@@ -308,6 +308,7 @@ MonoBehaviour:
   _elementToSpawnPrefab: {fileID: 8757832637795689934, guid: 7db329417d28f45a89e9be22db8cc065,
     type: 3}
   _spawnerContainer: {fileID: 660888751024467920}
+  _isStore: 1
 --- !u!1 &7194690362975120398
 GameObject:
   m_ObjectHideFlags: 0

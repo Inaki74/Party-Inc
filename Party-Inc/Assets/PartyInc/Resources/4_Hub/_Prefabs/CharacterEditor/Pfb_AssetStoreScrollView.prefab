@@ -521,3 +521,4 @@ MonoBehaviour:
   _elementToSpawnPrefab: {fileID: 6456388816680808766, guid: 893893b5b5c3845ad913b50fc2f13129,
     type: 3}
   _spawnerContainer: {fileID: 5652009117064947783}
+  _isStore: 1

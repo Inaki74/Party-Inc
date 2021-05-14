@@ -266,11 +266,7 @@ namespace PartyInc
 
             private void SetChosenAssetsToDefault()
             {
-                if (FindObjectOfType<Mono_StoreClosetResolver>().EnteredStore)
-                {
-                    SetChosenAssetsStore();
-                }
-                else
+                if (!FindObjectOfType<Mono_StoreClosetResolver>().EnteredStore)
                 {
                     SetChosenAssetsCloset();
                 }
@@ -283,17 +279,6 @@ namespace PartyInc
                     if (_ownedAssets[i].Count > 0)
                     {
                         Mng_CharacterEditorChoicesCache.Current.ChooseAsset(_ownedAssets[i].First().AssetId, (Enum_CharacterAssetTypes)i);
-                    }
-                }
-            }
-
-            public void SetChosenAssetsStore()
-            {
-                for (int i = 0; i < _storeDisplayAssetsMetadata.Length; i++)
-                {
-                    if (_storeDisplayAssetsMetadata[i].Count > 0)
-                    {
-                        Mng_CharacterEditorChoicesCache.Current.ChooseAsset(_storeDisplayAssetsMetadata[i].First().AssetId, (Enum_CharacterAssetTypes)i);
                     }
                 }
             }

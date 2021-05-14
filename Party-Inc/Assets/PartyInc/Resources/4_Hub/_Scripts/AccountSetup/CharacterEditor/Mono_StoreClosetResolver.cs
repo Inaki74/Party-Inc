@@ -14,6 +14,9 @@ namespace PartyInc
 
             public bool OnStore { get; private set; }
 
+            public delegate void ClosetStoreSwitch(bool toStore);
+            public static event ClosetStoreSwitch onClosetStoreSwitch;
+
             [SerializeField] private Toggle[] _storeClosetToggles = new Toggle[2]; // 0 -> closet, 1 -> store
             [SerializeField] private GameObject _closetEditor;
             [SerializeField] private GameObject _storeEditor;
@@ -71,7 +74,15 @@ namespace PartyInc
                     _storeEditor.SetActive(false);
                     OnStore = false;
                 }
+
+                StartCoroutine("WaitAFrameCo");
                 
+            }
+
+            private IEnumerator WaitAFrameCo()
+            {
+                yield return new WaitForEndOfFrame();
+                onClosetStoreSwitch?.Invoke(OnStore);
             }
         }
     }

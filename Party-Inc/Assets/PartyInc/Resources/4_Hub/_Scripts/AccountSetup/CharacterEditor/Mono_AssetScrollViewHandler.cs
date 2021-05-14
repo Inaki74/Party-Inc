@@ -25,6 +25,7 @@ namespace PartyInc
 
             [SerializeField] private GameObject _elementToSpawnPrefab;
             [SerializeField] private GameObject _spawnerContainer;
+            [SerializeField] private bool _isStore;
 
             public void InitializeScrollview(Data_CharacterAssetMetadata[] data, ToggleGroup buttonsToggle, Action<Data_CharacterAssetMetadata> onToggle)
             {
@@ -43,6 +44,7 @@ namespace PartyInc
                         buttonHandler = element.GetComponentInChildren<Mono_AssetButtonHandler>();
                     }
 
+                    buttonsToggle.allowSwitchOff = _isStore;
                     buttonHandler.InitializeButton(unit, buttonsToggle, onToggle);// (unit)
 
                     _toggles.Add(buttonHandler);

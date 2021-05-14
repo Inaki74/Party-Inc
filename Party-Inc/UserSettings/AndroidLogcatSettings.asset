@@ -3,7 +3,7 @@
     "m_SelectedPackage": {
         "deviceId": "LDG4C18508000010",
         "name": "com.LoopStudios.PartyInc",
-        "processId": 5423,
+        "processId": 19715,
         "exited": false
     },
     "m_SelectedPriority": 0,
@@ -78,6 +78,12 @@
             "deviceId": "LDG4C18508000010",
             "name": "com.LoopStudios.PartyInc",
             "processId": 5423,
+            "exited": false
+        },
+        {
+            "deviceId": "LDG4C18508000010",
+            "name": "com.LoopStudios.PartyInc",
+            "processId": 19715,
             "exited": false
         }
     ],

@@ -19,7 +19,13 @@ namespace PartyInc
             {
                 base.InitializeButton(assetData, theTG, onToggle);
 
-                _onHoldAction.OnHold = OnHoldButton;
+
+                //_onHoldAction.OnHold = OnHoldButton;
+
+                _theToggle.onValueChanged.AddListener(delegate
+                {
+                    OnToggleOff();
+                });
 
                 // We need:
                 // Price of the asset
@@ -40,6 +46,14 @@ namespace PartyInc
                 storeData = Mng_CharacterEditorCache.Current.GetAssetStoreData(AssetData.AssetId, (int)AssetData.AssetType);
 
                 _priceText.text = storeData.baseprice.ToString();
+            }
+
+            private void OnToggleOff()
+            {
+                if (!_theToggle.isOn)
+                {
+                    Mng_CharacterEditorChoicesCache.Current.RemoveStoreAssetFromCart(storeData);
+                }
             }
 
             protected override void AwakeOverride()

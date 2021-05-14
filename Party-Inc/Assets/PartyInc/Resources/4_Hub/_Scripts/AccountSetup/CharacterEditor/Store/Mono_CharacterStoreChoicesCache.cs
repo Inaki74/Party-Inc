@@ -9,8 +9,8 @@ namespace PartyInc
     {
         public class Mono_CharacterStoreChoicesCache : MonoBehaviour
         {
-            private List<AssetsStoreData> _chosenAssets = new List<AssetsStoreData>();
-            public List<AssetsStoreData> ChosenAssets
+            private AssetsStoreData[] _chosenAssets = new AssetsStoreData[16];
+            public AssetsStoreData[] ChosenAssets
             {
                 get
                 {
@@ -28,7 +28,10 @@ namespace PartyInc
             // Start is called before the first frame update
             void Start()
             {
-
+                for(int i = 0; i < _chosenAssets.Length; i++)
+                {
+                    _chosenAssets[i] = default;
+                }
             }
 
             // Update is called once per frame
@@ -39,26 +42,35 @@ namespace PartyInc
 
             public void AddAsset(AssetsStoreData assetData)
             {
-                if (_chosenAssets.Any(asset => asset.assetid == assetData.assetid))
-                {
-                    return;
-                }
+                _chosenAssets[(int)assetData.assettype] = assetData;
 
-                _chosenAssets.Add(assetData);
+                int nonDefaultItems = CountNonDefaultItems(_chosenAssets);
 
-                onChosenAssetListModified?.Invoke(_chosenAssets.Count);
+                onChosenAssetListModified?.Invoke(nonDefaultItems);
             }
 
             public void RemoveAsset(AssetsStoreData assetData)
             {
-                if (!_chosenAssets.Any(asset => asset.assetid == assetData.assetid))
+                _chosenAssets[(int) assetData.assettype] = default;
+
+                int nonDefaultItems = CountNonDefaultItems(_chosenAssets);
+
+                onChosenAssetListModified?.Invoke(nonDefaultItems);
+            }
+
+            private int CountNonDefaultItems(AssetsStoreData[] assetData)
+            {
+                int count = 0;
+
+                foreach(AssetsStoreData asset in assetData)
                 {
-                    return;
+                    if (!asset.Equals(default(AssetsStoreData)))
+                    {
+                        count++;
+                    }
                 }
 
-                _chosenAssets.Remove(assetData);
-
-                onChosenAssetListModified?.Invoke(_chosenAssets.Count);
+                return count;
             }
         }
     }

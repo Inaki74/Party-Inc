@@ -33,6 +33,16 @@ namespace PartyInc
                 }
             }
 
+            private void Awake()
+            {
+                Mono_StoreClosetResolver.onClosetStoreSwitch += OnClosetStoreSwitch;
+            }
+
+            private void OnDestroy()
+            {
+                Mono_StoreClosetResolver.onClosetStoreSwitch -= OnClosetStoreSwitch;
+            }
+
             private void OnDisable()
             {
                 
@@ -64,7 +74,19 @@ namespace PartyInc
                 _lastClosetPage = pageType;
                 _closetPages[pageType].SetActive(true);
 
-                onClosetChangePage?.Invoke((Enum_CharacterEditorPages) pageType);
+                onClosetChangePage?.Invoke((Enum_CharacterEditorPages)pageType);
+            }
+
+            public void OnClosetStoreSwitch(bool toStore)
+            {
+                if (toStore)
+                {
+                    onStoreChangePage?.Invoke((Enum_CharacterEditorPages)_lastStorePage);
+                }
+                else
+                {
+                    onClosetChangePage?.Invoke((Enum_CharacterEditorPages) _lastClosetPage);
+                }
             }
 
             public void BtnGoBack()

@@ -148,9 +148,13 @@ namespace PartyInc
 
                 print(chosenAssetId);
 
-                Mono_AssetButtonHandler chosenButtonHandler = theButtons.First(b => b.AssetData.AssetId == chosenAssetId);
+                Mono_AssetButtonHandler chosenButtonHandler = theButtons.FirstOrDefault(b => b.AssetData.AssetId == chosenAssetId);
 
-                chosenButtonHandler.ToggleButton();
+                if (chosenButtonHandler != null && !chosenButtonHandler.Equals(default(Mono_AssetButtonHandler)))
+                {
+                    print("AAAAAA");
+                    chosenButtonHandler.ToggleButton();
+                }
             }
 
             protected void ActivateVariableCarousel(GameObject prefab, int amountElements, Data_CharacterAssetMetadata[] elements)
@@ -265,14 +269,17 @@ namespace PartyInc
                 // If the one im toggling is parent of the current chosen asset, dont change
                 string currentChosenAssetId = Mng_CharacterEditorChoicesCache.Current.GetChosenAssetId(assetData.AssetType);
 
-                if (currentChosenAssetId.Contains(Mng_CharacterEditorCache.ASSET_NAME_SEPARATOR))
+                if (!string.IsNullOrEmpty(currentChosenAssetId))
                 {
-                    // Its a variation
-                    string[] splitCurrentChosenAssetId = currentChosenAssetId.Split(Mng_CharacterEditorCache.ASSET_NAME_SEPARATOR);
-                    if (splitCurrentChosenAssetId[0] == assetData.AssetId)
+                    if (currentChosenAssetId.Contains(Mng_CharacterEditorCache.ASSET_NAME_SEPARATOR))
                     {
-                        // The current chosen asset is a child of the triggered button
-                        return;
+                        // Its a variation
+                        string[] splitCurrentChosenAssetId = currentChosenAssetId.Split(Mng_CharacterEditorCache.ASSET_NAME_SEPARATOR);
+                        if (splitCurrentChosenAssetId[0] == assetData.AssetId)
+                        {
+                            // The current chosen asset is a child of the triggered button
+                            return;
+                        }
                     }
                 }
 

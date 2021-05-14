@@ -27,7 +27,7 @@ namespace PartyInc
                 }
             }
 
-            public List<AssetsStoreData> GetChosenStoreAssets()
+            public AssetsStoreData[] GetChosenStoreAssets()
             {
                 return _storeCache.ChosenAssets;
             }
