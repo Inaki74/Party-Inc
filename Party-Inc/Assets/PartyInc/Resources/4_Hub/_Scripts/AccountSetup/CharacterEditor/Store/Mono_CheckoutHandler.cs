@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace PartyInc
 {
@@ -10,6 +11,12 @@ namespace PartyInc
         {
             [SerializeField] private GameObject _scrollContent;
             [SerializeField] private GameObject _checkoutButtonPrefab;
+
+            [SerializeField] private Text _priceText;
+
+            private List<AssetsStoreData> _checkoutItems = new List<AssetsStoreData>();
+
+            private int _totalPrice;
 
             private void OnEnable()
             {
@@ -25,7 +32,30 @@ namespace PartyInc
             {
                 List<AssetsStoreData> checkoutAssets = Mng_CharacterEditorChoicesCache.Current.GetCart();
 
-                for(int i = 0; i < checkoutAssets.Count; i++)
+                InitializeItems(checkoutAssets);
+
+                _totalPrice = GetTotalPrice(checkoutAssets);
+
+                _priceText.text = _totalPrice.ToString();
+
+                _checkoutItems = checkoutAssets;
+            }
+
+            private int GetTotalPrice(List<AssetsStoreData> checkoutPrice)
+            {
+                int sum = 0;
+
+                foreach(AssetsStoreData asset in checkoutPrice)
+                {
+                    sum += asset.baseprice;
+                }
+
+                return sum;
+            }
+
+            private void InitializeItems(List<AssetsStoreData> checkoutAssets)
+            {
+                for (int i = 0; i < checkoutAssets.Count; i++)
                 {
                     AssetsStoreData assetData = checkoutAssets[i];
 

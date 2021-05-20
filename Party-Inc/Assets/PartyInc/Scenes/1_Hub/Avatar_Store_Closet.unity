@@ -22225,6 +22225,7 @@ MonoBehaviour:
   _scrollContent: {fileID: 1661360452}
   _checkoutButtonPrefab: {fileID: 5635796237215304456, guid: ec0192a9535ef4c01b4e60c90ae762b6,
     type: 3}
+  _priceText: {fileID: 500605484}
 --- !u!1 &882936204
 GameObject:
   m_ObjectHideFlags: 0

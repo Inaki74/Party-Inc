@@ -44,16 +44,22 @@ namespace PartyInc
 
             public void SetChosenStoreAssetId(string id, Enum_CharacterAssetTypes assetType)
             {
+                if (_storeCache == null) return;
+
                 _storeCache.ChosenAssets[(int)assetType] = id;
             }
 
             public void AddStoreAssetToCart(AssetsStoreData assetData)
             {
+                if (_storeCache == null) return;
+
                 _storeCache.SetAsset(assetData);
             }
 
             public void RemoveStoreAssetFromCart(AssetsStoreData assetData)
             {
+                if (_storeCache == null) return;
+
                 _storeCache.RemoveAsset(assetData);
             }
 

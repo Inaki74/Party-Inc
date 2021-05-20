@@ -91,6 +91,9 @@ namespace PartyInc
 
             public List<Data_CharacterAssetMetadata> GetVariationsOfAsset(string selectedAssetForType, Enum_CharacterAssetTypes type)
             {
+                if (_allAssetsMetadata[(int)type].Count == 0) return new List<Data_CharacterAssetMetadata>();
+
+                print("SELECTED ASSET FOR TYPE " + selectedAssetForType);
                 List<Data_CharacterAssetMetadata> variationsMetadata = new List<Data_CharacterAssetMetadata>();
                 Data_CharacterAssetMetadata theSelectedAsset = _allAssetsMetadata[(int)type].First(m => m.AssetId == selectedAssetForType);
 
@@ -191,10 +194,10 @@ namespace PartyInc
 
                 yield return new WaitUntil(() => Fb_FirebaseAuthenticateManager.Current.AuthInitialized);
 
+                InitializeAllAssetsMetadata();
+
                 if (Fb_FirebaseAuthenticateManager.Current.Auth.CurrentUser != null)
                 {
-                    InitializeAllAssetsMetadata();
-
                     yield return new WaitUntil(() => Fb_FirestoreSession.Current.SetupCompleted);
 
                     LoadBasicAssetsMetadata();

@@ -109,8 +109,14 @@ namespace PartyInc
                 }
 
                 Mng_CharacterEditorChoicesCache.Current.SetChosenStoreAssetId(assetData.AssetId, assetData.AssetType);
-                AssetsStoreData assetStoreData = Mng_CharacterEditorCache.Current.GetAssetStoreData(assetData.AssetId, (int)assetData.AssetType);
-                Mng_CharacterEditorChoicesCache.Current.AddStoreAssetToCart(assetStoreData);
+
+                bool isAVariation = assetData.AssetId.Contains(Mng_CharacterEditorCache.ASSET_NAME_SEPARATOR);
+
+                if (!isAVariation)
+                {
+                    AssetsStoreData assetStoreData = Mng_CharacterEditorCache.Current.GetAssetStoreData(assetData.AssetId, (int)assetData.AssetType);
+                    Mng_CharacterEditorChoicesCache.Current.AddStoreAssetToCart(assetStoreData);
+                }
             }
 
             protected override void Init()
