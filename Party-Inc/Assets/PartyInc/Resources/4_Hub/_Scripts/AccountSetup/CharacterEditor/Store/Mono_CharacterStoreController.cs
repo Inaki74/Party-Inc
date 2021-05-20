@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using System.Linq;
 
 namespace PartyInc
 {
@@ -55,10 +56,23 @@ namespace PartyInc
                             ActivateVariableCarousel(
                                 _assetButtonScrollView,
                                 10,
-                                Mng_CharacterEditorCache.Current.GetVariationsOfSelectedAsset(toggleSelected).ToArray());
+                                Mng_CharacterEditorCache.Current.GetVariationsOfAsset(Mng_CharacterEditorChoicesCache.Current.GetChosenStoreAssetId(toggleSelected), toggleSelected).ToArray());
                         }
                     }
                 }
+            }
+
+            protected override void TriggerChosenAsset(Enum_CharacterAssetTypes type)
+            {
+                print("TriggerChosenAsset");
+                if (_positionsEditor.activeInHierarchy)
+                {
+                    return;
+                }
+
+                string chosenAssetId = Mng_CharacterEditorChoicesCache.Current.GetChosenStoreAssetId(type);
+
+                TriggerChosenAsset(chosenAssetId);
             }
 
             protected override void TogglePlayableCarousel(Data_CharacterAssetMetadata[] metadataArray, Enum_CharacterAssetTypes toggleSelected)
@@ -76,8 +90,25 @@ namespace PartyInc
 
             protected override void OnToggleGetInfo(Data_CharacterAssetMetadata assetData)
             {
-                // This looks the same
-                base.OnToggleGetInfo(assetData);
+                // If the current asset chosen is a variation
+                // If the one im toggling is parent of the current chosen asset, dont change
+                string currentChosenAssetId = Mng_CharacterEditorChoicesCache.Current.GetChosenStoreAssetId(assetData.AssetType);
+
+                if (!string.IsNullOrEmpty(currentChosenAssetId))
+                {
+                    if (currentChosenAssetId.Contains(Mng_CharacterEditorCache.ASSET_NAME_SEPARATOR))
+                    {
+                        // Its a variation
+                        string[] splitCurrentChosenAssetId = currentChosenAssetId.Split(Mng_CharacterEditorCache.ASSET_NAME_SEPARATOR);
+                        if (splitCurrentChosenAssetId[0] == assetData.AssetId)
+                        {
+                            // The current chosen asset is a child of the triggered button
+                            return;
+                        }
+                    }
+                }
+
+                Mng_CharacterEditorChoicesCache.Current.SetChosenStoreAssetId(assetData.AssetId, assetData.AssetType);
             }
 
             protected override void Init()

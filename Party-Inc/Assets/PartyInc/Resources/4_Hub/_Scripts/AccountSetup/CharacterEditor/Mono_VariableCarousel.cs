@@ -216,12 +216,16 @@ namespace PartyInc
 
             public void UnstageCarousel()
             {
+                print("UnstageCarousel");
                 _carousel.localPosition = new Vector2(0f, _carousel.localPosition.y);
 
+                print(_placeIndicatorHolder.transform.childCount);
                 for(int i = 0; i < _placeIndicatorHolder.transform.childCount; i++)
                 {
-                    Destroy(_carousel.transform.GetChild(i).gameObject);
+                    print(i);
+                    
                     Destroy(_placeIndicatorHolder.transform.GetChild(i).gameObject);
+                    DestroyImmediate(_carousel.transform.GetChild(i).gameObject);
                 }
 
                 _carouselSpot = 0;
@@ -229,7 +233,6 @@ namespace PartyInc
                 _placeIndicators = null;
 
                 _swipe = false;
-                
             }
 
             private void CheckIfCarouselSwipe()

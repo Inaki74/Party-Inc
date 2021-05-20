@@ -19,7 +19,6 @@ namespace PartyInc
             {
                 base.InitializeButton(assetData, theTG, onToggle);
 
-
                 //_onHoldAction.OnHold = OnHoldButton;
 
                 _theToggle.onValueChanged.AddListener(delegate
@@ -52,6 +51,7 @@ namespace PartyInc
             {
                 if (!_theToggle.isOn)
                 {
+                    print(this.name + " says: TOGGLED OFFFF");
                     Mng_CharacterEditorChoicesCache.Current.RemoveStoreAssetFromCart(storeData);
                 }
             }
@@ -64,6 +64,7 @@ namespace PartyInc
             protected override void DestroyOverride()
             {
                 base.DestroyOverride();
+                _theToggle.onValueChanged.RemoveAllListeners();
             }
         }
     }

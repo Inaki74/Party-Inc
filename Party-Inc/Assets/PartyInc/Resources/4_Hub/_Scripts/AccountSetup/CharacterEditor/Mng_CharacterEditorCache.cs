@@ -89,10 +89,9 @@ namespace PartyInc
                 StartCoroutine(StartCache());
             }
 
-            public List<Data_CharacterAssetMetadata> GetVariationsOfSelectedAsset(Enum_CharacterAssetTypes type)
+            public List<Data_CharacterAssetMetadata> GetVariationsOfAsset(string selectedAssetForType, Enum_CharacterAssetTypes type)
             {
                 List<Data_CharacterAssetMetadata> variationsMetadata = new List<Data_CharacterAssetMetadata>();
-                string selectedAssetForType = Mng_CharacterEditorChoicesCache.Current.GetChosenAssetId(type);
                 Data_CharacterAssetMetadata theSelectedAsset = _allAssetsMetadata[(int)type].First(m => m.AssetId == selectedAssetForType);
 
                 if (!theSelectedAsset.IsVariation)
@@ -266,19 +265,31 @@ namespace PartyInc
 
             private void SetChosenAssetsToDefault()
             {
-                if (!FindObjectOfType<Mono_StoreClosetResolver>().EnteredStore)
-                {
-                    SetChosenAssetsCloset();
-                }
+                // These are the assets the character is wearing when entering the scene
+                SetChosenAssetsCloset();
+                SetChosenAssetsStore();
             }
 
             public void SetChosenAssetsCloset()
             {
                 for (int i = 0; i < _ownedAssets.Length; i++)
                 {
+                    // TODO: Change this to the characters equipped items.
                     if (_ownedAssets[i].Count > 0)
                     {
                         Mng_CharacterEditorChoicesCache.Current.ChooseAsset(_ownedAssets[i].First().AssetId, (Enum_CharacterAssetTypes)i);
+                    }
+                }
+            }
+
+            public void SetChosenAssetsStore()
+            {
+                for (int i = 0; i < _ownedAssets.Length; i++)
+                {
+                    // TODO: Change this to the characters equipped items.
+                    if (_ownedAssets[i].Count > 0)
+                    {
+                        Mng_CharacterEditorChoicesCache.Current.SetChosenStoreAssetId(_ownedAssets[i].First().AssetId, (Enum_CharacterAssetTypes)i);
                     }
                 }
             }

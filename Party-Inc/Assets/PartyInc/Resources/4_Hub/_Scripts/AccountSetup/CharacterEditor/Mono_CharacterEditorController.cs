@@ -118,45 +118,6 @@ namespace PartyInc
                 }
             }
 
-            protected void TriggerChosenAsset(Enum_CharacterAssetTypes type)
-            {
-                print("TriggerChosenAsset");
-                if (_positionsEditor.activeInHierarchy)
-                {
-                    return;
-                }
-
-                string chosenAssetId = Mng_CharacterEditorChoicesCache.Current.GetChosenAssetId(type);
-                
-                if (string.IsNullOrEmpty(chosenAssetId)) return;
-
-                List<Mono_AssetButtonHandler> theButtons = new List<Mono_AssetButtonHandler>();
-                foreach(GameObject assetScrollViewGO in _theVariableCarousel.CarouselElements)
-                {
-                    Mono_AssetScrollViewHandler theAssetScrollViewHandler = assetScrollViewGO.GetComponent<Mono_AssetScrollViewHandler>();
-                    foreach(Mono_AssetButtonHandler theButtonHandler in theAssetScrollViewHandler.Toggles)
-                    {
-                        theButtons.Add(theButtonHandler);
-                    }
-                }
-
-                // If the chosen asset id is a variation and the variation ISNT present, we need to find its parent here and trigger it.
-                if (chosenAssetId.Contains(Mng_CharacterEditorCache.ASSET_NAME_SEPARATOR) && !theButtons.Any(b => b.AssetData.AssetId == chosenAssetId))
-                {
-                    chosenAssetId = chosenAssetId.Split(Mng_CharacterEditorCache.ASSET_NAME_SEPARATOR)[0];
-                }
-
-                print(chosenAssetId);
-
-                Mono_AssetButtonHandler chosenButtonHandler = theButtons.FirstOrDefault(b => b.AssetData.AssetId == chosenAssetId);
-
-                if (chosenButtonHandler != null && !chosenButtonHandler.Equals(default(Mono_AssetButtonHandler)))
-                {
-                    print("AAAAAA");
-                    chosenButtonHandler.ToggleButton();
-                }
-            }
-
             protected void ActivateVariableCarousel(GameObject prefab, int amountElements, Data_CharacterAssetMetadata[] elements)
             {
                 print("ActivateCarousel");
@@ -197,6 +158,52 @@ namespace PartyInc
                 Outro();
             }
 
+            protected void TriggerChosenAsset(string chosenAssetIdEntry)
+            {
+                string chosenAssetId = chosenAssetIdEntry;
+
+                if (string.IsNullOrEmpty(chosenAssetId)) return;
+
+                List<Mono_AssetButtonHandler> theButtons = new List<Mono_AssetButtonHandler>();
+                foreach (GameObject assetScrollViewGO in _theVariableCarousel.CarouselElements)
+                {
+                    Mono_AssetScrollViewHandler theAssetScrollViewHandler = assetScrollViewGO.GetComponent<Mono_AssetScrollViewHandler>();
+                    foreach (Mono_AssetButtonHandler theButtonHandler in theAssetScrollViewHandler.Toggles)
+                    {
+                        theButtons.Add(theButtonHandler);
+                    }
+                }
+
+                // If the chosen asset id is a variation and the variation ISNT present, we need to find its parent here and trigger it.
+                if (chosenAssetId.Contains(Mng_CharacterEditorCache.ASSET_NAME_SEPARATOR) && !theButtons.Any(b => b.AssetData.AssetId == chosenAssetId))
+                {
+                    chosenAssetId = chosenAssetId.Split(Mng_CharacterEditorCache.ASSET_NAME_SEPARATOR)[0];
+                }
+
+                print(chosenAssetId);
+
+                Mono_AssetButtonHandler chosenButtonHandler = theButtons.FirstOrDefault(b => b.AssetData.AssetId == chosenAssetId);
+
+                if (chosenButtonHandler != null && !chosenButtonHandler.Equals(default(Mono_AssetButtonHandler)))
+                {
+                    print("AAAAAA");
+                    chosenButtonHandler.ToggleButton();
+                }
+            }
+
+            protected virtual void TriggerChosenAsset(Enum_CharacterAssetTypes type)
+            {
+                print("TriggerChosenAsset");
+                if (_positionsEditor.activeInHierarchy)
+                {
+                    return;
+                }
+
+                string chosenAssetId = Mng_CharacterEditorChoicesCache.Current.GetChosenAssetId(type);
+
+                TriggerChosenAsset(chosenAssetId);
+            }
+
             protected virtual void TogglePlayableCarousel(Data_CharacterAssetMetadata[] metadataArray, Enum_CharacterAssetTypes toggleSelected)
             {
                 if (metadataArray.Length > 0)
@@ -229,7 +236,7 @@ namespace PartyInc
 
             protected virtual void IdentifyToggledOptionsAndLoadCarousel(Toggle[] toggles, Enum_CharacterAssetTypes toggleSelected)
             {
-                print("IdentifyToggledOptionsAndLoadCarousel");
+                print("EditorController IdentifyToggledOptionsAndLoadCarousel");
 
                 for (int i = 0; i < toggles.Length; i++)
                 {
@@ -251,7 +258,7 @@ namespace PartyInc
                             ActivateVariableCarousel(
                                 _assetButtonScrollView,
                                 15,
-                                Mng_CharacterEditorCache.Current.GetVariationsOfSelectedAsset(toggleSelected).ToArray());
+                                Mng_CharacterEditorCache.Current.GetVariationsOfAsset(Mng_CharacterEditorChoicesCache.Current.GetChosenAssetId(toggleSelected), toggleSelected).ToArray());
                         }
                         else
                         {

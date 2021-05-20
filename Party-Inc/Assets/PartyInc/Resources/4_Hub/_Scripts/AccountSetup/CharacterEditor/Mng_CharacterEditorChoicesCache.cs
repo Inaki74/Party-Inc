@@ -27,20 +27,37 @@ namespace PartyInc
                 }
             }
 
-            public AssetsStoreData[] GetChosenStoreAssets()
+            /// <summary>
+            /// STORE
+            /// </summary>
+            /// <returns></returns>
+
+            public AssetsStoreData[] GetCart()
             {
-                return _storeCache.ChosenAssets;
+                return _storeCache.Cart;
+            }
+
+            public string GetChosenStoreAssetId(Enum_CharacterAssetTypes assetType)
+            {
+                return _storeCache.ChosenAssets[(int)assetType];
+            }
+
+            public void SetChosenStoreAssetId(string id, Enum_CharacterAssetTypes assetType)
+            {
+                _storeCache.ChosenAssets[(int)assetType] = id;
             }
 
             public void AddStoreAssetToCart(AssetsStoreData assetData)
             {
-                _storeCache.AddAsset(assetData);
+                _storeCache.SetAsset(assetData);
             }
 
             public void RemoveStoreAssetFromCart(AssetsStoreData assetData)
             {
                 _storeCache.RemoveAsset(assetData);
             }
+
+            /////////////
 
             public string GetChosenAssetId(Enum_CharacterAssetTypes assetType)
             {

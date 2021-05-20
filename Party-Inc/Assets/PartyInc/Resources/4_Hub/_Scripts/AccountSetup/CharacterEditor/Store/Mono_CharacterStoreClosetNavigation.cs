@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace PartyInc
 {
@@ -8,6 +9,9 @@ namespace PartyInc
     {
         public class Mono_CharacterStoreClosetNavigation : MonoBehaviour
         {
+            [SerializeField] private Toggle[] _closetToggles = new Toggle[5];
+            [SerializeField] private Toggle[] _storeToggles = new Toggle[5];
+
             [SerializeField] private GameObject[] _closetPages;
             [SerializeField] private GameObject[] _storePages;
             [SerializeField] private GameObject _loading;
@@ -61,24 +65,36 @@ namespace PartyInc
 
             public void OnStorePageToggle(int pageType)
             {
-                _storePages[_lastStorePage].SetActive(false);
-                _lastStorePage = pageType;
-                _storePages[pageType].SetActive(true);
+                print("OnStorePageToggle " + pageType);
 
-                onStoreChangePage?.Invoke((Enum_CharacterEditorPages)pageType);
+                if (_storeToggles[pageType-1].isOn)
+                {
+                    _storePages[_lastStorePage].SetActive(false);
+                    _lastStorePage = pageType;
+                    _storePages[pageType].SetActive(true);
+
+                    onStoreChangePage?.Invoke((Enum_CharacterEditorPages)pageType);
+                }
             }
 
             public void OnClosetPageToggle(int pageType)
             {
-                _closetPages[_lastClosetPage].SetActive(false);
-                _lastClosetPage = pageType;
-                _closetPages[pageType].SetActive(true);
+                print("OnStorePageToggle " + pageType);
 
-                onClosetChangePage?.Invoke((Enum_CharacterEditorPages)pageType);
+                if (_closetToggles[pageType - 1].isOn)
+                {
+                    _closetPages[_lastClosetPage].SetActive(false);
+                    _lastClosetPage = pageType;
+                    _closetPages[pageType].SetActive(true);
+
+                    onClosetChangePage?.Invoke((Enum_CharacterEditorPages)pageType);
+                }
             }
 
             public void OnClosetStoreSwitch(bool toStore)
             {
+                print("OnCLosetStoreSwitch " + toStore);
+
                 if (toStore)
                 {
                     onStoreChangePage?.Invoke((Enum_CharacterEditorPages)_lastStorePage);

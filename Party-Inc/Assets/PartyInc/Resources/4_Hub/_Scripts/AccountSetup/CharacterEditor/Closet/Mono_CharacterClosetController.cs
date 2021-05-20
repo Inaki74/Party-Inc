@@ -12,7 +12,7 @@ namespace PartyInc
             protected override void IdentifyToggledOptionsAndLoadCarousel(Toggle[] toggles, Enum_CharacterAssetTypes toggleSelected)
             {
                 // TODO: If you dont do anything else with this, please switch to an overridable property thanks.
-                print("IdentifyToggledOptionsAndLoadCarousel");
+                print("ClosetController IdentifyToggledOptionsAndLoadCarousel");
 
                 for (int i = 0; i < toggles.Length; i++)
                 {
@@ -34,7 +34,7 @@ namespace PartyInc
                             ActivateVariableCarousel(
                                 _assetButtonScrollView,
                                 10,
-                                Mng_CharacterEditorCache.Current.GetVariationsOfSelectedAsset(toggleSelected).ToArray());
+                                Mng_CharacterEditorCache.Current.GetVariationsOfAsset(Mng_CharacterEditorChoicesCache.Current.GetChosenAssetId(toggleSelected), toggleSelected).ToArray());
                         }
                         else
                         {

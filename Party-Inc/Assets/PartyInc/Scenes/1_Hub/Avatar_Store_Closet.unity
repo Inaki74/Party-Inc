@@ -49179,6 +49179,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4ee0d5248f9ae4d69b56516e008ef9dc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _closetToggles:
+  - {fileID: 398932465}
+  - {fileID: 631326622}
+  - {fileID: 1068596829}
+  - {fileID: 897040943}
+  - {fileID: 1030841351}
+  _storeToggles:
+  - {fileID: 0}
+  - {fileID: 1723270545}
+  - {fileID: 1894602431}
+  - {fileID: 300408371}
+  - {fileID: 1801152751}
   _closetPages:
   - {fileID: 0}
   - {fileID: 1557521537}

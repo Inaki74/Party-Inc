@@ -9,8 +9,21 @@ namespace PartyInc
     {
         public class Mono_CharacterStoreChoicesCache : MonoBehaviour
         {
-            private AssetsStoreData[] _chosenAssets = new AssetsStoreData[16];
-            public AssetsStoreData[] ChosenAssets
+            private AssetsStoreData[] _cart = new AssetsStoreData[16];
+            public AssetsStoreData[] Cart
+            {
+                get
+                {
+                    return _cart;
+                }
+                set
+                {
+                    _cart = value;
+                }
+            }
+
+            private string[] _chosenAssets = new string[16];
+            public string[] ChosenAssets
             {
                 get
                 {
@@ -28,9 +41,14 @@ namespace PartyInc
             // Start is called before the first frame update
             void Start()
             {
-                for(int i = 0; i < _chosenAssets.Length; i++)
+                for(int i = 0; i < _cart.Length; i++)
                 {
-                    _chosenAssets[i] = default;
+                    _cart[i] = default;
+                }
+
+                for (int i = 0; i < _chosenAssets.Length; i++)
+                {
+                    _chosenAssets[i] = null;
                 }
             }
 
@@ -40,20 +58,22 @@ namespace PartyInc
 
             }
 
-            public void AddAsset(AssetsStoreData assetData)
+            public void SetAsset(AssetsStoreData assetData)
             {
-                _chosenAssets[(int)assetData.assettype] = assetData;
+                _cart[(int)assetData.assettype] = assetData;
+                _chosenAssets[(int)assetData.assettype] = assetData.assetid;
 
-                int nonDefaultItems = CountNonDefaultItems(_chosenAssets);
+                int nonDefaultItems = CountNonDefaultItems(_cart);
 
                 onChosenAssetListModified?.Invoke(nonDefaultItems);
             }
 
             public void RemoveAsset(AssetsStoreData assetData)
             {
-                _chosenAssets[(int) assetData.assettype] = default;
+                _cart[(int) assetData.assettype] = default;
+                _chosenAssets[(int)assetData.assettype] = Mng_CharacterEditorChoicesCache.Current.GetChosenAssetId(assetData.assettype);
 
-                int nonDefaultItems = CountNonDefaultItems(_chosenAssets);
+                int nonDefaultItems = CountNonDefaultItems(_cart);
 
                 onChosenAssetListModified?.Invoke(nonDefaultItems);
             }
