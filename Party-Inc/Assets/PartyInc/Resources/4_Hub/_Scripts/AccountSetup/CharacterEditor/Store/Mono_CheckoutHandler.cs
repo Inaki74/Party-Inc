@@ -23,9 +23,9 @@ namespace PartyInc
 
             private void InitializeCheckoutScreen()
             {
-                AssetsStoreData[] checkoutAssets = Mng_CharacterEditorChoicesCache.Current.GetCart();
+                List<AssetsStoreData> checkoutAssets = Mng_CharacterEditorChoicesCache.Current.GetCart();
 
-                for(int i = 0; i < checkoutAssets.Length; i++)
+                for(int i = 0; i < checkoutAssets.Count; i++)
                 {
                     AssetsStoreData assetData = checkoutAssets[i];
 

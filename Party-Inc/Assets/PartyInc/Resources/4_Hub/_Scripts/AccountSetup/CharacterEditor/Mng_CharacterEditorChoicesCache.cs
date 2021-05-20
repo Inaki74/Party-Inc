@@ -32,9 +32,9 @@ namespace PartyInc
             /// </summary>
             /// <returns></returns>
 
-            public AssetsStoreData[] GetCart()
+            public List<AssetsStoreData> GetCart()
             {
-                return _storeCache.Cart;
+                return _storeCache.GetCartWithoutDefaults();
             }
 
             public string GetChosenStoreAssetId(Enum_CharacterAssetTypes assetType)

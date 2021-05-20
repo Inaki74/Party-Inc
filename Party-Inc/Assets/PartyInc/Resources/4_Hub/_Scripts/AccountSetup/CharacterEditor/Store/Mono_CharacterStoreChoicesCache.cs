@@ -58,8 +58,25 @@ namespace PartyInc
 
             }
 
+            public List<AssetsStoreData> GetCartWithoutDefaults()
+            {
+                List<AssetsStoreData> result = new List<AssetsStoreData>();
+
+                foreach (AssetsStoreData asset in _cart)
+                {
+                    if (!asset.Equals(default(AssetsStoreData)))
+                    {
+                        result.Add(asset);
+                    }
+                }
+
+                return result;
+            }
+
             public void SetAsset(AssetsStoreData assetData)
             {
+                print(assetData);
+
                 _cart[(int)assetData.assettype] = assetData;
                 _chosenAssets[(int)assetData.assettype] = assetData.assetid;
 

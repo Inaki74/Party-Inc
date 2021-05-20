@@ -25,6 +25,11 @@ namespace PartyInc
                 AssetsStoreData outsider = (AssetsStoreData)obj;
                 return this.assetid == outsider.assetid;
             }
+
+            public override string ToString()
+            {
+                return storename + " " + assetid;
+            }
         }
 
         public enum Enum_AssetRarities
