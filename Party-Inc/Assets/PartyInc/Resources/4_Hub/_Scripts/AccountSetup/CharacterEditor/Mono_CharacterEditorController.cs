@@ -36,6 +36,7 @@ namespace PartyInc
             [SerializeField] protected GameObject _searchModalScreen;
             [SerializeField] protected GameObject _sortModalScreen;
 
+            private Enum_CharacterEditorPages _lastPage;
 
             // Start is called before the first frame update
             void Start()
@@ -67,6 +68,8 @@ namespace PartyInc
             protected void OnPageChange(Enum_CharacterEditorPages thePage)
             {
                 print("OnPageChange");
+
+                _lastPage = thePage;
 
                 if (_variableCarousel.activeInHierarchy)
                     _variableCarousel.SetActive(false);
@@ -220,11 +223,13 @@ namespace PartyInc
             protected virtual void Init()
             {
                 Mono_CharacterEditorNavigation.onChangePage += OnPageChange;
+                Mng_Reloader.onReload += ReloadPage;
             }
 
             protected virtual void Outro()
             {
                 Mono_CharacterEditorNavigation.onChangePage -= OnPageChange;
+                Mng_Reloader.onReload -= ReloadPage;
             }
 
             protected virtual void IdentifyToggledOptionsAndLoadPlayableCarousel(Enum_CharacterAssetTypes toggled)
@@ -308,6 +313,11 @@ namespace PartyInc
                 }
             }
 
+            public void ReloadPage()
+            {
+                OnPageChange(_lastPage);
+            }
+
             public void BtnOpenSearchModal()
             {
                 _searchModalScreen.SetActive(true);
@@ -319,7 +329,6 @@ namespace PartyInc
             }
 
             protected int _optionCounter = 0;
-
 
             public void OnOptionToggle(int pageToggle)
             {

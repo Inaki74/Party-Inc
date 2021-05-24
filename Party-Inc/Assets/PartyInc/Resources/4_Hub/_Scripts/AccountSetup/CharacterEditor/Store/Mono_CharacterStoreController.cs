@@ -24,7 +24,7 @@ namespace PartyInc
 
             protected override void IdentifyToggledOptionsAndLoadPlayableCarousel(Enum_CharacterAssetTypes toggled)
             {
-                Data_CharacterAssetMetadata[] metadataArray = Mng_CharacterEditorCache.Current.GetParentsDisplayAssetsMetadata((int)toggled).ToArray();
+                Data_CharacterAssetMetadata[] metadataArray = Mng_CharacterEditorCache.Current.GetParentsStoreAssetsMetadataOfAssetType((int)toggled).ToArray();
 
                 TogglePlayableCarousel(metadataArray, toggled);
             }
@@ -46,7 +46,7 @@ namespace PartyInc
                             ActivateVariableCarousel(
                                 _storeAssetButtonScrollView,
                                 10,
-                                Mng_CharacterEditorCache.Current.GetParentsDisplayAssetsMetadata((int)toggleSelected).ToArray());
+                                Mng_CharacterEditorCache.Current.GetParentsStoreAssetsMetadataOfAssetType((int)toggleSelected).ToArray());
                         }
                         else if (i == 1)
                         {

@@ -29,6 +29,8 @@ namespace PartyInc
             // Emote assets populate numbers 9 - 14
             // Tune assets populate the number 15
             // Face assets populate numbers 16 - 23 (last since they are not buyable)
+            public AssetFilterSettings CurrentFilter { get; set; }
+
             [SerializeField] private Mono_CharacterStoreCache _storeCache;
             private List<Data_CharacterAssetMetadata>[] _storeDisplayAssetsMetadata = new List<Data_CharacterAssetMetadata>[24];
 
@@ -67,6 +69,8 @@ namespace PartyInc
                         _storeDisplayAssetsMetadata[i] = new List<Data_CharacterAssetMetadata>();
                     }
                 }
+
+                CurrentFilter = new AssetFilterSettings("", false, false, false, false, 0, 0);
             }
 
             private void InitializeAllAssetsMetadata()
@@ -143,6 +147,25 @@ namespace PartyInc
                     }
                 }
 
+                listWithoutVariations = Stt_AssetFilterer.FilterAssets(listWithoutVariations, CurrentFilter);
+
+                return listWithoutVariations;
+            }
+
+            public List<Data_CharacterAssetMetadata> GetParentsStoreAssetsMetadataOfAssetType(int type)
+            {
+                List<Data_CharacterAssetMetadata> listWithoutVariations = new List<Data_CharacterAssetMetadata>();
+
+                foreach (Data_CharacterAssetMetadata metadata in _storeDisplayAssetsMetadata[type])
+                {
+                    if (!metadata.IsVariation)
+                    {
+                        listWithoutVariations.Add(metadata);
+                    }
+                }
+
+                listWithoutVariations = Stt_AssetFilterer.FilterAssets(listWithoutVariations, CurrentFilter);
+
                 return listWithoutVariations;
             }
 
@@ -159,21 +182,6 @@ namespace PartyInc
                         _storeDisplayAssetsMetadata[type].Add(variation);
                     }
                 }
-            }
-
-            public List<Data_CharacterAssetMetadata> GetParentsDisplayAssetsMetadata(int type)
-            {
-                List<Data_CharacterAssetMetadata> listWithoutVariations = new List<Data_CharacterAssetMetadata>();
-
-                foreach (Data_CharacterAssetMetadata metadata in _storeDisplayAssetsMetadata[type])
-                {
-                    if (!metadata.IsVariation)
-                    {
-                        listWithoutVariations.Add(metadata);
-                    }
-                }
-
-                return listWithoutVariations;
             }
 
             public AssetsStoreData GetAssetStoreData(string assetId, int assetType)
