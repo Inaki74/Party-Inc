@@ -121,12 +121,16 @@ namespace PartyInc
 
             protected override void Init()
             {
+                base.Init();
+
                 Mono_CharacterStoreClosetNavigation.onStoreChangePage += OnPageChange;
                 Mono_CharacterStoreChoicesCache.onChosenAssetListModified += UpdateCheckoutIndicator;
             }
 
             protected override void Outro()
             {
+                base.Init();
+
                 Mono_CharacterStoreClosetNavigation.onStoreChangePage -= OnPageChange;
                 Mono_CharacterStoreChoicesCache.onChosenAssetListModified -= UpdateCheckoutIndicator;
             }

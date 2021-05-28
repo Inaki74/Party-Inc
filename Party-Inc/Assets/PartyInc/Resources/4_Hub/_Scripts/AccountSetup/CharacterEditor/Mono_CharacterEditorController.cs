@@ -68,6 +68,7 @@ namespace PartyInc
             protected void OnPageChange(Enum_CharacterEditorPages thePage)
             {
                 print("OnPageChange");
+                print(thePage);
 
                 _lastPage = thePage;
 
@@ -153,6 +154,7 @@ namespace PartyInc
 
             private void Awake()
             {
+                print("AWAKEEEEEEEEEEEEEEEEEEEEEEEEEEEE#############");
                 Init();
             }
 
@@ -222,6 +224,7 @@ namespace PartyInc
 
             protected virtual void Init()
             {
+                print("ASDASDASDASDASDASDASDASDASDASDASDASD" + name);
                 Mono_CharacterEditorNavigation.onChangePage += OnPageChange;
                 Mng_Reloader.onReload += ReloadPage;
             }
@@ -315,6 +318,7 @@ namespace PartyInc
 
             public void ReloadPage()
             {
+                print(_lastPage + " " + name);
                 OnPageChange(_lastPage);
             }
 

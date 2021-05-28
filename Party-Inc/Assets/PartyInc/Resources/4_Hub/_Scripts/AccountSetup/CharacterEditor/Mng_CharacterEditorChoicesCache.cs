@@ -44,7 +44,7 @@ namespace PartyInc
 
             public void SetChosenStoreAssetId(string id, Enum_CharacterAssetTypes assetType)
             {
-                if (_storeCache == null) return;
+                if (_storeCache == null || (int)assetType > 15) return;
 
                 _storeCache.ChosenAssets[(int)assetType] = id;
             }

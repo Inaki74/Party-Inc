@@ -30,9 +30,11 @@ namespace PartyInc
                     return assets;
                 }
 
-                List<Data_CharacterAssetMetadata> result = assets;
 
-                foreach(Data_CharacterAssetMetadata asset in result)
+                List<Data_CharacterAssetMetadata> result = assets;
+                List<Data_CharacterAssetMetadata> aux = assets.ToList();
+
+                foreach (Data_CharacterAssetMetadata asset in aux)
                 {
                     AssetsStoreData assetData = Mng_CharacterEditorCache.Current.GetAssetStoreData(asset.AssetId, (int)asset.AssetType);
 

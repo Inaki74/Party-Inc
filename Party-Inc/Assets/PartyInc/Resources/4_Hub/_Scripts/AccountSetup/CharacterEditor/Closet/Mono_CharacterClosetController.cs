@@ -66,15 +66,17 @@ namespace PartyInc
 
             protected override void Init()
             {
+                base.Init();
+
                 Mono_CharacterStoreClosetNavigation.onClosetChangePage += OnPageChange;
             }
 
             protected override void Outro()
             {
+                base.Init();
+
                 Mono_CharacterStoreClosetNavigation.onClosetChangePage -= OnPageChange;
             }
-
-            
         }
     }
 }

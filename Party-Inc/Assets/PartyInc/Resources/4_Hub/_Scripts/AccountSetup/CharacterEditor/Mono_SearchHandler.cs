@@ -11,11 +11,8 @@ namespace PartyInc
         {
             [SerializeField] private Mono_ModalScreen _searchModal;
             [SerializeField] private Text _searchTextBox;
-            [SerializeField] private Button _searchButton;
-            [SerializeField] private Image _searchButtonImage;
-
-            [SerializeField] private Sprite _startSearch;
-            [SerializeField] private Sprite _cancelSearch;
+            [SerializeField] private GameObject _searchButtonGO;
+            [SerializeField] private GameObject _cancelSearchButtonGO;
 
             private string _nameToSearch;
 
@@ -27,7 +24,8 @@ namespace PartyInc
 
                 _searchModal.OnCloseModal();
 
-                _searchButtonImage.sprite = _cancelSearch;
+                _searchButtonGO.SetActive(false);
+                _cancelSearchButtonGO.SetActive(true);
 
                 Mng_Reloader.Current.Reload();
             }
@@ -38,7 +36,8 @@ namespace PartyInc
                 aux.name = "";
                 Mng_CharacterEditorCache.Current.CurrentFilter = aux;
 
-                _searchButtonImage.sprite = _startSearch;
+                _searchButtonGO.SetActive(true);
+                _cancelSearchButtonGO.SetActive(false);
 
                 Mng_Reloader.Current.Reload();
             }
