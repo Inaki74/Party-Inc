@@ -180,6 +180,7 @@ namespace PartyInc
 
             public void Setup()
             {
+                Debug.Log("Getting player data");
                 Fb_FirestoreManager.Current.Get(Fb_FirestoreManager.Current.Players, Auth.Fb_FirebaseAuthenticateManager.Current.Auth.CurrentUser.UserId, res =>
                 {
                     if (res.success)

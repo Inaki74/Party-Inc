@@ -58,7 +58,7 @@ namespace PartyInc
                 }
             }
 
-            if (isInActiveScene && (Screen.orientation == ScreenOrientation.Landscape || Screen.autorotateToLandscapeLeft || Screen.autorotateToLandscapeRight))
+            if (isInActiveScene && (Screen.orientation == ScreenOrientation.LandscapeLeft || Screen.autorotateToLandscapeLeft || Screen.autorotateToLandscapeRight))
             {
                 Screen.orientation = ScreenOrientation.Portrait;
                 Screen.autorotateToLandscapeLeft = false;

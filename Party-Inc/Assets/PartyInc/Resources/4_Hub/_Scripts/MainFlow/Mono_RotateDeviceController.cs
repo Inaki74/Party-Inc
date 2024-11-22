@@ -25,7 +25,7 @@ namespace PartyInc
                 {
                     _runOnce = true;
                     Screen.autorotateToPortrait = false;
-                    Screen.orientation = ScreenOrientation.Landscape;
+                    Screen.orientation = ScreenOrientation.LandscapeLeft;
                 }
 
                 _waitTime += Time.deltaTime;

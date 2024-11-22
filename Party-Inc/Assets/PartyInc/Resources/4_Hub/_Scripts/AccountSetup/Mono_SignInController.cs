@@ -81,6 +81,7 @@ namespace PartyInc
             {
                 Fb_FirestoreSession.Current.Setup();
 
+                
                 yield return new WaitUntil(() => Fb_FirestoreSession.Current.SetupCompleted);
 
                 yield return new WaitUntil(() => Mng_PhotonManager.Current.PhotonAuthComplete);

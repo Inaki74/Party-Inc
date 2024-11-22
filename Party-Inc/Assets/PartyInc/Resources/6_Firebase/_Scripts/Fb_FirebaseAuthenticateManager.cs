@@ -90,8 +90,8 @@ namespace PartyInc
                         Debug.Log("User with email: " + _auth.CurrentUser.Email + " logged in!");
 
                         result.success = true;
-                        result.uid = task.Result.UserId;
-                        result.username = task.Result.DisplayName;
+                        result.uid = task.Result.User.UserId;
+                        result.username = task.Result.User.DisplayName;
 
                         Callback(result);
                         return;
@@ -167,7 +167,7 @@ namespace PartyInc
                                 Debug.Log("Username set!");
 
                                 result.success = true;
-                                result.uid = task.Result.UserId;
+                                result.uid = task.Result.User.UserId;
                                 result.username = username;
 
                                 Callback(result);
